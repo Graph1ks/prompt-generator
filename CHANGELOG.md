@@ -21,6 +21,9 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Added bundled instrument/lexicon mining reports with curation-aware filtering, instrument segment/head-token evidence, section-aware term/phrase evidence, source examples, full CSV exports, automatic local curation backup, and concise terminal output.
 - Added reviewed knowledge decision bundles and transactional knowledge apply/recompile/validate/rollback tooling for instrument families, canonical instruments, aliases, dictionary concepts, definitions, and context definitions.
 - Strengthened knowledge-mining reports with semantic curation fingerprints and phrase-noise suppression for instrument-list adjacency, Key/Mode literals, connector boundaries, and common grammar scaffolding.
+- Added instrument ontology v2 decision bundles with scoped report binding, aliases for existing instruments, durable instrument traits, and transactional Advanced parameter/option authoring.
+- Added semantic Instruments decomposition reports that distinguish fully-semantic coverage from explicit instrument-identity coverage.
+- Changed the Instruments mining queue from raw-string prioritization to semantic-residual prioritization so already-explained compound phrases no longer require manual review.
 
 ### Changed
 
