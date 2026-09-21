@@ -16,7 +16,7 @@ Prompt V'gine is designed around:
 - Easy mode with curated musical statements;
 - Advanced mode with granular controls and custom text;
 - a shared semantic MusicSpec beneath both modes;
-- site-wide inline explanations for genres, instruments, production terms, descriptors, and generated prompt language;
+- site-wide inline explanations for genres, instruments, full instrument playing/processing expressions, production terms, descriptors, and generated prompt language;
 - source-compatible structured prompt output such as `[Genre: ...]`, `[BPM: ...]`, `[Groove: ...]`;
 - separate comma-delimited Exclude output;
 - local/offline-first data and zero required paid services.
@@ -41,7 +41,7 @@ Then build or resume with the same sources:
 py scripts\data\build_local_data.py --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json" --out-dir ".local-data\current"
 ```
 
-The build is checkpointed and resumable; ordinary reruns resume safely. It creates/adopts local `corpus.sqlite`, preserves durable `curation.sqlite`, compiles `knowledge.sqlite`, and keeps incomplete work isolated until validation/promotion.
+The build is checkpointed and resumable; ordinary reruns resume safely. It creates/adopts local `corpus.sqlite`, preserves durable `curation.sqlite`, compiles `knowledge.sqlite`, materializes every source Instruments expression as a selectable knowledge row, and keeps incomplete work isolated until validation/promotion.
 
 Then validate/inspect it:
 
@@ -50,6 +50,8 @@ python scripts/data/query_corpus.py --db .local-data/current/corpus.sqlite term 
 python scripts/data/query_corpus.py --db .local-data/current/corpus.sqlite section drums
 python scripts/data/query_corpus.py --db .local-data/current/corpus.sqlite unmatched-genres
 python scripts/data/query_curation.py --db .local-data/current/curation.sqlite queue --type genre_crosswalk
+python scripts/data/query_knowledge.py --db .local-data/current/knowledge.sqlite stats
+python scripts/data/query_knowledge.py --db .local-data/current/knowledge.sqlite expression "clean electric guitar"
 python scripts/data/validate_local_data.py --dir .local-data/current
 ```
 
@@ -71,7 +73,8 @@ The initial architecture was validated against the project-provided snapshot con
 - 115,736 parsed structured prompt sections;
 - 852,459 structured-prompt tokens;
 - 24 Major Genres;
-- 1,564 taxonomy genres/subgenres.
+- 1,564 taxonomy genres/subgenres;
+- 6,035 unique source-backed Instruments expressions in the current Factory snapshot.
 
 The database itself is not committed. Aggregate architecture findings are recorded in `docs/PROMPT_CORPUS_PROFILE.md`.
 
