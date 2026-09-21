@@ -2,7 +2,7 @@
 
 Prompt V'gine source factories, generated databases, checkpoints, reports, and curation backups are **local-only**. GitHub contains only reproducible schemas/tools/docs/tests.
 
-The local build follows the same long-job safety standard used by RhymeLab: visible progress, persisted checkpoints, ordinary-rerun resume, source/build fingerprint binding, validation before promotion, and no implicit destruction of the last known-good data.
+The local build follows the same long-job safety standard used by RhymeLab: visible progress, persisted checkpoints, ordinary-rerun resume, source/build fingerprint binding, validation before promotion, and no implicit destruction of the last known-good data.\n\n**Database V1 is complete for the current Factory snapshot.** The commands below remain the canonical maintenance/update workflow. The table-by-table database map and completion boundary are in `docs/DATABASE_V1.md`.
 
 ## Windows 11 / PowerShell — owner path
 
@@ -68,9 +68,9 @@ Primary acceptance report:
 
 Do not paste detailed build/mining output into chat unless that acceptance phase fails.
 
-### Acceptance-gated semantic completion — next database phase
+### Acceptance-gated semantic completion — completed for current snapshot
 
-Only after the acceptance report above says `status: ok`, prepare the next large semantic-review phase with one command:
+For future Factory snapshots with new residual semantics, or for forensic regeneration, this read-only planner remains available after acceptance:
 
 ```powershell
 py scripts\\data\\knowledge_completion_session.py prepare --out-dir ".local-data\\current" --batch-size 250
@@ -93,7 +93,7 @@ Crucially, this phase does not modify `curation.sqlite` and does not alter produ
 
 The plan records a SHA-256 for every generated batch. The generated v2 decision-bundle template is itself bound to the exact completion-plan SHA through `report_sha256.completion_plan`, so reviewed semantic decisions cannot silently drift to another completion snapshot.
 
-Use the generated template as the starting point for reviewed additive decisions, apply it through `knowledge_curation_session.py`, then regenerate the completion plan for the next coherent batch.
+For the current completed V1 snapshot, the semantic completion plan is terminal: 6,035 / 6,035 expressions are fully semantic, residual count is 0, and no review batches should be generated. Do **not** restart semantic curation merely because identity coverage is below 100%.
 
 
 ### 3. Status
