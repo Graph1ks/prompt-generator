@@ -17,7 +17,8 @@ Read in this order:
 7. `docs/PROMPT_FORMAT.md`
 8. `docs/RUNTIME_DATA_CONTRACT_V1.md`
 9. `docs/APPLICATION_ARCHITECTURE.md`
-10. `docs/LOCAL_DATA_BUILD.md` only when operating the local databases
+10. `docs/LOCAL_OUTPUT_LAYOUT.md` when operating local reports/logs
+11. `docs/LOCAL_DATA_BUILD.md` only when operating the local databases
 
 Owner workspace: `D:\prompt-engine`.
 
