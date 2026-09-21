@@ -309,7 +309,6 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
                 (
                     out
                     / "reports"
-                    / "knowledge-completion"
                     / "knowledge-completion-plan-v1.json"
                 ).read_text(encoding="utf-8")
             )
@@ -356,7 +355,6 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
                 (
                     out
                     / "reports"
-                    / "knowledge-completion"
                     / "knowledge-completion-plan-v1.json"
                 ).read_text(encoding="utf-8")
             )
@@ -387,7 +385,6 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
             plan_path = (
                 out
                 / "reports"
-                / "knowledge-completion"
                 / "knowledge-completion-plan-v1.json"
             )
             state = load_review_state(
