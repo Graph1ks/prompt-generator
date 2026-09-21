@@ -12,15 +12,55 @@ import type {
   RuntimeMajorGenre,
 } from "@vgine/runtime-data";
 import type { SearchIndex } from "@vgine/search";
-import { Button, Cluster, Stack, Text } from "@vgine/ui";
 
-const ROLE_LABELS: Readonly<Record<GenreInfluenceRole, string>> = {
-  foundation: "Foundation",
-  fusion: "Fusion",
-  accent: "Accent",
+import { Icon } from "./icons.js";
+
+const ROLE_META: Readonly<
+  Record<
+    GenreInfluenceRole,
+    { readonly label: string; readonly purpose: string; readonly number: string }
+  >
+> = {
+  foundation: {
+    label: "Foundation",
+    purpose: "Führt die musikalische Sprache.",
+    number: "01",
+  },
+  fusion: {
+    label: "Fusion",
+    purpose: "Bringt eine zweite Perspektive hinein.",
+    number: "02",
+  },
+  accent: {
+    label: "Accent",
+    purpose: "Färbt den Sound, ohne ihn zu übernehmen.",
+    number: "03",
+  },
 };
 
-const PAGE_SIZE = 48;
+const PAGE_SIZE = 12;
+const FEATURED_MAJOR_LABELS = new Set([
+  "Hip-Hop / Rap",
+  "Soul",
+  "Jazz",
+  "Electronic",
+  "Rock",
+  "Pop",
+  "Ambient / New Age",
+]);
+
+const FEATURED_GENRES = [
+  "Trip-Hop",
+  "Neo-Soul",
+  "Boom Bap",
+  "Lo-Fi Hip-Hop",
+  "Deep House",
+  "Dream Pop",
+  "Downtempo",
+  "Alternative R&B",
+  "Ambient",
+  "Synthpop",
+] as const;
 
 export interface GenrePickerProps {
   readonly runtime: RuntimeBootstrap;
@@ -31,7 +71,7 @@ export interface GenrePickerProps {
   readonly onSpecChange: (spec: MusicSpec) => void;
 }
 
-function genreForRole(
+function genreIdForRole(
   spec: MusicSpec | null,
   role: GenreInfluenceRole,
 ): string | null {
@@ -54,174 +94,276 @@ export function GenrePicker({
   const deferredQuery = useDeferredValue(query);
   const [majorId, setMajorId] = useState<string | null>(null);
   const [limit, setLimit] = useState(PAGE_SIZE);
+  const [showAllFamilies, setShowAllFamilies] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(spec === null);
 
   const genreById = useMemo(
     () => new Map(runtime.genres.genres.map((genre) => [genre.id, genre])),
+    [runtime.genres.genres],
+  );
+  const genreByLabel = useMemo(
+    () => new Map(runtime.genres.genres.map((genre) => [genre.label, genre])),
     [runtime.genres.genres],
   );
   const majorById = useMemo(
     () => new Map(runtime.core.major_genres.map((major) => [major.id, major])),
     [runtime.core.major_genres],
   );
-  const majorCounts = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const genre of runtime.genres.genres) {
-      for (const id of genre.major_genre_ids) {
-        counts.set(id, (counts.get(id) ?? 0) + 1);
-      }
-    }
-    return counts;
-  }, [runtime.genres.genres]);
 
   const orderedMajors = useMemo(
     () =>
       [...runtime.core.major_genres].sort(
-        (a, b) => a.source_ordinal - b.source_ordinal || a.label.localeCompare(b.label),
+        (a, b) =>
+          a.source_ordinal - b.source_ordinal || a.label.localeCompare(b.label),
       ),
     [runtime.core.major_genres],
   );
 
-  const matchingGenres = useMemo(() => {
+  const visibleMajors = useMemo(
+    () =>
+      showAllFamilies
+        ? orderedMajors
+        : orderedMajors.filter((major) => FEATURED_MAJOR_LABELS.has(major.label)),
+    [orderedMajors, showAllFamilies],
+  );
+
+  const allMatches = useMemo(() => {
     const normalizedQuery = deferredQuery.trim();
     if (normalizedQuery) {
       return searchIndex
-        .search({ query: normalizedQuery, kinds: ["genre"], limit: Math.min(limit, 500) })
+        .search({ query: normalizedQuery, kinds: ["genre"], limit: 500 })
         .map((result) => genreById.get(result.id))
         .filter((genre): genre is RuntimeGenre => genre !== undefined);
     }
+
     if (majorId) {
       return sortGenres(
         runtime.genres.genres.filter((genre) =>
           genre.major_genre_ids.includes(majorId),
         ),
-      ).slice(0, limit);
+      );
     }
-    return [];
-  }, [deferredQuery, genreById, limit, majorId, runtime.genres.genres, searchIndex]);
 
-  const totalForMajor =
-    majorId === null
-      ? 0
-      : runtime.genres.genres.filter((genre) =>
-          genre.major_genre_ids.includes(majorId),
-        ).length;
+    return FEATURED_GENRES.map((label) => genreByLabel.get(label)).filter(
+      (genre): genre is RuntimeGenre => genre !== undefined,
+    );
+  }, [
+    deferredQuery,
+    genreById,
+    genreByLabel,
+    majorId,
+    runtime.genres.genres,
+    searchIndex,
+  ]);
 
-  const canShowMore =
-    query.trim().length > 0
-      ? matchingGenres.length === limit && limit < 500
-      : majorId !== null && matchingGenres.length < totalForMajor;
+  const visibleGenres = allMatches.slice(0, limit);
+  const resultCountLabel =
+    deferredQuery.trim() && allMatches.length === 500
+      ? "500+"
+      : allMatches.length.toLocaleString();
 
   useEffect(() => {
     setLimit(PAGE_SIZE);
   }, [query, majorId]);
 
+  function openRole(role: GenreInfluenceRole) {
+    if (spec === null && role !== "foundation") return;
+    onRoleChange(role);
+    setPickerOpen(true);
+  }
+
   function selectGenre(genre: RuntimeGenre) {
     if (spec === null) {
       onSpecChange(createMusicSpec(genre.id));
       onRoleChange("foundation");
-      return;
+    } else {
+      onSpecChange(setGenreInfluence(spec, activeRole, genre.id));
     }
-    onSpecChange(setGenreInfluence(spec, activeRole, genre.id));
+    setPickerOpen(false);
+    setQuery("");
+    setMajorId(null);
   }
 
   function clearOptionalRole(role: "fusion" | "accent") {
     if (spec === null) return;
     onSpecChange(removeGenreInfluence(spec, role));
+    onRoleChange(role);
+    setPickerOpen(true);
+  }
+
+  function familyLabel(genre: RuntimeGenre): string {
+    return genre.major_genre_ids
+      .map((id) => majorById.get(id)?.label)
+      .filter((value): value is string => Boolean(value))
+      .slice(0, 2)
+      .join(" / ");
   }
 
   return (
-    <div className="genre-picker">
-      <div className="genre-role-grid" aria-label="Genre influence roles">
+    <>
+      <div className="genre-slots" aria-label="Genre influences">
         {(["foundation", "fusion", "accent"] as const).map((role) => {
-          const genreId = genreForRole(spec, role);
-          const selectedGenre = genreId ? genreById.get(genreId) : undefined;
+          const genreId = genreIdForRole(spec, role);
+          const genre = genreId ? genreById.get(genreId) : undefined;
+          const meta = ROLE_META[role];
           const disabled = spec === null && role !== "foundation";
-          return (
-            <div key={role} className="genre-role-slot" data-active={role === activeRole || undefined}>
+
+          if (!genre) {
+            return (
               <button
+                key={role}
                 type="button"
-                className="genre-role-button"
+                className="add-genre"
+                data-role={role}
                 disabled={disabled}
-                aria-pressed={role === activeRole}
-                onClick={() => onRoleChange(role)}
+                onClick={() => openRole(role)}
               >
-                <span>{ROLE_LABELS[role]}</span>
-                <strong>{selectedGenre?.label ?? (role === "foundation" ? "Required" : "Optional")}</strong>
+                <span className="plus">
+                  <Icon name="plus" />
+                </span>
+                <strong>
+                  {role === "foundation"
+                    ? "Foundation wählen"
+                    : role === "fusion"
+                      ? "Fusion hinzufügen"
+                      : "Accent hinzufügen"}
+                </strong>
+                <span>
+                  {role === "foundation"
+                    ? "Der Ausgangspunkt für deinen Sound."
+                    : role === "fusion"
+                      ? "Eine neue Perspektive."
+                      : "Ein kleines bisschen anders."}
+                </span>
               </button>
-              {role !== "foundation" && genreId && (
-                <button
-                  type="button"
-                  className="genre-role-clear"
-                  aria-label={"Clear " + ROLE_LABELS[role] + " genre"}
-                  onClick={() => clearOptionalRole(role)}
-                >
-                  ×
+            );
+          }
+
+          return (
+            <article
+              key={role}
+              className="genre-card"
+              data-role={role}
+              data-selected={pickerOpen && activeRole === role ? "" : undefined}
+            >
+              <div className="genre-card-role">
+                <span>
+                  {meta.number} / {meta.label}
+                </span>
+                <span className="genre-card-status">LIVE</span>
+              </div>
+              <div className="genre-art" aria-hidden="true" />
+              <h3>{genre.label}</h3>
+              <div className="genre-family">{familyLabel(genre)}</div>
+              <div className="genre-purpose">{meta.purpose}</div>
+              <div className="genre-actions">
+                <button type="button" onClick={() => openRole(role)}>
+                  Ändern <Icon name="arrow" />
                 </button>
-              )}
-            </div>
+                {role !== "foundation" && (
+                  <button
+                    type="button"
+                    className="genre-remove"
+                    aria-label={meta.label + " entfernen"}
+                    onClick={() => clearOptionalRole(role)}
+                  >
+                    <Icon name="close" />
+                  </button>
+                )}
+              </div>
+            </article>
           );
         })}
       </div>
 
-      <label className="genre-search">
-        <span className="sr-only">Search genres</span>
-        <input
-          type="search"
-          value={query}
-          placeholder={"Search " + runtime.genres.genres.length.toLocaleString() + " genres for " + ROLE_LABELS[activeRole] + "…"}
-          autoComplete="off"
-          onChange={(event) => setQuery(event.currentTarget.value)}
-        />
-        {query && (
-          <button
-            type="button"
-            aria-label="Clear genre search"
-            onClick={() => setQuery("")}
-          >
-            ×
-          </button>
-        )}
-      </label>
+      <div className="role-info">
+        <Icon name="info" />
+        <span>
+          Foundation führt. Fusion ergänzt. Accent färbt. Keine Prozentregler —
+          jede Rolle bleibt semantisch nachvollziehbar.
+        </span>
+      </div>
 
-      {!query.trim() && majorId === null ? (
-        <div className="major-genre-grid" aria-label="Major genres">
-          {orderedMajors.map((major: RuntimeMajorGenre) => (
+      {pickerOpen && (
+        <section className="genre-picker-panel" aria-label="Genre auswählen">
+          <div className="picker-top">
+            <div>
+              <h3>{ROLE_META[activeRole].label} wählen</h3>
+              <p>Major Genre oder Subgenre — beides funktioniert.</p>
+            </div>
             <button
-              key={major.id}
               type="button"
-              className="major-genre-card"
-              onClick={() => setMajorId(major.id)}
+              className="icon-btn"
+              aria-label="Genre-Auswahl schließen"
+              onClick={() => setPickerOpen(false)}
             >
-              <span>{major.label}</span>
-              <small>{majorCounts.get(major.id) ?? 0}</small>
+              <Icon name="close" />
             </button>
-          ))}
-        </div>
-      ) : (
-        <Stack gap="3">
-          <Cluster gap="2" className="genre-result-heading">
-            {majorId && !query.trim() && (
-              <>
-                <Button size="sm" tone="ghost" onClick={() => setMajorId(null)}>
-                  ← Majors
-                </Button>
-                <Text as="strong" size="sm">
-                  {majorById.get(majorId)?.label ?? "Genre"}
-                </Text>
-              </>
+          </div>
+
+          <label className="searchbox">
+            <Icon name="search" />
+            <span className="sr-only">Genres durchsuchen</span>
+            <input
+              type="search"
+              value={query}
+              autoComplete="off"
+              placeholder={
+                runtime.genres.genres.length.toLocaleString() +
+                " Genres & Subgenres durchsuchen …"
+              }
+              onChange={(event) => setQuery(event.currentTarget.value)}
+            />
+            {query ? (
+              <button
+                type="button"
+                className="search-clear"
+                aria-label="Suche leeren"
+                onClick={() => setQuery("")}
+              >
+                <Icon name="close" />
+              </button>
+            ) : (
+              <kbd>/</kbd>
             )}
-            {query.trim() && (
-              <Text as="small" tone="muted" size="xs">
-                SEARCH RESULTS
-              </Text>
-            )}
-            <Text as="small" tone="muted" size="xs">
-              {matchingGenres.length} shown
-            </Text>
-          </Cluster>
+          </label>
+
+          <div className="family-chips">
+            <button
+              type="button"
+              className={!majorId ? "chip selected" : "chip"}
+              onClick={() => setMajorId(null)}
+            >
+              Alle
+            </button>
+            {visibleMajors.map((major: RuntimeMajorGenre) => (
+              <button
+                key={major.id}
+                type="button"
+                className={majorId === major.id ? "chip selected" : "chip"}
+                onClick={() => setMajorId(major.id)}
+              >
+                {major.label}
+              </button>
+            ))}
+            <button
+              type="button"
+              className="chip"
+              onClick={() => setShowAllFamilies((current) => !current)}
+            >
+              {showAllFamilies ? "Weniger" : "Alle 24 Familien"}
+              <Icon name={showAllFamilies ? "back" : "plus"} />
+            </button>
+          </div>
+
+          <div className="result-meta">
+            {resultCountLabel} Treffer
+            {majorId ? " · " + (majorById.get(majorId)?.label ?? "") : ""}
+            {!query.trim() && !majorId ? " · kuratierter Einstieg" : ""}
+          </div>
 
           <div className="genre-results">
-            {matchingGenres.map((genre) => {
+            {visibleGenres.map((genre) => {
               const selectedRole = spec?.genre_influences.find(
                 (entry) => entry.genre_id === genre.id,
               )?.role;
@@ -229,42 +371,55 @@ export function GenrePicker({
                 <button
                   key={genre.id}
                   type="button"
-                  className="genre-result"
-                  data-selected={selectedRole || undefined}
+                  className={selectedRole ? "genre-result picked" : "genre-result"}
+                  disabled={Boolean(selectedRole)}
                   onClick={() => selectGenre(genre)}
                 >
-                  <span className="genre-result-copy">
-                    <strong>{genre.label}</strong>
-                    <small>
-                      {genre.major_genre_ids
-                        .map((id) => majorById.get(id)?.label)
-                        .filter(Boolean)
-                        .join(" · ")}
+                  <span>{genre.label}</span>
+                  <small>{familyLabel(genre)}</small>
+                  {selectedRole && (
+                    <small className="picked-label">
+                      {ROLE_META[selectedRole].label} ✓
                     </small>
-                  </span>
-                  <span className="genre-result-action">
-                    {selectedRole ? ROLE_LABELS[selectedRole] : "Set " + ROLE_LABELS[activeRole]}
-                  </span>
+                  )}
                 </button>
               );
             })}
           </div>
 
-          {matchingGenres.length === 0 && (
-            <div className="genre-empty">
-              <Text as="p" tone="muted" size="sm">
-                No reviewed genre matches this search.
-              </Text>
-            </div>
+          {visibleGenres.length === 0 && (
+            <p className="empty-state">
+              Kein Treffer. Versuch einen anderen Begriff oder eine andere
+              Genre-Familie.
+            </p>
           )}
 
-          {canShowMore && (
-            <Button tone="ghost" onClick={() => setLimit((current) => current + PAGE_SIZE)}>
-              Show more
-            </Button>
+          {allMatches.length > limit && (
+            <button
+              type="button"
+              className="text-btn"
+              onClick={() => setLimit((current) => current + PAGE_SIZE)}
+            >
+              Weitere {Math.min(PAGE_SIZE, allMatches.length - limit)} anzeigen
+              <Icon name="arrow" />
+            </button>
           )}
-        </Stack>
+        </section>
       )}
-    </div>
+
+      <div className="guide-card">
+        <Icon name="spark" />
+        <div>
+          <strong>Echte Taxonomie statt Demo-Regeln.</strong>
+          <p>
+            Auswahl, Suche und Compiler laufen jetzt über Runtime Pack,
+            MusicSpec und den Produktionscompiler.
+          </p>
+        </div>
+        <span className="badge">
+          {runtime.genres.genres.length.toLocaleString()} reviewed
+        </span>
+      </div>
+    </>
   );
 }
