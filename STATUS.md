@@ -1,43 +1,49 @@
 # Project Status
 
 **Last updated:** 2026-09-21
-**Current phase/milestone:** scalable instrument ontology + semantic residual mining ready
+**Current phase/milestone:** database-first Instruments foundation complete in repository; owner-local promotion/acceptance is one bundled run
 
 ## Current objective
 
-Replace item-by-item Instruments cleanup with a compositional ontology: canonical instrument identities + reusable semantic modifiers + Advanced parameters. Future mining reviews only semantic residuals that the ontology cannot already explain.
+Make the database complete before UI/runtime work: preserve every source-backed Instruments phrase as a first-class selectable expression while also linking canonical instrument identity and reusable playing/processing/arrangement semantics underneath it.
 
 ## Current state
 
-- Owner-local Windows workspace: D:\prompt-engine.
+- Owner-local Windows workspace: `D:\prompt-engine`.
 - Real Factory files and generated databases/reports remain local-only.
 - Validated evidence baseline: 10,043 tracks, 115,736 sections, 852,459 tokens, 24 Major Genres, 1,564 taxonomy genres.
 - Genre crosswalk is complete locally: 138 decisions applied and 0 unresolved genre candidates remain.
-- The refreshed Instruments report contains 6,035 unique source segments, 5,930 not exact-matched as curated surfaces, and is bound to curation fingerprint `9e056bdd...`.
-- The already-applied core knowledge layer contains 70 canonical instruments/groups plus 71 reusable concepts.
-- Instrument ontology v2 adds durable `instrument_trait_patch`, scoped v2 decision bundles, aliases for existing instruments, Advanced instrument parameters/options, and compiled instrument traits.
-- Mining now performs longest-match semantic decomposition against compiled knowledge.
-- Source strings such as `clean electric guitar`, `restrained strings`, `programmed drums`, `warm pad`, or `noise sweeps` are represented compositionally instead of becoming thousands of fake instrument identities.
-- Semantic-only layers such as pads/effects/noise are allowed to be fully explained without forcing them into an instrument entity.
-- The Instruments review queue is now residual-driven: fully explained segments are removed automatically; only unresolved semantic residue remains prioritized.
-- The current owner-local v2 decision bundle adds 58 canonical instrument/group entities, 171 reusable concepts, 27 aliases on existing instruments, 10 Advanced instrument dimensions with 100 options, and 118 instrument-trait links.
-- Against the current 1,000 prioritized source segments, the prepared ontology covers 100% semantically in the deterministic estimator; 84.8% resolve to an explicit instrument identity plus modifiers, covering 92.1% of weighted occurrences. Semantic-only layers account for the remainder rather than being fabricated as instruments.
+- Current Factory evidence contains 6,035 unique comma/semicolon-delimited Instruments expressions.
+- The database contract now requires **all source Instruments expressions** to be materialized into `knowledge.instrument_expression`, remain `selectable=1`, and preserve their original render/output wording.
+- Compound expressions such as `clean electric guitar`, `muted trumpet`, `restrained strings`, `programmed drums`, `warm pad`, etc. are **not discarded**. They are product-level options describing how an instrument/layer is played, voiced, processed, or arranged.
+- Canonical instrument identity remains a second layer for grouping/search/explanation. Expression decomposition is additive metadata only.
+- `instrument_expression_instrument` links source expressions to resolved canonical instrument identities.
+- `instrument_expression_concept` links the same expression to reusable playing/processing/role/timbre/etc. concepts.
+- Expressions can be `identity`, `semantic`, `partial`, or `unresolved`; none of those states removes a source-backed expression from the selectable database.
+- Residual-only mining applies only to **future semantic curation review**, not to product availability. Fully understood expressions leave the review queue but stay in `knowledge.sqlite`.
+- Instrument ontology v2 also supports durable `instrument_trait_patch`, scoped decision bundles, aliases, Advanced instrument parameters/options, and compiled instrument traits.
+- Build revision is now `promptvgine-local-data-build-v2-resumable-2-instrument-expressions`.
+- Completed old checkpoints can advance to the new compiler revision without rebuilding the corpus or deleting durable curation.
+- `database_foundation_session.py finalize` runs build/recompile + validation + mining refresh + acceptance reporting as one solo-dev phase and keeps verbose subprocess output in report files.
 - Knowledge apply remains backup-first, hash/fingerprint-bound, transactional, automatically recompiled/validated, rollback-safe, and report-refreshing.
 
 ## Last verified checks
 
-- GitHub Actions `validate` passes through the current instrument-ontology v2 implementation.
-- Synthetic v2 scoped apply covers instrument aliases, traits, parameters/options, knowledge compile, and validation.
+- GitHub Actions `validate` passes on the complete source-expression materialization implementation.
+- Synthetic build tests require every source Instruments expression to exist in `knowledge.sqlite`, be selectable, and preserve exact output text.
+- Synthetic knowledge-c​​uration tests verify that a compound expression such as `clean rhythm electric guitar` remains selectable while linking Electric Guitar + Clean + Rhythm semantics.
+- Synthetic v2 scoped apply covers instrument aliases, traits, parameters/options, compile, and validation.
 - Synthetic mining covers semantic-vs-identity decomposition reports.
-- Existing build/resume, genre curation, stale-review rejection, and rollback suites remain covered.
+- Synthetic revision-upgrade coverage verifies a completed older checkpoint can recompile knowledge without rebuilding the promoted corpus.
+- Bundled database-finalization coverage verifies one concise terminal summary plus detailed report/log files.
 
 ## Current blocker
 
-None after CI passes on the final branch head.
+Repository-side database foundation has no blocker. The real owner-local databases still need one bundled finalization run after merge because GitHub intentionally does not contain the real Factory/database files.
 
 ## Next concrete action
 
-Merge instrument ontology v2, then the owner saves the reviewed local `instrument-ontology-decisions-v2.json` bundle and runs one bundled apply command. That apply automatically recompiles/validates and produces the next residual-only mining reports.
+Merge this branch, then owner runs exactly one database-finalization command from `docs/LOCAL_DATA_BUILD.md`. That run upgrades/recompiles the local `knowledge.sqlite`, validates that all 6,035 current source expressions are present/selectable, refreshes semantic reports, and writes `reports/database/database-foundation-acceptance-v1.json`.
 
 ## Do not redo
 
@@ -45,12 +51,18 @@ Merge instrument ontology v2, then the owner saves the reviewed local `instrumen
 - Do not delete durable `curation.sqlite`.
 - Do not use the retired `--force` workflow.
 - Do not redo the completed genre crosswalk.
-- Do not turn 6,035 source segments into 6,035 selectable instruments.
-- Do not manually review phrases that the semantic decomposition already resolves.
+- Do not collapse 6,035 source expressions into only a small canonical-instrument list.
+- Do not call compound playing/processing expressions disposable “pseudo instruments”.
+- Do not remove fully-semantic expressions from the product database; only remove them from further semantic-review queues.
 - Do not treat corpus frequency as automatic musical truth.
 
 ## Important context
 
-The owner-local decision artifact is intentionally not committed. Repository code/schema/tests define the reproducible apply/decomposition machinery; reviewed decisions remain in ignored local curation state.
+The database is deliberately two-layered:
 
-For exact Windows commands read `docs/LOCAL_DATA_BUILD.md`.
+1. **instrument expression** = the actual selectable/renderable source phrase;
+2. **canonical instrument + semantic concepts** = structured meaning underneath that phrase.
+
+This preserves the full source vocabulary while still enabling clean search, dictionary explanations, Advanced controls, relations, and future recombination.
+
+For the single owner-local finalization command read `docs/LOCAL_DATA_BUILD.md`.
