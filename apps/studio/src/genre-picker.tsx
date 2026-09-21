@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import {
   createMusicSpec,
   removeGenreInfluence,
@@ -11,7 +11,7 @@ import type {
   RuntimeGenre,
   RuntimeMajorGenre,
 } from "@vgine/runtime-data";
-import { createSearchIndex } from "@vgine/search";
+import type { SearchIndex } from "@vgine/search";
 import { Button, Cluster, Stack, Text } from "@vgine/ui";
 
 const ROLE_LABELS: Readonly<Record<GenreInfluenceRole, string>> = {
@@ -24,6 +24,7 @@ const PAGE_SIZE = 48;
 
 export interface GenrePickerProps {
   readonly runtime: RuntimeBootstrap;
+  readonly searchIndex: SearchIndex;
   readonly spec: MusicSpec | null;
   readonly activeRole: GenreInfluenceRole;
   readonly onRoleChange: (role: GenreInfluenceRole) => void;
@@ -43,12 +44,14 @@ function sortGenres(genres: readonly RuntimeGenre[]): RuntimeGenre[] {
 
 export function GenrePicker({
   runtime,
+  searchIndex,
   spec,
   activeRole,
   onRoleChange,
   onSpecChange,
 }: GenrePickerProps) {
   const [query, setQuery] = useState("");
+  const deferredQuery = useDeferredValue(query);
   const [majorId, setMajorId] = useState<string | null>(null);
   const [limit, setLimit] = useState(PAGE_SIZE);
 
@@ -60,11 +63,6 @@ export function GenrePicker({
     () => new Map(runtime.core.major_genres.map((major) => [major.id, major])),
     [runtime.core.major_genres],
   );
-  const index = useMemo(
-    () => createSearchIndex(runtime.search.documents),
-    [runtime.search.documents],
-  );
-
   const majorCounts = useMemo(() => {
     const counts = new Map<string, number>();
     for (const genre of runtime.genres.genres) {
@@ -84,9 +82,9 @@ export function GenrePicker({
   );
 
   const matchingGenres = useMemo(() => {
-    const normalizedQuery = query.trim();
+    const normalizedQuery = deferredQuery.trim();
     if (normalizedQuery) {
-      return index
+      return searchIndex
         .search({ query: normalizedQuery, kinds: ["genre"], limit: Math.min(limit, 500) })
         .map((result) => genreById.get(result.id))
         .filter((genre): genre is RuntimeGenre => genre !== undefined);
@@ -99,7 +97,7 @@ export function GenrePicker({
       ).slice(0, limit);
     }
     return [];
-  }, [genreById, index, limit, majorId, query, runtime.genres.genres]);
+  }, [deferredQuery, genreById, limit, majorId, runtime.genres.genres, searchIndex]);
 
   const totalForMajor =
     majorId === null
