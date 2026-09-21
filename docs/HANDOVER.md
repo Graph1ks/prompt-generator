@@ -1,8 +1,8 @@
-# Handover — Design System + Motion Foundation
+# Handover — React/Vite Studio Shell
 
 **Last updated:** 2026-09-21  
-**Handoff target:** real search benchmark plus React/Vite Studio shell  
-**Milestone:** Database V1 remains closed; domain/runtime/compiler/search plus V'gine semantic design/motion foundations are implemented
+**Handoff target:** real Runtime Pack/search wiring + first production Genre picker  
+**Milestone:** Database V1 remains closed; domain/runtime/compiler/search/design foundations plus a production-buildable React/Vite Studio shell are implemented
 
 ## Read this first
 
@@ -170,9 +170,9 @@ The TypeScript foundation now adds:
 
 `packages/runtime-data` now validates/loads the Runtime Pack bootstrap contract and adapts it into compiler-domain data. `packages/search` now implements deterministic exact/prefix/token/substring ranking with stable IDs and a worker-ready request/response envelope. A real-payload benchmark harness is available as `pnpm bench:search`.
 
-`packages/ui` now provides the semantic token contract plus Paradise/Ash CSS themes; `packages/motion` centralizes causal motion recipes and reduced-motion behavior. Both add zero external runtime dependencies and deliberately precede React primitives.
+`packages/ui` now provides the semantic token contract, Paradise/Ash themes and the first React primitives. `packages/motion` centralizes causal motion recipes and reduced-motion behavior.
 
-No React/Radix/Motion-for-React/Tauri packages have been installed yet.
+`apps/studio` is now a responsive React/Vite shell using reviewed exact versions: React/React DOM 19.3.0, Vite 8.3.0 and @vitejs/plugin-react 6.1.1. It intentionally does not invent missing editor content and does not yet add Router, Radix, Motion-for-React, Zustand or TanStack.
 
 ## Next-thread mission
 
@@ -181,10 +181,10 @@ Treat Database V1 and Runtime Pack v1 as accepted dependencies and move upward i
 Recommended order:
 
 1. **Real search benchmark** — run `pnpm bench:search` against `.local-data/current/runtime-v1/search.json`; record index-build and P50/P90/P95/P99/max query latency.
-2. **React/Vite dependency review + Studio shell** — introduce only reviewed/pinned UI build/runtime packages and consume the existing semantic packages.
-3. **V'gine primitives** — implement the first accessible reusable surfaces/buttons/text/layout primitives against `@vgine/ui` tokens.
-4. **Search worker integration** — add the actual Worker transport when profiling shows it improves UI responsiveness.
-5. **Editor-content enrichment** — parameters/statements/Exclude remain additive Post-V1 work; do not reinterpret the empty editor payload as a database failure.
+2. **Runtime Pack -> Studio wiring** — load validated bootstrap data through `@vgine/runtime-data`; do not let React parse raw pack JSON directly.
+3. **Production Genre picker** — major-genre browsing + search + 1–3 Foundation/Fusion/Accent selections backed by stable IDs and shared MusicSpec.
+4. **Compiler preview integration** — MusicSpec -> pure compiler -> live prompt/budget/diagnostics; rendered strings remain output only.
+5. **Search worker integration / editor enrichment** — add Worker transport only if profiling justifies it; parameters/statements/Exclude remain additive Post-V1 work.
 
 ## Post-V1 enrichment is allowed but is not a blocker
 
