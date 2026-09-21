@@ -155,6 +155,56 @@ py scripts\data\query_corpus.py --db ".local-data\current\corpus.sqlite" exclude
 py scripts\data\query_corpus.py --db ".local-data\current\corpus.sqlite" profile
 ```
 
+## Bundled curation session — preferred workflow
+
+Do not dump large review queues into the terminal.
+
+Prepare one complete review bundle:
+
+```powershell
+py scripts\data\curation_session.py prepare --out-dir ".local-data\current"
+```
+
+That single command:
+
+- integrity-checks corpus + curation;
+- creates an integrity-checked curation backup;
+- exports all currently unreviewed genre-crosswalk candidates;
+- adds source examples plus deterministic nearest-taxonomy suggestions;
+- writes JSON + CSV reports under `.local-data\current\reports\curation\`;
+- prints only a short summary/path to the terminal.
+
+Primary handoff file for AI/human review:
+
+```text
+.local-data\current\reports\curation\genre-crosswalk-review-v1.json
+```
+
+After a reviewed decision bundle exists at:
+
+```text
+.local-data\current\reports\curation\genre-crosswalk-decisions-v1.json
+```
+
+apply the entire reviewed batch with one command:
+
+```powershell
+py scripts\data\curation_session.py apply --out-dir ".local-data\current" --bundle ".local-data\current\reports\curation\genre-crosswalk-decisions-v1.json" --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json"
+```
+
+The apply bundle automatically:
+
+- verifies report/bundle freshness;
+- validates all referenced canonical genre IDs;
+- creates a fresh curation backup;
+- applies decisions in one SQLite transaction;
+- recompiles knowledge;
+- runs post-apply validation;
+- rolls curation back from backup if compile/validation fails;
+- writes a detailed receipt/report;
+- refreshes the remaining review report;
+- prints only a concise final summary plus live build progress if a long stage actually runs.
+
 ## Inspect curation
 
 ```powershell
