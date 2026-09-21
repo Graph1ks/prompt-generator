@@ -163,3 +163,52 @@ The product will contain thousands of options and must explain them. Native drop
 Constraint logic is surfaced primarily as quality checks/relations. It can warn about competing melodic owners, low-end collisions, or contradictory mix instructions, but it does not silently remove creative content or forbid genre combinations.
 
 Deliberate overrides remain possible and visible.
+
+
+## ADR-010 — Durable curation is separate from compiled knowledge
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Context
+
+Factory evidence is replaceable and will change over time. Definitions, aliases, instrument identities, parameter design, Easy statements, and explicit genre crosswalk decisions are authored knowledge and must survive every source rebuild.
+
+### Decision
+
+Use three local database lifecycles:
+
+- `corpus.sqlite` — disposable evidence/mining output rebuilt from Factory files;
+- `curation.sqlite` — durable local authoring state, never deleted by normal rebuilds;
+- `knowledge.sqlite` — disposable compiled knowledge produced from current taxonomy/bootstrap plus the durable curation overlay.
+
+`--force` may replace corpus/knowledge but must not delete curation.
+
+### Why
+
+A single rebuildable DB would eventually make a Factory refresh destructive to months of reviewed knowledge. A single durable monolith would make evidence refresh and runtime compilation harder to audit.
+
+### Consequences
+
+Curation requires local backups and additive migrations. The repository ships an integrity-checked backup tool. Generated knowledge can always be reconstructed.
+
+---
+
+## ADR-011 — Factory updates are reviewed by snapshot diff before promotion
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+A new Factory export is first built into a separate local directory. The new `corpus.sqlite` is compared to the current corpus for track/document, taxonomy, Major Genre mapping, and section-label changes.
+
+Only after validation/diff review is the snapshot promoted and combined with the durable curation layer.
+
+### Why
+
+Source schemas and vocabulary can evolve even when top-level schema identifiers remain stable. A reproducible diff makes changes visible before they silently affect product knowledge/mining.
+
+### Consequences
+
+`scripts/data/diff_local_data.py` is part of the normal update workflow. Generated diff reports stay local.
