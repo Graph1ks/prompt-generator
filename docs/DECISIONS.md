@@ -278,3 +278,62 @@ Adopt the RhymeLab-style long-running-job standard for all non-trivial local dat
 ### Implementation
 
 The v2 local builder uses ignored `.build-v2/state.sqlite` plus staged SQLite work artifacts. Existing valid v1 promoted corpus data can be adopted by source fingerprint, so the owner is not forced to destroy/rebuild the already-created local corpus merely to upgrade build tooling.
+
+
+---
+
+## ADR-014 — Instrument identities are canonical entities; descriptors stay composable
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Context
+
+The source Instruments section contains thousands of unique comma-separated segments. Many are not unique instruments: they combine identity with properties or roles, for example clean/distorted/muted guitar, soft/restrained strings, programmed/electronic drums, lead/rhythm parts, and warm/dark synth layers.
+
+Promoting every source segment as an instrument would create a noisy, non-composable option catalog and would make Easy/Advanced state difficult to reconcile.
+
+### Decision
+
+Curate a stable canonical instrument/entity layer and model reusable modifiers separately.
+
+Instrument identity belongs in `instrument_patch` / `instrument_alias_patch`. Reusable concepts such as source type, tone, role, articulation, performance method, envelope/shape, dynamics, processing, and space belong in knowledge/parameter concepts rather than being baked into every instrument identity.
+
+Broad groups such as Strings, Brass Section, Woodwind Section, Keyboards, Drums, and Percussion may exist as explicit selectable identities when the source itself uses them meaningfully.
+
+### Consequences
+
+- Corpus segments remain evidence, not direct UI options.
+- "clean electric guitar" can decompose into Electric Guitar + Clean rather than becoming a permanent standalone instrument.
+- The runtime can explain/highlight both the instrument and its modifiers.
+- Search aliases can recognize source wording without multiplying canonical entities.
+
+---
+
+## ADR-015 — Reviewed knowledge bundles are hash/fingerprint-bound and rollback-safe
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Context
+
+AI/human curation happens from local report files. Applying a decision file to changed source evidence or changed durable curation could silently write stale decisions.
+
+### Decision
+
+Knowledge curation uses explicit decision bundles bound to:
+
+- the mining `review_id`;
+- Vault and Genre Map source SHA-256 fingerprints;
+- exact instrument and lexicon report SHA-256 values;
+- a semantic curation fingerprint for newly generated reports.
+
+Applying a bundle automatically backs up `curation.sqlite`, validates identities/aliases, writes all durable changes in one SQLite transaction, recompiles `knowledge.sqlite`, validates the result, and restores/recompiles recovery state if the operation fails.
+
+The first legacy mining report generated before semantic curation fingerprints is accepted only through exact report hashes + source fingerprints; refreshed reports use the stronger fingerprint contract.
+
+### Consequences
+
+- File-based AI handoff remains practical without weakening local data safety.
+- Ordinary curation does not require manual SQL or copy/paste queues.
+- Reviewed decisions fail closed when their evidence snapshot becomes stale.
