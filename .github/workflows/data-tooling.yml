@@ -50,5 +50,12 @@ jobs:
       - name: Install TypeScript workspace
         run: pnpm install --no-frozen-lockfile
 
+      - name: Bootstrap lockfile capture
+        run: |
+          echo "LOCKFILE_BASE64_BEGIN"
+          base64 -w0 pnpm-lock.yaml
+          echo
+          echo "LOCKFILE_BASE64_END"
+
       - name: Validate TypeScript foundation
         run: pnpm run check
