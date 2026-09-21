@@ -50,6 +50,24 @@ Default behavior:
 
 Do not trade correctness for speed. Gain speed by reducing ceremony, avoiding duplicated work, batching related operations, and choosing appropriately scoped solutions.
 
+### Solo-dev operator workflow — HARD RULE
+
+For owner-local workflows, especially data review/curation/build tasks, optimize for one competent solo developer rather than an interactive tutorial.
+
+Default contract:
+
+- one command should complete one coherent phase or bundle of work instead of forcing chains of manual micro-steps;
+- large review/debug/diagnostic payloads must go to local machine-readable report files for AI/human handoff, not flood the terminal;
+- when a later reviewed decision set is required, use an explicit decision-bundle file and a separate apply command rather than ad-hoc console edits;
+- before any durable curation/state mutation, create and verify a local backup automatically when practical;
+- durable updates should be transactional and rollback-safe; failed compile/validation must not leave partially applied curation/state;
+- after apply/mutation, automatically run the required recompile/materialization and validation steps when they are part of the same coherent operation;
+- terminal output should be limited to useful live progress, warnings/errors, and a short final summary with the relevant report path(s);
+- ask the owner for intervention only at meaningful decision boundaries, not between routine reversible implementation steps;
+- prefer file-based handoff artifacts that another AI worker can inspect directly over copy/paste-heavy terminal workflows.
+
+Future AI workers should treat this as the default operating style unless a task is genuinely small enough that bundling/report files would add more complexity than value.
+
 ## 2. Engineering quality
 
 Solutions must be:
