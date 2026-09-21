@@ -288,6 +288,182 @@ def instrument_report(
     }
 
 
+
+DECOMPOSITION_SYNTAX = {
+    "and","or","with","plus","the","a","an","of",
+    "two","three","four","multiple","dual","second","additional",
+}
+
+
+def phrase_tokens(value: str) -> tuple[str, ...]:
+    return tuple(re.findall(r"[a-z0-9]+(?:-[a-z0-9]+)*", norm(value)))
+
+
+def compiled_semantic_lexicon(knowledge: sqlite3.Connection) -> tuple[dict, dict]:
+    instrument_phrases = {}
+    for row in knowledge.execute(
+        """SELECT i.id,i.label,i.label_norm,a.alias_surface,a.alias_norm
+           FROM instrument i
+           LEFT JOIN instrument_alias a
+             ON a.instrument_id=i.id AND a.status IN ('reviewed','approved')
+           WHERE i.status IN ('reviewed','approved')
+           ORDER BY i.id,a.alias_norm"""
+    ):
+        for surface in (row["label"], row["label_norm"], row["alias_surface"], row["alias_norm"]):
+            toks = phrase_tokens(surface or "")
+            if toks:
+                instrument_phrases.setdefault(
+                    toks,
+                    {"kind": "instrument", "id": row["id"], "label": row["label"]},
+                )
+
+    concept_phrases = {}
+    for row in knowledge.execute(
+        """SELECT e.id,e.canonical_label,t.surface,t.surface_norm
+           FROM knowledge_entry e
+           LEFT JOIN term_variant t ON t.entry_id=e.id
+           WHERE e.status IN ('reviewed','approved')
+             AND e.entry_type<>'instrument'
+           ORDER BY e.id,t.match_priority DESC,t.surface_norm"""
+    ):
+        for surface in (row["canonical_label"], row["surface"], row["surface_norm"]):
+            toks = phrase_tokens(surface or "")
+            if toks:
+                concept_phrases.setdefault(
+                    toks,
+                    {"kind": "concept", "id": row["id"], "label": row["canonical_label"]},
+                )
+    return instrument_phrases, concept_phrases
+
+
+def decompose_surface(surface: str, instrument_phrases: dict, concept_phrases: dict) -> dict:
+    toks = list(phrase_tokens(surface))
+    matches = []
+    covered = [False] * len(toks)
+    lexicons = (instrument_phrases, concept_phrases)
+
+    # Longest-match semantics, with instrument identity preferred on equal spans.
+    max_len = 1
+    for lexicon in lexicons:
+        if lexicon:
+            max_len = max(max_len, max(len(key) for key in lexicon))
+
+    for span_len in range(max_len, 0, -1):
+        for start in range(0, len(toks) - span_len + 1):
+            end = start + span_len
+            if any(covered[start:end]):
+                continue
+            key = tuple(toks[start:end])
+            found = None
+            for lexicon in lexicons:
+                if key in lexicon:
+                    found = lexicon[key]
+                    break
+            if not found:
+                continue
+            matches.append(
+                {
+                    **found,
+                    "surface": " ".join(toks[start:end]),
+                    "start": start,
+                    "end": end,
+                }
+            )
+            for idx in range(start, end):
+                covered[idx] = True
+
+    residual = [
+        token
+        for idx, token in enumerate(toks)
+        if not covered[idx] and token not in DECOMPOSITION_SYNTAX
+    ]
+    semantic_token_count = sum(1 for token in toks if token not in DECOMPOSITION_SYNTAX)
+    covered_semantic = semantic_token_count - len(residual)
+    instrument_matches = [m for m in matches if m["kind"] == "instrument"]
+    concept_matches = [m for m in matches if m["kind"] == "concept"]
+    confidence = (
+        covered_semantic / semantic_token_count
+        if semantic_token_count
+        else 0.0
+    )
+    return {
+        "matches": sorted(matches, key=lambda x: (x["start"], x["end"])),
+        "instrument_ids": sorted({m["id"] for m in instrument_matches}),
+        "concept_ids": sorted({m["id"] for m in concept_matches}),
+        "residual_tokens": residual,
+        "coverage": round(confidence, 4),
+        "fully_decomposed": bool(instrument_matches) and not residual,
+    }
+
+
+def instrument_decomposition_report(
+    knowledge: sqlite3.Connection,
+    instrument_rows: list[dict],
+    detail_limit: int = 1500,
+) -> dict:
+    instrument_phrases, concept_phrases = compiled_semantic_lexicon(knowledge)
+    residual_counter = Counter()
+    decomposed = []
+    fully_unique = 0
+    fully_occurrences = 0
+    total_occurrences = 0
+
+    for row in instrument_rows:
+        result = decompose_surface(
+            row["surface"], instrument_phrases, concept_phrases
+        )
+        total_occurrences += int(row["occurrence_count"])
+        if result["fully_decomposed"]:
+            fully_unique += 1
+            fully_occurrences += int(row["occurrence_count"])
+        for token in result["residual_tokens"]:
+            residual_counter[token] += int(row["occurrence_count"])
+        decomposed.append(
+            {
+                "candidate_id": row["candidate_id"],
+                "surface": row["surface"],
+                "occurrence_count": row["occurrence_count"],
+                "track_count": row["track_count"],
+                **result,
+            }
+        )
+
+    decomposed.sort(
+        key=lambda row: (
+            row["fully_decomposed"],
+            row["coverage"],
+            -row["occurrence_count"],
+            row["surface"],
+        )
+    )
+    return {
+        "compiled_instrument_phrase_count": len(instrument_phrases),
+        "compiled_concept_phrase_count": len(concept_phrases),
+        "unique_segment_count": len(instrument_rows),
+        "fully_decomposed_unique": fully_unique,
+        "fully_decomposed_unique_ratio": round(
+            fully_unique / len(instrument_rows), 4
+        ) if instrument_rows else 0.0,
+        "occurrence_count": total_occurrences,
+        "fully_decomposed_occurrences": fully_occurrences,
+        "fully_decomposed_occurrence_ratio": round(
+            fully_occurrences / total_occurrences, 4
+        ) if total_occurrences else 0.0,
+        "top_residual_tokens": [
+            {"token": token, "weighted_occurrence_count": count}
+            for token, count in residual_counter.most_common(250)
+        ],
+        "priority_unresolved": [
+            row for row in decomposed if not row["fully_decomposed"]
+        ][:detail_limit],
+        "_full_rows": decomposed,
+        "notes": [
+            "This is a deterministic semantic coverage report, not an automatic approval mechanism.",
+            "A source segment is fully decomposed only when at least one curated instrument identity is recognized and every remaining semantic token is covered by curated concepts.",
+            "Syntax/coordination words and simple quantities do not count as unresolved semantic tokens.",
+        ],
+    }
+
 def fts_examples(corpus: sqlite3.Connection, surface: str, limit: int = MAX_EXAMPLES) -> list[dict]:
     # Quote the phrase so FTS treats multiword candidates as a phrase.
     q = '"' + surface.replace('"', '""') + '"'
