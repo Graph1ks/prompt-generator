@@ -143,6 +143,23 @@ CREATE TABLE IF NOT EXISTS genre_alias (
 );
 CREATE INDEX IF NOT EXISTS idx_genre_alias_genre ON genre_alias(genre_id, status);
 
+-- Explicit source-label mapping. Unlike genre_alias this permits a single
+-- source surface to map to multiple genre influences (composite labels).
+CREATE TABLE IF NOT EXISTS genre_source_mapping (
+  source_norm TEXT NOT NULL,
+  source_surface TEXT NOT NULL,
+  mapping_kind TEXT NOT NULL CHECK (mapping_kind IN ('alias','composite','taxonomy-gap')),
+  target_genre_id TEXT REFERENCES genre(id) ON DELETE CASCADE,
+  target_role_hint TEXT,
+  ordinal INTEGER NOT NULL DEFAULT 1,
+  status TEXT NOT NULL DEFAULT 'approved'
+    CHECK (status IN ('candidate','reviewed','approved','deprecated')),
+  provenance_key TEXT REFERENCES provenance(provenance_key) ON DELETE SET NULL,
+  PRIMARY KEY(source_norm, ordinal)
+);
+CREATE INDEX IF NOT EXISTS idx_genre_source_mapping_target
+  ON genre_source_mapping(target_genre_id, status);
+
 CREATE TABLE IF NOT EXISTS instrument_family (
   id TEXT PRIMARY KEY,
   label TEXT NOT NULL UNIQUE,
