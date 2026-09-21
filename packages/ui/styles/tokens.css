@@ -1,0 +1,74 @@
+@layer vgine.tokens {
+  :root {
+    color-scheme: dark;
+
+    --vg-space-1: 0.25rem;
+    --vg-space-2: 0.5rem;
+    --vg-space-3: 0.75rem;
+    --vg-space-4: 1rem;
+    --vg-space-5: 1.25rem;
+    --vg-space-6: 1.5rem;
+    --vg-space-8: 2rem;
+    --vg-space-10: 2.5rem;
+    --vg-space-12: 3rem;
+
+    --vg-radius-sm: 0.5rem;
+    --vg-radius-md: 0.75rem;
+    --vg-radius-lg: 1rem;
+    --vg-radius-xl: 1.5rem;
+    --vg-radius-pill: 999px;
+
+    --vg-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --vg-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+    --vg-text-xs: 0.75rem;
+    --vg-text-sm: 0.875rem;
+    --vg-text-md: 1rem;
+    --vg-text-lg: 1.125rem;
+    --vg-text-xl: 1.375rem;
+    --vg-text-2xl: clamp(1.625rem, 2vw + 1rem, 2.5rem);
+
+    --vg-line-tight: 1.15;
+    --vg-line-normal: 1.45;
+    --vg-line-relaxed: 1.65;
+
+    --vg-weight-regular: 400;
+    --vg-weight-medium: 520;
+    --vg-weight-semibold: 640;
+    --vg-weight-bold: 760;
+
+    --vg-touch-target: 2.75rem;
+    --vg-content-max: 100rem;
+    --vg-studio-rail: clamp(4.5rem, 7vw, 7rem);
+    --vg-preview-width: clamp(20rem, 29vw, 31rem);
+
+    --vg-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.16);
+    --vg-shadow-md: 0 8px 24px rgb(0 0 0 / 0.22);
+    --vg-shadow-lg: 0 18px 60px rgb(0 0 0 / 0.34);
+
+    --vg-z-base: 0;
+    --vg-z-sticky: 20;
+    --vg-z-popover: 40;
+    --vg-z-sheet: 60;
+    --vg-z-dialog: 80;
+    --vg-z-toast: 100;
+
+    --vg-focus-ring-width: 2px;
+    --vg-focus-ring-offset: 3px;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  :where(button, input, textarea, select, [role="button"], [tabindex]):focus-visible {
+    outline: var(--vg-focus-ring-width) solid var(--vg-color-focus);
+    outline-offset: var(--vg-focus-ring-offset);
+  }
+
+  :where(button, [role="button"], input[type="checkbox"], input[type="radio"]) {
+    min-block-size: var(--vg-touch-target);
+  }
+}
