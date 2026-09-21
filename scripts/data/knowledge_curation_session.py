@@ -540,6 +540,7 @@ def apply_bundle(curation_path: Path, bundle: dict) -> dict:
                     row_id,
                     iid,
                     surface,
+                    alias_norm,
                     alias.get("status", "approved"),
                     timestamp,
                 ),
