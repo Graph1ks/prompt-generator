@@ -118,23 +118,12 @@ Static curation supplies the trustworthy building blocks.
 
 ## 8. Genre crosswalk decisions
 
-The first real build seeds unresolved Vault genre labels into `candidate_review`.
-
-A reviewed decision goes into `genre_crosswalk_decision`.
-
-Decision kinds:
-
-- `alias` — the source label is another name/spelling for one canonical genre;
-- `composite` — the source label represents multiple canonical influences;
-- `taxonomy-gap` — valid source identity not represented cleanly in the current taxonomy;
-- `ignore` — deliberately not mapped;
-- `defer` — needs more research.
-
-A composite can use multiple rows with the same `source_norm` and different `ordinal`/targets.
-
-Do not turn `Pop Soul` into `Pop` simply because string matching finds one word.
+The initial 138-item local genre crosswalk has been reviewed/applied successfully. Future Factory snapshots may add unresolved labels; those continue to use the same report/decision-bundle workflow.
 
 ## 9. Instruments
+
+Start this phase with `py scripts\\data\\knowledge_mining_session.py prepare --out-dir ".local-data\\current"`. Review the generated instrument and lexicon JSON files; the full CSV files remain local evidence.
+
 
 Instrument identity is separate from how it is played/processed.
 
