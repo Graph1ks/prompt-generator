@@ -5,6 +5,21 @@ import argparse, collections, datetime as dt, gzip, hashlib, json, re, sqlite3, 
 from pathlib import Path
 
 VAULT_SCHEMA="graph1ks-prompt-control-deck-v1"; GENRE_SCHEMA="graph1ks-genre-map-v2"; RULES="corpus-extract-v1"
+STYLE_PROMPT_MAX_CHARACTERS=1000
+# Source-derived P90 full-line lengths from GRAPH1KS_PUBLIC_VAULT_FACTORY v4.13.3.
+# These are soft renderer targets, not per-section truncation limits.
+RENDERER_SECTION_SOFT_MAX={
+ "genre":56,"era":49,"bpm":10,"key_mode":25,"groove":106,"melody":110,
+ "harmony":97,"drums":94,"bass":89,"instruments":107,"exciters":80,
+ "texture":88,"vocal":None,"dynamics":87,"space_mix":107,"production":120,
+ "structure":96,
+}
+RENDERER_SECTION_SOURCE_SAMPLES={
+ "genre":10043,"era":9226,"bpm":10040,"key_mode":10043,"groove":9016,
+ "melody":10043,"harmony":9956,"drums":9362,"bass":10036,"instruments":9882,
+ "exciters":20,"texture":2915,"vocal":0,"dynamics":747,"space_mix":9760,
+ "production":4459,"structure":16,
+}
 SECTION_MAP={
  "Genre":("genre","Genre","canonical"),"Era":("era","Era","canonical"),"BPM":("bpm","BPM","canonical"),
  "BPM/Meter":("bpm_meter","BPM/Meter","compound"),"Meter":("meter","Meter","canonical"),
@@ -122,8 +137,8 @@ def build_knowledge(c,g,corpus,gsha):
  stamp=now(); meta(c,{"schema_version":"knowledge-v1","rules":RULES,"taxonomy":g.get("taxonomy"),"taxonomy_version":g.get("taxonomy_version"),"genre_map_sha256":gsha,"built_at":stamp,"curation_state":"bootstrap-candidates"}); cur=c.cursor(); prov="genre-map-factory"
  cur.execute("INSERT INTO provenance(provenance_key,source_kind,source_ref,source_version,source_hash,extraction_rule_version,notes) VALUES (?,?,?,?,?,?,?)",(prov,"factory","GRAPH1KS_GENRE_MAP_FACTORY.json",str(g.get("taxonomy_version")),gsha,RULES,"Full source file remains local-only."))
  for key,label,order in OUTPUT_SECTIONS: cur.execute("INSERT INTO prompt_section_definition(section_key,output_label,output_order,optional,easy_visible,advanced_visible) VALUES (?,?,?,?,?,?)",(key,label,order,1,1,1))
- cur.execute("INSERT INTO renderer_profile(id,label,version,active,notes) VALUES (?,?,?,?,?)",("suno-structured-v1","Suno structured prompt",1,1,"[Header: content] lines; Exclude is separate comma-list output."))
- cur.executemany("INSERT INTO renderer_section(renderer_profile_id,section_key,output_order,emit_when_empty) VALUES (?,?,?,0)",[("suno-structured-v1",k,o) for k,_,o in OUTPUT_SECTIONS])
+ cur.execute("INSERT INTO renderer_profile(id,label,version,active,max_characters,overflow_policy,notes) VALUES (?,?,?,?,?,?,?)",("suno-structured-v1","Suno structured prompt",1,1,STYLE_PROMPT_MAX_CHARACTERS,"semantic-budget","[Header: content] lines; hard 1000-character style-prompt budget; Exclude is separate comma-list output."))
+ cur.executemany("INSERT INTO renderer_section(renderer_profile_id,section_key,output_order,emit_when_empty,soft_max_characters,source_sample_count) VALUES (?,?,?,0,?,?)",[("suno-structured-v1",k,o,RENDERER_SECTION_SOFT_MAX.get(k),RENDERER_SECTION_SOURCE_SAMPLES.get(k,0)) for k,_,o in OUTPUT_SECTIONS])
  mids={}
  for i,label in enumerate(g["major_genres"],1):
   mid=sid("major",label); eid=sid("knowledge:genre",f"major::{label}"); mids[label]=mid
