@@ -64,13 +64,14 @@
 
 **Runtime/language:** TypeScript/React planned for application; Python standard library for local data bootstrap/mining tooling.  
 **Primary framework:** React/Vite direction; Tauri 2 or equivalent lightweight shell subject to final dependency/license review.  
-**Storage:** local generated SQLite evidence/knowledge databases; runtime web/native bundles compiled locally from approved knowledge.  
+**Storage:** local SQLite split into disposable evidence (`corpus.sqlite`), durable authoring (`curation.sqlite`), and disposable compiled knowledge (`knowledge.sqlite`); future web/native runtime bundles are compiled locally.  
 **Packaging/distribution:** static web/PWA + local desktop packaging; no required backend.
 
 ### Architecture constraints
 
 - MusicSpec/semantic state is the source of truth; rendered Suno text is an output format.
 - Keep raw source evidence lossless before applying normalization/curation.
+- Never overwrite durable `curation.sqlite` during a Factory rebuild; generated corpus/knowledge are replaceable, curation is not.
 - Do not couple semantic knowledge to a single Suno renderer version.
 - Preserve provenance and source hashes for every generated data build.
 - Heavy corpus/evidence data is build-time only.
@@ -145,7 +146,8 @@ Never commit local source packs, generated databases, private paths, or user pro
 
 Minimum foundation checks:
 
-- `python -m py_compile scripts/data/build_local_data.py scripts/data/query_corpus.py`
+- `python -m py_compile scripts/data/*.py`
+- `python -m unittest discover -s tests -p "test_*.py" -v`
 - synthetic fixture build succeeds from `data/fixtures/`
 - `PRAGMA integrity_check` returns `ok` for generated local databases
 - source schema/hash preflight succeeds
@@ -169,7 +171,7 @@ Important durable design documents:
 
 ## Current priorities
 
-1. Stabilize local corpus/knowledge schema and genre crosswalk curation workflow.
-2. Mine/curate instruments, descriptors, parameters, reusable statements, and dictionary entries from the corpus without promoting raw frequency directly to product truth.
-3. Implement MusicSpec + renderer contracts before building the production UI.
+1. Run the finished local data toolchain against the owner’s local Factory files and start deliberate genre/term/instrument curation.
+2. Mine/curate instruments, descriptors, parameters, reusable statements, and dictionary entries without promoting raw frequency directly to product truth.
+3. Implement the documented MusicSpec/compiler contracts in TypeScript.
 4. Build the first production-quality Easy/Advanced editor and inline knowledge interaction on top of the stable semantic model.
