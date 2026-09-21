@@ -47,7 +47,13 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Added Factory-derived renderer budgeting: source preflight/validation rejects structured prompts above 1,000 characters, compiled renderer profiles carry the global hard limit, and renderer sections carry P90 soft targets/sample counts without inventing missing Vocal evidence.
 - Build revision advanced to `promptvgine-local-data-build-v2-resumable-3-prompt-budget`; completed older checkpoints can advance knowledge stages without rebuilding a matching promoted corpus.
 
+### Fixed
+
+- Fixed the Studio white-screen regression where Vite development could load stale ignored `packages/*/dist` output and miss newly added workspace exports such as `createMusicSpec`. `pnpm dev` now rebuilds workspace packages first, and Vite dev resolves exact internal `@vgine/*` imports from source.
+
 ### Changed
+
+- Reworked the Studio presentation to preserve the supplied V'GINE concept's product composition instead of a generic dashboard shell: editorial top bar/intro, horizontal four-stage navigation, large color-coded Genre Influence cards, inline taxonomy picker, sticky record-sleeve Live Prompt, Style/Exclude tabs, budget treatment and mobile Studio/Preview dock. Runtime Pack, MusicSpec and compiler contracts remain the production source of truth.
 
 - **Database V1 milestone completed** for the current Factory snapshot: 6,035 / 6,035 source-backed Instruments expressions are fully semantic with 0 semantic residuals; all remain first-class selectable/renderable entities. The last completion snapshot contains 4,472 fully identity-decomposed expressions, 9 instrument families, 164 canonical instrument entities, and 161 active aliases.
 - Added `docs/DATABASE_V1.md` as the canonical three-database/table inventory, invariants, completion boundary, maintenance lifecycle, and next-thread starting point.
