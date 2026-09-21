@@ -502,7 +502,7 @@ def prepare(args) -> int:
     plan = {
         "schema": PLAN_SCHEMA,
         "generated_at": utc_now(),
-        "status": "ready",
+        "status": "complete" if not residual else "ready",
         "review_id": review_id,
         "source": source,
         "curation_fingerprint": curation_fingerprint,
@@ -545,6 +545,11 @@ def prepare(args) -> int:
             "decision_bundle_template": str(reports_dir / "knowledge-curation-decisions-v2.template.json"),
         },
         "next_action": (
+            "Semantic completion achieved: no residual review batches remain. "
+            "Preserve the complete selectable source-expression catalog and proceed "
+            "to downstream knowledge/runtime work."
+            if not residual
+            else
             "Review one or more generated batches and encode accepted additive canonical "
             "instrument/concept/alias/trait/parameter decisions in a fingerprint-bound "
             "knowledge-curation-decisions-v2 bundle; then apply through "
@@ -581,8 +586,9 @@ def prepare(args) -> int:
             "parameter_options": [],
         },
     )
+    phase = "complete" if not residual else "prepared"
     print(
-        f"[knowledge-completion] prepared · residual {len(residual):,}"
+        f"[knowledge-completion] {phase} · residual {len(residual):,}"
         f" · batches {batch_count:,} · report: {plan_path}"
     )
     return 0
