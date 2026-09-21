@@ -519,7 +519,7 @@ def main() -> int:
     mode.add_argument("--plan", action="store_true", help="Read-only preflight; do not write runtime artifacts")
     mode.add_argument("--status", action="store_true", help="Inspect final/incomplete runtime export state")
     ap.add_argument("--reset-incomplete", action="store_true", help="Delete only incomplete runtime work before export")
-    ap.add_argument("--report", type=Path, help="Optional machine-readable export report path")
+    ap.add_argument("--report", type=Path, help="Override machine-readable export report path; exports default to the sibling reports/runtime-export-v1.json")
     args = ap.parse_args()
 
     try:
@@ -536,9 +536,12 @@ def main() -> int:
                     conn.close()
             else:
                 result = compile_runtime(args.knowledge, args.out_dir, args.reset_incomplete)
-        if args.report:
-            args.report.parent.mkdir(parents=True, exist_ok=True)
-            write_json_atomic(args.report, result)
+        report_path = args.report
+        if report_path is None and not args.plan and not args.status:
+            report_path = args.out_dir.parent / "reports" / "runtime-export-v1.json"
+        if report_path:
+            report_path.parent.mkdir(parents=True, exist_ok=True)
+            write_json_atomic(report_path, result)
         print(json.dumps(result, ensure_ascii=False, sort_keys=True, indent=2))
         return 0
     except KeyboardInterrupt:
