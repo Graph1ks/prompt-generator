@@ -129,7 +129,7 @@ Important: do **not** split blindly on `and` or `-`. Coordination and hyphen han
 
 Current build revision:
 
-`promptvgine-local-data-build-v2-resumable-2-instrument-expressions`
+`promptvgine-local-data-build-v2-resumable-3-prompt-budget`
 
 A completed old v2 checkpoint can advance to this compiler revision by resetting only knowledge stages. The promoted corpus remains unchanged. Durable `curation.sqlite` remains unchanged.
 
@@ -246,6 +246,19 @@ Primary local outputs:
 ```
 
 These batches are evidence/review inputs for additive v2 ontology/concept curation. They are **not** a product-filter list and are never a replacement for the complete selectable expression catalog. The completion plan stores each batch SHA-256, and the generated v2 decision template binds to the exact plan hash via `report_sha256.completion_plan`; the existing apply path verifies that binding before durable mutation.
+
+## Structured style-prompt budget
+
+The current Factory proves a hard `structured_prompt` ceiling of **1,000
+characters** across all 10,043 source tracks. The renderer profile therefore
+stores `max_characters=1000` and source-derived P90 soft line budgets. Build
+preflight and validation fail closed if a source structured prompt exceeds the
+limit or the compiled renderer loses the 1,000-character contract.
+
+Do not implement overflow as `prompt[:1000]`. Preserve complete bracketed
+sections and semantic meaning. Compact lower-priority derived/redundant material
+first; never silently discard locked/custom user intent. Exclude remains a
+separate output channel and does not consume this budget.
 
 ## Query/debug tools
 
