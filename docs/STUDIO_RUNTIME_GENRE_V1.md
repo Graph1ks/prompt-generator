@@ -45,7 +45,7 @@ apps/studio/public/runtime-v1
 
 The destination is ignored by Git.
 
-`pnpm dev` stages automatically before starting Vite.
+`pnpm dev` first rebuilds the internal TypeScript workspace packages, then stages the Runtime Pack, then starts Vite. In development Vite resolves exact internal `@vgine/*` JavaScript imports from workspace source so stale ignored `packages/*/dist` artifacts cannot hide newly added exports.
 
 A local static build containing the staged runtime assets is:
 
@@ -119,8 +119,8 @@ Interaction model:
 
 1. choose active role: Foundation / Fusion / Accent;
 2. browse one of 24 Major Genres or search directly;
-3. result lists are bounded to 48 items initially;
-4. `Show more` expands in bounded batches rather than mounting all 1,564 entries;
+3. result lists are bounded to 12 items initially;
+4. `Show more` expands in bounded 12-item batches rather than mounting all 1,564 entries;
 5. stable IDs are written to MusicSpec; labels remain display data.
 
 Foundation is required. Fusion and Accent remain optional and removable.
@@ -151,7 +151,20 @@ The live preview therefore uses the production compiler path, not a React-specif
 
 Copy/Export is enabled only when a compiled prompt exists and the semantic budget is valid.
 
-## 8. Current deliberate limitations
+## 8. Studio presentation contract
+
+The production Studio follows the supplied V'GINE concept's core interaction composition rather than a generic dashboard:
+
+- editorial top bar and product intro;
+- horizontal four-stage Sound DNA / Pulse / Palette / Finish navigation;
+- large color-coded Foundation / Fusion / Accent cards;
+- inline search/browse picker rather than a giant dropdown;
+- sticky dark record-sleeve Live Prompt with Style/Exclude tabs and budget meter;
+- mobile Studio/Preview switching through a fixed bottom dock.
+
+This is a presentation/interaction contract only. Demo-derived local recommendation values and demo-only prompt rules are not production data sources.
+
+## 9. Current deliberate limitations
 
 This slice implements the Genre facet end-to-end.
 
@@ -168,7 +181,7 @@ Not implemented yet:
 - Radix behavior primitives;
 - Tauri packaging.
 
-## 9. Next application slice
+## 10. Next application slice
 
 Preferred order:
 

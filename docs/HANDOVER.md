@@ -173,9 +173,11 @@ The TypeScript foundation now adds:
 
 `packages/ui` now provides the semantic token contract, Paradise/Ash themes and the first React primitives. `packages/motion` centralizes causal motion recipes and reduced-motion behavior.
 
-`apps/studio` now stages/loads the owner-local Runtime Pack, validates the bootstrap payload, builds one shared local search index, browses/searches the real 24 Major Genres + 1,564 taxonomy genres, creates/updates Foundation/Fusion/Accent MusicSpec state, and renders the pure compiler live prompt/budget output. It intentionally does not invent missing editor content and still does not add Router, Radix, Motion-for-React, Zustand or TanStack.
+`apps/studio` now stages/loads the owner-local Runtime Pack, validates the bootstrap payload, builds one shared local search index, browses/searches the real 24 Major Genres + 1,564 taxonomy genres, creates/updates Foundation/Fusion/Accent MusicSpec state, and renders the pure compiler live prompt/budget output. Its presentation is deliberately aligned to the supplied V'GINE Studio concept: editorial intro, horizontal four-stage workflow, large role cards, inline picker, sticky record-sleeve preview and mobile Studio/Preview dock. It intentionally does not invent missing editor content and still does not add Router, Radix, Motion-for-React, Zustand or TanStack.
 
 Real search benchmark acceptance: 10,348 documents; 92.014 ms index build; median 4.900 ms; P95 10.117 ms; P99/max 14.472 ms. Keep the dependency-free kernel unless later profiling proves a concrete need.
+
+Development-runtime rule: `pnpm dev` must build the internal workspace packages before staging Runtime Pack assets and starting Vite. Vite development also resolves exact internal `@vgine/*` JavaScript imports from workspace source, so ignored/stale `packages/*/dist` output cannot hide newly added exports. Production builds continue to validate compiled package output.
 
 ## Next-thread mission
 
