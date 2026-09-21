@@ -1,5 +1,6 @@
 import csv
 import json
+import sqlite3
 import subprocess
 import sys
 import tempfile
@@ -118,6 +119,70 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
             writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
             writer.writeheader()
             writer.writerows(rows)
+        knowledge_db = out / "knowledge.sqlite"
+        conn = sqlite3.connect(knowledge_db)
+        try:
+            conn.executescript(
+                """
+                CREATE TABLE instrument_family(
+                    id TEXT PRIMARY KEY,
+                    label TEXT NOT NULL,
+                    knowledge_entry_id TEXT
+                );
+                CREATE TABLE instrument(
+                    id TEXT PRIMARY KEY,
+                    label TEXT NOT NULL,
+                    label_norm TEXT NOT NULL,
+                    family_id TEXT,
+                    status TEXT NOT NULL,
+                    knowledge_entry_id TEXT
+                );
+                CREATE TABLE instrument_alias(
+                    alias_norm TEXT PRIMARY KEY,
+                    alias_surface TEXT NOT NULL,
+                    instrument_id TEXT NOT NULL,
+                    status TEXT NOT NULL
+                );
+                """
+            )
+            conn.execute(
+                "INSERT INTO instrument_family VALUES (?,?,?)",
+                ("family:guitars", "Guitars", "entry:family:guitars"),
+            )
+            conn.executemany(
+                "INSERT INTO instrument VALUES (?,?,?,?,?,?)",
+                [
+                    (
+                        "instrument:electric-guitar",
+                        "Electric Guitar",
+                        "electric guitar",
+                        "family:guitars",
+                        "reviewed",
+                        "entry:instrument:electric-guitar",
+                    ),
+                    (
+                        "instrument:trumpet",
+                        "Trumpet",
+                        "trumpet",
+                        None,
+                        "reviewed",
+                        "entry:instrument:trumpet",
+                    ),
+                ],
+            )
+            conn.execute(
+                "INSERT INTO instrument_alias VALUES (?,?,?,?)",
+                (
+                    "electric-guitar",
+                    "electric-guitar",
+                    "instrument:electric-guitar",
+                    "reviewed",
+                ),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
         curation = out / "curation.sqlite"
         curation.write_bytes(b"durable-curation-sentinel")
         return out, acceptance_path, curation
@@ -163,6 +228,17 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
             self.assertEqual(plan["counts"]["fully_semantic_expressions"], 2)
             self.assertEqual(plan["counts"]["semantic_residual_expressions"], 2)
             self.assertEqual(plan["counts"]["batch_count"], 2)
+            self.assertEqual(plan["identity_catalog"]["family_count"], 1)
+            self.assertEqual(plan["identity_catalog"]["instrument_count"], 2)
+            self.assertEqual(plan["identity_catalog"]["alias_count"], 1)
+            self.assertEqual(
+                plan["identity_catalog"]["instruments"][0]["id"],
+                "instrument:electric-guitar",
+            )
+            self.assertEqual(
+                plan["identity_catalog"]["instruments"][0]["aliases"][0]["surface"],
+                "electric-guitar",
+            )
             self.assertTrue(
                 plan["contract"]["source_expressions_remain_first_class_selectable_entities"]
             )
