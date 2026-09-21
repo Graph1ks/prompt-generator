@@ -104,6 +104,77 @@ def compiled_semantic_lexicon(
     return instrument_phrases, concept_phrases
 
 
+def infer_coordinated_shared_head_identities(
+    toks: list[str],
+    covered: list[bool],
+    matches: list[dict],
+    instrument_phrases: dict[tuple[str, ...], dict],
+) -> None:
+    """Infer coordinated identities only from exact reviewed phrases.
+
+    Example: when baritone saxophones, tenor saxophones, and generic
+    saxophones are all known, tenor and baritone saxophones may safely share
+    the right-hand head. No new identity is invented.
+    """
+    coordinators = {"and", "or"}
+    right_matches = [
+        match
+        for match in matches
+        if match.get("kind") == "instrument"
+        and match["start"] > 0
+        and toks[match["start"] - 1] in coordinators
+    ]
+    inferred_keys: set[tuple[str, int, int]] = set()
+
+    for right in right_matches:
+        coordinator = right["start"] - 1
+        right_tokens = tuple(toks[right["start"] : right["end"]])
+        if len(right_tokens) < 2:
+            continue
+
+        shared_suffixes = [
+            right_tokens[suffix_start:]
+            for suffix_start in range(1, len(right_tokens))
+            if right_tokens[suffix_start:] in instrument_phrases
+        ]
+        if not shared_suffixes:
+            continue
+
+        window_start = max(0, coordinator - 4)
+        candidates: list[tuple[int, int, tuple[str, ...], dict]] = []
+        for start in range(window_start, coordinator):
+            for end in range(start + 1, coordinator + 1):
+                if any(covered[start:end]):
+                    continue
+                span = toks[start:end]
+                if any(token in DECOMPOSITION_SYNTAX for token in span):
+                    continue
+                for suffix in shared_suffixes:
+                    key = tuple(span) + suffix
+                    found = instrument_phrases.get(key)
+                    if found:
+                        candidates.append((start, end, key, found))
+
+        candidates.sort(key=lambda item: (-(item[1] - item[0]), item[0], item[1]))
+        for start, end, key, found in candidates:
+            if any(covered[start:end]):
+                continue
+            dedupe_key = (found["id"], start, end)
+            if dedupe_key in inferred_keys:
+                continue
+            inferred_keys.add(dedupe_key)
+            matches.append(
+                {
+                    **found,
+                    "surface": " ".join(key),
+                    "start": start,
+                    "end": end,
+                    "inference": "coordinated_shared_head",
+                }
+            )
+            for idx in range(start, end):
+                covered[idx] = True
+
 def decompose_surface(
     surface: str,
     instrument_phrases: dict[tuple[str, ...], dict],
@@ -142,6 +213,13 @@ def decompose_surface(
             )
             for idx in range(start, end):
                 covered[idx] = True
+
+    infer_coordinated_shared_head_identities(
+        toks,
+        covered,
+        matches,
+        instrument_phrases,
+    )
 
     residual = [
         token
