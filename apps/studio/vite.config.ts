@@ -8,14 +8,16 @@ function workspaceSourcePath(directory: string): string {
   return path.replace(/^\/([A-Za-z]:\/)/u, "$1");
 }
 
-const workspaceSourceAliases = [
+const workspacePackages = [
   ["music-spec", "music-spec"],
   ["compiler", "compiler"],
   ["runtime-data", "runtime-data"],
   ["search", "search"],
   ["ui", "ui"],
   ["motion", "motion"],
-].map(([packageName, directory]) => ({
+] as const;
+
+const workspaceSourceAliases = workspacePackages.map(([packageName, directory]) => ({
   find: new RegExp("^@vgine/" + packageName + "$"),
   replacement: workspaceSourcePath(directory),
 }));
@@ -23,7 +25,9 @@ const workspaceSourceAliases = [
 export default defineConfig(({ command }) => ({
   base: "./",
   plugins: [react()],
-  resolve: command === "serve" ? { alias: workspaceSourceAliases } : undefined,
+  ...(command === "serve"
+    ? { resolve: { alias: workspaceSourceAliases } }
+    : {}),
   build: {
     target: "es2022",
   },
