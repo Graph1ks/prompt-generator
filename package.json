@@ -9,7 +9,7 @@
     "pnpm": "11.27.1"
   },
   "scripts": {
-    "dev": "pnpm runtime:stage && pnpm --filter @vgine/studio dev",
+    "dev": "pnpm run build:packages && pnpm runtime:stage && pnpm --filter @vgine/studio dev",
     "build": "pnpm run build:packages && pnpm run build:studio",
     "build:packages": "tsc -b",
     "build:studio": "pnpm --filter @vgine/studio build",
