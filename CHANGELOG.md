@@ -33,10 +33,15 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Added end-to-end completion-review binding: every semantic-review batch is SHA-addressed in the completion plan, a v2 decision template binds to the exact plan hash, and `knowledge_curation_session.py` verifies `completion_plan` as a supported reviewed artifact before durable mutation.
 - Added conservative coordinated shared-head instrument decomposition: phrases such as `tenor and baritone saxophones` can reuse a reviewed shared head only when all inferred instrument phrases already exist in the canonical/alias lexicon; unknown combinations remain residual.
 - Added explicit decomposition grammar scaffolding for `as`, `in`, and `used` so sentence structure does not masquerade as missing instrument semantics.
-- Added guarded hyphen-compound decomposition: exact reviewed de-hyphenated phrases are reused, while component-level inference requires complete reviewed coverage and refuses compounds that would imply multiple instrument identities.\n- Hardened instrument-expression tokenization for Unicode names, apostrophes, and dotted acronyms, and expanded the explicit grammar/count scaffolding set used only by semantic decomposition.
-- Added Factory-derived renderer budgeting: source preflight/validation rejects structured prompts above 1,000 characters, compiled renderer profiles carry the global hard limit, and renderer sections carry P90 soft targets/sample counts without inventing missing Vocal evidence.\n- Build revision advanced to `promptvgine-local-data-build-v2-resumable-3-prompt-budget`; completed older checkpoints can advance knowledge stages without rebuilding a matching promoted corpus.
+- Added guarded hyphen-compound decomposition: exact reviewed de-hyphenated phrases are reused, while component-level inference requires complete reviewed coverage and refuses compounds that would imply multiple instrument identities.
+- Hardened instrument-expression tokenization for Unicode names, apostrophes, and dotted acronyms, and expanded the explicit grammar/count scaffolding set used only by semantic decomposition.
+- Added Factory-derived renderer budgeting: source preflight/validation rejects structured prompts above 1,000 characters, compiled renderer profiles carry the global hard limit, and renderer sections carry P90 soft targets/sample counts without inventing missing Vocal evidence.
+- Build revision advanced to `promptvgine-local-data-build-v2-resumable-3-prompt-budget`; completed older checkpoints can advance knowledge stages without rebuilding a matching promoted corpus.
 
 ### Changed
+
+- **Database V1 milestone completed** for the current Factory snapshot: 6,035 / 6,035 source-backed Instruments expressions are fully semantic with 0 semantic residuals; all remain first-class selectable/renderable entities. The last completion snapshot contains 4,472 fully identity-decomposed expressions, 9 instrument families, 164 canonical instrument entities, and 161 active aliases.
+- Added `docs/DATABASE_V1.md` as the canonical three-database/table inventory, invariants, completion boundary, maintenance lifecycle, and next-thread starting point.
 
 - Repository is now explicitly a zero-paid-service, local/offline-first, owner-controlled solo-dev project.
 - Raw Factory files, generated databases, generated reports, backups, and runtime data bundles are explicitly local-only and ignored by Git.
