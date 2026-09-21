@@ -18,10 +18,10 @@ from knowledge_mining_session import sha256_file
 class KnowledgeCompletionSessionTests(unittest.TestCase):
     def write_fixture(self, root: Path):
         out = root / "out"
-        database = out / "reports"
-        knowledge = out / "reports"
-        database.mkdir(parents=True)
-        knowledge.mkdir(parents=True)
+        reports = out / "reports"
+        reports.mkdir(parents=True)
+        database = reports
+        knowledge = reports
         acceptance = {
             "schema": "promptvgine-database-foundation-acceptance-v1",
             "status": "ok",
