@@ -60,7 +60,7 @@ writing budget:
 | Instruments | 9,882 | 84 | 107 | 114 | 176 | 5 |
 | Texture | 2,915 | 66 | 88 | 95 | 121 | 1 |
 | Dynamics | 747 | 69 | 87 | 93 | 115 | 1 |
-| Space/Mix | 9,760 | 87 | 107 | 113 | 170 | 3 |
+| Space/Mix | 9,761* | 87 | 107 | 113 | 170 | 3 |
 | Production | 4,459 | 95 | 120 | 126 | 165 | 2 |
 
 The common 12-section layout's independent P90 line budgets plus newline
