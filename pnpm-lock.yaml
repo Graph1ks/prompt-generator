@@ -20,6 +20,18 @@ importers:
 
   packages/music-spec: {}
 
+  packages/runtime-data:
+    dependencies:
+      '@vgine/music-spec':
+        specifier: workspace:*
+        version: link:../music-spec
+
+  packages/search:
+    dependencies:
+      '@vgine/runtime-data':
+        specifier: workspace:*
+        version: link:../runtime-data
+
 packages:
 
   '@typescript/typescript-aix-ppc64@7.0.2':
