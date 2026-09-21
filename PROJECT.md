@@ -195,6 +195,7 @@ Important durable design documents:
 - `docs/RUNTIME_DATA_CONTRACT_V1.md`
 - `docs/COMPILER_V1.md`
 - `docs/RUNTIME_SEARCH_V1.md`
+- `docs/DESIGN_SYSTEM_V1.md`
 - `docs/LOCAL_OUTPUT_LAYOUT.md`
 
 ## Current priorities
@@ -203,6 +204,6 @@ Database V1 is complete for the current Factory snapshot. Current priorities are
 
 1. Validate Runtime Pack v1 against the real owner-local `knowledge.sqlite` and record size/count findings.
 2. Measure the dependency-free local search kernel against the real 10,348-document Runtime Pack before adding any search dependency.
-3. Build the V'gine design-system/motion foundation and React/Vite Studio shell on the stable MusicSpec/compiler/runtime-data/search packages.
+3. Review/pin React + Vite and build the first Studio shell on the implemented V'gine design/motion and domain/runtime packages.
 4. Wire Runtime Pack genre, instrument-expression and dictionary/search data into the production editor.
 5. Continue Vocal/statements/parameters/definitions as additive Post-V1 enrichment, not as a reason to reopen the completed database milestone.
