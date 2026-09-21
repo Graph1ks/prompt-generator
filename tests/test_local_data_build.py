@@ -306,7 +306,7 @@ class LocalDataBuildTests(unittest.TestCase):
                 self.assertEqual(c.execute("select count(*) from track").fetchone()[0], 2)
                 self.assertEqual(
                     k.execute("select value from build_meta where key='build_revision'").fetchone()[0],
-                    "promptvgine-local-data-build-v2-resumable-2-instrument-expressions",
+                    "promptvgine-local-data-build-v2-resumable-3-prompt-budget",
                 )
             finally:
                 c.close()
@@ -386,7 +386,7 @@ class LocalDataBuildTests(unittest.TestCase):
                     state.execute(
                         "select value from build_meta where key='build_revision'"
                     ).fetchone()[0],
-                    "promptvgine-local-data-build-v2-resumable-2-instrument-expressions",
+                    "promptvgine-local-data-build-v2-resumable-3-prompt-budget",
                 )
             finally:
                 state.close()
