@@ -62,9 +62,9 @@
 
 ## Architecture
 
-**Runtime/language:** TypeScript/React planned for application; Python standard library for local data bootstrap/mining tooling.  
-**Primary framework:** React/Vite direction; Tauri 2 or equivalent lightweight shell subject to final dependency/license review.  
-**Storage:** local SQLite split into disposable evidence (`corpus.sqlite`), durable authoring (`curation.sqlite`), and disposable compiled knowledge (`knowledge.sqlite`); resumable build checkpoints live in ignored local state; future web/native runtime bundles are compiled locally.  
+**Runtime/language:** strict TypeScript for application/runtime/compiler; Python standard library for local data bootstrap/mining/runtime-pack tooling.  
+**Primary framework:** React + Vite in a pnpm workspace; Tauri 2 is the accepted desktop-shell direction after web foundation stabilization.  
+**Storage:** local SQLite split into disposable evidence (`corpus.sqlite`), durable authoring (`curation.sqlite`), and disposable compiled knowledge (`knowledge.sqlite`); resumable build checkpoints live in ignored local state; versioned Runtime Pack artifacts are compiled locally for web/native consumption.  
 **Packaging/distribution:** static web/PWA + local desktop packaging; no required backend.
 
 ### Operator workflow
@@ -140,8 +140,11 @@ Project-specific additions to `AGENTS.md`:
 
 - Core data build uses Python standard library unless a third-party dependency provides clear value and passes cost/license review.
 - Do not introduce a required cloud database, hosted search service, or metered model/API.
-- Do not add a runtime SQLite-WASM dependency merely to reuse the native DB in web; static web shards are a valid compile target.
-- Final font/icon/motion libraries require explicit dependency/asset review.
+- Do not add a runtime SQLite-WASM dependency merely to reuse the native DB in web; versioned Runtime Pack artifacts are the web/native boundary.
+- V'gine owns a modular semantic-token design system; do not introduce a generic Tailwind/MUI/Bootstrap visual foundation.
+- Radix may be adopted selectively behind V'gine wrappers; shadcn is reference material rather than the base system.
+- Motion for React is the selected motion-engine candidate; actual package versions still require dependency/license review.
+- Final font/icon/motion/UI dependencies require explicit dependency/asset review.
 
 ## Data sources
 
@@ -186,13 +189,15 @@ Important durable design documents:
 - `docs/PROMPT_CORPUS_PROFILE.md`
 - `docs/LOCAL_DATA_BUILD.md`
 - `docs/DECISIONS.md`
+- `docs/APPLICATION_ARCHITECTURE.md`
+- `docs/RUNTIME_DATA_CONTRACT_V1.md`
 
 ## Current priorities
 
 Database V1 is complete for the current Factory snapshot. Current priorities are now:
 
-1. Define/compile the runtime data contract/shards from `knowledge.sqlite` for web/native/server consumption.
-2. Implement the documented MusicSpec -> `suno-structured-v1` compiler in TypeScript, including deterministic semantic enforcement of the 1,000-character budget.
-3. Wire compiled genre, instrument-expression and dictionary/search data into the application.
+1. Validate Runtime Pack v1 against the real owner-local `knowledge.sqlite` and record size/count findings.
+2. Scaffold the strict TypeScript/pnpm workspace and implement the documented MusicSpec -> `suno-structured-v1` compiler, including deterministic semantic enforcement of the 1,000-character budget.
+3. Wire Runtime Pack genre, instrument-expression and dictionary/search data into the application.
 4. Build the first production-quality Easy/Advanced editor and inline knowledge interaction on top of the stable semantic model.
 5. Continue Vocal/statements/parameters/definitions as additive Post-V1 enrichment, not as a reason to reopen the completed database milestone.
