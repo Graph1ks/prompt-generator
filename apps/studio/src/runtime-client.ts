@@ -5,10 +5,12 @@ import {
   type RuntimeCompilerKnowledge,
   type RuntimePackReader,
 } from "@vgine/runtime-data";
+import { createSearchIndex, type SearchIndex } from "@vgine/search";
 
 export interface StudioRuntime {
   readonly bootstrap: RuntimeBootstrap;
   readonly compilerKnowledge: RuntimeCompilerKnowledge;
+  readonly searchIndex: SearchIndex;
 }
 
 function createBrowserReader(): RuntimePackReader {
@@ -37,11 +39,12 @@ async function sha256Hex(text: string): Promise<string> {
 }
 
 export async function loadStudioRuntime(): Promise<StudioRuntime> {
-  const bootstrap = await loadRuntimeBootstrap(createBrowserReader(), {
-    sha256Hex,
-  });
+  const hashOptions =
+    globalThis.crypto?.subtle === undefined ? {} : { sha256Hex };
+  const bootstrap = await loadRuntimeBootstrap(createBrowserReader(), hashOptions);
   return {
     bootstrap,
     compilerKnowledge: buildCompilerKnowledge(bootstrap),
+    searchIndex: createSearchIndex(bootstrap.search.documents),
   };
 }
