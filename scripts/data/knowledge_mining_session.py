@@ -312,7 +312,7 @@ def lexicon_report(
     for surface, sections in by_term.items():
         total_occ = sum(x["occurrence_count"] for x in sections)
         total_tracks_upper = sum(x["track_count"] for x in sections)
-        if total_occ < 5:
+        if total_occ < 2:
             continue
         max_occ = max(x["occurrence_count"] for x in sections)
         score = max_occ + math.log2(total_occ + 1) * 6 + len(sections) * 8
