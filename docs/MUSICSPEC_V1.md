@@ -39,7 +39,7 @@ MusicSpec
 └─ exclude[]
 ```
 
-The JSON Schema lives in `schema/music-spec-v1.schema.json`.
+The JSON Schema lives in `schema/music-spec-v1.schema.json`. The executable TypeScript contract/runtime validator lives in `packages/music-spec`; unknown facet keys are rejected in v1 rather than silently interpreted.
 
 ## 3. Genre influences
 
