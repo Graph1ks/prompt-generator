@@ -206,7 +206,30 @@ Do not import data merely because it is publicly accessible.
 
 Do not use private production data as test fixtures unless explicitly sanitized and approved.
 
-## 8. QA strategy
+## 8. Long-running local data/build job standard — HARD RULE
+
+Any owner-local workflow that may process large datasets, run for more than a trivial interactive duration, or create a materialized/runtime artifact must be designed as a resumable build pipeline by default.
+
+Hard requirements:
+
+- provide a read-only plan/preflight mode when the job can materially affect time, disk usage, or downstream artifacts;
+- split work into deterministic named stages and bounded transactional batches;
+- persist checkpoints in machine-readable local state, normally SQLite, so a crash, process exit, reboot, or ordinary rerun does not discard completed work;
+- rerunning the normal build command must resume safely from the last committed checkpoint without requiring special recovery steps;
+- handle SIGINT/SIGTERM cooperatively: finish or roll back the current safe unit, persist paused/error state, close databases, and retain reusable work;
+- print useful console progress for active stages: stage name, processed/total rows where known, percentage, throughput, batch duration, and ETA when meaningful;
+- expose a status/inspection command for incomplete work;
+- fingerprint or otherwise bind work state to source inputs and build semantics; refuse to combine changed inputs or changed build logic with stale checkpoints;
+- write expensive/incomplete output to a distinct work artifact and promote only after validation; prefer atomic rename/swap for final promotion;
+- never destroy the last known-good promoted artifact implicitly; replacement/reset/destructive operations require explicit flags and should preserve the previous artifact when practical;
+- run integrity/invariant checks before promotion and emit a machine-readable final report with source/build fingerprints, stage status, counts, timing, and safety invariants;
+- keep source-of-truth inputs immutable unless an explicit accepted contract says otherwise;
+- make reset semantics narrow: resetting incomplete work must not delete canonical/source inputs, durable curation, or already promoted artifacts;
+- test pause/resume, stale-checkpoint rejection, invariants, safe reset, and promotion behavior on small synthetic fixtures in CI.
+
+For genuinely small one-shot scripts where checkpointing would add more complexity than the whole job, keep the implementation simple. Large-data workflows must not silently opt out of resumability.
+
+## 10. QA strategy
 
 Use risk-based QA.
 
@@ -241,7 +264,7 @@ When performance matters:
 
 Prefer algorithmic/data-layout/query improvements over cosmetic micro-optimizations.
 
-## 10. Dependency policy
+## 11. Dependency policy
 
 Before adding a dependency, ask:
 
@@ -255,7 +278,7 @@ Before adding a dependency, ask:
 
 Pin or lock dependencies according to the ecosystem's standard practice.
 
-## 11. Repository visibility and hygiene
+## 12. Repository visibility and hygiene
 
 Repository visibility and collaboration mode must be selected explicitly in `PROJECT.md`.
 
@@ -304,7 +327,7 @@ Keep public repositories free of:
 
 Prefer reproducible project-relative commands and paths.
 
-## 12. Documentation and continuity
+## 13. Documentation and continuity
 
 Documentation must make the project understandable **and resumable**.
 
@@ -343,7 +366,7 @@ Do not create process documents merely to create process documents.
 
 A meaningful work session is not complete if the implementation changed materially but `STATUS.md` / `docs/HANDOVER.md` still describe an obsolete state.
 
-## 13. Project license and contribution model
+## 14. Project license and contribution model
 
 At project initialization, do not merely ask for a license name. Proactively analyze the intended product/distribution model and recommend the strongest-fitting license strategy.
 
@@ -372,7 +395,7 @@ Do not pretend uncertain licensing questions are settled facts. For unusual lice
 
 Record the decision in `PROJECT.md` and follow `docs/LICENSING.md`.
 
-## 14. Definition of done
+## 15. Definition of done
 
 A coherent change is done when applicable:
 
@@ -393,7 +416,7 @@ A coherent change is done when applicable:
 - performance requirements are measured when relevant;
 - known limitations are explicit.
 
-## 15. Decision priority
+## 16. Decision priority
 
 When constraints compete, use this order unless the project explicitly overrides it:
 
