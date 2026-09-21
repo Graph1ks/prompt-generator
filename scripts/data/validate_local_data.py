@@ -5,6 +5,7 @@ import argparse, sqlite3
 from pathlib import Path
 
 from instrument_semantics import collect_source_instrument_expressions
+from local_data_v1_core import STYLE_PROMPT_MAX_CHARACTERS
 
 def connect(path):
     if not path.is_file(): raise FileNotFoundError(path)
@@ -26,6 +27,9 @@ def main():
         if knowledge.execute("SELECT COUNT(*) FROM genre").fetchone()[0]!=rg: errors.append("knowledge: genre count differs from corpus taxonomy")
         if knowledge.execute("SELECT COUNT(*) FROM major_genre").fetchone()[0]!=rm: errors.append("knowledge: major genre count differs from corpus taxonomy")
         if knowledge.execute("SELECT COUNT(*) FROM renderer_profile WHERE active=1").fetchone()[0]!=1: errors.append("knowledge: expected exactly one active renderer")
+        if corpus.execute("SELECT COUNT(*) FROM track WHERE length(structured_prompt)>?",(STYLE_PROMPT_MAX_CHARACTERS,)).fetchone()[0]: errors.append(f"corpus: source structured_prompt exceeds {STYLE_PROMPT_MAX_CHARACTERS} characters")
+        budget=knowledge.execute("SELECT max_characters FROM renderer_profile WHERE id='suno-structured-v1'").fetchone()
+        if not budget or budget[0]!=STYLE_PROMPT_MAX_CHARACTERS: errors.append(f"knowledge: suno-structured-v1 max_characters must equal {STYLE_PROMPT_MAX_CHARACTERS}")
         if knowledge.execute("SELECT COUNT(*) FROM prompt_section_definition WHERE lower(output_label)='exclude'").fetchone()[0]: errors.append("knowledge: Exclude must not be a structured prompt section")
         source_expressions=len(collect_source_instrument_expressions(corpus))
         knowledge_expressions=knowledge.execute("SELECT COUNT(*) FROM instrument_expression WHERE source_kind='factory'").fetchone()[0]
