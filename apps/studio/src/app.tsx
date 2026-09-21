@@ -184,13 +184,12 @@ export function App() {
         ? "Runtime wird geladen"
         : "Runtime nicht verfügbar";
 
+  const currentChapterIndex = STUDIO_CHAPTERS.findIndex(
+    (entry) => entry.id === chapter.id,
+  );
   const nextChapter =
-    STUDIO_CHAPTERS[
-      Math.min(
-        STUDIO_CHAPTERS.length - 1,
-        STUDIO_CHAPTERS.findIndex((entry) => entry.id === chapter.id) + 1,
-      )
-    ];
+    STUDIO_CHAPTERS.find((_, index) => index === currentChapterIndex + 1) ??
+    chapter;
 
   return (
     <div className="studio-shell">
