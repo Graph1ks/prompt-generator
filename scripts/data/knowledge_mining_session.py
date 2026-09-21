@@ -740,6 +740,33 @@ def prepare(args) -> int:
 
     full_instrument_rows = instruments.pop("_full_rows")
     full_decomposition_rows = decomposition.pop("_full_rows")
+    decomposition_by_id = {
+        row["candidate_id"]: row for row in full_decomposition_rows
+    }
+    semantic_unresolved = []
+    semantic_covered = 0
+    for row in full_instrument_rows:
+        semantic = decomposition_by_id[row["candidate_id"]]
+        if semantic["fully_semantic"]:
+            semantic_covered += 1
+            continue
+        if row["already_curated"]:
+            continue
+        semantic_unresolved.append(
+            {
+                **row,
+                "semantic_coverage": semantic["coverage"],
+                "recognized_instrument_ids": semantic["instrument_ids"],
+                "recognized_concept_ids": semantic["concept_ids"],
+                "residual_tokens": semantic["residual_tokens"],
+            }
+        )
+    instruments["semantic_covered_unique_segments"] = semantic_covered
+    instruments["semantic_unresolved_unique_segments"] = len(semantic_unresolved)
+    instruments["prioritized_candidates"] = semantic_unresolved[: args.instrument_limit]
+    instruments["notes"].append(
+        "Prioritized candidates are now semantic residuals: segments already fully explained by curated instruments/concepts are removed from the review queue."
+    )
     full_terms = lexicon.pop("_full_terms")
     full_phrases = lexicon.pop("_full_phrases")
 
@@ -825,6 +852,8 @@ def prepare(args) -> int:
         "counts": {
             "instrument_unique_segments": len(full_instrument_rows),
             "instrument_prioritized": len(instruments["prioritized_candidates"]),
+            "instrument_semantic_covered_unique": instruments["semantic_covered_unique_segments"],
+            "instrument_semantic_unresolved_unique": instruments["semantic_unresolved_unique_segments"],
             "instrument_fully_semantic_unique": decomposition["fully_semantic_unique"],
             "instrument_fully_semantic_unique_ratio": decomposition["fully_semantic_unique_ratio"],
             "instrument_fully_semantic_occurrence_ratio": decomposition["fully_semantic_occurrence_ratio"],
