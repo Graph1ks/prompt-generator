@@ -30,7 +30,11 @@ Local-only:
 - runtime SQLite/JSON/search bundles;
 - generated corpus reports and intermediate indexes.
 
-## Canonical Database V1 inventory\n\nFor the completed milestone, exact table purposes, V1 completion counts, hard invariants and next-thread boundary are documented in **`docs/DATABASE_V1.md`**. This architecture document explains lifecycle/design; `DATABASE_V1.md` is the concise operational/table map.\n\n## 2. Data products
+## Canonical Database V1 inventory
+
+For the completed milestone, exact table purposes, V1 completion counts, hard invariants and next-thread boundary are documented in **`docs/DATABASE_V1.md`**. This architecture document explains lifecycle/design; `DATABASE_V1.md` is the concise operational/table map.
+
+## 2. Data products
 
 ### A. `corpus.sqlite` — evidence/mining database
 
