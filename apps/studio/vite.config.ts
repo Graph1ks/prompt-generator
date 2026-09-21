@@ -1,7 +1,12 @@
-import { fileURLToPath } from "node:url";
-
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+
+function workspaceSourcePath(directory: string): string {
+  const path = decodeURIComponent(
+    new URL("../../packages/" + directory + "/src/index.ts", import.meta.url).pathname,
+  );
+  return path.replace(/^\/([A-Za-z]:\/)/u, "$1");
+}
 
 const workspaceSourceAliases = [
   ["music-spec", "music-spec"],
@@ -12,9 +17,7 @@ const workspaceSourceAliases = [
   ["motion", "motion"],
 ].map(([packageName, directory]) => ({
   find: new RegExp("^@vgine/" + packageName + "$"),
-  replacement: fileURLToPath(
-    new URL("../../packages/" + directory + "/src/index.ts", import.meta.url),
-  ),
+  replacement: workspaceSourcePath(directory),
 }));
 
 export default defineConfig(({ command }) => ({
