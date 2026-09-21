@@ -95,9 +95,9 @@ class CurationSessionTests(unittest.TestCase):
                 text=True,
             )
             self.assertIn("prepared 1 candidates", result.stdout)
-            report_path = out / "reports" / "curation" / "genre-crosswalk-review-v1.json"
-            csv_path = out / "reports" / "curation" / "genre-crosswalk-review-v1.csv"
-            summary_path = out / "reports" / "curation" / "curation-session-summary.json"
+            report_path = out / "reports" / "curation-genre-crosswalk-review-v1.json"
+            csv_path = out / "reports" / "curation-genre-crosswalk-review-v1.csv"
+            summary_path = out / "reports" / "curation-session-summary.json"
             self.assertTrue(report_path.is_file())
             self.assertTrue(csv_path.is_file())
             self.assertTrue(summary_path.is_file())
@@ -119,7 +119,7 @@ class CurationSessionTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
             )
-            report_path = out / "reports" / "curation" / "genre-crosswalk-review-v1.json"
+            report_path = out / "reports" / "curation-genre-crosswalk-review-v1.json"
             report = json.loads(report_path.read_text(encoding="utf-8"))
             candidate = report["candidates"][0]
             target = next(
@@ -139,7 +139,7 @@ class CurationSessionTests(unittest.TestCase):
                     }
                 ],
             }
-            bundle_path = out / "reports" / "curation" / "genre-crosswalk-decisions-v1.json"
+            bundle_path = out / "reports" / "curation-genre-crosswalk-decisions-v1.json"
             bundle_path.write_text(json.dumps(bundle, indent=2), encoding="utf-8")
 
             result = subprocess.run(
@@ -191,7 +191,7 @@ class CurationSessionTests(unittest.TestCase):
                 knowledge.close()
 
             receipt = json.loads(
-                (out / "reports" / "curation" / "last-apply-receipt.json").read_text(
+                (out / "reports" / "curation-last-apply-receipt.json").read_text(
                     encoding="utf-8"
                 )
             )
@@ -208,7 +208,7 @@ class CurationSessionTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
             )
-            bundle_path = out / "reports" / "curation" / "genre-crosswalk-decisions-v1.json"
+            bundle_path = out / "reports" / "curation-genre-crosswalk-decisions-v1.json"
             bundle_path.write_text(
                 json.dumps(
                     {
