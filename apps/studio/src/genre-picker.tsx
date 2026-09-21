@@ -170,7 +170,7 @@ export function GenrePicker({
         <input
           type="search"
           value={query}
-          placeholder={"Search 1,564 genres for " + ROLE_LABELS[activeRole] + "…"}
+          placeholder={"Search " + runtime.genres.genres.length.toLocaleString() + " genres for " + ROLE_LABELS[activeRole] + "…"}
           autoComplete="off"
           onChange={(event) => setQuery(event.currentTarget.value)}
         />
