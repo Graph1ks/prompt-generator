@@ -26,7 +26,7 @@ Make the database complete before UI/runtime work: preserve every source-backed 
 - Completed old checkpoints can advance to the new compiler revision without rebuilding the corpus or deleting durable curation.
 - `database_foundation_session.py finalize` runs build/recompile + validation + mining refresh + acceptance reporting as one solo-dev phase and keeps verbose subprocess output in report files.
 - Knowledge apply remains backup-first, hash/fingerprint-bound, transactional, automatically recompiled/validated, rollback-safe, and report-refreshing.
-- `knowledge_completion_session.py prepare` is the next repository-side database phase: it refuses to run until the owner-local database acceptance is `ok`, reconciles acceptance with the full decomposition export, writes SHA-addressed residual-semantic review batches, and generates a v2 decision template hash-bound to the exact completion plan without mutating curation or changing the source-expression catalog.
+- `knowledge_completion_session.py prepare` is the next repository-side database phase: it refuses to run until the owner-local database acceptance is `ok`, uses acceptance as the immutable foundation/source-inventory gate, validates the fresh decomposition export against itself, allows legitimate semantic coverage to advance after curation, writes SHA-addressed residual-semantic review batches, and generates a v2 decision template hash-bound to the exact completion plan without mutating curation or changing the source-expression catalog.
 
 ## Last verified checks
 
@@ -37,7 +37,7 @@ Make the database complete before UI/runtime work: preserve every source-backed 
 - Synthetic mining covers semantic-vs-identity decomposition reports.
 - Synthetic revision-upgrade coverage verifies a completed older checkpoint can recompile knowledge without rebuilding the promoted corpus.
 - Bundled database-finalization coverage verifies one concise terminal summary plus detailed report/log files.
-- Semantic-completion planner coverage verifies successful acceptance produces deterministic bounded batches, failed acceptance/stale decomposition fail closed, durable curation bytes remain unchanged, and completion-plan hashes are accepted as first-class v2 review bindings.
+- Semantic-completion planner coverage verifies successful acceptance produces deterministic bounded batches, failed acceptance/stale decomposition fail closed, post-acceptance semantic progress is accepted and reported as baseline-vs-current deltas, durable curation bytes remain unchanged, and completion-plan hashes are accepted as first-class v2 review bindings.
 
 ## Current blocker
 
