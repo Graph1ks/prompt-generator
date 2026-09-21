@@ -70,6 +70,7 @@ CURATION_HASH_TABLES = [
     "instrument_family_patch",
     "instrument_patch",
     "instrument_alias_patch",
+    "instrument_trait_patch",
     "parameter_patch",
     "parameter_option_patch",
     "statement_patch",
