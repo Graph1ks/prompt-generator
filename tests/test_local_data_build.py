@@ -456,9 +456,7 @@ class LocalDataBuildTests(unittest.TestCase):
     def test_renderer_profile_carries_source_derived_character_budget(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            vault, genres = self.write_sources(root)
-            out = root / "out"
-            result = self.run_builder(vault, genres, out)
+            out, result = self.run_builder(root)
             self.assertEqual(result.returncode, 0, msg=result.stderr)
             knowledge = sqlite3.connect(out / "knowledge.sqlite")
             try:
@@ -480,6 +478,16 @@ class LocalDataBuildTests(unittest.TestCase):
                 self.assertEqual(sections["vocal"], (None, 0))
             finally:
                 knowledge.close()
+
+    def test_source_prompt_over_1000_characters_fails_preflight(self):
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            changed = copy.deepcopy(VAULT)
+            changed["tracks"][0]["structured_prompt"] = "[Genre: " + ("x" * 992) + "]"
+            self.assertGreater(len(changed["tracks"][0]["structured_prompt"]), 1000)
+            _, result = self.run_builder(tmp, vault_data=changed, check=False)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("1000-character limit", result.stderr)
 
     def test_plan_is_read_only(self):
         with tempfile.TemporaryDirectory() as td:
