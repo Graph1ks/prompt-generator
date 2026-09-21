@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-21  
-**Current milestone:** **React/Vite Studio shell implemented** — next: real Runtime Pack/search wiring and production pickers
+**Current milestone:** **Runtime-backed Genre Studio slice implemented** — next: reusable picker pattern + Instruments/knowledge controls
 
 ## Completion verdict
 
@@ -83,15 +83,15 @@ Expected result: acceptance remains `status: ok`; the compiled knowledge DB is s
 - `@vgine/search` provides dependency-free deterministic local ranking, stable-ID results and a worker-ready request/response protocol.
 - `@vgine/ui` now owns semantic design tokens and the Paradise/Ash theme contract with no external font/component framework.
 - `@vgine/motion` now owns durations/easings/springs and named causal recipes with reduced-motion behavior; no animation library dependency is required at this layer.
-- `pnpm bench:search` benchmarks the real `.local-data/current/runtime-v1/search.json`; no external search dependency will be adopted before that measurement.
+- Real 10,348-document search benchmark accepted: 92.014 ms one-time index build; median 4.900 ms, P95 10.117 ms, P99/max 14.472 ms. The dependency-free kernel remains the production baseline; no fuzzy/index dependency or Worker is justified by current measurements.
 - React 19.3.0 + React DOM 19.3.0 + Vite 8.3.0 + @vitejs/plugin-react 6.1.1 are now pinned and reviewed; no Router/Radix/Motion-for-React/Zustand/TanStack package is installed yet.
-- `apps/studio` now builds as a responsive V'gine shell with desktop chapter rail, mobile chapter dock, live-output pane, theme switch, 17-facet chapter navigation and no fabricated editor options.
+- `apps/studio` now stages and validates the real Runtime Pack, builds one shared search index, renders a production Genre picker over 24 Major Genres / 1,564 taxonomy genres, writes stable IDs into shared MusicSpec state, and drives the pure compiler/live 1,000-character budget preview.
 - `@vgine/ui` now includes the first reusable React primitives (`Surface`, `Button`, `IconButton`, `Text`, `Stack`, `Cluster`) styled only through V'gine semantic tokens.
 - Local operator outputs are standardized: flat `reports/`, separate `logs/`, durable `.local-data/backups/`; legacy nested report folders have a safe plan/apply migrator.
 
 ## Current blocker
 
-**No implementation blocker.** The real 10,348-document search benchmark is still the measurement gate before any fuzzy/index-library dependency. The Studio shell itself builds successfully with the frozen dependency graph.
+**No implementation blocker.** Search performance, Runtime Pack loading, Genre selection, MusicSpec creation and live compiler preview are all validated in the current application slice. Owner-local visual/touch review remains useful but is not an architecture blocker.
 
 Future enrichment does not reopen the V1 database milestone unless it changes schema/invariants.
 
@@ -99,11 +99,11 @@ Future enrichment does not reopen the V1 database milestone unless it changes sc
 
 Proceed in this order:
 
-1. run `pnpm bench:search` against the real owner-local Runtime Pack and record build/query latency;
-2. wire the real Runtime Pack bootstrap into `apps/studio` and replace shell placeholders with stable-ID genre/search data;
-3. implement the production Genre picker first, using the existing search kernel and 24-major taxonomy without giant DOM lists;
-4. connect MusicSpec state -> compiler -> live prompt/budget pane; move search behind a Web Worker when profiling justifies it;
-5. enrich empty editor statements/parameters/Exclude content additively without reopening Database V1.
+1. extract the Genre browse/search/result mechanics into the reusable V'gine Picker/SearchResults pattern;
+2. add lazy Runtime Pack repositories for instrument expressions and knowledge detail payloads;
+3. implement the production Instruments picker over all 6,035 source expressions without mounting giant lists;
+4. add ProjectStorage/IndexedDB persistence for versioned MusicSpec projects;
+5. expand the remaining facets and additive editor-content enrichment without reopening Database V1.
 
 ## Do not redo
 
@@ -129,4 +129,5 @@ Proceed in this order:
 - `docs/COMPILER_V1.md` — implemented compiler/budget behavior
 - `docs/RUNTIME_SEARCH_V1.md` — runtime loader/search contract and benchmark gate
 - `docs/DESIGN_SYSTEM_V1.md` — semantic themes/tokens/motion foundation
+- `docs/STUDIO_RUNTIME_GENRE_V1.md` — real Runtime Pack staging, Genre picker and live compiler integration
 - `docs/LOCAL_OUTPUT_LAYOUT.md` — canonical local reports/logs/backups layout
