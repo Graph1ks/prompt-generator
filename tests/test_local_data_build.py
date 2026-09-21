@@ -423,12 +423,7 @@ class LocalDataBuildTests(unittest.TestCase):
                 1,
             )
             self.assertIn("[database-foundation] OK", result.stdout)
-            report_path = (
-                out
-                / "reports"
-                / "database"
-                / "database-foundation-acceptance-v1.json"
-            )
+            report_path = out / "reports" / "database-foundation-acceptance-v1.json"
             self.assertTrue(report_path.is_file())
             report = json.loads(report_path.read_text(encoding="utf-8"))
             self.assertEqual(report["status"], "ok")
