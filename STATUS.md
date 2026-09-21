@@ -20,6 +20,7 @@ Make the database complete before UI/runtime work: preserve every source-backed 
 - `instrument_expression_instrument` links source expressions to resolved canonical instrument identities.
 - `instrument_expression_concept` links the same expression to reusable playing/processing/role/timbre/etc. concepts.
 - Expressions can be `identity`, `semantic`, `partial`, or `unresolved`; none of those states removes a source-backed expression from the selectable database.
+- Instrument decomposition now supports conservative coordinated shared-head inference: e.g. `tenor and baritone saxophones` may resolve both identities only when the shared head and each reconstructed phrase already exist in the reviewed instrument lexicon. It never invents a new identity from coordination.
 - Residual-only mining applies only to **future semantic curation review**, not to product availability. Fully understood expressions leave the review queue but stay in `knowledge.sqlite`.
 - Instrument ontology v2 also supports durable `instrument_trait_patch`, scoped decision bundles, aliases, Advanced instrument parameters/options, and compiled instrument traits.
 - Build revision is now `promptvgine-local-data-build-v2-resumable-2-instrument-expressions`.
@@ -34,7 +35,7 @@ Make the database complete before UI/runtime work: preserve every source-backed 
 - Synthetic build tests require every source Instruments expression to exist in `knowledge.sqlite`, be selectable, and preserve exact output text.
 - Synthetic knowledge-c​​uration tests verify that a compound expression such as `clean rhythm electric guitar` remains selectable while linking Electric Guitar + Clean + Rhythm semantics.
 - Synthetic v2 scoped apply covers instrument aliases, traits, parameters/options, compile, and validation.
-- Synthetic mining covers semantic-vs-identity decomposition reports.
+- Synthetic mining covers semantic-vs-identity decomposition reports, reviewed shared-head coordination, negative non-inference cases, and explicit grammar-scaffolding suppression.
 - Synthetic revision-upgrade coverage verifies a completed older checkpoint can recompile knowledge without rebuilding the promoted corpus.
 - Bundled database-finalization coverage verifies one concise terminal summary plus detailed report/log files.
 - Semantic-completion planner coverage verifies successful acceptance produces deterministic bounded batches, failed acceptance/stale decomposition fail closed, post-acceptance semantic progress is accepted and reported as baseline-vs-current deltas, the current canonical instrument/family/alias catalog is captured for identity review, durable curation bytes remain unchanged, and completion-plan hashes are accepted as first-class v2 review bindings.
