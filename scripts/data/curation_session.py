@@ -82,7 +82,7 @@ def integrity(path: Path) -> None:
 def backup_sqlite(source: Path, backup_dir: Path) -> Path:
     integrity(source)
     backup_dir.mkdir(parents=True, exist_ok=True)
-    stamp = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
+    stamp = dt.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
     target = backup_dir / f"curation-{stamp}.sqlite"
     src = sqlite3.connect(source)
     dst = sqlite3.connect(target)
@@ -524,14 +524,14 @@ def apply_decisions(curation_path: Path, validated: list[dict]) -> dict:
                         timestamp,
                     ),
                 )
-            conn.execute(
+            update = conn.execute(
                 """UPDATE candidate_review
                    SET review_status=?,reviewed_at=?,reviewer_note=?
                    WHERE candidate_key=? AND review_status='unreviewed'""",
                 (review_status, timestamp, reviewer_note, key),
             )
-            if conn.total_changes <= 0:
-                raise RuntimeError(f"candidate update failed: {key}")
+            if update.rowcount != 1:
+                raise RuntimeError(f"candidate update failed or became stale: {key}")
             applied += 1
         conn.commit()
     except Exception:
