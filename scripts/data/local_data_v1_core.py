@@ -197,6 +197,13 @@ def apply_curation(k,c):
   if not has("instrument","id",iid): counts["instrument_aliases_skipped_missing_instrument"]+=1; continue
   if status=="deprecated": cur.execute("DELETE FROM instrument_alias WHERE alias_norm=?",(snorm,)); continue
   cur.execute("INSERT INTO instrument_alias(alias_norm,alias_surface,instrument_id,status) VALUES (?,?,?,?) ON CONFLICT(alias_norm) DO UPDATE SET alias_surface=excluded.alias_surface,instrument_id=excluded.instrument_id,status=excluded.status",(snorm,surface,iid,status)); counts["instrument_aliases_applied"]+=1
+ for _,iid,eid,trait_type,confidence,status in c.execute("SELECT id,instrument_id,entry_id,trait_type,confidence,status FROM instrument_trait_patch ORDER BY id"):
+  if not has("instrument","id",iid): counts["instrument_traits_skipped_missing_instrument"]+=1; continue
+  if not has("knowledge_entry","id",eid): counts["instrument_traits_skipped_missing_entry"]+=1; continue
+  if status=="deprecated":
+   cur.execute("DELETE FROM instrument_trait WHERE instrument_id=? AND entry_id=? AND trait_type=?",(iid,eid,trait_type)); continue
+  if status=="candidate": continue
+  cur.execute("INSERT INTO instrument_trait(instrument_id,entry_id,trait_type,confidence,status,provenance_key) VALUES (?,?,?,?,?,'local-curation') ON CONFLICT(instrument_id,entry_id,trait_type) DO UPDATE SET confidence=excluded.confidence,status=excluded.status,provenance_key='local-curation'",(iid,eid,trait_type,confidence,status)); counts["instrument_traits_applied"]+=1
  for row in c.execute("SELECT id,section_key,label,canonical_slug,value_type,easy_visible,advanced_visible,allow_custom_text,knowledge_entry_id,sort_order,status FROM parameter_patch ORDER BY id"):
   pid,section,label,pslug,vtype,easy,adv,custom,eid,sort_order,status=row
   if status=="deprecated": cur.execute("DELETE FROM parameter WHERE id=?",(pid,)); continue

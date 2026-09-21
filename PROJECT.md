@@ -37,7 +37,7 @@
 - Structured Suno prompt rendering using source-compatible `[Header: content]` sections.
 - Separate comma-delimited Exclude output.
 - Site-wide inline music dictionary / knowledge layer with beginner/context/current-project explanations.
-- Instrument identity separated from role, register, articulation, envelope/behavior, processing, and space.
+- Every source Instruments phrase is preserved as a first-class selectable expression; canonical instrument identity is separately linked to role, register, articulation, envelope/behavior, processing, performance, and space semantics.
 - Quality checks/relations that explain conflicts without blocking creative choices.
 - Local-only corpus mining, knowledge database generation, and runtime data compilation.
 - Responsive/mobile-first interaction patterns and accessible non-hover fallbacks.
@@ -57,7 +57,7 @@
 **Primary quality target:** deterministic, explainable, local-first semantic generation with excellent UI ergonomics.  
 **Performance targets:** picker/search interactions should feel instant on normal hardware; runtime data must be compiled/sharded so the 10k-prompt evidence corpus is not required by the normal UI.  
 **Availability target:** core builder works offline after application/assets are installed or cached.  
-**Data-size assumptions:** current evidence baseline is 10,043 prompt records and 1,564 taxonomy genres; architecture must tolerate substantial future growth without giant dropdowns or full-corpus browser payloads.  
+**Data-size assumptions:** current evidence baseline is 10,043 prompt records, 1,564 taxonomy genres, and 6,035 unique source Instruments expressions; architecture must tolerate substantial future growth without giant native dropdowns or full-corpus browser payloads.  
 **Supported environments:** modern evergreen browsers; desktop targets through a web-native shell; local data tooling via Python 3.11+ recommended.
 
 ## Architecture

@@ -37,6 +37,38 @@ py scripts\data\build_local_data.py --vault ".local-data\source\GRAPH1KS_PUBLIC_
 
 There is no normal `--force` workflow anymore.
 
+
+### Database foundation finalization — preferred owner workflow
+
+After pulling a repository revision that changes database/compiler semantics, use one bundled phase instead of running build/validate/mining manually:
+
+```powershell
+Set-Location D:\prompt-engine
+git pull
+py scripts\data\database_foundation_session.py finalize --out-dir ".local-data\current" --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json"
+```
+
+This command:
+
+- upgrades/recompiles generated knowledge without rebuilding a matching promoted corpus unnecessarily;
+- preserves durable `curation.sqlite`;
+- validates corpus, knowledge, and curation;
+- verifies every source-backed Instruments expression is present in `knowledge.sqlite`;
+- verifies every source-backed expression remains selectable;
+- verifies the original expression output wording is preserved;
+- refreshes knowledge-mining/decomposition reports;
+- stores verbose subprocess output under `reports\database\`;
+- prints one concise final terminal line.
+
+Primary acceptance report:
+
+```text
+.local-data\current\reports\database\database-foundation-acceptance-v1.json
+```
+
+Do not paste detailed build/mining output into chat unless that acceptance phase fails.
+
+
 ### 3. Status
 
 ```powershell
@@ -150,7 +182,9 @@ After the genre crosswalk is reviewed/applied, prepare the next evidence bundle 
 py scripts\data\knowledge_mining_session.py prepare --out-dir ".local-data\current"
 ```
 
-The command integrity-checks corpus + curation, creates an integrity-checked curation backup, mines instrument-list segments plus head-token variant groups, mines section-aware terms and repeated 2–4 word phrases, marks already-curated surfaces, and writes prioritized JSON reports plus full CSV evidence. It does **not** mutate curation or auto-promote candidates.
+The command integrity-checks corpus + curation + compiled knowledge, creates an integrity-checked curation backup, mines instrument-list segments plus head-token variant groups, mines section-aware terms and repeated 2–4 word phrases, and writes prioritized JSON reports plus full CSV evidence. It does **not** mutate curation or auto-promote candidates.
+
+Instrument mining is semantic-residual driven. Every source segment is decomposed with longest-match semantics against compiled canonical instruments and concepts. Fully explained segments are removed from the primary review queue. Semantic-only sound layers such as pads/effects/noise may be fully explained without being forced into fake instrument identities.
 
 Primary review files:
 
@@ -164,6 +198,8 @@ Full local evidence:
 ```text
 .local-data\current\reports\knowledge\instrument-candidates-full-v1.csv
 .local-data\current\reports\knowledge\lexicon-candidates-full-v1.csv
+.local-data\current\reports\knowledge\instrument-decomposition-v1.json
+.local-data\current\reports\knowledge\instrument-decomposition-full-v1.csv
 .local-data\current\reports\knowledge\knowledge-mining-summary-v1.json
 ```
 
@@ -186,6 +222,39 @@ The apply command verifies source/review fingerprints and exact reviewed-report 
 New mining reports include a semantic curation fingerprint so future decision bundles are rejected if durable curation changes after review. The first pre-fingerprint report can still be applied only when its exact report hashes and source fingerprints match.
 
 Phrase prioritization deliberately excludes Instruments-list adjacency, Key/Mode literals, boundary connectors, and common grammatical scaffolding. Mined phrases remain evidence until reviewed.
+
+## Scalable instrument ontology v2
+
+Reviewed Instruments work can use a scoped v2 bundle. This lets one large Instruments-only decision set add canonical instruments, aliases, semantic concepts, intrinsic instrument traits, Advanced parameters, and parameter options without requiring an unrelated lexicon report hash.
+
+Save the reviewed owner-local bundle as:
+
+```text
+.local-data\current\reports\knowledge\instrument-ontology-decisions-v2.json
+```
+
+Apply it with one command:
+
+```powershell
+py scripts\data\knowledge_curation_session.py apply --out-dir ".local-data\current" --bundle ".local-data\current\reports\knowledge\instrument-ontology-decisions-v2.json" --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json"
+```
+
+The command validates the exact reviewed report hash + source fingerprints + curation fingerprint, backs up durable curation, applies additive curation-schema migrations, writes the bundle transactionally, recompiles knowledge, validates, restores/recompiles recovery state on failure, and refreshes the residual-only mining reports.
+
+The current v2 ontology model separates **canonical instrument identity** from source/role/processing/articulation/timbre/density/register/voice-architecture/arrangement/style semantics. This must not be confused with the product option catalog: every source compound expression remains an independent selectable/renderable `instrument_expression`. Do not multiply canonical identities just because source expressions differ.
+
+## Inspect compiled instrument expressions
+
+These commands are expert/debug tools; normal operation should use the bundled database finalizer above.
+
+```powershell
+py scripts\data\query_knowledge.py --db ".local-data\current\knowledge.sqlite" stats
+py scripts\data\query_knowledge.py --db ".local-data\current\knowledge.sqlite" expression "clean electric guitar"
+py scripts\data\query_knowledge.py --db ".local-data\current\knowledge.sqlite" search "muted trumpet"
+py scripts\data\query_knowledge.py --db ".local-data\current\knowledge.sqlite" unresolved --limit 100
+```
+
+The expression query returns the full source-facing option plus any resolved canonical instruments, concepts, decomposition state, and residual semantics.
 
 ## Inspect corpus evidence
 

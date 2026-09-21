@@ -1,6 +1,6 @@
 # Prompt V'gine — Local Data Architecture
 
-**Status:** v1 foundation  
+**Status:** v2 data foundation  
 **Hard rule:** raw factories, generated databases, generated indexes, and compiled runtime data stay local and are not committed to GitHub.
 
 ## 1. Why this is split from application source
@@ -65,7 +65,7 @@ Contains:
 - beginner definitions and context definitions;
 - semantic relations;
 - explicit Vault→taxonomy genre crosswalk decisions, including composite mappings;
-- instrument/family/alias curation;
+- instrument/family/alias/trait curation;
 - Advanced parameters/options;
 - Easy-mode statements/combinations;
 - a review queue for unresolved source evidence.
@@ -83,7 +83,9 @@ Contains:
 - dictionary/knowledge entries and term variants;
 - definitions and context definitions;
 - concept relations;
-- instruments/families/aliases;
+- instruments/families/aliases/traits;
+- every source-backed Instruments expression as a first-class selectable phrase, preserving how the instrument/layer is played, voiced, processed, or arranged;
+- semantic links from each instrument expression to canonical instruments and reusable concepts where known;
 - parameters and parameter options;
 - Easy-mode statements/combinations;
 - prompt section definitions and renderer profiles;
@@ -130,6 +132,7 @@ LOCAL SOURCE PACKS
       ▼
 [6] Knowledge compile
       │  taxonomy/bootstrap + durable curation overlay
+      │  + complete source Instruments expression materialization
       ▼
 [7] knowledge.sqlite
       │  disposable compiled knowledge
@@ -222,6 +225,35 @@ Core evidence tables:
 - `section_value_stat`.
 
 The v2 corpus build persists token occurrences so later section/genre/phrase mining can be resumed and recomputed deterministically from the local corpus without rereading Factory prompt text. These positional rows remain build-time evidence and are not intended as a web-runtime payload.
+
+## 9. Instruments: canonical identity + full playable expressions
+
+The Instruments source data is not reduced to a small canonical instrument list.
+
+Two layers coexist in `knowledge.sqlite`:
+
+1. **Canonical instrument identity** — stable entities such as Electric Guitar, Trumpet, Strings, Synth Bass, or Drum Kit.
+2. **Instrument expression** — the complete selectable source phrase that describes how an instrument or sound layer is played/voiced/processed/used, for example `clean electric guitar`, `muted trumpet`, `restrained strings`, `programmed drums`, `warm pad`, or `noise sweeps`.
+
+Every comma/semicolon-delimited source Instruments segment is materialized into `instrument_expression` with its original output text, frequency evidence, search row, and `selectable=1`. Semantic decomposition never deletes or replaces that phrase.
+
+Where knowledge is available, an expression also links to:
+
+- one or more canonical instruments through `instrument_expression_instrument`;
+- reusable concepts through `instrument_expression_concept`;
+- a primary/base instrument when exactly one identity is resolved;
+- residual semantic tokens when the phrase is only partially understood.
+
+This means `clean rhythm electric guitar` remains a first-class option while also resolving to Electric Guitar + Clean + Rhythm. Decomposition improves search, explanation, Advanced controls, and future recombination; it is not a lossy normalization step.
+
+Source-backed expression states are:
+
+- `identity` — fully understood and contains a canonical instrument identity;
+- `semantic` — fully understood as a sound/performance/production layer without forcing a fake instrument identity;
+- `partial` — some semantics resolve, residual terms remain;
+- `unresolved` — no current semantic decomposition.
+
+The current Factory snapshot contains 6,035 unique source instrument expressions. The database contract requires all of them to remain present and selectable after knowledge compilation.
 
 ## 9. Genre identity and crosswalk
 
@@ -341,6 +373,8 @@ python scripts/data/build_local_data.py --vault /path/GRAPH1KS_PUBLIC_VAULT_FACT
 python scripts/data/build_local_data.py --vault /path/GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz --genre-map /path/GRAPH1KS_GENRE_MAP_FACTORY.json --out-dir .local-data/current
 python scripts/data/validate_local_data.py --dir .local-data/current
 python scripts/data/query_corpus.py --db .local-data/current/corpus.sqlite term grit
+python scripts/data/query_knowledge.py --db .local-data/current/knowledge.sqlite stats
+python scripts/data/query_knowledge.py --db .local-data/current/knowledge.sqlite expression "clean electric guitar"
 python scripts/data/backup_curation.py --source .local-data/current/curation.sqlite
 ```
 

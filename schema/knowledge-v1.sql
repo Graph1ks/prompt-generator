@@ -186,6 +186,63 @@ CREATE TABLE IF NOT EXISTS instrument_alias (
     CHECK (status IN ('candidate','reviewed','approved','deprecated'))
 );
 
+-- Every source Instruments segment is preserved as a first-class selectable
+-- expression. Canonical instrument identity and reusable semantic concepts are
+-- linked underneath it; the original source wording/output is never discarded.
+CREATE TABLE IF NOT EXISTS instrument_expression (
+  id TEXT PRIMARY KEY,
+  label TEXT NOT NULL,
+  label_norm TEXT NOT NULL UNIQUE,
+  output_text TEXT NOT NULL,
+  source_kind TEXT NOT NULL DEFAULT 'factory'
+    CHECK (source_kind IN ('factory','curated')),
+  status TEXT NOT NULL DEFAULT 'source'
+    CHECK (status IN ('source','reviewed','approved','deprecated')),
+  selectable INTEGER NOT NULL DEFAULT 1 CHECK (selectable IN (0,1)),
+  base_instrument_id TEXT REFERENCES instrument(id) ON DELETE SET NULL,
+  occurrence_count INTEGER NOT NULL DEFAULT 0,
+  track_count INTEGER NOT NULL DEFAULT 0,
+  decomposition_state TEXT NOT NULL DEFAULT 'unresolved'
+    CHECK (decomposition_state IN ('identity','semantic','partial','unresolved')),
+  semantic_coverage REAL NOT NULL DEFAULT 0.0
+    CHECK (semantic_coverage >= 0.0 AND semantic_coverage <= 1.0),
+  residual_json TEXT NOT NULL DEFAULT '[]',
+  provenance_key TEXT REFERENCES provenance(provenance_key) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_instrument_expression_rank
+  ON instrument_expression(status, selectable, track_count DESC, occurrence_count DESC);
+CREATE INDEX IF NOT EXISTS idx_instrument_expression_base
+  ON instrument_expression(base_instrument_id, decomposition_state);
+CREATE INDEX IF NOT EXISTS idx_instrument_expression_norm
+  ON instrument_expression(label_norm);
+
+CREATE TABLE IF NOT EXISTS instrument_expression_instrument (
+  expression_id TEXT NOT NULL REFERENCES instrument_expression(id) ON DELETE CASCADE,
+  instrument_id TEXT NOT NULL REFERENCES instrument(id) ON DELETE CASCADE,
+  role TEXT NOT NULL DEFAULT 'identity',
+  ordinal INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY(expression_id, instrument_id, role, ordinal)
+);
+CREATE INDEX IF NOT EXISTS idx_instrument_expression_instrument_lookup
+  ON instrument_expression_instrument(instrument_id, expression_id);
+
+CREATE TABLE IF NOT EXISTS instrument_expression_concept (
+  expression_id TEXT NOT NULL REFERENCES instrument_expression(id) ON DELETE CASCADE,
+  entry_id TEXT NOT NULL REFERENCES knowledge_entry(id) ON DELETE CASCADE,
+  role TEXT,
+  ordinal INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY(expression_id, entry_id, ordinal)
+);
+CREATE INDEX IF NOT EXISTS idx_instrument_expression_concept_lookup
+  ON instrument_expression_concept(entry_id, expression_id);
+
+CREATE VIRTUAL TABLE IF NOT EXISTS instrument_expression_search USING fts5(
+  expression_id UNINDEXED,
+  label,
+  semantic_terms,
+  tokenize='unicode61 remove_diacritics 2'
+);
+
 CREATE TABLE IF NOT EXISTS prompt_section_definition (
   section_key TEXT PRIMARY KEY,
   output_label TEXT NOT NULL,
@@ -326,3 +383,6 @@ CREATE VIRTUAL TABLE IF NOT EXISTS knowledge_search USING fts5(
 
 INSERT OR IGNORE INTO schema_migrations(version, name, applied_at)
 VALUES (1, 'knowledge-v1', strftime('%Y-%m-%dT%H:%M:%fZ','now'));
+
+INSERT OR IGNORE INTO schema_migrations(version, name, applied_at)
+VALUES (2, 'instrument-expression-layer', strftime('%Y-%m-%dT%H:%M:%fZ','now'));

@@ -18,6 +18,7 @@ import sys
 import time
 from pathlib import Path
 
+from instrument_semantics import collect_source_instrument_expressions, materialize_instrument_expressions
 from local_data_v1_core import (
     GENRE_SCHEMA,
     OUTPUT_SECTIONS,
@@ -40,7 +41,7 @@ from local_data_v1_core import (
     tokens,
 )
 
-BUILD_REVISION = "promptvgine-local-data-build-v2-resumable-1"
+BUILD_REVISION = "promptvgine-local-data-build-v2-resumable-2-instrument-expressions"
 WORK_DIR_NAME = ".build-v2"
 STAGES = [
     ("corpus_init", 10),
@@ -70,6 +71,7 @@ CURATION_HASH_TABLES = [
     "instrument_family_patch",
     "instrument_patch",
     "instrument_alias_patch",
+    "instrument_trait_patch",
     "parameter_patch",
     "parameter_option_patch",
     "statement_patch",
@@ -285,6 +287,29 @@ def bind_state(conn: sqlite3.Connection, vault_sha: str, genre_sha: str) -> None
         return
     mismatches = {k: {"checkpoint": existing[k], "current": v} for k, v in expected.items() if existing[k] != v}
     if mismatches:
+        source_keys = {"vault_sha256", "genre_map_sha256"}
+        source_mismatch = any(k in mismatches for k in source_keys)
+        revision_only = set(mismatches) == {"build_revision"}
+        if revision_only and not source_mismatch and state_meta(conn, "status") == "complete":
+            # A completed checkpoint may advance to a new compiler revision without
+            # throwing away the promoted corpus or durable curation.
+            reset_stages_from(conn, 100)
+            conn.execute("DELETE FROM build_meta WHERE key='completed_at'")
+            set_state_meta(
+                conn,
+                {
+                    "build_revision": expected["build_revision"],
+                    "status": "in_progress",
+                    "revision_migrated_at": utc_now(),
+                },
+            )
+            event(
+                conn,
+                "info",
+                "completed checkpoint advanced to new knowledge compiler revision",
+                detail=mismatches,
+            )
+            return
         raise SystemExit(
             "Existing resumable work is bound to different source/build fingerprints. "
             "Run --status to inspect it. Use --reset-work only if you intentionally want to discard the incomplete checkpoint.\n"
@@ -913,7 +938,8 @@ def compile_knowledge(
         try:
             queue_profile = seed_review_queue(curation, corpus, info["vault_sha"])
             overlay_profile = apply_curation(kc, curation)
-            overlay_profile = {**queue_profile, **overlay_profile}
+            expression_profile = materialize_instrument_expressions(kc, corpus)
+            overlay_profile = {**queue_profile, **overlay_profile, **expression_profile}
             meta(kc, {
                 "vault_sha256": info["vault_sha"],
                 "genre_map_sha256": info["genre_sha"],
@@ -927,7 +953,16 @@ def compile_knowledge(
             kc.close()
         elapsed = time.perf_counter() - started
         stage_complete(state, "curation_overlay", 1, 1, overlay_profile, elapsed)
-        progress_line("knowledge:curation", 1, 1, started, extra=[f"queue +{overlay_profile.get('genre_crosswalk_candidates_added', 0)}"])
+        progress_line(
+            "knowledge:curation",
+            1,
+            1,
+            started,
+            extra=[
+                f"queue +{overlay_profile.get('genre_crosswalk_candidates_added', 0)}",
+                f"instrument expressions {overlay_profile.get('instrument_expressions', 0):,}",
+            ],
+        )
     else:
         overlay_profile = parse_json(overlay_row["detail_json"]) or {}
     return bootstrap_profile, overlay_profile
@@ -961,6 +996,21 @@ def validate_stage(state: sqlite3.Connection, corpus_path: Path, knowledge_path:
             raise RuntimeError(f"genre count mismatch: corpus={corpus_genres} knowledge={knowledge_genres}")
         if knowledge.execute("SELECT COUNT(*) FROM prompt_section_definition WHERE lower(output_label)='exclude'").fetchone()[0]:
             raise RuntimeError("Exclude must not be a structured prompt section")
+        source_expression_count = len(collect_source_instrument_expressions(corpus))
+        knowledge_expression_count = knowledge.execute(
+            "SELECT COUNT(*) FROM instrument_expression WHERE source_kind='factory'"
+        ).fetchone()[0]
+        selectable_expression_count = knowledge.execute(
+            "SELECT COUNT(*) FROM instrument_expression WHERE source_kind='factory' AND selectable=1 AND status<>'deprecated'"
+        ).fetchone()[0]
+        if source_expression_count != knowledge_expression_count:
+            raise RuntimeError(
+                f"instrument expression count mismatch: source={source_expression_count} knowledge={knowledge_expression_count}"
+            )
+        if selectable_expression_count != source_expression_count:
+            raise RuntimeError(
+                f"not all source instrument expressions are selectable: source={source_expression_count} selectable={selectable_expression_count}"
+            )
     except Exception as exc:
         stage_error(state, "validate", exc)
         raise
@@ -979,6 +1029,12 @@ def collect_knowledge_profile(path: Path) -> dict:
             "approved_genre_aliases": conn.execute("SELECT COUNT(*) FROM genre_alias WHERE status='approved'").fetchone()[0],
             "knowledge_entries": conn.execute("SELECT COUNT(*) FROM knowledge_entry").fetchone()[0],
             "approved_definitions": conn.execute("SELECT COUNT(*) FROM definition WHERE status='approved'").fetchone()[0],
+            "instruments": conn.execute("SELECT COUNT(*) FROM instrument WHERE status<>'deprecated'").fetchone()[0],
+            "instrument_expressions": conn.execute("SELECT COUNT(*) FROM instrument_expression WHERE status<>'deprecated'").fetchone()[0],
+            "instrument_expression_identity": conn.execute("SELECT COUNT(*) FROM instrument_expression WHERE decomposition_state='identity' AND status<>'deprecated'").fetchone()[0],
+            "instrument_expression_semantic_only": conn.execute("SELECT COUNT(*) FROM instrument_expression WHERE decomposition_state='semantic' AND status<>'deprecated'").fetchone()[0],
+            "instrument_expression_partial": conn.execute("SELECT COUNT(*) FROM instrument_expression WHERE decomposition_state='partial' AND status<>'deprecated'").fetchone()[0],
+            "instrument_expression_unresolved": conn.execute("SELECT COUNT(*) FROM instrument_expression WHERE decomposition_state='unresolved' AND status<>'deprecated'").fetchone()[0],
             "renderer_sections": conn.execute("SELECT COUNT(*) FROM renderer_section WHERE renderer_profile_id='suno-structured-v1'").fetchone()[0],
         }
     finally:

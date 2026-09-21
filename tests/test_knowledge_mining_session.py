@@ -176,6 +176,21 @@ class KnowledgeMiningSessionTests(unittest.TestCase):
             self.assertTrue(summary_path.is_file())
             self.assertTrue((reports / "instrument-candidates-full-v1.csv").is_file())
             self.assertTrue((reports / "lexicon-candidates-full-v1.csv").is_file())
+            self.assertTrue((reports / "instrument-decomposition-v1.json").is_file())
+            self.assertTrue((reports / "instrument-decomposition-full-v1.csv").is_file())
+
+            decomposition = json.loads(
+                (reports / "instrument-decomposition-v1.json").read_text(encoding="utf-8")
+            )
+            self.assertIn("fully_semantic_unique_ratio", decomposition)
+            self.assertIn("fully_identity_decomposed_unique_ratio", decomposition)
+            self.assertGreaterEqual(
+                decomposition["fully_semantic_unique_ratio"],
+                decomposition["fully_identity_decomposed_unique_ratio"],
+            )
+            self.assertTrue(
+                all(row["residual_tokens"] for row in decomposition["priority_unresolved"])
+            )
 
             instruments = json.loads(instrument_path.read_text(encoding="utf-8"))
             labels = {x["surface"] for x in instruments["prioritized_candidates"]}

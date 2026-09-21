@@ -159,6 +159,22 @@ CREATE TABLE IF NOT EXISTS instrument_alias_patch (
   UNIQUE(instrument_id, alias_norm, revision)
 );
 
+CREATE TABLE IF NOT EXISTS instrument_trait_patch (
+  id TEXT PRIMARY KEY,
+  instrument_id TEXT NOT NULL,
+  entry_id TEXT NOT NULL,
+  trait_type TEXT NOT NULL,
+  confidence REAL,
+  status TEXT NOT NULL DEFAULT 'candidate'
+    CHECK (status IN ('candidate','reviewed','approved','deprecated')),
+  revision INTEGER NOT NULL DEFAULT 1,
+  notes TEXT,
+  updated_at TEXT NOT NULL,
+  UNIQUE(instrument_id, entry_id, trait_type, revision)
+);
+CREATE INDEX IF NOT EXISTS idx_instrument_trait_patch_instrument
+  ON instrument_trait_patch(instrument_id, trait_type, status);
+
 CREATE TABLE IF NOT EXISTS parameter_patch (
   id TEXT PRIMARY KEY,
   section_key TEXT NOT NULL,
@@ -244,6 +260,9 @@ CREATE INDEX IF NOT EXISTS idx_candidate_review_queue
 
 INSERT OR IGNORE INTO schema_migrations(version, name, applied_at)
 VALUES (1, 'curation-v1', strftime('%Y-%m-%dT%H:%M:%fZ','now'));
+
+INSERT OR IGNORE INTO schema_migrations(version, name, applied_at)
+VALUES (2, 'instrument-trait-patch', strftime('%Y-%m-%dT%H:%M:%fZ','now'));
 
 INSERT OR IGNORE INTO curation_meta(key, value)
 VALUES ('schema_version', 'curation-v1');
