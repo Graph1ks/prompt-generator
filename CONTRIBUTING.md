@@ -4,11 +4,11 @@ Graph1ks Prompt V'gine is a public **owner-controlled solo-dev project**, not a 
 
 ## Code and documentation contributions
 
-Unsolicited pull requests are not accepted by default.
+External code/documentation contributions are **not accepted under the current project model**. This keeps authorship and commercial rights in Graph1ks Material centralized with Graph1ks.
 
-Code/documentation contributions may be considered only when Graph1ks explicitly invites or authorizes the contribution in advance. Authorization to contribute does not grant commercial rights in the project.
+If the owner later decides to accept outside code/documentation contributions, the contributor-rights mechanism must be designed and documented **before** any such contribution is merged.
 
-Do not submit third-party code, data, generated bulk content, fonts, icons, models, or other material unless its provenance and license are disclosed and compatible with the project.
+Do not submit third-party code, data, generated bulk content, fonts, icons, models, or other material through pull requests.
 
 ## Issues and suggestions
 
