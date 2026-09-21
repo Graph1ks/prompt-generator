@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-21  
-**Current milestone:** **V'gine design-system/motion foundation implemented** — next: real search benchmark + React/Vite Studio shell
+**Current milestone:** **React/Vite Studio shell implemented** — next: real Runtime Pack/search wiring and production pickers
 
 ## Completion verdict
 
@@ -84,12 +84,14 @@ Expected result: acceptance remains `status: ok`; the compiled knowledge DB is s
 - `@vgine/ui` now owns semantic design tokens and the Paradise/Ash theme contract with no external font/component framework.
 - `@vgine/motion` now owns durations/easings/springs and named causal recipes with reduced-motion behavior; no animation library dependency is required at this layer.
 - `pnpm bench:search` benchmarks the real `.local-data/current/runtime-v1/search.json`; no external search dependency will be adopted before that measurement.
-- No React/Vite/Tauri/Motion/Radix/Zustand/TanStack package is installed yet.
+- React 19.3.0 + React DOM 19.3.0 + Vite 8.3.0 + @vitejs/plugin-react 6.1.1 are now pinned and reviewed; no Router/Radix/Motion-for-React/Zustand/TanStack package is installed yet.
+- `apps/studio` now builds as a responsive V'gine shell with desktop chapter rail, mobile chapter dock, live-output pane, theme switch, 17-facet chapter navigation and no fabricated editor options.
+- `@vgine/ui` now includes the first reusable React primitives (`Surface`, `Button`, `IconButton`, `Text`, `Stack`, `Cluster`) styled only through V'gine semantic tokens.
 - Local operator outputs are standardized: flat `reports/`, separate `logs/`, durable `.local-data/backups/`; legacy nested report folders have a safe plan/apply migrator.
 
 ## Current blocker
 
-**No implementation blocker.** One owner-local benchmark against the real 10,348-document `search.json` is still needed before deciding whether the dependency-free ranking kernel needs fuzzy/index-library escalation. Do not add further Runtime Pack shards or a search dependency without measured evidence.
+**No implementation blocker.** The real 10,348-document search benchmark is still the measurement gate before any fuzzy/index-library dependency. The Studio shell itself builds successfully with the frozen dependency graph.
 
 Future enrichment does not reopen the V1 database milestone unless it changes schema/invariants.
 
@@ -98,9 +100,9 @@ Future enrichment does not reopen the V1 database milestone unless it changes sc
 Proceed in this order:
 
 1. run `pnpm bench:search` against the real owner-local Runtime Pack and record build/query latency;
-2. review/pin React + Vite dependencies and scaffold the first Studio shell on the stable domain/runtime/design packages;
-3. add the first reusable V'gine primitives and adaptive desktop/mobile shell composition;
-4. move search behind a Web Worker when application profiling justifies it;
+2. wire the real Runtime Pack bootstrap into `apps/studio` and replace shell placeholders with stable-ID genre/search data;
+3. implement the production Genre picker first, using the existing search kernel and 24-major taxonomy without giant DOM lists;
+4. connect MusicSpec state -> compiler -> live prompt/budget pane; move search behind a Web Worker when profiling justifies it;
 5. enrich empty editor statements/parameters/Exclude content additively without reopening Database V1.
 
 ## Do not redo
