@@ -17,7 +17,7 @@ RENDERER_SECTION_SOFT_MAX={
 RENDERER_SECTION_SOURCE_SAMPLES={
  "genre":10043,"era":9226,"bpm":10040,"key_mode":10043,"groove":9016,
  "melody":10043,"harmony":9956,"drums":9362,"bass":10036,"instruments":9882,
- "exciters":20,"texture":2915,"vocal":0,"dynamics":747,"space_mix":9760,
+ "exciters":20,"texture":2915,"vocal":0,"dynamics":747,"space_mix":9761,
  "production":4459,"structure":16,
 }
 SECTION_MAP={
