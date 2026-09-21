@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BUILDER = ROOT / "scripts" / "data" / "build_local_data.py"
 V1_BUILDER = ROOT / "scripts" / "data" / "local_data_v1_core.py"
+DATABASE_FINALIZER = ROOT / "scripts" / "data" / "database_foundation_session.py"
 
 VAULT = {
     "schema": "graph1ks-prompt-control-deck-v1",
@@ -389,6 +390,68 @@ class LocalDataBuildTests(unittest.TestCase):
                 )
             finally:
                 state.close()
+
+    def test_database_foundation_finalize_is_bundled_and_reports_complete_expressions(self):
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            vault, genres = self.write_sources(tmp)
+            out = tmp / "out"
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(DATABASE_FINALIZER),
+                    "finalize",
+                    "--out-dir",
+                    str(out),
+                    "--vault",
+                    str(vault),
+                    "--genre-map",
+                    str(genres),
+                ],
+                cwd=ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(
+                result.returncode,
+                0,
+                msg=f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}",
+            )
+            self.assertEqual(
+                len([line for line in result.stdout.splitlines() if line.strip()]),
+                1,
+            )
+            self.assertIn("[database-foundation] OK", result.stdout)
+            report_path = (
+                out
+                / "reports"
+                / "database"
+                / "database-foundation-acceptance-v1.json"
+            )
+            self.assertTrue(report_path.is_file())
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+            self.assertEqual(report["status"], "ok")
+            self.assertEqual(report["corpus"]["source_instrument_expressions"], 6)
+            self.assertEqual(report["knowledge"]["instrument_expressions"], 6)
+            self.assertEqual(
+                report["knowledge"]["selectable_instrument_expressions"], 6
+            )
+            self.assertTrue(
+                report["invariants"]["all_source_expressions_materialized"]
+            )
+            self.assertTrue(
+                report["invariants"]["all_source_expressions_selectable"]
+            )
+            self.assertTrue(
+                report["invariants"]["all_source_output_text_preserved"]
+            )
+            self.assertTrue(
+                (out / "reports" / "database" / "01-build.stdout.txt").is_file()
+            )
+            self.assertTrue(
+                (out / "reports" / "database" / "03-knowledge-mining.stdout.txt").is_file()
+            )
 
     def test_plan_is_read_only(self):
         with tempfile.TemporaryDirectory() as td:
