@@ -117,10 +117,12 @@ It owns:
 - expression IDs;
 - canonical instrument/concept phrase lexicons;
 - longest-match semantic decomposition;
+- conservative shared-head coordination for reviewed identities such as `tenor and baritone saxophones`, where both reconstructed identity phrases must already exist in the lexicon;
+- explicit decomposition-grammar suppression for scaffolding such as `as`, `in`, and `used`;
 - source-expression aggregation;
 - complete `knowledge.sqlite` expression materialization.
 
-Important: do **not** split blindly on `and`; phrases like `kick and snare` or compound performance expressions must remain intact unless a later explicit parser proves otherwise.
+Important: do **not** split blindly on `and`. The parser now handles only a narrow reviewed shared-head case: a right-hand instrument phrase may donate a known instrument head to unresolved left coordinands only when the shared head itself and every reconstructed phrase already exist as reviewed canonical/alias phrases. Otherwise the source remains residual for review.
 
 ### 3. Build revision upgrade without corpus destruction
 
@@ -271,7 +273,7 @@ Synthetic coverage verifies:
 - v2 aliases/traits/parameters/options compile;
 - stale reviewed bundles fail closed;
 - compile failures restore durable curation;
-- semantic decomposition reports work;
+- semantic decomposition reports work, including conservative shared-head identity inference without inventing unknown identities;
 - database finalizer emits one concise stdout line and detailed reports;
 - acceptance-gated semantic completion emits deterministic bounded review batches, permits measured semantic progress after the foundation acceptance snapshot, captures current canonical instrument/family/alias IDs for safe identity curation, fails closed on failed/source-drift/internally inconsistent inputs, and does not mutate durable curation.
 
