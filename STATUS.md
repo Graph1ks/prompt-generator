@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-21  
-**Current milestone:** **Runtime Pack v1 implemented** — owner-local real-data validation, then TypeScript compiler foundation
+**Current milestone:** **TypeScript compiler foundation implemented** — next: runtime-data/search adapter and application design-system foundation
 
 ## Completion verdict
 
@@ -74,14 +74,17 @@ Expected result: acceptance remains `status: ok`; the compiled knowledge DB is s
 
 - Application architecture is frozen in `docs/APPLICATION_ARCHITECTURE.md` and ADR-021 through ADR-029.
 - Runtime Pack v1 is frozen in `docs/RUNTIME_DATA_CONTRACT_V1.md` + `schema/runtime-pack-v1.schema.json`.
+- Owner-local Runtime Pack v1 validation succeeded against the completed real `knowledge.sqlite`: runtime build ID `3b774ba611011ef9771c6700e2c5b156f73639a948ad0f83316c28bca8c99bfe`; 1,564 genres; 6,035 instrument expressions; 164 canonical instruments across 9 families; 2,749 knowledge entries; 10,348 search documents; ~10.53 MiB uncompressed payload total.
+- The validated runtime `editor.json` currently contains 0 parameters/options/statements/Exclude entries. That is a Post-V1 enrichment/product-content gap, not a Runtime Pack failure.
 - `scripts/data/export_runtime_v1.py` compiles deterministic runtime payloads from `knowledge.sqlite` with plan/status, resumable staged work, stale-source rejection, validation, atomic promotion and previous-pack retention.
-- Synthetic tests cover lossless source-expression export, no-op reruns, stale-work recovery and last-known-good retention.
-- No UI/runtime third-party packages have been installed yet; dependency versions/licenses remain gated until the TypeScript application scaffold.
+- Strict TypeScript/pnpm workspace is present with `@vgine/music-spec` and pure `@vgine/compiler`.
+- Compiler v1 performs MusicSpec runtime validation, canonical structured rendering, separate Exclude output, exact semantic deduplication, deterministic lower-priority omission, Unicode code-point budgeting and explicit `budget_conflict` diagnostics without blind truncation.
+- No React/Vite/Tauri/Motion/Radix/Zustand/TanStack package is installed yet.
 - Local operator outputs are standardized: flat `reports/`, separate `logs/`, durable `.local-data/backups/`; legacy nested report folders have a safe plan/apply migrator.
 
 ## Current blocker
 
-**No architecture blocker.** The new Runtime Pack exporter still needs one owner-local run against the real completed `knowledge.sqlite` so actual payload counts/sizes can be recorded before deciding whether any further sharding is justified.
+**None.** Runtime Pack real-data validation and the first compiler/budget implementation are complete. Do not add further Runtime Pack shards unless measured application startup/search behavior demonstrates a need.
 
 Future enrichment does not reopen the V1 database milestone unless it changes schema/invariants.
 
@@ -89,10 +92,11 @@ Future enrichment does not reopen the V1 database milestone unless it changes sc
 
 Proceed in this order:
 
-1. run Runtime Pack v1 `--plan`, export and `--status` against the real owner-local `knowledge.sqlite`; record pack sizes/counts and verify all 6,035 Factory expressions survive;
-2. scaffold the strict TypeScript/pnpm workspace and `music-spec` package;
-3. implement the pure MusicSpec -> `suno-structured-v1` compiler and 1,000-character semantic budget engine;
-4. add runtime-data/search repositories, then the modular V'gine design-system/motion foundation and Studio UI.
+1. add `packages/runtime-data` to load/validate Runtime Pack v1 and adapt its snake_case payloads into compiler/search domain types;
+2. add `packages/search` with deterministic local ranking and a worker-ready boundary; benchmark the real 10,348-document search payload before choosing a search dependency;
+3. add the V'gine design-token/UI/motion package foundations;
+4. scaffold the React/Vite Studio shell on those packages;
+5. enrich empty editor statements/parameters/Exclude content additively without reopening Database V1.
 
 ## Do not redo
 
@@ -115,4 +119,5 @@ Proceed in this order:
 - `docs/PROMPT_FORMAT.md` — renderer contract
 - `docs/RUNTIME_DATA_CONTRACT_V1.md` — compiled application data boundary
 - `docs/APPLICATION_ARCHITECTURE.md` — production stack, module/design/motion architecture
+- `docs/COMPILER_V1.md` — implemented compiler/budget behavior
 - `docs/LOCAL_OUTPUT_LAYOUT.md` — canonical local reports/logs/backups layout
