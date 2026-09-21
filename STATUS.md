@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-21  
-**Current milestone:** **Runtime-data/search foundation implemented** — next: real search benchmark plus V'gine design-system/motion foundation
+**Current milestone:** **V'gine design-system/motion foundation implemented** — next: real search benchmark + React/Vite Studio shell
 
 ## Completion verdict
 
@@ -81,6 +81,8 @@ Expected result: acceptance remains `status: ok`; the compiled knowledge DB is s
 - Compiler v1 performs MusicSpec runtime validation, canonical structured rendering, separate Exclude output, exact semantic deduplication, deterministic lower-priority omission, Unicode code-point budgeting and explicit `budget_conflict` diagnostics without blind truncation.
 - `@vgine/runtime-data` validates Runtime Pack v1 bootstrap payloads, manifest counts and optional hashes, then adapts renderer/genre data into the pure compiler view.
 - `@vgine/search` provides dependency-free deterministic local ranking, stable-ID results and a worker-ready request/response protocol.
+- `@vgine/ui` now owns semantic design tokens and the Paradise/Ash theme contract with no external font/component framework.
+- `@vgine/motion` now owns durations/easings/springs and named causal recipes with reduced-motion behavior; no animation library dependency is required at this layer.
 - `pnpm bench:search` benchmarks the real `.local-data/current/runtime-v1/search.json`; no external search dependency will be adopted before that measurement.
 - No React/Vite/Tauri/Motion/Radix/Zustand/TanStack package is installed yet.
 - Local operator outputs are standardized: flat `reports/`, separate `logs/`, durable `.local-data/backups/`; legacy nested report folders have a safe plan/apply migrator.
@@ -96,8 +98,8 @@ Future enrichment does not reopen the V1 database milestone unless it changes sc
 Proceed in this order:
 
 1. run `pnpm bench:search` against the real owner-local Runtime Pack and record build/query latency;
-2. add the V'gine semantic design-token/UI/motion package foundations without importing a generic component aesthetic;
-3. scaffold the React/Vite Studio shell on the stable domain/runtime packages;
+2. review/pin React + Vite dependencies and scaffold the first Studio shell on the stable domain/runtime/design packages;
+3. add the first reusable V'gine primitives and adaptive desktop/mobile shell composition;
 4. move search behind a Web Worker when application profiling justifies it;
 5. enrich empty editor statements/parameters/Exclude content additively without reopening Database V1.
 
@@ -124,4 +126,5 @@ Proceed in this order:
 - `docs/APPLICATION_ARCHITECTURE.md` — production stack, module/design/motion architecture
 - `docs/COMPILER_V1.md` — implemented compiler/budget behavior
 - `docs/RUNTIME_SEARCH_V1.md` — runtime loader/search contract and benchmark gate
+- `docs/DESIGN_SYSTEM_V1.md` — semantic themes/tokens/motion foundation
 - `docs/LOCAL_OUTPUT_LAYOUT.md` — canonical local reports/logs/backups layout
