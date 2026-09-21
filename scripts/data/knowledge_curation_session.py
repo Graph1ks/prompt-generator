@@ -74,6 +74,18 @@ def restore_backup(backup: Path, target: Path) -> None:
     integrity(target)
 
 
+
+def ensure_curation_schema(curation_path: Path) -> None:
+    """Apply additive durable-schema migrations after backup, before mutation."""
+    schema_path = Path(__file__).resolve().parents[2] / "schema" / "curation-v1.sql"
+    conn = open_rw(curation_path)
+    try:
+        conn.executescript(schema_path.read_text(encoding="utf-8"))
+        conn.commit()
+    finally:
+        conn.close()
+    integrity(curation_path)
+
 def expected_source_hashes(corpus_path: Path) -> dict:
     with open_ro(corpus_path) as corpus:
         meta = source_meta(corpus)
@@ -742,6 +754,7 @@ def apply_command(args) -> int:
     bundle = read_json(args.bundle.resolve())
     validation = validate_bundle(bundle, out_dir, corpus_path, curation_path)
     backup = backup_sqlite(curation_path, out_dir.parent / "backups")
+    ensure_curation_schema(curation_path)
 
     receipt = {
         "schema": "promptvgine-knowledge-curation-apply-receipt-v1",
@@ -751,6 +764,7 @@ def apply_command(args) -> int:
         "bundle_file": str(args.bundle.resolve()),
         "bundle_sha256": sha256_file(args.bundle.resolve()),
         "backup": str(backup),
+        "schema_migration": "ok",
         "preflight": validation,
         "status": "running",
     }
