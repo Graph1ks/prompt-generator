@@ -1,69 +1,25 @@
-# Contribution Policy
+# Contributing
 
-This document defines whether and how outside contributions are accepted.
+Graph1ks Prompt V'gine is a public **owner-controlled solo-dev project**, not a community-governed project.
 
-## Before starting
+## Code and documentation contributions
 
-Read:
+External code/documentation contributions are **not accepted under the current project model**. This keeps authorship and commercial rights in Graph1ks Material centralized with Graph1ks.
 
-- `AGENTS.md`
-- `PROJECT.md`
-- `SECURITY.md`
-- `docs/LICENSING.md`
+If the owner later decides to accept outside code/documentation contributions, the contributor-rights mechanism must be designed and documented **before** any such contribution is merged.
 
-Project-specific rules in `PROJECT.md` override generic template defaults when they are explicit.
+Do not submit third-party code, data, generated bulk content, fonts, icons, models, or other material through pull requests.
 
-## Is this project accepting outside code contributions?
+## Issues and suggestions
 
-Check `PROJECT.md`.
+Issues may be used for bug reports, suggestions, and feedback. They are input channels, not roadmap commitments or automatic work queues.
 
-The default public mode for repositories created from this template is **owner-controlled source**. In that mode, outside code contributions are not accepted unless the project explicitly opts in.
+## Licensing
 
-If `PROJECT.md` says:
+Graph1ks Material is governed by `LICENSE`, `COMMERCIAL_LICENSE.md`, and `COPYRIGHT`.
 
-- **owner-controlled**: do not open unsolicited pull requests; Issues may still be used for bug reports or suggestions when enabled;
-- **community**: outside contributions are accepted under the documented review and contributor-rights rules.
+The project is source-available and noncommercial for third parties. Monetized use, including project-connected donations/tips, is not permitted.
 
-Public visibility alone is not an invitation to contribute code.
+## Security
 
-Issues and Discussions may still be available for bug reports, suggestions, Q&A, and feedback. Their presence does not guarantee implementation, roadmap priority, or maintainer response.
-
-See `docs/REPOSITORY_VISIBILITY.md`.
-
-## Engineering expectations
-
-Keep changes focused and production-quality.
-
-A contribution should normally:
-
-- solve a concrete problem;
-- follow existing architecture unless the change intentionally improves it;
-- include relevant tests;
-- avoid unrelated rewrites;
-- introduce no secret/private-path leakage;
-- introduce no paid required dependency;
-- introduce no license-incompatible dependency or asset;
-- update affected documentation.
-
-## Dependencies
-
-Do not add a dependency solely for convenience without checking:
-
-- whether the current stack already solves the problem;
-- production cost;
-- license;
-- transitive impact;
-- maintenance health;
-- size/complexity.
-
-Include the reasoning in the pull request when the dependency is non-trivial.
-
-## Contributor rights
-
-The project's contribution mechanism is defined in `PROJECT.md`.
-
-If it is still marked undecided, the project owner should decide whether no additional mechanism, DCO, CLA, or another contributor-rights model is appropriate before actively soliciting substantial outside contributions.
-
-## Security issues
-
-Do not publish exploitable vulnerability details in a public issue. Follow `SECURITY.md`.
+Do not publish secrets, credentials, private data, exploitable security details, local private paths, or owner-local Factory/database contents in public issues or pull requests. Follow `SECURITY.md`.

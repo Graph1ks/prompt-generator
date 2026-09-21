@@ -6,7 +6,7 @@
 
 **Stage:** architecture/data foundation  
 **Repository mode:** public owner-controlled / solo-dev  
-**License:** undecided
+**License:** source-available / noncommercial for third parties; commercial rights reserved to Graph1ks
 
 ## Product direction
 
@@ -29,15 +29,19 @@ See `docs/PRODUCT_UX_FOUNDATION.md` for the accepted UX foundation.
 
 The repo stores schemas, deterministic build/mining tools, documentation, and tiny synthetic fixtures. Build the data locally:
 
-```bash
-python scripts/data/build_local_data.py \
-  --vault /path/to/GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz \
-  --genre-map /path/to/GRAPH1KS_GENRE_MAP_FACTORY.json \
-  --out-dir .local-data/current \
-  --force
+On Windows/PowerShell, first run the read-only plan:
+
+```powershell
+py scripts\data\build_local_data.py --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json" --out-dir ".local-data\current" --plan
 ```
 
-This creates local `corpus.sqlite`, durable `curation.sqlite`, compiled `knowledge.sqlite`, and a local build report.
+Then build or resume with the same sources:
+
+```powershell
+py scripts\data\build_local_data.py --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json" --out-dir ".local-data\current"
+```
+
+The build is checkpointed and resumable; ordinary reruns resume safely. It creates/adopts local `corpus.sqlite`, preserves durable `curation.sqlite`, compiles `knowledge.sqlite`, and keeps incomplete work isolated until validation/promotion.
 
 Then validate/inspect it:
 
@@ -97,4 +101,6 @@ docs/                   product, data, continuity, licensing docs
 
 ## Security / cost / licensing
 
-The core path must remain zero-cost and local/static-capable. No paid API, cloud database, or model service is required for the current design. See `AGENTS.md`, `PROJECT.md`, `SECURITY.md`, and `docs/LICENSING.md`.
+The core path must remain zero-cost and local/static-capable. No paid API, cloud database, or model service is required for the current design.
+
+Graph1ks Material is source-available for noncommercial use under the repository `LICENSE`. Third-party monetization—including project-connected donations/tips—is prohibited; commercial rights in Graph1ks Material are reserved to Graph1ks. See `LICENSE`, `COMMERCIAL_LICENSE.md`, `LICENSES.md`, `PROJECT.md`, and `docs/LICENSING.md`.

@@ -64,8 +64,16 @@
 
 **Runtime/language:** TypeScript/React planned for application; Python standard library for local data bootstrap/mining tooling.  
 **Primary framework:** React/Vite direction; Tauri 2 or equivalent lightweight shell subject to final dependency/license review.  
-**Storage:** local SQLite split into disposable evidence (`corpus.sqlite`), durable authoring (`curation.sqlite`), and disposable compiled knowledge (`knowledge.sqlite`); future web/native runtime bundles are compiled locally.  
+**Storage:** local SQLite split into disposable evidence (`corpus.sqlite`), durable authoring (`curation.sqlite`), and disposable compiled knowledge (`knowledge.sqlite`); resumable build checkpoints live in ignored local state; future web/native runtime bundles are compiled locally.  
 **Packaging/distribution:** static web/PWA + local desktop packaging; no required backend.
+
+### Large-data build reliability
+
+Long-running local ingestion, mining, enrichment, compilation, migration, and materialization jobs are durable build pipelines rather than disposable scripts.
+
+They must provide plan/status/resume behavior, source/build fingerprints, bounded checkpointed work, visible console progress, cooperative stop handling, integrity gates, and validation-before-promotion. Incomplete work is isolated from promoted artifacts. Reset operations may remove only incomplete work unless the owner explicitly requests something more destructive.
+
+The current local-data builder implements this contract with `.build-v2/state.sqlite`, staged work databases, ordinary-rerun resume, stale-checkpoint rejection, and retained `*.previous.sqlite` promoted backups.
 
 ### Architecture constraints
 
@@ -92,30 +100,35 @@ Core application and local build pipeline must remain fully functional without p
 
 ## Licensing strategy
 
-**Source model:** undecided; repository is currently public owner-controlled source  
-**Commercial model:** commercial use intended/possible; final terms undecided  
+**Source model:** source-available, not OSI Open Source  
+**Commercial model:** third-party use is noncommercial only; commercial/monetized rights in Graph1ks Material are reserved to Graph1ks  
 **Deployment/distribution:** mixed static web + distributed desktop binaries  
 **Copyleft posture:** permissive preferred for dependencies unless explicitly reviewed
 
-### Code
+### Graph1ks Material
 
-**Chosen code license/terms:** undecided  
-**Why it fits:** owner decision still required before release terms are finalized  
-**Patent considerations:** review with final dependency/license choice  
-**Attribution/NOTICE requirements:** track per dependency/asset
+Graph1ks-authored code, project-specific documentation, UI, tests, scripts, schemas, and original project assets are governed by:
+
+- `LICENSE`
+- `COMMERCIAL_LICENSE.md`
+- `COPYRIGHT`
+
+The public grant permits noncommercial use/modification/sharing under the repository terms. Project-connected monetization is prohibited for third parties, including donations/tips, ads, sponsorships, affiliate revenue, paid support/hosting/SaaS, subscriptions, paid access, and bundling with paid products/services.
+
+Commercial exploitation of Graph1ks Material is reserved to Graph1ks. The repository does not offer a public third-party commercial license.
 
 ### Data / models / assets
 
-**Dataset/corpus license or terms:** project-provided factory data; redistribution is not assumed and generated databases are local-only  
-**Model/weights license or terms:** none required for core  
-**Fonts/media/assets license or terms:** must be reviewed before final inclusion; prototype font direction is not automatic production approval  
-**Documentation license:** undecided
+**Factory/generated data:** owner-local build inputs/artifacts; not committed or granted public redistribution rights by the root code license  
+**Third-party data/code/assets:** retain their original terms; authoritative boundaries live in `LICENSES.md`, `THIRD_PARTY_NOTICES.md`, and `DATA_SOURCES.md`  
+**Model/weights:** none required for core  
+**Fonts/media/assets:** must be reviewed before final inclusion; prototype choices are not automatic production approval
 
 ### Contribution model
 
-**External contributions accepted?** no by default / owner-triggered only  
-**Contributor mechanism:** none currently  
-**Why:** solo-dev owner-controlled project
+**External contributions accepted?** no under the current project model  
+**Contributor mechanism:** none currently; if outside code/documentation contributions are ever enabled, define contributor-rights terms before merging any contribution  
+**Why:** solo-dev, owner-controlled project; keep authorship and commercial rights in Graph1ks Material centralized
 
 ## Dependency policy
 

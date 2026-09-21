@@ -12,8 +12,7 @@ Build and validate:
 python scripts/data/build_local_data.py \
   --vault /path/to/GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz \
   --genre-map /path/to/GRAPH1KS_GENRE_MAP_FACTORY.json \
-  --out-dir .local-data/current \
-  --force
+  --out-dir .local-data/current
 
 python scripts/data/validate_local_data.py --dir .local-data/current
 python scripts/data/backup_curation.py --source .local-data/current/curation.sqlite
@@ -180,7 +179,7 @@ This is what keeps Easy and Advanced reversible views of the same semantic state
 
 ## 11. Rebuild after curation
 
-After changing `curation.sqlite`, rerun the normal builder with `--force`.
+After changing `curation.sqlite`, rerun the normal builder command. The v2 builder detects the curation fingerprint change, keeps the corpus, and recompiles the affected knowledge stages.
 
 The builder:
 

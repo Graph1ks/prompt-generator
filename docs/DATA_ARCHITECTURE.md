@@ -56,7 +56,7 @@ This database is build-time evidence. It is not a runtime dependency.
 
 Purpose: preserve human/AI-reviewed semantic decisions across any number of Factory/corpus rebuilds.
 
-This is the only database in the v1 pipeline that is **not disposable**. Normal `--force` rebuilds never delete it.
+This is the only database in the local pipeline that is **not disposable**. Normal v2 build/resume and promotion never delete it.
 
 Contains:
 
@@ -221,7 +221,7 @@ Core evidence tables:
 - `prompt_section_fts`;
 - `section_value_stat`.
 
-The optional `--deep-token-index` persists every token offset when exact positional research is necessary. It is deliberately opt-in because the normal FTS/statistical index is much smaller and sufficient for most work.
+The v2 corpus build persists token occurrences so later section/genre/phrase mining can be resumed and recomputed deterministically from the local corpus without rereading Factory prompt text. These positional rows remain build-time evidence and are not intended as a web-runtime payload.
 
 ## 9. Genre identity and crosswalk
 
@@ -337,7 +337,8 @@ The canonical commands, backup procedure, validation steps, and source-diff work
 Core commands:
 
 ```bash
-python scripts/data/build_local_data.py --vault /path/GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz --genre-map /path/GRAPH1KS_GENRE_MAP_FACTORY.json --out-dir .local-data/current --force
+python scripts/data/build_local_data.py --vault /path/GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz --genre-map /path/GRAPH1KS_GENRE_MAP_FACTORY.json --out-dir .local-data/current --plan
+python scripts/data/build_local_data.py --vault /path/GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz --genre-map /path/GRAPH1KS_GENRE_MAP_FACTORY.json --out-dir .local-data/current
 python scripts/data/validate_local_data.py --dir .local-data/current
 python scripts/data/query_corpus.py --db .local-data/current/corpus.sqlite term grit
 python scripts/data/backup_curation.py --source .local-data/current/curation.sqlite

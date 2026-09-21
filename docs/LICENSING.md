@@ -1,3 +1,26 @@
+# Prompt V'gine Licensing Decision
+
+**Status:** accepted project policy as of 2026-09-21.
+
+Graph1ks Prompt V'gine is **source-available, not OSI Open Source**.
+
+Graph1ks-authored material is governed by the complete license texts stored directly in this repository:
+
+- `LICENSE`
+- `COMMERCIAL_LICENSE.md`
+- `COPYRIGHT`
+- `LICENSES.md`
+
+Third parties may use, study, modify, and noncommercially share Graph1ks Material under `LICENSE`. Third-party commercial or monetized use is not granted. Project-connected donations/tips, advertising, sponsorship, affiliate revenue, paid hosting/SaaS/support, paid access, and bundling with paid products/services are treated as monetized use.
+
+Commercial exploitation of Graph1ks Material is reserved to Graph1ks. `COMMERCIAL_LICENSE.md` documents that boundary and is not a public offer granting commercial rights to others.
+
+Third-party material is excluded from the Graph1ks grant and remains subject to its own terms. Track those boundaries in `THIRD_PARTY_NOTICES.md` and `DATA_SOURCES.md`.
+
+This is a custom source-available licensing policy, not individualized legal advice. Before a high-stakes commercial release or relying on enforcement in a specific jurisdiction, qualified legal review is prudent.
+
+---
+
 # Licensing and Contributor Strategy
 
 This document is an engineering decision framework, not legal advice. For high-stakes commercial licensing or unusual rights questions, use authoritative license sources and obtain qualified legal review when warranted.
