@@ -1,8 +1,8 @@
-# Handover — Runtime Pack V1 Foundation
+# Handover — TypeScript Compiler Foundation
 
 **Last updated:** 2026-09-21  
-**Handoff target:** owner-local runtime validation, then TypeScript compiler/application foundation  
-**Milestone:** Database V1 remains closed; Runtime Pack v1 contract/export implementation is now present
+**Handoff target:** runtime-data/search adapter, then V'gine design-system/application foundation  
+**Milestone:** Database V1 remains closed; Runtime Pack v1 is owner-validated and the first strict TypeScript MusicSpec/compiler/budget implementation is present
 
 ## Read this first
 
@@ -17,8 +17,9 @@ Read in this order:
 7. `docs/PROMPT_FORMAT.md`
 8. `docs/RUNTIME_DATA_CONTRACT_V1.md`
 9. `docs/APPLICATION_ARCHITECTURE.md`
-10. `docs/LOCAL_OUTPUT_LAYOUT.md` when operating local reports/logs
-11. `docs/LOCAL_DATA_BUILD.md` only when operating the local databases
+10. `docs/COMPILER_V1.md`
+11. `docs/LOCAL_OUTPUT_LAYOUT.md` when operating local reports/logs
+12. `docs/LOCAL_DATA_BUILD.md` only when operating the local databases
 
 Owner workspace: `D:\prompt-engine`.
 
@@ -146,6 +147,25 @@ Tracked implementation:
 
 The exporter writes `core.json`, `genres.json`, `instruments.json`, `instrument-expressions.json`, `editor.json`, `knowledge.json`, `search.json` and `manifest.json`. It is deterministic, resumable at payload-stage boundaries, rejects stale partial work, validates Database V1 expression/budget invariants and retains the last promoted pack during replacement.
 
+Owner-local real Runtime Pack validation completed successfully:
+
+- runtime build ID: `3b774ba611011ef9771c6700e2c5b156f73639a948ad0f83316c28bca8c99bfe`;
+- 1,564 genres;
+- 6,035 source instrument expressions;
+- 9 instrument families / 164 canonical instruments;
+- 2,749 knowledge entries;
+- 10,348 search documents;
+- total uncompressed JSON payload ~10.53 MiB;
+- editor payload currently has no statements/parameters/options/Exclude content.
+
+The TypeScript foundation now adds:
+
+- root pnpm workspace, Node 24 LTS baseline and strict TypeScript;
+- `packages/music-spec` — typed MusicSpec v1 + runtime validation;
+- `packages/compiler` — pure deterministic renderer/budget kernel;
+- compiler regression tests using Node's built-in test runner;
+- `docs/COMPILER_V1.md` — exact protection/compaction behavior.
+
 No React/Radix/Motion/Tauri packages have been installed yet.
 
 ## Next-thread mission
@@ -154,11 +174,11 @@ Treat Database V1 and Runtime Pack v1 as accepted dependencies and move upward i
 
 Recommended order:
 
-1. **Owner-local Runtime Pack validation** — run plan/export/status against the real `knowledge.sqlite`; record actual file sizes/counts and confirm 6,035 Factory expressions.
-2. **TypeScript workspace + MusicSpec package** — strict TS/pnpm foundation and schema-compatible types/migrations.
-3. **MusicSpec compiler** — deterministic renderer with structured compilation result.
-4. **1,000-character budget engine** — preserve explicit/locked intent, compact lower-priority derived/redundant material, keep complete bracketed sections.
-5. **Search + design-system/application foundation** — runtime repository/search worker, then V'gine UI/motion modules and Easy/Advanced surfaces.
+1. **Runtime-data adapter** — validate/load Runtime Pack v1 and expose normalized compiler/search repositories without leaking physical JSON/SQLite shapes upward.
+2. **Search package** — benchmark the real 10,348-document payload, implement deterministic local ranking + worker boundary, then decide whether any external search dependency is justified.
+3. **Design-system/motion foundation** — semantic Paradise/Ash tokens, primitives package boundaries and centralized motion recipes.
+4. **React/Vite Studio shell** — consume the packages rather than reimplementing domain logic.
+5. **Editor-content enrichment** — parameters/statements/Exclude remain additive Post-V1 work; do not reinterpret the empty editor payload as a database failure.
 
 ## Post-V1 enrichment is allowed but is not a blocker
 

@@ -19,10 +19,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -38,3 +38,17 @@ jobs:
 
       - name: Run synthetic local-data tests
         run: python -m unittest discover -s tests -p "test_*.py" -v
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24.21.0"
+
+      - name: Install pinned pnpm
+        run: npm install --global pnpm@11.27.1
+
+      - name: Install TypeScript workspace
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate TypeScript foundation
+        run: pnpm run check

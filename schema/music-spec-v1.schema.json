@@ -31,6 +31,9 @@
     },
     "facets": {
       "type": "object",
+      "propertyNames": {
+        "enum": ["genre", "era", "bpm", "key_mode", "groove", "melody", "harmony", "drums", "bass", "instruments", "exciters", "texture", "vocal", "dynamics", "space_mix", "production", "structure"]
+      },
       "additionalProperties": { "$ref": "#/$defs/facetState" }
     },
     "exclude": {
