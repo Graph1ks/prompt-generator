@@ -392,6 +392,8 @@ def decompose_surface(surface: str, instrument_phrases: dict, concept_phrases: d
         "concept_ids": sorted({m["id"] for m in concept_matches}),
         "residual_tokens": residual,
         "coverage": round(confidence, 4),
+        "fully_semantic": not residual,
+        "fully_identity_decomposed": bool(instrument_matches) and not residual,
         "fully_decomposed": bool(instrument_matches) and not residual,
     }
 
@@ -404,8 +406,10 @@ def instrument_decomposition_report(
     instrument_phrases, concept_phrases = compiled_semantic_lexicon(knowledge)
     residual_counter = Counter()
     decomposed = []
-    fully_unique = 0
-    fully_occurrences = 0
+    fully_semantic_unique = 0
+    fully_semantic_occurrences = 0
+    fully_identity_unique = 0
+    fully_identity_occurrences = 0
     total_occurrences = 0
 
     for row in instrument_rows:
@@ -413,9 +417,12 @@ def instrument_decomposition_report(
             row["surface"], instrument_phrases, concept_phrases
         )
         total_occurrences += int(row["occurrence_count"])
-        if result["fully_decomposed"]:
-            fully_unique += 1
-            fully_occurrences += int(row["occurrence_count"])
+        if result["fully_semantic"]:
+            fully_semantic_unique += 1
+            fully_semantic_occurrences += int(row["occurrence_count"])
+        if result["fully_identity_decomposed"]:
+            fully_identity_unique += 1
+            fully_identity_occurrences += int(row["occurrence_count"])
         for token in result["residual_tokens"]:
             residual_counter[token] += int(row["occurrence_count"])
         decomposed.append(
@@ -430,7 +437,8 @@ def instrument_decomposition_report(
 
     decomposed.sort(
         key=lambda row: (
-            row["fully_decomposed"],
+            row["fully_semantic"],
+            row["fully_identity_decomposed"],
             row["coverage"],
             -row["occurrence_count"],
             row["surface"],
@@ -440,26 +448,36 @@ def instrument_decomposition_report(
         "compiled_instrument_phrase_count": len(instrument_phrases),
         "compiled_concept_phrase_count": len(concept_phrases),
         "unique_segment_count": len(instrument_rows),
-        "fully_decomposed_unique": fully_unique,
-        "fully_decomposed_unique_ratio": round(
-            fully_unique / len(instrument_rows), 4
+        "fully_semantic_unique": fully_semantic_unique,
+        "fully_semantic_unique_ratio": round(
+            fully_semantic_unique / len(instrument_rows), 4
+        ) if instrument_rows else 0.0,
+        "fully_identity_decomposed_unique": fully_identity_unique,
+        "fully_identity_decomposed_unique_ratio": round(
+            fully_identity_unique / len(instrument_rows), 4
         ) if instrument_rows else 0.0,
         "occurrence_count": total_occurrences,
-        "fully_decomposed_occurrences": fully_occurrences,
-        "fully_decomposed_occurrence_ratio": round(
-            fully_occurrences / total_occurrences, 4
+        "fully_semantic_occurrences": fully_semantic_occurrences,
+        "fully_semantic_occurrence_ratio": round(
+            fully_semantic_occurrences / total_occurrences, 4
+        ) if total_occurrences else 0.0,
+        "fully_identity_decomposed_occurrences": fully_identity_occurrences,
+        "fully_identity_decomposed_occurrence_ratio": round(
+            fully_identity_occurrences / total_occurrences, 4
         ) if total_occurrences else 0.0,
         "top_residual_tokens": [
             {"token": token, "weighted_occurrence_count": count}
             for token, count in residual_counter.most_common(250)
         ],
         "priority_unresolved": [
-            row for row in decomposed if not row["fully_decomposed"]
+            row for row in decomposed if not row["fully_semantic"]
         ][:detail_limit],
         "_full_rows": decomposed,
         "notes": [
             "This is a deterministic semantic coverage report, not an automatic approval mechanism.",
-            "A source segment is fully decomposed only when at least one curated instrument identity is recognized and every remaining semantic token is covered by curated concepts.",
+            "fully_semantic means every semantic token is covered by curated instrument identities or curated concepts.",
+            "fully_identity_decomposed is stricter: at least one canonical instrument identity must be recognized and no semantic residual may remain.",
+            "Semantic-only sound layers such as pads, sweeps, effects, or noise can therefore be fully semantic without being forced into fake instrument identities.",
             "Syntax/coordination words and simple quantities do not count as unresolved semantic tokens.",
         ],
     }
@@ -680,7 +698,7 @@ def write_decomposition_csv(path: Path, rows: list[dict]) -> None:
         w.writerow(
             [
                 "candidate_id","surface","occurrence_count","track_count","coverage",
-                "fully_decomposed","instrument_ids","concept_ids","residual_tokens",
+                "fully_semantic","fully_identity_decomposed","instrument_ids","concept_ids","residual_tokens",
             ]
         )
         for row in rows:
@@ -691,7 +709,8 @@ def write_decomposition_csv(path: Path, rows: list[dict]) -> None:
                     row["occurrence_count"],
                     row["track_count"],
                     row["coverage"],
-                    row["fully_decomposed"],
+                    row["fully_semantic"],
+                    row["fully_identity_decomposed"],
                     "|".join(row["instrument_ids"]),
                     "|".join(row["concept_ids"]),
                     "|".join(row["residual_tokens"]),
@@ -806,9 +825,12 @@ def prepare(args) -> int:
         "counts": {
             "instrument_unique_segments": len(full_instrument_rows),
             "instrument_prioritized": len(instruments["prioritized_candidates"]),
-            "instrument_fully_decomposed_unique": decomposition["fully_decomposed_unique"],
-            "instrument_fully_decomposed_unique_ratio": decomposition["fully_decomposed_unique_ratio"],
-            "instrument_fully_decomposed_occurrence_ratio": decomposition["fully_decomposed_occurrence_ratio"],
+            "instrument_fully_semantic_unique": decomposition["fully_semantic_unique"],
+            "instrument_fully_semantic_unique_ratio": decomposition["fully_semantic_unique_ratio"],
+            "instrument_fully_semantic_occurrence_ratio": decomposition["fully_semantic_occurrence_ratio"],
+            "instrument_fully_identity_decomposed_unique": decomposition["fully_identity_decomposed_unique"],
+            "instrument_fully_identity_decomposed_unique_ratio": decomposition["fully_identity_decomposed_unique_ratio"],
+            "instrument_fully_identity_decomposed_occurrence_ratio": decomposition["fully_identity_decomposed_occurrence_ratio"],
             "term_candidates_before_limit": lexicon["term_candidate_count_before_limit"],
             "term_prioritized": len(lexicon["prioritized_terms"]),
             "phrase_candidates_before_limit": lexicon["phrase_candidate_count_before_limit"],
@@ -829,7 +851,8 @@ def prepare(args) -> int:
     print(
         "[knowledge-mining] prepared"
         f" · instruments {summary['counts']['instrument_prioritized']}/{summary['counts']['instrument_unique_segments']}"
-        f" · decomposed {summary['counts']['instrument_fully_decomposed_unique_ratio']:.1%} unique"
+        f" · semantic {summary['counts']['instrument_fully_semantic_unique_ratio']:.1%} unique"
+        f" · identities {summary['counts']['instrument_fully_identity_decomposed_unique_ratio']:.1%} unique"
         f" · terms {summary['counts']['term_prioritized']}"
         f" · phrases {summary['counts']['phrase_prioritized']}"
         f" · backup OK"
