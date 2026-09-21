@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts" / "data"))
 
-from instrument_semantics import decompose_surface
+from instrument_semantics import decompose_surface, phrase_tokens
 
 BUILDER = ROOT / "scripts" / "data" / "build_local_data.py"
 MINER = ROOT / "scripts" / "data" / "knowledge_mining_session.py"
@@ -116,6 +116,35 @@ GENRES = {
 
 
 class KnowledgeMiningSessionTests(unittest.TestCase):
+    def test_phrase_tokens_preserve_unicode_words_and_normalize_punctuation(self):
+        self.assertEqual(phrase_tokens("paired bağlamas"), ("paired", "bağlamas"))
+        self.assertEqual(phrase_tokens("Jew's harp"), ("jews", "harp"))
+        self.assertEqual(
+            phrase_tokens("T.O.N.T.O.-style synthesizer"),
+            ("tonto-style", "synthesizer"),
+        )
+
+    def test_decomposition_ignores_reviewed_grammar_and_count_scaffolding(self):
+        instrument = {
+            "kind": "instrument",
+            "id": "instrument:piano",
+            "label": "Piano",
+            "role": "identity",
+        }
+        concept = {
+            "kind": "concept",
+            "id": "concept:accent",
+            "label": "Accent",
+            "role": "arrangement_role",
+        }
+        result = decompose_surface(
+            "one piano played for accents",
+            {("piano",): instrument},
+            {("accents",): concept},
+        )
+        self.assertEqual(result["residual_tokens"], [])
+        self.assertTrue(result["fully_identity_decomposed"])
+
     def test_hyphen_compound_reuses_exact_reviewed_phrase(self):
         instrument = {
             "kind": "instrument",
