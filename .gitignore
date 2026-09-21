@@ -15,6 +15,29 @@
 *.local.*
 config.local.*
 
+# Prompt V'gine local source/build data — HARD RULE
+.local-data/
+.local-data-*/
+local-data/
+data/local/
+data/generated/
+data/reports/
+data/source/
+
+# Never version generated DB/search/dump artifacts
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.dump
+
+# Local factory/source bundles (real project data stays outside Git)
+GRAPH1KS_PUBLIC_VAULT_FACTORY.json
+GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz
+GRAPH1KS_GENRE_MAP_FACTORY.json
+
 # OS metadata
 .DS_Store
 Thumbs.db
@@ -52,15 +75,6 @@ obj/
 venv/
 __pycache__/
 *.py[cod]
-
-# Local databases / dumps — explicitly opt in if intentionally versioned
-*.sqlite
-*.sqlite3
-*.db
-*.db-journal
-*.db-wal
-*.db-shm
-*.dump
 
 # Local archives / artifacts
 *.zip
