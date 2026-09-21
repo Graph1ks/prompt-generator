@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-21  
-**Current milestone:** **TypeScript compiler foundation implemented** — next: runtime-data/search adapter and application design-system foundation
+**Current milestone:** **Runtime-data/search foundation implemented** — next: real search benchmark plus V'gine design-system/motion foundation
 
 ## Completion verdict
 
@@ -79,12 +79,15 @@ Expected result: acceptance remains `status: ok`; the compiled knowledge DB is s
 - `scripts/data/export_runtime_v1.py` compiles deterministic runtime payloads from `knowledge.sqlite` with plan/status, resumable staged work, stale-source rejection, validation, atomic promotion and previous-pack retention.
 - Strict TypeScript/pnpm workspace is present with `@vgine/music-spec` and pure `@vgine/compiler`.
 - Compiler v1 performs MusicSpec runtime validation, canonical structured rendering, separate Exclude output, exact semantic deduplication, deterministic lower-priority omission, Unicode code-point budgeting and explicit `budget_conflict` diagnostics without blind truncation.
+- `@vgine/runtime-data` validates Runtime Pack v1 bootstrap payloads, manifest counts and optional hashes, then adapts renderer/genre data into the pure compiler view.
+- `@vgine/search` provides dependency-free deterministic local ranking, stable-ID results and a worker-ready request/response protocol.
+- `pnpm bench:search` benchmarks the real `.local-data/current/runtime-v1/search.json`; no external search dependency will be adopted before that measurement.
 - No React/Vite/Tauri/Motion/Radix/Zustand/TanStack package is installed yet.
 - Local operator outputs are standardized: flat `reports/`, separate `logs/`, durable `.local-data/backups/`; legacy nested report folders have a safe plan/apply migrator.
 
 ## Current blocker
 
-**None.** Runtime Pack real-data validation and the first compiler/budget implementation are complete. Do not add further Runtime Pack shards unless measured application startup/search behavior demonstrates a need.
+**No implementation blocker.** One owner-local benchmark against the real 10,348-document `search.json` is still needed before deciding whether the dependency-free ranking kernel needs fuzzy/index-library escalation. Do not add further Runtime Pack shards or a search dependency without measured evidence.
 
 Future enrichment does not reopen the V1 database milestone unless it changes schema/invariants.
 
@@ -92,10 +95,10 @@ Future enrichment does not reopen the V1 database milestone unless it changes sc
 
 Proceed in this order:
 
-1. add `packages/runtime-data` to load/validate Runtime Pack v1 and adapt its snake_case payloads into compiler/search domain types;
-2. add `packages/search` with deterministic local ranking and a worker-ready boundary; benchmark the real 10,348-document search payload before choosing a search dependency;
-3. add the V'gine design-token/UI/motion package foundations;
-4. scaffold the React/Vite Studio shell on those packages;
+1. run `pnpm bench:search` against the real owner-local Runtime Pack and record build/query latency;
+2. add the V'gine semantic design-token/UI/motion package foundations without importing a generic component aesthetic;
+3. scaffold the React/Vite Studio shell on the stable domain/runtime packages;
+4. move search behind a Web Worker when application profiling justifies it;
 5. enrich empty editor statements/parameters/Exclude content additively without reopening Database V1.
 
 ## Do not redo
@@ -120,4 +123,5 @@ Proceed in this order:
 - `docs/RUNTIME_DATA_CONTRACT_V1.md` — compiled application data boundary
 - `docs/APPLICATION_ARCHITECTURE.md` — production stack, module/design/motion architecture
 - `docs/COMPILER_V1.md` — implemented compiler/budget behavior
+- `docs/RUNTIME_SEARCH_V1.md` — runtime loader/search contract and benchmark gate
 - `docs/LOCAL_OUTPUT_LAYOUT.md` — canonical local reports/logs/backups layout

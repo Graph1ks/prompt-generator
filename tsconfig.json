@@ -2,6 +2,8 @@
   "files": [],
   "references": [
     { "path": "./packages/music-spec" },
-    { "path": "./packages/compiler" }
+    { "path": "./packages/compiler" },
+    { "path": "./packages/runtime-data" },
+    { "path": "./packages/search" }
   ]
 }
