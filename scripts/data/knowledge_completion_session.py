@@ -365,7 +365,7 @@ def prepare(args) -> int:
     review_id = decomposition.get("review_id")
     curation_fingerprint = decomposition.get("curation_fingerprint")
 
-    batch_paths: list[str] = []
+    batch_reports: list[dict] = []
     for batch_index in range(batch_count):
         start = batch_index * args.batch_size
         batch_rows = residual[start : start + args.batch_size]
@@ -392,7 +392,7 @@ def prepare(args) -> int:
                 "rows": batch_rows,
             },
         )
-        batch_paths.append(str(path))
+        batch_reports.append({"path": str(path), "sha256": sha256_file(path)})
 
     groups_path = reports_dir / "residual-token-groups-v1.csv"
     write_groups_csv(groups_path, groups)
@@ -431,7 +431,8 @@ def prepare(args) -> int:
         "top_residual_token_groups": groups[:100],
         "reports": {
             "residual_token_groups_csv": str(groups_path),
-            "review_batches": batch_paths,
+            "review_batches": batch_reports,
+            "decision_bundle_template": str(reports_dir / "knowledge-curation-decisions-v2.template.json"),
         },
         "next_action": (
             "Review one or more generated batches and encode accepted additive canonical "
@@ -441,6 +442,35 @@ def prepare(args) -> int:
         ),
     }
     write_json(plan_path, plan)
+    plan_sha = sha256_file(plan_path)
+    try:
+        bundle_source = {
+            "prompt_vault_sha256": source["prompt_vault"]["sha256"],
+            "genre_map_sha256": source["genre_map"]["sha256"],
+        }
+    except (KeyError, TypeError) as exc:
+        raise SystemExit("decomposition report is missing source fingerprints") from exc
+    if not review_id:
+        raise SystemExit("decomposition report is missing review_id")
+    template_path = reports_dir / "knowledge-curation-decisions-v2.template.json"
+    write_json(
+        template_path,
+        {
+            "schema": "promptvgine-knowledge-curation-decisions-v2",
+            "bundle_id": f"instrument-semantic-completion-{review_id}",
+            "review_id": review_id,
+            "curation_fingerprint": curation_fingerprint,
+            "source": bundle_source,
+            "report_sha256": {"completion_plan": plan_sha},
+            "instrument_families": [],
+            "instruments": [],
+            "instrument_aliases": [],
+            "instrument_traits": [],
+            "concepts": [],
+            "parameters": [],
+            "parameter_options": [],
+        },
+    )
     print(
         f"[knowledge-completion] prepared · residual {len(residual):,}"
         f" · batches {batch_count:,} · report: {plan_path}"

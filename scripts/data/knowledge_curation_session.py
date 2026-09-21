@@ -26,8 +26,9 @@ BUNDLE_SCHEMAS = {
     "promptvgine-knowledge-curation-decisions-v2",
 }
 REPORT_FILES = {
-    "instrument": "instrument-candidates-v1.json",
-    "lexicon": "lexicon-candidates-v1.json",
+    "instrument": Path("knowledge") / "instrument-candidates-v1.json",
+    "lexicon": Path("knowledge") / "lexicon-candidates-v1.json",
+    "completion_plan": Path("knowledge-completion") / "knowledge-completion-plan-v1.json",
 }
 
 
@@ -96,7 +97,7 @@ def expected_source_hashes(corpus_path: Path) -> dict:
 
 
 def load_review_state(out_dir: Path, report_hash: dict) -> dict:
-    reports_dir = out_dir / "reports" / "knowledge"
+    reports_dir = out_dir / "reports"
     if not report_hash:
         raise SystemExit("decision bundle must bind at least one reviewed report")
     unsupported = sorted(set(report_hash) - set(REPORT_FILES))

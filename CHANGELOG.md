@@ -30,6 +30,7 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Added `query_knowledge.py` for compiled expression/stat/search inspection.
 - Added a bundled `database_foundation_session.py finalize` workflow that recompiles, validates, refreshes mining, writes acceptance/log reports, and keeps terminal output concise.
 - Added `knowledge_completion_session.py prepare`, an acceptance-gated read-only semantic completion planner that reconciles accepted expression/decomposition counts and emits residual-token reports plus bounded Instruments semantic-review batches without mutating curation or shrinking the selectable expression catalog.
+- Added end-to-end completion-review binding: every semantic-review batch is SHA-addressed in the completion plan, a v2 decision template binds to the exact plan hash, and `knowledge_curation_session.py` verifies `completion_plan` as a supported reviewed artifact before durable mutation.
 - Build revision advanced to `promptvgine-local-data-build-v2-resumable-2-instrument-expressions`; completed older checkpoints can advance knowledge stages without rebuilding a matching promoted corpus.
 
 ### Changed
