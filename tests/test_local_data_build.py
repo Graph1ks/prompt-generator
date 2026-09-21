@@ -453,6 +453,34 @@ class LocalDataBuildTests(unittest.TestCase):
                 (out / "reports" / "database" / "03-knowledge-mining.stdout.txt").is_file()
             )
 
+    def test_renderer_profile_carries_source_derived_character_budget(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            vault, genres = self.write_sources(root)
+            out = root / "out"
+            result = self.run_builder(vault, genres, out)
+            self.assertEqual(result.returncode, 0, msg=result.stderr)
+            knowledge = sqlite3.connect(out / "knowledge.sqlite")
+            try:
+                profile = knowledge.execute(
+                    "SELECT max_characters,overflow_policy FROM renderer_profile "
+                    "WHERE id='suno-structured-v1'"
+                ).fetchone()
+                self.assertEqual(profile, (1000, "semantic-budget"))
+                sections = {
+                    key: (soft, samples)
+                    for key, soft, samples in knowledge.execute(
+                        "SELECT section_key,soft_max_characters,source_sample_count "
+                        "FROM renderer_section WHERE renderer_profile_id='suno-structured-v1'"
+                    )
+                }
+                self.assertEqual(sections["melody"], (110, 10043))
+                self.assertEqual(sections["instruments"], (107, 9882))
+                self.assertEqual(sections["production"], (120, 4459))
+                self.assertEqual(sections["vocal"], (None, 0))
+            finally:
+                knowledge.close()
+
     def test_plan_is_read_only(self):
         with tempfile.TemporaryDirectory() as td:
             tmp = Path(td)
