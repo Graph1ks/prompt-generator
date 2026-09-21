@@ -340,6 +340,46 @@ class LocalDataBuildTests(unittest.TestCase):
             self.assertTrue((out / "corpus.previous.sqlite").exists())
             self.assertEqual((out / "corpus.previous.sqlite").read_bytes(), old_bytes)
 
+    def test_completed_checkpoint_auto_advances_build_revision_without_reset(self):
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            out, first = self.run_builder(tmp)
+            self.assertEqual(first.returncode, 0)
+            corpus_before = (out / "corpus.sqlite").read_bytes()
+
+            state = sqlite3.connect(out / ".build-v2" / "state.sqlite")
+            try:
+                state.execute(
+                    "update build_meta set value=? where key='build_revision'",
+                    ("promptvgine-local-data-build-v2-resumable-1",),
+                )
+                state.execute(
+                    "update build_meta set value='complete' where key='status'"
+                )
+                state.commit()
+            finally:
+                state.close()
+
+            _, result = self.run_builder(tmp)
+            self.assertEqual(
+                result.returncode,
+                0,
+                msg=f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}",
+            )
+            self.assertEqual((out / "corpus.sqlite").read_bytes(), corpus_before)
+            self.assertTrue((out / "knowledge.previous.sqlite").exists())
+
+            state = sqlite3.connect(out / ".build-v2" / "state.sqlite")
+            try:
+                self.assertEqual(
+                    state.execute(
+                        "select value from build_meta where key='build_revision'"
+                    ).fetchone()[0],
+                    "promptvgine-local-data-build-v2-resumable-2-instrument-expressions",
+                )
+            finally:
+                state.close()
+
     def test_plan_is_read_only(self):
         with tempfile.TemporaryDirectory() as td:
             tmp = Path(td)
