@@ -167,6 +167,26 @@ Full local evidence:
 .local-data\current\reports\knowledge\knowledge-mining-summary-v1.json
 ```
 
+## Bundled knowledge curation apply
+
+After AI/human review, place the reviewed decision bundle at:
+
+```text
+.local-data\current\reports\knowledge\knowledge-curation-decisions-v1.json
+```
+
+Apply the whole reviewed batch with one command:
+
+```powershell
+py scripts\data\knowledge_curation_session.py apply --out-dir ".local-data\current" --bundle ".local-data\current\reports\knowledge\knowledge-curation-decisions-v1.json" --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json"
+```
+
+The apply command verifies source/review fingerprints and exact reviewed-report hashes, creates a curation backup, applies instrument families/instruments/aliases/dictionary entries in one transaction, recompiles knowledge, validates the promoted databases, restores curation and recompiles recovery state if the operation fails, writes a receipt, and refreshes the next mining reports.
+
+New mining reports include a semantic curation fingerprint so future decision bundles are rejected if durable curation changes after review. The first pre-fingerprint report can still be applied only when its exact report hashes and source fingerprints match.
+
+Phrase prioritization deliberately excludes Instruments-list adjacency, Key/Mode literals, boundary connectors, and common grammatical scaffolding. Mined phrases remain evidence until reviewed.
+
 ## Inspect corpus evidence
 
 ```powershell
