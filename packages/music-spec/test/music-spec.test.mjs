@@ -3,7 +3,10 @@ import test from "node:test";
 
 import {
   MUSIC_SPEC_SCHEMA_VERSION,
+  createMusicSpec,
   parseMusicSpec,
+  removeGenreInfluence,
+  setGenreInfluence,
   validateMusicSpec,
 } from "../dist/index.js";
 
@@ -50,4 +53,29 @@ test("rejects duplicate genre roles and duplicate routing facets", () => {
   assert.equal(result.valid, false);
   assert.ok(result.issues.some((entry) => entry.code === "duplicate_genre_role"));
   assert.ok(result.issues.some((entry) => entry.code === "duplicate_routing_facet"));
+});
+
+
+test("creates and updates ordered genre influence state", () => {
+  let spec = createMusicSpec("genre:boom-bap");
+  spec = setGenreInfluence(spec, "accent", "genre:ambient");
+  spec = setGenreInfluence(spec, "fusion", "genre:jazz");
+  assert.deepEqual(
+    spec.genre_influences.map((entry) => [entry.role, entry.genre_id]),
+    [
+      ["foundation", "genre:boom-bap"],
+      ["fusion", "genre:jazz"],
+      ["accent", "genre:ambient"],
+    ],
+  );
+
+  spec = setGenreInfluence(spec, "fusion", "genre:soul");
+  assert.equal(spec.genre_influences[1].genre_id, "genre:soul");
+
+  spec = removeGenreInfluence(spec, "accent");
+  assert.deepEqual(
+    spec.genre_influences.map((entry) => entry.role),
+    ["foundation", "fusion"],
+  );
+  assert.equal(validateMusicSpec(spec).valid, true);
 });
