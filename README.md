@@ -4,7 +4,7 @@
 
 ## Status
 
-**Stage:** architecture/data foundation  
+**Stage:** **Database V1 complete** / runtime + compiler implementation next  
 **Repository mode:** public owner-controlled / solo-dev  
 **License:** source-available / noncommercial for third parties; commercial rights reserved to Graph1ks
 
@@ -63,7 +63,7 @@ python scripts/data/backup_curation.py --source .local-data/current/curation.sql
 
 When Factory files change, build a second snapshot and compare it with `scripts/data/diff_local_data.py`.
 
-See `docs/LOCAL_DATA_BUILD.md` and `docs/DATA_ARCHITECTURE.md`.
+See `docs/DATABASE_V1.md` for the completed table-by-table database contract, plus `docs/LOCAL_DATA_BUILD.md` and `docs/DATA_ARCHITECTURE.md` for operations/architecture.
 
 ## Current source baseline
 
@@ -74,7 +74,7 @@ The initial architecture was validated against the project-provided snapshot con
 - 852,459 structured-prompt tokens;
 - 24 Major Genres;
 - 1,564 taxonomy genres/subgenres;
-- 6,035 unique source-backed Instruments expressions in the current Factory snapshot.
+- 6,035 unique source-backed Instruments expressions in the current Factory snapshot;\n- 6,035 / 6,035 Instruments expressions fully semantic, with 0 semantic residuals in the completed V1 snapshot;\n- 4,472 fully identity-decomposed expressions (~74.1%), with semantic-only layers intentionally allowed.
 
 The database itself is not committed. Aggregate architecture findings are recorded in `docs/PROMPT_CORPUS_PROFILE.md`.
 
