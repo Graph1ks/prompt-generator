@@ -313,3 +313,59 @@ export function parseMusicSpec(value: unknown): MusicSpec {
   }
   return value as MusicSpec;
 }
+
+
+const GENRE_ROLE_ORDER: Readonly<Record<GenreInfluenceRole, number>> = {
+  foundation: 0,
+  fusion: 1,
+  accent: 2,
+};
+
+export function createMusicSpec(foundationGenreId: string): MusicSpec {
+  if (!foundationGenreId) {
+    throw new Error("foundation genre ID must be non-empty");
+  }
+  return {
+    schema_version: MUSIC_SPEC_SCHEMA_VERSION,
+    genre_influences: [
+      {
+        role: "foundation",
+        genre_id: foundationGenreId,
+        routing: [],
+        locked: false,
+      },
+    ],
+    facets: {},
+    exclude: [],
+  };
+}
+
+export function setGenreInfluence(
+  spec: MusicSpec,
+  role: GenreInfluenceRole,
+  genreId: string,
+): MusicSpec {
+  if (!genreId) throw new Error("genre ID must be non-empty");
+
+  const existing = spec.genre_influences.find((entry) => entry.role === role);
+  const next: GenreInfluence = existing
+    ? { ...existing, genre_id: genreId }
+    : { role, genre_id: genreId, routing: [], locked: false };
+
+  const influences = spec.genre_influences
+    .filter((entry) => entry.role !== role)
+    .concat(next)
+    .sort((a, b) => GENRE_ROLE_ORDER[a.role] - GENRE_ROLE_ORDER[b.role]);
+
+  return { ...spec, genre_influences: influences };
+}
+
+export function removeGenreInfluence(
+  spec: MusicSpec,
+  role: Exclude<GenreInfluenceRole, "foundation">,
+): MusicSpec {
+  return {
+    ...spec,
+    genre_influences: spec.genre_influences.filter((entry) => entry.role !== role),
+  };
+}
