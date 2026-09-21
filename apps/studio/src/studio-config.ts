@@ -5,10 +5,10 @@ export interface StudioChapter {
   readonly label: string;
   readonly shortLabel: string;
   readonly description: string;
-  readonly facets: readonly FacetKey[];
+  readonly facets: readonly [FacetKey, ...FacetKey[]];
 }
 
-export const STUDIO_CHAPTERS: readonly StudioChapter[] = [
+export const STUDIO_CHAPTERS: readonly [StudioChapter, ...StudioChapter[]] = [
   {
     id: "dna",
     label: "Sound DNA",
