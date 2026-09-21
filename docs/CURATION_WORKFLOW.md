@@ -132,18 +132,26 @@ py scripts\data\knowledge_curation_session.py apply --out-dir ".local-data\curre
 
 The apply bundle is backed up, transactional, fingerprint/hash-bound to the reviewed evidence, automatically recompiled/validated, and rollback-safe.
 
-Important decomposition rule: an Instruments-list segment is evidence, not automatically an instrument identity. For example, properties such as clean, distorted, muted, warm, layered, lead, rhythm, programmed, or electronic are normally modeled as reusable concepts/roles/properties around a canonical instrument rather than creating thousands of descriptor-heavy instrument identities.
+Important decomposition rule: every source Instruments-list segment is a **first-class selectable instrument expression**. The complete wording is preserved because words such as clean, distorted, muted, warm, layered, lead, rhythm, programmed, electronic, staccato, restrained, etc. describe how the instrument/layer is played, voiced, processed, or arranged.
 
+That full expression is not the same thing as canonical instrument identity. Prompt V'gine therefore stores both:
 
-Instrument identity is separate from how it is played/processed.
+- the original/source-backed `instrument_expression` as the actual selectable/renderable phrase;
+- canonical instrument entities for stable identity/search/grouping;
+- reusable concepts/options for the expression's playing/processing/role semantics.
 
-Curate separately:
+Example: `clean rhythm electric guitar` remains selectable and renders exactly as that phrase, while its semantic links can resolve Electric Guitar + Clean + Rhythm. Decomposition is additive metadata, never a reason to discard the compound expression.
+
+All source expressions are generated into `knowledge.sqlite` automatically. Curation improves their semantic links; it does not decide whether the source expression is allowed to exist.
+
+Curate canonical identity separately through:
 
 - `instrument_family_patch`;
 - `instrument_patch`;
-- `instrument_alias_patch`.
+- `instrument_alias_patch`;
+- `instrument_trait_patch`.
 
-Then model descriptors such as attack, sustain, register, articulation, saturation, width, and role as concepts/options—not as part of the instrument name.
+Model attack, sustain, register, articulation, saturation, width, role, playing method, and similar semantics as concepts/options so they can explain and recombine expressions without destroying the original source phrase.
 
 ## 10. Advanced parameters/options
 
