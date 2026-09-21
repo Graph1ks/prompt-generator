@@ -15,6 +15,7 @@ import datetime as dt
 import hashlib
 import json
 import math
+import sqlite3
 from pathlib import Path
 
 ACCEPTANCE_SCHEMA = "promptvgine-database-foundation-acceptance-v1"
@@ -57,6 +58,72 @@ def load_json(path: Path) -> dict:
     if not isinstance(value, dict):
         raise SystemExit(f"expected JSON object: {path}")
     return value
+
+
+def load_identity_catalog(path: Path) -> dict:
+    if not path.is_file():
+        raise SystemExit(f"required compiled knowledge DB not found: {path}")
+    try:
+        conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+        conn.row_factory = sqlite3.Row
+        try:
+            if conn.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+                raise SystemExit("compiled knowledge DB integrity check failed")
+            families = [
+                {
+                    "id": row["id"],
+                    "label": row["label"],
+                    "knowledge_entry_id": row["knowledge_entry_id"],
+                }
+                for row in conn.execute(
+                    """SELECT id,label,knowledge_entry_id
+                       FROM instrument_family
+                       ORDER BY lower(label),id"""
+                )
+            ]
+            aliases_by_instrument: dict[str, list[dict]] = {}
+            for row in conn.execute(
+                """SELECT instrument_id,alias_surface,alias_norm,status
+                   FROM instrument_alias
+                   WHERE status<>'deprecated'
+                   ORDER BY instrument_id,alias_norm"""
+            ):
+                aliases_by_instrument.setdefault(row["instrument_id"], []).append(
+                    {
+                        "surface": row["alias_surface"],
+                        "normalized": row["alias_norm"],
+                        "status": row["status"],
+                    }
+                )
+            instruments = [
+                {
+                    "id": row["id"],
+                    "label": row["label"],
+                    "label_norm": row["label_norm"],
+                    "family_id": row["family_id"],
+                    "status": row["status"],
+                    "knowledge_entry_id": row["knowledge_entry_id"],
+                    "aliases": aliases_by_instrument.get(row["id"], []),
+                }
+                for row in conn.execute(
+                    """SELECT id,label,label_norm,family_id,status,knowledge_entry_id
+                       FROM instrument
+                       WHERE status<>'deprecated'
+                       ORDER BY lower(label),id"""
+                )
+            ]
+        finally:
+            conn.close()
+    except sqlite3.Error as exc:
+        raise SystemExit(f"cannot read compiled identity catalog {path}: {exc}") from exc
+    return {
+        "knowledge_db": str(path),
+        "family_count": len(families),
+        "instrument_count": len(instruments),
+        "alias_count": sum(len(item["aliases"]) for item in instruments),
+        "families": families,
+        "instruments": instruments,
+    }
 
 
 def parse_bool(value: str) -> bool:
@@ -294,6 +361,11 @@ def prepare(args) -> int:
         if args.decomposition_csv
         else out_dir / "reports" / "knowledge" / "instrument-decomposition-full-v1.csv"
     )
+    knowledge_db_path = (
+        args.knowledge_db.resolve()
+        if args.knowledge_db
+        else out_dir / "knowledge.sqlite"
+    )
     if args.batch_size <= 0 or args.batch_size > 1000:
         raise SystemExit("--batch-size must be between 1 and 1000")
 
@@ -305,6 +377,7 @@ def prepare(args) -> int:
             f"unsupported decomposition schema: {decomposition.get('schema')!r}"
         )
     rows = load_decomposition_csv(decomposition_csv_path)
+    identity_catalog = load_identity_catalog(knowledge_db_path)
 
     expected = accepted["source_expressions"]
     try:
@@ -440,6 +513,7 @@ def prepare(args) -> int:
             "decomposition_json_sha256": decomposition_json_sha,
             "decomposition_csv": str(decomposition_csv_path),
             "decomposition_csv_sha256": decomposition_csv_sha,
+            "knowledge_db": str(knowledge_db_path),
         },
         "counts": {
             "source_instrument_expressions": expected,
@@ -463,6 +537,7 @@ def prepare(args) -> int:
             "semantic_coverage_may_advance_after_acceptance": True,
             "frequency_is_review_priority_evidence_only": True,
         },
+        "identity_catalog": identity_catalog,
         "top_residual_token_groups": groups[:100],
         "reports": {
             "residual_token_groups_csv": str(groups_path),
@@ -523,6 +598,7 @@ def main() -> int:
     prepare_parser.add_argument("--acceptance", type=Path)
     prepare_parser.add_argument("--decomposition-json", type=Path)
     prepare_parser.add_argument("--decomposition-csv", type=Path)
+    prepare_parser.add_argument("--knowledge-db", type=Path)
     prepare_parser.add_argument("--batch-size", type=int, default=250)
     args = parser.parse_args()
     if args.command == "prepare":
