@@ -1,102 +1,123 @@
 # Handover
 
 **Last updated:** 2026-09-21
-**Current phase/milestone:** corpus + genre crosswalk complete; first core instrument/lexicon curation batch ready for owner-local apply
+**Current phase/milestone:** scalable instrument ontology v2 + semantic residual mining
 
-## Current objective
+## Objective
 
-Continue on the owner's Windows 11 / VS Code machine at D:\prompt-engine. Apply the first reviewed high-confidence semantic knowledge batch safely, then review the refreshed report files for lower-frequency/niche knowledge.
+Continue on the owner's Windows 11 / VS Code machine at D:\prompt-engine. Apply the prepared instrument ontology v2 bundle once, then use the automatically refreshed residual-only reports instead of repeatedly hand-curating raw Instruments strings.
 
-## Owner-local state already established
+## Owner-local baseline
 
-The owner has real Factory inputs under ignored .local-data\source\ and promoted local databases under .local-data\current\.
+- Factory inputs: ignored .local-data\source\.
+- Promoted DBs: .local-data\current\.
+- 10,043 tracks / 115,736 structured sections / 852,459 tokens.
+- 24 Major Genres / 1,564 taxonomy genres.
+- Genre crosswalk complete: 138 decisions applied, remaining queue 0.
+- Core knowledge batch already applied before the current refreshed report: 70 canonical instrument/group entities + 71 concepts.
 
-Validated baseline:
+## Current refreshed Instruments evidence
 
-- 10,043 tracks;
-- 115,736 structured prompt sections;
-- 852,459 tokens;
-- 24 Major Genres / 1,564 taxonomy genres;
-- 138 previously unresolved genre labels have been reviewed/applied;
-- genre-crosswalk remaining queue: 0.
+Current owner-local report:
 
-## Completed foundation
+- review id: knowledge-mining-86ede80c49248ecbdbd7965d;
+- curation fingerprint: 9e056bdd959666c2df5a24c09966c67bc1c14fc16cff24a77f415deb39b93853;
+- instrument report SHA-256: 945acff3b4fbbe1fb78dfc175c14844afe2c9486e26c1cce38b24ad774b8f04f;
+- 6,035 unique Instruments segments;
+- 5,930 not exact-matched as curated surfaces.
 
-### Licensing and repository mode
+The report makes clear that most remaining strings are compositional phrases such as clean/rhythm/distorted guitars, programmed/hybrid drums, synth pads/basses, restrained strings, accents, support layers, effects, and stylistic modifiers. These must not become thousands of standalone instrument identities.
 
-Graph1ks Material is source-available/noncommercial for third parties. Complete license/policy texts live in the repository. Commercial rights in Graph1ks Material are reserved to Graph1ks.
+## Instrument ontology v2
 
-### Resumable local build
+The prepared local decision bundle adds one large coherent semantic layer:
 
-The v2 builder provides plan/status, checkpoints, ordinary-rerun resume, visible progress, stale-checkpoint rejection, staged work DBs, validation-before-promotion, previous-artifact retention, and narrow reset/rebuild semantics.
+- 58 new canonical instrument/group entities;
+- 171 reusable modifier/production/performance/style concepts;
+- 27 aliases attached to already-curated instruments;
+- 10 Advanced Instruments parameters;
+- 100 parameter options linked to knowledge entries;
+- 118 intrinsic instrument-trait relations.
 
-### Report-driven curation
+Representative new canonical entities include Synth Bass, Sub Bass, 808 Bass, Electronic Percussion, Synth Brass, Synth Strings, Analog/Digital/Polyphonic/Monophonic Synthesizer, Digital/Upright Piano, Harmonium, Melodica, Resonator/Baritone/Hollow-Body Guitar, Fretless Bass, orchestral/chamber ensembles, additional percussion, additional winds/brass, Electric Violin, and Turntables.
 
-Large review payloads stay in local report files rather than stdout. Genre decisions and knowledge decisions use reviewed files plus transactional apply commands.
+The modifier layer covers source type, role, processing, articulation, timbre, density/prominence, register, voice architecture, arrangement behavior, and style color.
 
-The solo-dev operator HARD RULE in AGENTS.md requires bundled phases, concise terminal summaries, file-based AI handoffs, automatic backup, rollback-safe durable mutation, and automatic compile/validation.
+## Scale result
 
-## Current instrument/lexicon evidence
+A deterministic local estimator was run against all 1,000 prioritized candidates in the refreshed Instruments report using the same longest-match semantics implemented in the repository.
 
-The owner generated and uploaded instrument-candidates-v1.json and lexicon-candidates-v1.json. Both are review snapshot knowledge-mining-c082ec85dd25848b7b1e480d from the same current Factory source fingerprints.
+Before ontology v2:
 
-The Instruments evidence has 6,035 unique source segments. Those are deliberately not treated as 6,035 canonical instruments. Many segments combine identity with reusable properties such as clean/distorted/muted, acoustic/electric/electronic, lead/rhythm, programmed/sampled, restrained/soft, pads/stabs, or arrangement roles.
+- fully semantic: 419 / 1,000;
+- fully semantic weighted occurrences: 63.5%;
+- explicit instrument identity + modifiers: 376 / 1,000;
+- identity-resolved weighted occurrences: 60.0%.
 
-The lexicon evidence contains high-signal reusable concepts across Groove, Melody, Harmony, Drums, Bass, Instruments, Texture, Dynamics, Space/Mix, Production, and related sections.
+With the prepared ontology v2 bundle:
 
-## First reviewed core batch
+- fully semantic: 1,000 / 1,000;
+- fully semantic weighted occurrences: 100%;
+- explicit instrument identity + modifiers: 848 / 1,000;
+- identity-resolved weighted occurrences: 92.1%.
 
-A high-confidence core decision bundle is prepared outside Git because it targets owner-local durable curation.
+The 152 semantic-only cases are intentionally not fabricated as instruments: pads, effects, sweeps, noise, stabs, and similar production layers can be fully understood as concepts.
 
-It contains 9 instrument families, 70 canonical instrument/group entities with aliases, and 71 reusable knowledge concepts, with beginner-oriented definitions, useful section-context definitions, and source evidence metadata from the reviewed report files.
+These are coverage results for the current prioritized 1,000 report candidates, not a claim that all 6,035 source segments are now resolved. The next real local prepare run measures the full corpus and emits the remaining residuals.
 
-Key design rule: canonical instrument identity stays separate from reusable properties/roles/processing. For example, Clean + Electric Guitar is composable knowledge rather than a permanent Clean Electric Guitar identity.
-
-## New tooling in current code
+## Repository implementation
 
 | Path | Purpose |
 |---|---|
-| scripts/data/knowledge_mining_session.py | prepares instrument/lexicon reports; refreshed version adds semantic curation fingerprints and stronger phrase-noise filtering |
-| scripts/data/knowledge_curation_session.py | transactionally applies reviewed knowledge decisions, recompiles, validates, rolls back/recompiles recovery on failure, refreshes reports |
-| schema/knowledge-curation-decisions-v1.schema.json | reviewed knowledge-bundle contract |
-| tests/test_knowledge_curation_session.py | apply/compile/refresh, stale-curation rejection, rollback regression tests |
-| docs/CURATION_WORKFLOW.md | semantic authoring rules |
-| docs/LOCAL_DATA_BUILD.md | exact owner-local commands |
-| docs/DECISIONS.md | durable architecture decisions including instrument decomposition + reviewed-bundle safety |
+| schema/curation-v1.sql | additive durable instrument_trait_patch migration |
+| schema/knowledge-curation-decisions-v2.schema.json | scoped instrument ontology decision-bundle contract |
+| scripts/data/knowledge_curation_session.py | v1/v2 scoped validation, backup-first migration, aliases, traits, parameters/options, compile/validate/rollback |
+| scripts/data/local_data_v1_core.py | compiles durable instrument traits into knowledge.instrument_trait |
+| scripts/data/knowledge_mining_session.py | semantic decomposition, semantic-vs-identity coverage, residual-only Instruments review queue |
+| tests/test_knowledge_curation_session.py | v2 scoped apply + trait/parameter regression coverage |
+| tests/test_knowledge_mining_session.py | semantic decomposition report coverage |
 
-## Safety contract for knowledge apply
+## Semantic decomposition contract
 
-The decision bundle is bound to the mining review_id, exact instrument/lexicon report SHA-256 values, Vault/Genre Map SHA-256 values, and a semantic curation fingerprint for newly generated reports.
+For each source Instruments segment:
 
-The uploaded first report predates the new curation-fingerprint field, so its first bundle uses exact report hashes + review/source fingerprints. After apply, refreshed reports contain the semantic curation fingerprint.
+1. longest curated instrument/concept phrase matches are resolved;
+2. coordination/count syntax is ignored;
+3. remaining semantic tokens are reported as residuals;
+4. fully_semantic means no semantic residue remains;
+5. fully_identity_decomposed additionally requires an explicit canonical instrument identity.
 
-Before durable mutation, apply creates an integrity-checked local curation backup. All curation writes happen in one transaction. Knowledge is recompiled and validated automatically. On failure, durable curation is restored from backup and recovery compilation is attempted.
+The primary Instruments review queue now excludes fully_semantic segments. Future review therefore works on semantic gaps, not raw corpus-string count.
 
-## Phrase-mining lesson already applied
+## Apply safety
 
-Raw frequent n-grams contained substantial grammar/list noise: instrument adjacency, Key/Mode literals, boundary connector fragments, and phrases built around common with/by/to/from/into/via scaffolding.
+Knowledge decision bundles are bound to review/source/report hashes and current curation fingerprint.
 
-The miner now suppresses those classes from prioritized phrase review. Frequency remains evidence, never automatic approval.
+Apply order:
+
+1. integrity check;
+2. validate reviewed snapshot;
+3. create verified curation backup;
+4. apply additive curation schema migration;
+5. transactionally apply bundle;
+6. recompile knowledge;
+7. validate;
+8. on failure restore curation backup and attempt recovery compile;
+9. refresh mining/decomposition reports.
 
 ## Next concrete work
 
-1. Merge the current feature branch after required CI is green.
+1. Merge the feature branch after required CI is green.
 2. Owner pulls main.
-3. Owner saves the reviewed core bundle as .local-data\current\reports\knowledge\knowledge-curation-decisions-v1.json.
-4. Owner runs the single bundled apply command documented in docs/LOCAL_DATA_BUILD.md.
-5. On success, use the automatically refreshed instrument/lexicon reports for the next niche/descriptor/parameter batch.
-
-## Verification
-
-Required CI check: validate.
-
-Current synthetic coverage includes resumable corpus build/adoption/rebuild safety, durable genre curation apply, report-driven instrument/lexicon mining, reviewed knowledge apply, compiled knowledge verification, stale curation/report rejection, and apply failure rollback + recovery compile.
+3. Owner saves instrument-ontology-decisions-v2.json under .local-data\current\reports\knowledge\.
+4. Run the single apply command from docs/LOCAL_DATA_BUILD.md.
+5. Review the newly generated instrument-decomposition-v1.json and residual-only instrument-candidates-v1.json for the next semantic gap batch.
 
 ## Traps
 
-- Never commit real Factory files, generated SQLite data, local reports, decision bundles, or backups.
-- Never delete durable curation.sqlite during source/Factory updates.
-- Never promote raw source segments or n-gram frequency directly into product knowledge.
-- Do not bake role/tone/processing words permanently into every instrument identity.
-- The current Vault has no structured Vocal coverage; Vocal knowledge needs a separate curated source/enrichment phase.
-- Sparse Exciters/Structure evidence should not be overgeneralized.
+- Never commit Factory data, local databases, reports, decision bundles, or backups.
+- Never delete curation.sqlite.
+- Never promote source phrase frequency directly to selectable options.
+- Do not force semantic-only layers into fake instrument entities merely to improve an identity coverage metric.
+- Do not manually process candidates already covered by the decomposition layer.
+- Vocal remains a separate enrichment problem because the current source has no structured Vocal coverage.
