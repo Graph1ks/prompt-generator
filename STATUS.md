@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-21
-**Current phase/milestone:** local corpus foundation built; resumable v2 tooling and licensing ready for owner-local continuation
+**Current phase/milestone:** local corpus validated; report-driven genre curation bundle ready
 
 ## Current objective
 
@@ -17,7 +17,7 @@ Continue from the owner's existing validated local Factory build without risking
 - Complete project license/policy texts are stored in the repository.
 - Local build tooling v2 follows the RhymeLab long-running-job standard: read-only plan, visible progress, resumable checkpoints, ordinary-rerun resume, safe interruption, stale-checkpoint rejection, integrity gates, staged artifacts, and last-known-good promotion safety.
 - Existing matching v1 corpus.sqlite is adopted rather than destructively rebuilt. Durable curation.sqlite is never replaced by a normal build.
-- Synthetic CI covers build, curation survival, pause/resume, stale checkpoints, safe reset, read-only plan, v1 adoption, and previous-artifact retention.
+- Synthetic CI covers build safety plus report-driven curation prepare/apply, stale decision-bundle rejection, automatic backups, recompilation, and validation.
 
 ## Last verified checks
 
@@ -33,7 +33,7 @@ None.
 
 ## Next concrete action
 
-Owner pulls current main and runs the read-only v2 build plan against the existing local data. Do not delete or rebuild anything manually.
+Owner pulls current main, runs one bundled curation prepare command, then uploads the generated `genre-crosswalk-review-v1.json` for batch review. No terminal queue dump is needed.
 
 ## Do not redo
 
