@@ -58,7 +58,7 @@
 **Performance targets:** picker/search interactions should feel instant on normal hardware; runtime data must be compiled/sharded so the 10k-prompt evidence corpus is not required by the normal UI.  
 **Availability target:** core builder works offline after application/assets are installed or cached.  
 **Data-size assumptions:** current evidence baseline is 10,043 prompt records, 1,564 taxonomy genres, and 6,035 unique source Instruments expressions; architecture must tolerate substantial future growth without giant native dropdowns or full-corpus browser payloads.  
-**Supported environments:** modern evergreen browsers; desktop targets through a web-native shell; local data tooling via Python 3.11+ recommended.
+**Supported environments:** modern evergreen browsers; desktop targets through a web-native shell; JS/TS workspace baseline Node 24 LTS + pinned pnpm; local data tooling via Python 3.11+ recommended.
 
 ## Architecture
 
@@ -169,6 +169,7 @@ Minimum foundation checks:
 
 - `python -m py_compile scripts/data/*.py`
 - `python -m unittest discover -s tests -p "test_*.py" -v`
+- `pnpm run check`
 - synthetic fixture build succeeds from `data/fixtures/`
 - `PRAGMA integrity_check` returns `ok` for generated local databases
 - source schema/hash preflight succeeds
@@ -192,6 +193,7 @@ Important durable design documents:
 - `docs/DECISIONS.md`
 - `docs/APPLICATION_ARCHITECTURE.md`
 - `docs/RUNTIME_DATA_CONTRACT_V1.md`
+- `docs/COMPILER_V1.md`
 - `docs/LOCAL_OUTPUT_LAYOUT.md`
 
 ## Current priorities
