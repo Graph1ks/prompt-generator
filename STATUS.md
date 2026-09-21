@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-21
-**Current phase/milestone:** database-first Instruments foundation complete in repository; owner-local promotion/acceptance is one bundled run
+**Current phase/milestone:** database-first Instruments foundation complete; acceptance-gated semantic completion tooling ready
 
 ## Current objective
 
@@ -26,6 +26,7 @@ Make the database complete before UI/runtime work: preserve every source-backed 
 - Completed old checkpoints can advance to the new compiler revision without rebuilding the corpus or deleting durable curation.
 - `database_foundation_session.py finalize` runs build/recompile + validation + mining refresh + acceptance reporting as one solo-dev phase and keeps verbose subprocess output in report files.
 - Knowledge apply remains backup-first, hash/fingerprint-bound, transactional, automatically recompiled/validated, rollback-safe, and report-refreshing.
+- `knowledge_completion_session.py prepare` is the next repository-side database phase: it refuses to run until the owner-local database acceptance is `ok`, reconciles acceptance with the full decomposition export, and writes bounded residual-semantic review batches without mutating curation or changing the source-expression catalog.
 
 ## Last verified checks
 
@@ -36,6 +37,7 @@ Make the database complete before UI/runtime work: preserve every source-backed 
 - Synthetic mining covers semantic-vs-identity decomposition reports.
 - Synthetic revision-upgrade coverage verifies a completed older checkpoint can recompile knowledge without rebuilding the promoted corpus.
 - Bundled database-finalization coverage verifies one concise terminal summary plus detailed report/log files.
+- Semantic-completion planner coverage verifies successful acceptance produces deterministic bounded batches, failed acceptance/stale decomposition fail closed, and durable curation bytes remain unchanged.
 
 ## Current blocker
 
@@ -43,7 +45,7 @@ Repository-side database foundation has no blocker. The real owner-local databas
 
 ## Next concrete action
 
-Merge this branch, then owner runs exactly one database-finalization command from `docs/LOCAL_DATA_BUILD.md`. That run upgrades/recompiles the local `knowledge.sqlite`, validates that all 6,035 current source expressions are present/selectable, refreshes semantic reports, and writes `reports/database/database-foundation-acceptance-v1.json`.
+Owner pulls current `main` and runs the bundled database finalizer from `docs/LOCAL_DATA_BUILD.md`. Only when `reports/database/database-foundation-acceptance-v1.json` reports `status: ok`, run `knowledge_completion_session.py prepare`; review its bounded residual-semantic batches and encode accepted additive ontology/concept decisions through the existing v2 curation workflow.
 
 ## Do not redo
 
@@ -65,4 +67,6 @@ The database is deliberately two-layered:
 
 This preserves the full source vocabulary while still enabling clean search, dictionary explanations, Advanced controls, relations, and future recombination.
 
-For the single owner-local finalization command read `docs/LOCAL_DATA_BUILD.md`.
+The semantic-completion planner operates only on review work. It does not remove fully understood expressions, demote unresolved expressions, or make frequency-based semantic decisions.
+
+For the owner-local finalization and completion commands read `docs/LOCAL_DATA_BUILD.md`.

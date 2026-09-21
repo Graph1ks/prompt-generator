@@ -1,7 +1,7 @@
 # Handover
 
 **Last updated:** 2026-09-21  
-**Current phase/milestone:** database-first Instruments foundation implemented; one owner-local finalization run remains before higher-layer work
+**Current phase/milestone:** database-first Instruments foundation implemented; acceptance-gated semantic completion phase is ready
 
 ## Read this first
 
@@ -209,6 +209,39 @@ Detailed logs:
 
 Do not ask the owner to paste those logs unless acceptance fails.
 
+### 7. Acceptance-gated semantic completion
+
+New:
+
+`scripts/data/knowledge_completion_session.py`
+
+After the database foundation acceptance reports `status: ok`, run:
+
+```powershell
+py scripts\\data\\knowledge_completion_session.py prepare --out-dir ".local-data\\current" --batch-size 250
+```
+
+This phase is intentionally read-only. It:
+
+1. hard-gates on the owner-local database acceptance report and every acceptance invariant;
+2. reconciles accepted source/selectable/decomposition-state counts against the full decomposition JSON + CSV;
+3. fails closed when reports are missing, stale, or internally inconsistent;
+4. groups residual semantic tokens with occurrence/track evidence;
+5. ranks rows only for **review order**, never as semantic truth;
+6. emits bounded review batches for partial/unresolved expressions;
+7. leaves `curation.sqlite` untouched;
+8. never removes, hides, demotes, or replaces any source-backed `instrument_expression`.
+
+Primary local outputs:
+
+```text
+.local-data\\current\\reports\\knowledge-completion\\knowledge-completion-plan-v1.json
+.local-data\\current\\reports\\knowledge-completion\\residual-token-groups-v1.csv
+.local-data\\current\\reports\\knowledge-completion\\batches\\instrument-semantic-review-batch-###-v1.json
+```
+
+These batches are evidence/review inputs for additive v2 ontology/concept curation. They are **not** a product-filter list and are never a replacement for the complete selectable expression catalog.
+
 ## Query/debug tools
 
 Compiled knowledge inspection:
@@ -237,7 +270,8 @@ Synthetic coverage verifies:
 - stale reviewed bundles fail closed;
 - compile failures restore durable curation;
 - semantic decomposition reports work;
-- database finalizer emits one concise stdout line and detailed reports.
+- database finalizer emits one concise stdout line and detailed reports;
+- acceptance-gated semantic completion emits deterministic bounded review batches, fails closed on failed/stale acceptance inputs, and does not mutate durable curation.
 
 Required workflow: `Data tooling / validate`.
 
@@ -278,11 +312,14 @@ That work remains useful as semantic enrichment, but it must **not** be interpre
 
 Only after `database-foundation-acceptance-v1.json` reports `status: ok`:
 
-1. inspect full real expression/decomposition counts;
-2. enrich unresolved/partial semantics in large batches;
-3. expand canonical instrument ontology and definitions as evidence requires;
-4. curate remaining lexicon/parameter/statement knowledge;
-5. then proceed toward runtime bundle/compiler/UI work.
+1. run `knowledge_completion_session.py prepare` and inspect `knowledge-completion-plan-v1.json`;
+2. review unresolved/partial semantics in the generated bounded batches;
+3. encode accepted additive canonical instrument/concept/alias/trait/parameter decisions in scoped v2 bundles and apply them transactionally;
+4. regenerate completion reports after each coherent curation phase until residual semantics are acceptably covered;
+5. curate remaining lexicon/parameter/statement knowledge;
+6. then proceed toward runtime bundle/compiler/UI work.
+
+At every step all source-backed Instruments expressions remain selectable/renderable regardless of decomposition state.
 
 Database completeness comes first.
 

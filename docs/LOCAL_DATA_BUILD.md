@@ -68,6 +68,30 @@ Primary acceptance report:
 
 Do not paste detailed build/mining output into chat unless that acceptance phase fails.
 
+### Acceptance-gated semantic completion — next database phase
+
+Only after the acceptance report above says `status: ok`, prepare the next large semantic-review phase with one command:
+
+```powershell
+py scripts\\data\\knowledge_completion_session.py prepare --out-dir ".local-data\\current" --batch-size 250
+```
+
+This command is read-only with respect to the databases. It verifies the successful acceptance invariants, reconciles the accepted source/selectable/decomposition counts against the full instrument decomposition JSON + CSV, fails closed on stale/mismatched artifacts, groups residual semantic tokens, and writes bounded partial/unresolved review batches.
+
+Local outputs:
+
+```text
+.local-data\\current\\reports\\knowledge-completion\\knowledge-completion-plan-v1.json
+.local-data\\current\\reports\\knowledge-completion\\residual-token-groups-v1.csv
+.local-data\\current\\reports\\knowledge-completion\\batches\\instrument-semantic-review-batch-###-v1.json
+```
+
+The batches contain exact source expression wording plus current resolved instrument/concept IDs, residual tokens, coverage, occurrence/track evidence, and deterministic **review priority**. Frequency affects review order only; it never auto-approves semantics.
+
+Crucially, this phase does not modify `curation.sqlite` and does not alter product availability. Every source-backed Instruments expression remains a first-class selectable/renderable database entity whether it is fully decomposed, partial, or unresolved. Canonical identity and semantic concepts remain additive metadata underneath the expression.
+
+Use reviewed batch evidence to author scoped `knowledge-curation-decisions-v2` bundles, apply them through `knowledge_curation_session.py`, then regenerate the completion plan for the next coherent batch.
+
 
 ### 3. Status
 
