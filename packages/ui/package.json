@@ -1,0 +1,19 @@
+{
+  "name": "@vgine/ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./tokens.css": "./styles/tokens.css",
+    "./themes.css": "./styles/themes.css",
+    "./styles.css": "./styles/index.css"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b --pretty false"
+  }
+}

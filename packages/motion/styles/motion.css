@@ -1,0 +1,27 @@
+@layer vgine.motion {
+  :root {
+    --vg-motion-duration-instant: 0ms;
+    --vg-motion-duration-fast: 120ms;
+    --vg-motion-duration-normal: 220ms;
+    --vg-motion-duration-slow: 360ms;
+
+    --vg-motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --vg-motion-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+    --vg-motion-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+    --vg-motion-ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --vg-motion-duration-fast: 0ms;
+      --vg-motion-duration-normal: 0ms;
+      --vg-motion-duration-slow: 0ms;
+    }
+
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+    }
+  }
+}

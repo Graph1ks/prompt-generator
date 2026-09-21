@@ -1,0 +1,76 @@
+@layer vgine.tokens {
+  :root,
+  [data-theme="paradise"] {
+    --vg-palette-black: #000004;
+    --vg-palette-green: #1d402d;
+    --vg-palette-cream: #fff9ec;
+    --vg-palette-rust: #a85527;
+    --vg-palette-gold: #e4a030;
+
+    --vg-color-bg: var(--vg-palette-black);
+    --vg-color-surface: color-mix(in srgb, var(--vg-palette-green) 28%, var(--vg-palette-black));
+    --vg-color-surface-raised: color-mix(in srgb, var(--vg-palette-green) 46%, var(--vg-palette-black));
+    --vg-color-surface-floating: color-mix(in srgb, var(--vg-palette-green) 62%, var(--vg-palette-black));
+    --vg-color-surface-inverse: var(--vg-palette-cream);
+
+    --vg-color-text: var(--vg-palette-cream);
+    --vg-color-text-muted: color-mix(in srgb, var(--vg-palette-cream) 66%, var(--vg-palette-green));
+    --vg-color-text-inverse: var(--vg-palette-black);
+
+    --vg-color-border: color-mix(in srgb, var(--vg-palette-cream) 17%, transparent);
+    --vg-color-border-strong: color-mix(in srgb, var(--vg-palette-cream) 34%, transparent);
+
+    --vg-color-accent: var(--vg-palette-gold);
+    --vg-color-accent-strong: var(--vg-palette-rust);
+    --vg-color-accent-contrast: var(--vg-palette-black);
+    --vg-color-selection: color-mix(in srgb, var(--vg-palette-gold) 26%, transparent);
+    --vg-color-focus: var(--vg-palette-gold);
+
+    --vg-color-success: color-mix(in srgb, var(--vg-palette-green) 52%, var(--vg-palette-cream));
+    --vg-color-warning: var(--vg-palette-gold);
+    --vg-color-danger: var(--vg-palette-rust);
+
+    --vg-gradient-accent: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--vg-palette-rust) 88%, var(--vg-palette-gold)),
+      var(--vg-palette-gold)
+    );
+  }
+
+  [data-theme="ash"] {
+    --vg-palette-gray: #6d6c73;
+    --vg-palette-ink: #1d1e26;
+    --vg-palette-olive: #3e4034;
+    --vg-palette-charcoal: #262623;
+    --vg-palette-taupe: #a69286;
+
+    --vg-color-bg: var(--vg-palette-ink);
+    --vg-color-surface: var(--vg-palette-charcoal);
+    --vg-color-surface-raised: color-mix(in srgb, var(--vg-palette-olive) 70%, var(--vg-palette-ink));
+    --vg-color-surface-floating: var(--vg-palette-olive);
+    --vg-color-surface-inverse: var(--vg-palette-taupe);
+
+    --vg-color-text: var(--vg-palette-taupe);
+    --vg-color-text-muted: color-mix(in srgb, var(--vg-palette-taupe) 60%, var(--vg-palette-gray));
+    --vg-color-text-inverse: var(--vg-palette-ink);
+
+    --vg-color-border: color-mix(in srgb, var(--vg-palette-taupe) 19%, transparent);
+    --vg-color-border-strong: color-mix(in srgb, var(--vg-palette-taupe) 38%, transparent);
+
+    --vg-color-accent: var(--vg-palette-taupe);
+    --vg-color-accent-strong: var(--vg-palette-gray);
+    --vg-color-accent-contrast: var(--vg-palette-ink);
+    --vg-color-selection: color-mix(in srgb, var(--vg-palette-taupe) 24%, transparent);
+    --vg-color-focus: var(--vg-palette-taupe);
+
+    --vg-color-success: color-mix(in srgb, var(--vg-palette-olive) 44%, var(--vg-palette-taupe));
+    --vg-color-warning: var(--vg-palette-taupe);
+    --vg-color-danger: color-mix(in srgb, var(--vg-palette-taupe) 56%, var(--vg-palette-ink));
+
+    --vg-gradient-accent: linear-gradient(
+      135deg,
+      var(--vg-palette-gray),
+      var(--vg-palette-taupe)
+    );
+  }
+}

@@ -1,8 +1,8 @@
-# Handover — Runtime Data + Search Foundation
+# Handover — Design System + Motion Foundation
 
 **Last updated:** 2026-09-21  
-**Handoff target:** real search benchmark, then V'gine design-system/motion/application foundation  
-**Milestone:** Database V1 remains closed; Runtime Pack v1, MusicSpec/compiler, runtime-data adapter and local search kernel are implemented
+**Handoff target:** real search benchmark plus React/Vite Studio shell  
+**Milestone:** Database V1 remains closed; domain/runtime/compiler/search plus V'gine semantic design/motion foundations are implemented
 
 ## Read this first
 
@@ -19,8 +19,9 @@ Read in this order:
 9. `docs/APPLICATION_ARCHITECTURE.md`
 10. `docs/COMPILER_V1.md`
 11. `docs/RUNTIME_SEARCH_V1.md`
-12. `docs/LOCAL_OUTPUT_LAYOUT.md` when operating local reports/logs
-13. `docs/LOCAL_DATA_BUILD.md` only when operating the local databases
+12. `docs/DESIGN_SYSTEM_V1.md`
+13. `docs/LOCAL_OUTPUT_LAYOUT.md` when operating local reports/logs
+14. `docs/LOCAL_DATA_BUILD.md` only when operating the local databases
 
 Owner workspace: `D:\prompt-engine`.
 
@@ -169,7 +170,9 @@ The TypeScript foundation now adds:
 
 `packages/runtime-data` now validates/loads the Runtime Pack bootstrap contract and adapts it into compiler-domain data. `packages/search` now implements deterministic exact/prefix/token/substring ranking with stable IDs and a worker-ready request/response envelope. A real-payload benchmark harness is available as `pnpm bench:search`.
 
-No React/Radix/Motion/Tauri packages have been installed yet.
+`packages/ui` now provides the semantic token contract plus Paradise/Ash CSS themes; `packages/motion` centralizes causal motion recipes and reduced-motion behavior. Both add zero external runtime dependencies and deliberately precede React primitives.
+
+No React/Radix/Motion-for-React/Tauri packages have been installed yet.
 
 ## Next-thread mission
 
@@ -178,8 +181,8 @@ Treat Database V1 and Runtime Pack v1 as accepted dependencies and move upward i
 Recommended order:
 
 1. **Real search benchmark** — run `pnpm bench:search` against `.local-data/current/runtime-v1/search.json`; record index-build and P50/P90/P95/P99/max query latency.
-2. **Design-system/motion foundation** — semantic Paradise/Ash tokens, primitives package boundaries and centralized motion recipes.
-3. **React/Vite Studio shell** — consume the packages rather than reimplementing domain logic.
+2. **React/Vite dependency review + Studio shell** — introduce only reviewed/pinned UI build/runtime packages and consume the existing semantic packages.
+3. **V'gine primitives** — implement the first accessible reusable surfaces/buttons/text/layout primitives against `@vgine/ui` tokens.
 4. **Search worker integration** — add the actual Worker transport when profiling shows it improves UI responsiveness.
 5. **Editor-content enrichment** — parameters/statements/Exclude remain additive Post-V1 work; do not reinterpret the empty editor payload as a database failure.
 

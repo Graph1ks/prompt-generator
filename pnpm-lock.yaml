@@ -18,6 +18,8 @@ importers:
         specifier: workspace:*
         version: link:../music-spec
 
+  packages/motion: {}
+
   packages/music-spec: {}
 
   packages/runtime-data:
@@ -31,6 +33,8 @@ importers:
       '@vgine/runtime-data':
         specifier: workspace:*
         version: link:../runtime-data
+
+  packages/ui: {}
 
 packages:
 
