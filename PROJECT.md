@@ -194,6 +194,7 @@ Important durable design documents:
 - `docs/APPLICATION_ARCHITECTURE.md`
 - `docs/RUNTIME_DATA_CONTRACT_V1.md`
 - `docs/COMPILER_V1.md`
+- `docs/RUNTIME_SEARCH_V1.md`
 - `docs/LOCAL_OUTPUT_LAYOUT.md`
 
 ## Current priorities
@@ -201,7 +202,7 @@ Important durable design documents:
 Database V1 is complete for the current Factory snapshot. Current priorities are now:
 
 1. Validate Runtime Pack v1 against the real owner-local `knowledge.sqlite` and record size/count findings.
-2. Scaffold the strict TypeScript/pnpm workspace and implement the documented MusicSpec -> `suno-structured-v1` compiler, including deterministic semantic enforcement of the 1,000-character budget.
-3. Wire Runtime Pack genre, instrument-expression and dictionary/search data into the application.
-4. Build the first production-quality Easy/Advanced editor and inline knowledge interaction on top of the stable semantic model.
+2. Measure the dependency-free local search kernel against the real 10,348-document Runtime Pack before adding any search dependency.
+3. Build the V'gine design-system/motion foundation and React/Vite Studio shell on the stable MusicSpec/compiler/runtime-data/search packages.
+4. Wire Runtime Pack genre, instrument-expression and dictionary/search data into the production editor.
 5. Continue Vocal/statements/parameters/definitions as additive Post-V1 enrichment, not as a reason to reopen the completed database milestone.
