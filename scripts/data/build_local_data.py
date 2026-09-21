@@ -1125,6 +1125,14 @@ def run_build(args) -> int:
             work_report = work_dir / "build-report.json"
             final_report = out_dir / "reports" / "corpus-profile.json"
 
+            if args.rebuild_corpus:
+                print("[corpus] explicit fresh corpus rebuild requested; promoted artifacts and curation remain untouched until validation.", file=sys.stderr)
+                reset_stages_from(state, 10)
+                for path in (work_corpus, work_knowledge, work_report):
+                    path.unlink(missing_ok=True)
+                for path in (Path(str(work_corpus) + "-wal"), Path(str(work_corpus) + "-shm"), Path(str(work_knowledge) + "-wal"), Path(str(work_knowledge) + "-shm")):
+                    path.unlink(missing_ok=True)
+
             if previous_curation_sha and previous_curation_sha != current_curation_sha:
                 print("[curation] durable curation changed; keeping corpus and rebuilding compiled knowledge only.", file=sys.stderr)
                 reset_stages_from(state, 100)
