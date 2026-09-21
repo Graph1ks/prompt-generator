@@ -24,6 +24,12 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Added instrument ontology v2 decision bundles with scoped report binding, aliases for existing instruments, durable instrument traits, and transactional Advanced parameter/option authoring.
 - Added semantic Instruments decomposition reports that distinguish fully-semantic coverage from explicit instrument-identity coverage.
 - Changed the Instruments mining queue from raw-string prioritization to semantic-residual prioritization so already-explained compound phrases no longer require manual review.
+- Added complete source-backed Instruments expression materialization: every comma/semicolon-delimited source phrase is now preserved as a first-class selectable/renderable `instrument_expression` with original output wording, frequency evidence, semantic links, decomposition state, and search support.
+- Added compiled expression→instrument and expression→concept relations so compound options such as `clean rhythm electric guitar` remain selectable while also resolving to structured identity/modifier semantics.
+- Added hard validation that source-expression count, selectable-expression count, and preserved output wording stay lossless during knowledge compilation.
+- Added `query_knowledge.py` for compiled expression/stat/search inspection.
+- Added a bundled `database_foundation_session.py finalize` workflow that recompiles, validates, refreshes mining, writes acceptance/log reports, and keeps terminal output concise.
+- Build revision advanced to `promptvgine-local-data-build-v2-resumable-2-instrument-expressions`; completed older checkpoints can advance knowledge stages without rebuilding a matching promoted corpus.
 
 ### Changed
 
