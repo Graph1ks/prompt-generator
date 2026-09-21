@@ -124,6 +124,16 @@ The initial 138-item local genre crosswalk has been reviewed/applied successfull
 
 Start this phase with `py scripts\\data\\knowledge_mining_session.py prepare --out-dir ".local-data\\current"`. Review the generated instrument and lexicon JSON files; the full CSV files remain local evidence.
 
+Reviewed instrument/lexicon knowledge is applied through a decision bundle rather than manual SQL:
+
+```powershell
+py scripts\data\knowledge_curation_session.py apply --out-dir ".local-data\current" --bundle ".local-data\current\reports\knowledge\knowledge-curation-decisions-v1.json" --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json"
+```
+
+The apply bundle is backed up, transactional, fingerprint/hash-bound to the reviewed evidence, automatically recompiled/validated, and rollback-safe.
+
+Important decomposition rule: an Instruments-list segment is evidence, not automatically an instrument identity. For example, properties such as clean, distorted, muted, warm, layered, lead, rhythm, programmed, or electronic are normally modeled as reusable concepts/roles/properties around a canonical instrument rather than creating thousands of descriptor-heavy instrument identities.
+
 
 Instrument identity is separate from how it is played/processed.
 

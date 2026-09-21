@@ -1,129 +1,102 @@
 # Handover
 
 **Last updated:** 2026-09-21
-**Current phase/milestone:** owner-local corpus + genre crosswalk complete; instrument/lexicon mining is next
+**Current phase/milestone:** corpus + genre crosswalk complete; first core instrument/lexicon curation batch ready for owner-local apply
 
 ## Current objective
 
-Resume on the owner's Windows 11 / VS Code machine at D:\prompt-engine with the validated corpus and completed genre crosswalk, then continue evidence-backed instrument/lexicon curation through report files.
+Continue on the owner's Windows 11 / VS Code machine at D:\prompt-engine. Apply the first reviewed high-confidence semantic knowledge batch safely, then review the refreshed report files for lower-frequency/niche knowledge.
 
 ## Owner-local state already established
 
-The owner has the two real Factory files under .local-data\source\ and a successful local build under .local-data\current\.
+The owner has real Factory inputs under ignored .local-data\source\ and promoted local databases under .local-data\current\.
 
-The local build completed with 10,043 tracks, 115,736 sections, 852,459 tokens, 24 Major Genres, 1,564 taxonomy genres, and 138 unresolved Vault genre labels. validate_local_data.py passed.
+Validated baseline:
 
-## What is implemented
+- 10,043 tracks;
+- 115,736 structured prompt sections;
+- 852,459 tokens;
+- 24 Major Genres / 1,564 taxonomy genres;
+- 138 previously unresolved genre labels have been reviewed/applied;
+- genre-crosswalk remaining queue: 0.
 
-### Licensing
+## Completed foundation
 
-Graph1ks Material is source-available/noncommercial for third parties.
+### Licensing and repository mode
 
-Authoritative repository files:
+Graph1ks Material is source-available/noncommercial for third parties. Complete license/policy texts live in the repository. Commercial rights in Graph1ks Material are reserved to Graph1ks.
 
-- LICENSE
-- COMMERCIAL_LICENSE.md
-- COPYRIGHT
-- LICENSES.md
-- THIRD_PARTY_NOTICES.md
-- DATA_SOURCES.md
+### Resumable local build
 
-Project-connected donations/tips, advertising, sponsorship, affiliate revenue, paid hosting/SaaS/support, subscriptions, paid access, bundling, and other monetized uses are prohibited for third parties. Commercial rights in Graph1ks Material are reserved to Graph1ks.
+The v2 builder provides plan/status, checkpoints, ordinary-rerun resume, visible progress, stale-checkpoint rejection, staged work DBs, validation-before-promotion, previous-artifact retention, and narrow reset/rebuild semantics.
 
-Third-party material retains its own rights and terms.
+### Report-driven curation
 
-### Long-running local build contract
+Large review payloads stay in local report files rather than stdout. Genre decisions and knowledge decisions use reviewed files plus transactional apply commands.
 
-Prompt V'gine adopts the RhymeLab-style durable build standard in AGENTS.md and PROJECT.md.
+The solo-dev operator HARD RULE in AGENTS.md requires bundled phases, concise terminal summaries, file-based AI handoffs, automatic backup, rollback-safe durable mutation, and automatic compile/validation.
 
-The v2 local builder provides:
+## Current instrument/lexicon evidence
 
-- --plan read-only preflight;
-- --status inspection;
-- deterministic named stages;
-- bounded transactional track ingestion;
-- persisted SQLite checkpoint at .build-v2\state.sqlite;
-- ordinary-rerun resume;
-- safe Ctrl+C/SIGTERM pause behavior;
-- stage/current/total/percentage/throughput/batch/ETA console output;
-- SHA-256 source + build-revision checkpoint binding;
-- stale-checkpoint rejection;
-- incomplete building SQLite artifacts;
-- validation before promotion;
-- promotion rollback logic;
-- retained previous promoted artifacts;
-- --reset-work that removes only incomplete work;
-- optional explicit --rebuild-corpus.
+The owner generated and uploaded instrument-candidates-v1.json and lexicon-candidates-v1.json. Both are review snapshot knowledge-mining-c082ec85dd25848b7b1e480d from the same current Factory source fingerprints.
 
-The old --force path is intentionally retired.
+The Instruments evidence has 6,035 unique source segments. Those are deliberately not treated as 6,035 canonical instruments. Many segments combine identity with reusable properties such as clean/distorted/muted, acoustic/electric/electronic, lead/rhythm, programmed/sampled, restrained/soft, pads/stabs, or arrangement roles.
 
-### v1 local-data compatibility
+The lexicon evidence contains high-signal reusable concepts across Groove, Melody, Harmony, Drums, Bass, Instruments, Texture, Dynamics, Space/Mix, Production, and related sections.
 
-The owner does not need to discard the already-built v1 corpus.
+## First reviewed core batch
 
-If its source fingerprints match the current Factory files, v2 adopts it unchanged and recompiles only knowledge metadata as needed. Synthetic regression coverage verifies that the corpus bytes remain unchanged in this adoption path.
+A high-confidence core decision bundle is prepared outside Git because it targets owner-local durable curation.
 
-## Important files
+It contains 9 instrument families, 70 canonical instrument/group entities with aliases, and 71 reusable knowledge concepts, with beginner-oriented definitions, useful section-context definitions, and source evidence metadata from the reviewed report files.
+
+Key design rule: canonical instrument identity stays separate from reusable properties/roles/processing. For example, Clean + Electric Guitar is composable knowledge rather than a permanent Clean Electric Guitar identity.
+
+## New tooling in current code
 
 | Path | Purpose |
 |---|---|
-| docs/LOCAL_DATA_BUILD.md | exact Windows commands and safety behavior |
-| scripts/data/build_local_data.py | resumable v2 owner-local build/resume tool |
-| scripts/data/local_data_v1_core.py | preserved v1 semantic/import helpers and compatibility harness |
-| schema/build-state-v1.sql | checkpoint/status DB |
-| schema/corpus-v2.sql | resumable corpus-build schema |
-| schema/curation-v1.sql | durable local authoring state |
-| tests/test_local_data_build.py | build/resume/data-safety regression suite |
-| scripts/data/curation_session.py | bundled report export + transactional decision apply |
-| schema/genre-crosswalk-decisions-v1.schema.json | AI/human decision-bundle contract |
-| tests/test_curation_session.py | report/apply/staleness regression coverage |
-| scripts/data/knowledge_mining_session.py | bundled instrument + lexicon evidence reports |
-| tests/test_knowledge_mining_session.py | report generation, filtering, backup, non-mutation regression coverage |
-| LICENSE | operative noncommercial public terms |
-| COMMERCIAL_LICENSE.md | owner commercial-rights policy |
-| docs/DECISIONS.md | durable architecture/licensing decisions |
+| scripts/data/knowledge_mining_session.py | prepares instrument/lexicon reports; refreshed version adds semantic curation fingerprints and stronger phrase-noise filtering |
+| scripts/data/knowledge_curation_session.py | transactionally applies reviewed knowledge decisions, recompiles, validates, rolls back/recompiles recovery on failure, refreshes reports |
+| schema/knowledge-curation-decisions-v1.schema.json | reviewed knowledge-bundle contract |
+| tests/test_knowledge_curation_session.py | apply/compile/refresh, stale-curation rejection, rollback regression tests |
+| docs/CURATION_WORKFLOW.md | semantic authoring rules |
+| docs/LOCAL_DATA_BUILD.md | exact owner-local commands |
+| docs/DECISIONS.md | durable architecture decisions including instrument decomposition + reviewed-bundle safety |
+
+## Safety contract for knowledge apply
+
+The decision bundle is bound to the mining review_id, exact instrument/lexicon report SHA-256 values, Vault/Genre Map SHA-256 values, and a semantic curation fingerprint for newly generated reports.
+
+The uploaded first report predates the new curation-fingerprint field, so its first bundle uses exact report hashes + review/source fingerprints. After apply, refreshed reports contain the semantic curation fingerprint.
+
+Before durable mutation, apply creates an integrity-checked local curation backup. All curation writes happen in one transaction. Knowledge is recompiled and validated automatically. On failure, durable curation is restored from backup and recovery compilation is attempted.
+
+## Phrase-mining lesson already applied
+
+Raw frequent n-grams contained substantial grammar/list noise: instrument adjacency, Key/Mode literals, boundary connector fragments, and phrases built around common with/by/to/from/into/via scaffolding.
+
+The miner now suppresses those classes from prioritized phrase review. Frequency remains evidence, never automatic approval.
 
 ## Next concrete work
 
-The owner-local genre-crosswalk batch is complete:
-
-- 138 decisions applied;
-- compiled knowledge rebuilt;
-- validation passed;
-- remaining genre-crosswalk queue: 0.
-
-Next coherent slice:
-
-1. pull current main;
-2. run `py scripts\data\knowledge_mining_session.py prepare --out-dir ".local-data\current"`;
-3. upload/review:
-   - `reports\knowledge\instrument-candidates-v1.json`;
-   - `reports\knowledge\lexicon-candidates-v1.json`.
-4. keep the full CSV files local as deeper evidence and do not copy their contents into the terminal/chat unless specifically needed.
-
-The prepare command is read-only with respect to curation, integrity-checks local DBs, creates an integrity-checked curation backup, writes detailed machine-readable reports, and prints one concise summary line.
+1. Merge the current feature branch after required CI is green.
+2. Owner pulls main.
+3. Owner saves the reviewed core bundle as .local-data\current\reports\knowledge\knowledge-curation-decisions-v1.json.
+4. Owner runs the single bundled apply command documented in docs/LOCAL_DATA_BUILD.md.
+5. On success, use the automatically refreshed instrument/lexicon reports for the next niche/descriptor/parameter batch.
 
 ## Verification
 
 Required CI check: validate.
 
-The synthetic suite covers:
-
-- normal build;
-- durable curation recompilation;
-- safe pause + ordinary-rerun resume;
-- stale source/checkpoint rejection;
-- narrow safe reset;
-- read-only plan;
-- v1 promoted-corpus adoption;
-- previous promoted artifact retention.
+Current synthetic coverage includes resumable corpus build/adoption/rebuild safety, durable genre curation apply, report-driven instrument/lexicon mining, reviewed knowledge apply, compiled knowledge verification, stale curation/report rejection, and apply failure rollback + recovery compile.
 
 ## Traps
 
-- Never commit real Factory files or local/generated SQLite data.
-- Never use --reset-work as a substitute for ordinary resume.
-- Never delete durable curation.sqlite during source/build updates.
-- A new Factory snapshot should be built separately and diff-reviewed.
-- Do not claim all genre definitions are curated merely because identities exist.
-- The current Vault has no structured Vocal coverage and sparse Exciters/Structure evidence.
-- Custom source-available license terms are project policy; qualified legal review is prudent before high-stakes commercial release.
+- Never commit real Factory files, generated SQLite data, local reports, decision bundles, or backups.
+- Never delete durable curation.sqlite during source/Factory updates.
+- Never promote raw source segments or n-gram frequency directly into product knowledge.
+- Do not bake role/tone/processing words permanently into every instrument identity.
+- The current Vault has no structured Vocal coverage; Vocal knowledge needs a separate curated source/enrichment phase.
+- Sparse Exciters/Structure evidence should not be overgeneralized.

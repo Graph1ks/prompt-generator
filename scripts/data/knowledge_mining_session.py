@@ -36,6 +36,15 @@ TARGET_SECTIONS = [
     "era","key_mode","groove","melody","harmony","drums","bass","instruments",
     "exciters","texture","dynamics","space_mix","production","structure",
 ]
+PHRASE_SECTIONS = [x for x in TARGET_SECTIONS if x not in {"instruments", "key_mode"}]
+BOUNDARY_STOPWORDS = STOPWORDS | {"but","than","then","if","when","over","under","between"}
+INTERNAL_SCAFFOLD = {"with","by","to","from","into","via"}
+CURATION_HASH_TABLES = [
+    "entry_patch","term_variant_patch","definition_patch","context_definition_patch",
+    "relation_patch","genre_crosswalk_decision","instrument_family_patch","instrument_patch",
+    "instrument_alias_patch","parameter_patch","parameter_option_patch","statement_patch",
+    "statement_concept_patch","statement_option_patch","candidate_review",
+]
 
 
 def utc_now() -> str:
@@ -113,6 +122,29 @@ def source_meta(corpus: sqlite3.Connection) -> dict:
             "SELECT kind,sha256,schema_name,schema_version FROM source_file ORDER BY kind,id"
         )
     }
+
+
+def curation_fingerprint(curation: sqlite3.Connection) -> str:
+    """Deterministic semantic fingerprint; independent of SQLite page/layout changes."""
+    h = hashlib.sha256()
+    for table in CURATION_HASH_TABLES:
+        columns = [row[1] for row in curation.execute(f"PRAGMA table_info({table})")]
+        if not columns:
+            continue
+        quoted = ",".join(f'"{column}"' for column in columns)
+        order = ",".join(str(i + 1) for i in range(len(columns)))
+        h.update(f"[{table}]".encode("utf-8"))
+        for row in curation.execute(f"SELECT {quoted} FROM {table} ORDER BY {order}"):
+            h.update(
+                json.dumps(
+                    list(row),
+                    ensure_ascii=False,
+                    separators=(",", ":"),
+                    default=str,
+                ).encode("utf-8")
+            )
+            h.update(b"\n")
+    return h.hexdigest()
 
 
 def curated_surfaces(curation: sqlite3.Connection) -> tuple[set[str], set[str]]:
@@ -344,12 +376,18 @@ def lexicon_report(
              AND occurrence_count>=5
              AND canonical_key IN ({})
            ORDER BY occurrence_count DESC,track_count DESC""".format(
-               ",".join("?" for _ in TARGET_SECTIONS)
+               ",".join("?" for _ in PHRASE_SECTIONS)
            ),
-        TARGET_SECTIONS,
+        PHRASE_SECTIONS,
     ):
         phrase = row["phrase_norm"]
         words = phrase.split()
+        if not words:
+            continue
+        if words[0] in BOUNDARY_STOPWORDS or words[-1] in BOUNDARY_STOPWORDS:
+            continue
+        if any(word in INTERNAL_SCAFFOLD for word in words):
+            continue
         useful_words = [w for w in words if valid_term(w)]
         if not useful_words:
             continue
@@ -398,6 +436,8 @@ def lexicon_report(
             "Frequency is evidence, not approval.",
             "Function words and obvious grammatical scaffolding are conservatively filtered.",
             "The same term can have different meanings by section; sections are retained for context-definition review.",
+            "Instrument-list adjacency and key/mode literals are excluded from phrase prioritization.",
+            "Boundary connectors and common 'with/by/to/from/into/via' scaffolding are excluded.",
             "Phrases may still contain corpus grammar patterns and must be reviewed before promotion.",
         ],
         "_full_terms": terms,
@@ -469,6 +509,7 @@ def prepare(args) -> int:
 
     with open_ro(corpus_path) as corpus, open_ro(curation_path) as curation:
         sources = source_meta(corpus)
+        curation_sha = curation_fingerprint(curation)
         curated_instruments, curated_concepts = curated_surfaces(curation)
         instruments = instrument_report(corpus, curated_instruments, args.instrument_limit)
         lexicon = lexicon_report(corpus, curated_concepts, args.term_limit, args.phrase_limit)
@@ -482,6 +523,7 @@ def prepare(args) -> int:
         {
             "schema": SCHEMA,
             "sources": sources,
+            "curation_fingerprint": curation_sha,
             "instrument_count": len(full_instrument_rows),
             "term_count": len(full_terms),
             "phrase_count": len(full_phrases),
@@ -505,6 +547,7 @@ def prepare(args) -> int:
             "review_id": review_id,
             "generated_at": generated_at,
             "source": sources,
+            "curation_fingerprint": curation_sha,
             **instruments,
         },
     )
@@ -516,6 +559,7 @@ def prepare(args) -> int:
             "review_id": review_id,
             "generated_at": generated_at,
             "source": sources,
+            "curation_fingerprint": curation_sha,
             **lexicon,
         },
     )
@@ -528,6 +572,7 @@ def prepare(args) -> int:
         "review_id": review_id,
         "generated_at": generated_at,
         "source": sources,
+        "curation_fingerprint": curation_sha,
         "backup": str(backup),
         "reports": {
             "instrument_review": str(instrument_json),
