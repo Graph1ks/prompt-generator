@@ -18,6 +18,8 @@ import sqlite3
 from collections import Counter, defaultdict
 from pathlib import Path
 
+import instrument_semantics as instrument_semantics
+
 SCHEMA = "promptvgine-knowledge-mining-review-v1"
 MAX_EXAMPLES = 3
 
@@ -205,7 +207,7 @@ def instrument_report(
            ORDER BY track_id,ordinal"""
     ):
         seen_this_track = set()
-        for surface in split_instrument_segments(row["content_raw"]):
+        for surface in instrument_semantics.split_instrument_segments(row["content_raw"]):
             n = norm(surface)
             if not n:
                 continue
@@ -403,7 +405,7 @@ def instrument_decomposition_report(
     instrument_rows: list[dict],
     detail_limit: int = 1500,
 ) -> dict:
-    instrument_phrases, concept_phrases = compiled_semantic_lexicon(knowledge)
+    instrument_phrases, concept_phrases = instrument_semantics.compiled_semantic_lexicon(knowledge)
     residual_counter = Counter()
     decomposed = []
     fully_semantic_unique = 0
@@ -413,7 +415,7 @@ def instrument_decomposition_report(
     total_occurrences = 0
 
     for row in instrument_rows:
-        result = decompose_surface(
+        result = instrument_semantics.decompose_surface(
             row["surface"], instrument_phrases, concept_phrases
         )
         total_occurrences += int(row["occurrence_count"])
