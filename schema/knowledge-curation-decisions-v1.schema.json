@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://graph1ks.local/schemas/knowledge-curation-decisions-v1.schema.json",
+  "title": "Graph1ks Prompt V'gine Knowledge Curation Decisions v1",
+  "type": "object",
+  "required": [
+    "schema",
+    "bundle_id",
+    "review_id",
+    "source",
+    "report_sha256",
+    "instrument_families",
+    "instruments",
+    "concepts"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "promptvgine-knowledge-curation-decisions-v1" },
+    "bundle_id": { "type": "string", "minLength": 1 },
+    "review_id": { "type": "string", "minLength": 1 },
+    "curation_fingerprint": { "type": ["string", "null"] },
+    "source": {
+      "type": "object",
+      "required": ["prompt_vault_sha256", "genre_map_sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "prompt_vault_sha256": { "type": "string", "minLength": 64, "maxLength": 64 },
+        "genre_map_sha256": { "type": "string", "minLength": 64, "maxLength": 64 }
+      }
+    },
+    "report_sha256": {
+      "type": "object",
+      "required": ["instrument", "lexicon"],
+      "additionalProperties": false,
+      "properties": {
+        "instrument": { "type": "string", "minLength": 64, "maxLength": 64 },
+        "lexicon": { "type": "string", "minLength": 64, "maxLength": 64 }
+      }
+    },
+    "instrument_families": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["reviewed", "approved"] }
+        }
+      }
+    },
+    "instruments": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/instrument" }
+    },
+    "concepts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entry" }
+    }
+  },
+  "$defs": {
+    "variant": {
+      "type": "object",
+      "required": ["surface", "match_kind"],
+      "additionalProperties": false,
+      "properties": {
+        "surface": { "type": "string", "minLength": 1 },
+        "match_kind": { "enum": ["exact", "word", "phrase", "prefix", "manual"] },
+        "match_priority": { "type": "integer", "minimum": 1, "maximum": 1000 },
+        "is_primary": { "type": "boolean" }
+      }
+    },
+    "definition": {
+      "type": "object",
+      "required": ["kind", "text", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": ["one_liner", "plain", "why_it_matters", "hear_it_as", "misconception", "expert_note"]
+        },
+        "text": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["reviewed", "approved"] }
+      }
+    },
+    "context": {
+      "type": "object",
+      "required": ["context_type", "context_key", "text", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "context_type": {
+          "enum": ["section", "parameter", "option", "genre", "instrument", "role", "global"]
+        },
+        "context_key": { "type": "string", "minLength": 1 },
+        "text": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["reviewed", "approved"] }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "entry": {
+      "type": "object",
+      "required": [
+        "entry_id",
+        "entry_type",
+        "canonical_label",
+        "canonical_slug",
+        "status",
+        "difficulty",
+        "variants",
+        "definitions",
+        "contexts"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "entry_id": { "type": "string", "minLength": 1 },
+        "entry_type": { "type": "string", "minLength": 1 },
+        "canonical_label": { "type": "string", "minLength": 1 },
+        "canonical_slug": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["reviewed", "approved"] },
+        "difficulty": { "enum": ["beginner", "intermediate", "advanced"] },
+        "variants": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/variant" }
+        },
+        "definitions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/definition" }
+        },
+        "contexts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/context" }
+        },
+        "evidence": { "$ref": "#/$defs/evidence" }
+      }
+    },
+    "instrumentAlias": {
+      "type": "object",
+      "required": ["surface"],
+      "additionalProperties": false,
+      "properties": {
+        "surface": { "type": "string", "minLength": 1 }
+      }
+    },
+    "instrument": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "label_norm",
+        "family_id",
+        "status",
+        "entry",
+        "aliases"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "label_norm": { "type": "string", "minLength": 1 },
+        "family_id": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["reviewed", "approved"] },
+        "entry": { "$ref": "#/$defs/entry" },
+        "aliases": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/instrumentAlias" }
+        },
+        "evidence": { "$ref": "#/$defs/evidence" }
+      }
+    }
+  }
+}
