@@ -369,20 +369,20 @@ class KnowledgeMiningSessionTests(unittest.TestCase):
             self.assertEqual(len([x for x in result.stdout.splitlines() if x.strip()]), 1)
             self.assertIn("[knowledge-mining] prepared", result.stdout)
 
-            reports = out / "reports" / "knowledge"
-            instrument_path = reports / "instrument-candidates-v1.json"
-            lexicon_path = reports / "lexicon-candidates-v1.json"
+            reports = out / "reports"
+            instrument_path = reports / "knowledge-instrument-candidates-v1.json"
+            lexicon_path = reports / "knowledge-lexicon-candidates-v1.json"
             summary_path = reports / "knowledge-mining-summary-v1.json"
             self.assertTrue(instrument_path.is_file())
             self.assertTrue(lexicon_path.is_file())
             self.assertTrue(summary_path.is_file())
-            self.assertTrue((reports / "instrument-candidates-full-v1.csv").is_file())
-            self.assertTrue((reports / "lexicon-candidates-full-v1.csv").is_file())
-            self.assertTrue((reports / "instrument-decomposition-v1.json").is_file())
-            self.assertTrue((reports / "instrument-decomposition-full-v1.csv").is_file())
+            self.assertTrue((reports / "knowledge-instrument-candidates-full-v1.csv").is_file())
+            self.assertTrue((reports / "knowledge-lexicon-candidates-full-v1.csv").is_file())
+            self.assertTrue((reports / "knowledge-instrument-decomposition-v1.json").is_file())
+            self.assertTrue((reports / "knowledge-instrument-decomposition-full-v1.csv").is_file())
 
             decomposition = json.loads(
-                (reports / "instrument-decomposition-v1.json").read_text(encoding="utf-8")
+                (reports / "knowledge-instrument-decomposition-v1.json").read_text(encoding="utf-8")
             )
             self.assertIn("fully_semantic_unique_ratio", decomposition)
             self.assertIn("fully_identity_decomposed_unique_ratio", decomposition)
@@ -434,11 +434,11 @@ class KnowledgeMiningSessionTests(unittest.TestCase):
                 curation.close()
 
             self.run_prepare(out)
-            reports = out / "reports" / "knowledge"
-            instruments = json.loads((reports / "instrument-candidates-v1.json").read_text(encoding="utf-8"))
+            reports = out / "reports"
+            instruments = json.loads((reports / "knowledge-instrument-candidates-v1.json").read_text(encoding="utf-8"))
             self.assertNotIn("piano", {x["normalized"] for x in instruments["prioritized_candidates"]})
 
-            lexicon = json.loads((reports / "lexicon-candidates-v1.json").read_text(encoding="utf-8"))
+            lexicon = json.loads((reports / "knowledge-lexicon-candidates-v1.json").read_text(encoding="utf-8"))
             self.assertNotIn("grit", {x["normalized"] for x in lexicon["prioritized_terms"]})
 
     def test_prepare_does_not_mutate_curation(self):
