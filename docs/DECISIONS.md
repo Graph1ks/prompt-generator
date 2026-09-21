@@ -182,7 +182,7 @@ Use three local database lifecycles:
 - `curation.sqlite` — durable local authoring state, never deleted by normal rebuilds;
 - `knowledge.sqlite` — disposable compiled knowledge produced from current taxonomy/bootstrap plus the durable curation overlay.
 
-`--force` may replace corpus/knowledge but must not delete curation.
+Ordinary reruns resume safely. Generated corpus/knowledge may be replaced only through validated promotion; durable curation must not be deleted. The retired `--force` workflow is not part of v2.
 
 ### Why
 
@@ -212,3 +212,69 @@ Source schemas and vocabulary can evolve even when top-level schema identifiers 
 ### Consequences
 
 `scripts/data/diff_local_data.py` is part of the normal update workflow. Generated diff reports stay local.
+
+
+---
+
+## ADR-012 — Public source is noncommercial; Graph1ks retains commercial rights
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Context
+
+The repository is public so users can inspect, learn from, modify, and privately/noncommercially use the code. The owner does not want third parties monetizing Prompt V'gine or derivatives, including through donations/tips.
+
+### Decision
+
+Graph1ks Material is source-available under the repository `LICENSE`, not OSI Open Source.
+
+Third-party commercial/monetized use is prohibited. Monetization includes sales, paid access/features, subscriptions, donations/tips connected to the project or derivative, advertising, sponsorships, affiliates, paid support/hosting/SaaS, and bundling with paid products/services.
+
+Commercial rights in Graph1ks Material are reserved to Graph1ks.
+
+The complete operative project license/policy texts are stored in this repository rather than depending on a linked external license page.
+
+Third-party material remains under its own terms.
+
+### Consequences
+
+- Public GitHub visibility/forkability does not grant commercial rights.
+- Dependency/data/asset licensing still requires separate review for Graph1ks' own commercial distribution.
+- No CLA is added while outside contributions are not normally accepted.
+- The custom source-available terms should receive qualified legal review before a high-stakes commercial release if jurisdiction-specific enforceability matters.
+
+---
+
+## ADR-013 — Long-running local data jobs are resumable build systems
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Context
+
+Prompt V'gine will perform owner-local corpus ingestion, mining, enrichment, and materialization. As the knowledge base grows, disposable one-shot scripts create unacceptable restart/data-loss risk and poor operational visibility.
+
+### Decision
+
+Adopt the RhymeLab-style long-running-job standard for all non-trivial local data workflows:
+
+- read-only plan/preflight;
+- deterministic named stages;
+- bounded transactional batches;
+- persisted machine-readable checkpoints;
+- ordinary-rerun resume;
+- safe Ctrl+C/SIGTERM behavior;
+- visible progress/percentage/throughput/batch duration/ETA;
+- status inspection;
+- source/build fingerprint binding and stale-checkpoint rejection;
+- incomplete work artifacts separate from promoted data;
+- integrity/invariant checks before promotion;
+- atomic/rollback-aware promotion;
+- last known-good promoted artifacts retained;
+- narrow reset semantics that never delete sources, durable curation, or promoted data implicitly;
+- synthetic CI for pause/resume, stale checkpoints, safe reset, v1 adoption, and promotion retention.
+
+### Implementation
+
+The v2 local builder uses ignored `.build-v2/state.sqlite` plus staged SQLite work artifacts. Existing valid v1 promoted corpus data can be adopted by source fingerprint, so the owner is not forced to destroy/rebuild the already-created local corpus merely to upgrade build tooling.
