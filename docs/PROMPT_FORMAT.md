@@ -28,6 +28,14 @@ The style prompt uses one bracketed section per non-empty facet:
 
 Rules:
 
+- the complete rendered style prompt has a **hard maximum of 1,000 characters**, including brackets, headers and newline separators;
+- character counting is Unicode code-point/string length after final plaintext normalization;
+- budget semantics before serialization; never blindly slice the rendered string at character 1,000;
+- preserve complete `[Header: content]` lines; no section may be left syntactically incomplete;
+- source-derived P90 full-line lengths are soft budgeting targets, not hard section caps;
+- when over budget, compact/remove redundant or lower-priority derived material before explicit user intent;
+- locked or explicit custom user text is never silently removed solely to satisfy the budget; if protected content cannot fit, emit a clear budget diagnostic and require an explicit user choice;
+- Exclude is a separate output and does not consume the 1,000-character style-prompt budget;
 - emit only non-empty sections;
 - preserve the canonical order above;
 - headers are part of the copied plaintext;
@@ -83,3 +91,17 @@ The copied text remains exactly the clean renderer output.
 This contract is renderer profile `suno-structured-v1`.
 
 A future Suno format change creates a new renderer profile/version. It must not require rewriting MusicSpec or curated musical knowledge.
+
+
+## Source-derived soft section targets
+
+For `suno-structured-v1`, the compiled renderer profile stores the current
+Factory P90 full-line lengths as soft targets:
+
+`Genre 56 · Era 49 · BPM 10 · Key/Mode 25 · Groove 106 · Melody 110 · Harmony 97 · Drums 94 · Bass 89 · Instruments 107 · Exciters 80 · Texture 88 · Dynamics 87 · Space/Mix 107 · Production 120 · Structure 96`.
+
+Vocal has no source-derived target in the current snapshot because no structured
+Vocal rows exist. A future Vocal budget requires separate curated/source evidence.
+
+These values guide compression/allocation only. The global 1,000-character
+ceiling is the actual renderer invariant.
