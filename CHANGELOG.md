@@ -17,6 +17,7 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Recorded aggregate baseline findings from the supplied 10,043-prompt / 1,564-genre source snapshot.
 - Added a self-contained noncommercial source license, commercial-rights policy, copyright notice, licensing map, third-party notice ledger, and data-source redistribution boundary.
 - Added resumable v2 local build state, staged work artifacts, source/build fingerprinting, read-only plan/status commands, safe pause/resume, stale-checkpoint rejection, and loss-safe promotion.
+- Added bundled report-driven genre curation: automatic backup, full JSON/CSV review export, decision-bundle freshness/target validation, transactional apply, automatic knowledge recompile/validation, rollback on failure, receipts, and refreshed reports.
 
 ### Changed
 

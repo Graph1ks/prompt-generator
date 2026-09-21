@@ -74,19 +74,23 @@ If its source fingerprints match the current Factory files, v2 adopts it unchang
 | schema/corpus-v2.sql | resumable corpus-build schema |
 | schema/curation-v1.sql | durable local authoring state |
 | tests/test_local_data_build.py | build/resume/data-safety regression suite |
+| scripts/data/curation_session.py | bundled report export + transactional decision apply |
+| schema/genre-crosswalk-decisions-v1.schema.json | AI/human decision-bundle contract |
+| tests/test_curation_session.py | report/apply/staleness regression coverage |
 | LICENSE | operative noncommercial public terms |
 | COMMERCIAL_LICENSE.md | owner commercial-rights policy |
 | docs/DECISIONS.md | durable architecture/licensing decisions |
 
 ## Next concrete work
 
-1. Owner runs git pull.
-2. Owner runs the read-only v2 --plan command from docs/LOCAL_DATA_BUILD.md.
-3. Inspect plan output; it should recognize the existing promoted corpus and matching Factory fingerprints.
-4. Run the normal build/resume command without --force.
-5. Validate again.
-6. Back up curation.sqlite.
-7. Begin resolving the 138 genre crosswalk candidates, then proceed to dictionary/instrument/descriptor curation.
+The build/adoption phase is complete locally. The preferred next slice is a bundled genre-curation session:
+
+1. pull current main;
+2. run `py scripts\data\curation_session.py prepare --out-dir ".local-data\current"`;
+3. review/upload the generated `reports/curation/genre-crosswalk-review-v1.json`;
+4. apply the reviewed decision bundle with one `curation_session.py apply` command.
+
+The prepare command backs up curation and writes complete reports. The apply command is transactional, recompiles/validates automatically, rolls back durable curation on failure, and refreshes the next review report.
 
 ## Verification
 

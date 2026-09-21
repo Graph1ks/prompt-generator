@@ -67,6 +67,10 @@
 **Storage:** local SQLite split into disposable evidence (`corpus.sqlite`), durable authoring (`curation.sqlite`), and disposable compiled knowledge (`knowledge.sqlite`); resumable build checkpoints live in ignored local state; future web/native runtime bundles are compiled locally.  
 **Packaging/distribution:** static web/PWA + local desktop packaging; no required backend.
 
+### Operator workflow
+
+Owner-local maintenance should be optimized for a solo developer: one coherent command per meaningful phase, concise terminal summaries, detailed machine-readable reports for review/AI handoff, automatic backups before durable curation changes, and transactional apply/recompile/validation bundles where practical.
+
 ### Large-data build reliability
 
 Long-running local ingestion, mining, enrichment, compilation, migration, and materialization jobs are durable build pipelines rather than disposable scripts.
