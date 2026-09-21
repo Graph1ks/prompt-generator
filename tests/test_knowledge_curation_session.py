@@ -36,7 +36,7 @@ VAULT = {
                 "[Groove: laid-back swing, firm backbeat]\n"
                 "[Drums: dry snare, rounded kick]\n"
                 "[Bass: electric bass, short roots]\n"
-                "[Instruments: electric guitar, piano, tenor sax]\n"
+                "[Instruments: clean rhythm electric guitar, electric guitar, piano, tenor sax]\n"
                 "[Production: softened transients, dry center]"
             ),
             "negative_prompt": "vocals",
@@ -466,6 +466,149 @@ class KnowledgeCurationApplyTests(unittest.TestCase):
                              and status='approved'"""
                     ).fetchone()[0],
                     1,
+                )
+            finally:
+                knowledge.close()
+
+    def test_compound_playing_expression_stays_selectable_and_links_semantics(self):
+        with tempfile.TemporaryDirectory() as td:
+            vault, genres, out = self.setup_local(Path(td))
+            reports = out / "reports" / "knowledge"
+            instrument_path = reports / "instrument-candidates-v1.json"
+            instrument_report = json.loads(instrument_path.read_text(encoding="utf-8"))
+
+            def concept(eid, label, slug, entry_type):
+                return {
+                    "entry_id": eid,
+                    "entry_type": entry_type,
+                    "canonical_label": label,
+                    "canonical_slug": slug,
+                    "status": "approved",
+                    "difficulty": "beginner",
+                    "variants": [
+                        {
+                            "surface": label.casefold(),
+                            "match_kind": "word",
+                            "match_priority": 200,
+                            "is_primary": True,
+                        }
+                    ],
+                    "definitions": [
+                        {
+                            "kind": "one_liner",
+                            "text": f"Semantic test concept for {label}.",
+                            "status": "approved",
+                        }
+                    ],
+                    "contexts": [],
+                }
+
+            bundle = {
+                "schema": "promptvgine-knowledge-curation-decisions-v2",
+                "bundle_id": "synthetic-expression-preservation-v2",
+                "review_id": instrument_report["review_id"],
+                "curation_fingerprint": instrument_report["curation_fingerprint"],
+                "source": {
+                    "prompt_vault_sha256": instrument_report["source"]["prompt_vault"]["sha256"],
+                    "genre_map_sha256": instrument_report["source"]["genre_map"]["sha256"],
+                },
+                "report_sha256": {"instrument": sha(instrument_path)},
+                "instrument_families": [
+                    {"id": "family:guitars", "label": "Guitars", "status": "approved"}
+                ],
+                "instruments": [
+                    {
+                        "id": "instrument:electric-guitar",
+                        "label": "Electric Guitar",
+                        "label_norm": "electric guitar",
+                        "family_id": "family:guitars",
+                        "status": "approved",
+                        "entry": {
+                            "entry_id": "instrument:electric-guitar",
+                            "entry_type": "instrument",
+                            "canonical_label": "Electric Guitar",
+                            "canonical_slug": "electric-guitar",
+                            "status": "approved",
+                            "difficulty": "beginner",
+                            "variants": [
+                                {
+                                    "surface": "electric guitar",
+                                    "match_kind": "phrase",
+                                    "match_priority": 300,
+                                    "is_primary": True,
+                                }
+                            ],
+                            "definitions": [
+                                {
+                                    "kind": "one_liner",
+                                    "text": "A guitar whose pickup signal is amplified or processed electrically.",
+                                    "status": "approved",
+                                }
+                            ],
+                            "contexts": [],
+                        },
+                        "aliases": [],
+                    }
+                ],
+                "concepts": [
+                    concept("concept:clean", "Clean", "clean", "processing_character"),
+                    concept("concept:rhythm-role", "Rhythm", "rhythm-role", "instrument_role"),
+                ],
+            }
+            bundle_path = reports / "expression-preservation-v2.json"
+            bundle_path.write_text(json.dumps(bundle, indent=2), encoding="utf-8")
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(APPLY),
+                    "apply",
+                    "--out-dir",
+                    str(out),
+                    "--bundle",
+                    str(bundle_path),
+                    "--vault",
+                    str(vault),
+                    "--genre-map",
+                    str(genres),
+                ],
+                cwd=ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(
+                result.returncode,
+                0,
+                msg=f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}",
+            )
+
+            knowledge = sqlite3.connect(out / "knowledge.sqlite")
+            try:
+                row = knowledge.execute(
+                    """select id,output_text,selectable,base_instrument_id,decomposition_state
+                       from instrument_expression
+                       where label_norm='clean rhythm electric guitar'"""
+                ).fetchone()
+                self.assertIsNotNone(row)
+                self.assertEqual(row[1], "clean rhythm electric guitar")
+                self.assertEqual(row[2], 1)
+                self.assertEqual(row[3], "instrument:electric-guitar")
+                self.assertEqual(row[4], "identity")
+                self.assertEqual(
+                    knowledge.execute(
+                        """select count(*) from instrument_expression_instrument
+                           where expression_id=? and instrument_id='instrument:electric-guitar'""",
+                        (row[0],),
+                    ).fetchone()[0],
+                    1,
+                )
+                self.assertEqual(
+                    knowledge.execute(
+                        """select count(*) from instrument_expression_concept
+                           where expression_id=? and entry_id in ('concept:clean','concept:rhythm-role')""",
+                        (row[0],),
+                    ).fetchone()[0],
+                    2,
                 )
             finally:
                 knowledge.close()
