@@ -50,8 +50,8 @@
     --vg-color-surface-floating: var(--vg-palette-olive);
     --vg-color-surface-inverse: var(--vg-palette-taupe);
 
-    --vg-color-text: color-mix(in srgb, var(--vg-palette-taupe) 88%, white);
-    --vg-color-text-muted: var(--vg-palette-gray);
+    --vg-color-text: var(--vg-palette-taupe);
+    --vg-color-text-muted: color-mix(in srgb, var(--vg-palette-taupe) 60%, var(--vg-palette-gray));
     --vg-color-text-inverse: var(--vg-palette-ink);
 
     --vg-color-border: color-mix(in srgb, var(--vg-palette-taupe) 19%, transparent);
