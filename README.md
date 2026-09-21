@@ -74,7 +74,9 @@ The initial architecture was validated against the project-provided snapshot con
 - 852,459 structured-prompt tokens;
 - 24 Major Genres;
 - 1,564 taxonomy genres/subgenres;
-- 6,035 unique source-backed Instruments expressions in the current Factory snapshot;\n- 6,035 / 6,035 Instruments expressions fully semantic, with 0 semantic residuals in the completed V1 snapshot;\n- 4,472 fully identity-decomposed expressions (~74.1%), with semantic-only layers intentionally allowed.
+- 6,035 unique source-backed Instruments expressions in the current Factory snapshot;
+- 6,035 / 6,035 Instruments expressions fully semantic, with 0 semantic residuals in the completed V1 snapshot;
+- 4,472 fully identity-decomposed expressions (~74.1%), with semantic-only layers intentionally allowed.
 
 The database itself is not committed. Aggregate architecture findings are recorded in `docs/PROMPT_CORPUS_PROFILE.md`.
 
