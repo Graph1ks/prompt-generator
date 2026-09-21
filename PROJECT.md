@@ -188,7 +188,7 @@ Important durable design documents:
 
 ## Current priorities
 
-1. Run the finished local data toolchain against the owner’s local Factory files and start deliberate genre/term/instrument curation.
-2. Mine/curate instruments, descriptors, parameters, reusable statements, and dictionary entries without promoting raw frequency directly to product truth.
+1. Continue from the completed local genre crosswalk with report-driven instrument and lexicon mining/curation.
+2. Curate instruments, descriptors, parameters, reusable statements, and dictionary entries without promoting raw frequency directly to product truth.
 3. Implement the documented MusicSpec/compiler contracts in TypeScript.
 4. Build the first production-quality Easy/Advanced editor and inline knowledge interaction on top of the stable semantic model.

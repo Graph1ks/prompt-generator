@@ -1,11 +1,11 @@
 # Handover
 
 **Last updated:** 2026-09-21
-**Current phase/milestone:** owner-local corpus exists and validates; resumable v2 build/tooling + noncommercial licensing foundation complete
+**Current phase/milestone:** owner-local corpus + genre crosswalk complete; instrument/lexicon mining is next
 
 ## Current objective
 
-Resume on the owner's Windows 11 / VS Code machine at D:\prompt-engine, adopt the existing valid local v1 corpus safely, and proceed into evidence-backed curation.
+Resume on the owner's Windows 11 / VS Code machine at D:\prompt-engine with the validated corpus and completed genre crosswalk, then continue evidence-backed instrument/lexicon curation through report files.
 
 ## Owner-local state already established
 
@@ -77,20 +77,31 @@ If its source fingerprints match the current Factory files, v2 adopts it unchang
 | scripts/data/curation_session.py | bundled report export + transactional decision apply |
 | schema/genre-crosswalk-decisions-v1.schema.json | AI/human decision-bundle contract |
 | tests/test_curation_session.py | report/apply/staleness regression coverage |
+| scripts/data/knowledge_mining_session.py | bundled instrument + lexicon evidence reports |
+| tests/test_knowledge_mining_session.py | report generation, filtering, backup, non-mutation regression coverage |
 | LICENSE | operative noncommercial public terms |
 | COMMERCIAL_LICENSE.md | owner commercial-rights policy |
 | docs/DECISIONS.md | durable architecture/licensing decisions |
 
 ## Next concrete work
 
-The build/adoption phase is complete locally. The preferred next slice is a bundled genre-curation session:
+The owner-local genre-crosswalk batch is complete:
+
+- 138 decisions applied;
+- compiled knowledge rebuilt;
+- validation passed;
+- remaining genre-crosswalk queue: 0.
+
+Next coherent slice:
 
 1. pull current main;
-2. run `py scripts\data\curation_session.py prepare --out-dir ".local-data\current"`;
-3. review/upload the generated `reports/curation/genre-crosswalk-review-v1.json`;
-4. apply the reviewed decision bundle with one `curation_session.py apply` command.
+2. run `py scripts\data\knowledge_mining_session.py prepare --out-dir ".local-data\current"`;
+3. upload/review:
+   - `reports\knowledge\instrument-candidates-v1.json`;
+   - `reports\knowledge\lexicon-candidates-v1.json`.
+4. keep the full CSV files local as deeper evidence and do not copy their contents into the terminal/chat unless specifically needed.
 
-The prepare command backs up curation and writes complete reports. The apply command is transactional, recompiles/validates automatically, rolls back durable curation on failure, and refreshes the next review report.
+The prepare command is read-only with respect to curation, integrity-checks local DBs, creates an integrity-checked curation backup, writes detailed machine-readable reports, and prints one concise summary line.
 
 ## Verification
 

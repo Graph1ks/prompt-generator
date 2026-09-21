@@ -1,11 +1,11 @@
 # Project Status
 
 **Last updated:** 2026-09-21
-**Current phase/milestone:** local corpus validated; report-driven genre curation bundle ready
+**Current phase/milestone:** genre crosswalk complete locally; instrument/lexicon knowledge mining ready
 
 ## Current objective
 
-Continue from the owner's existing validated local Factory build without risking local data, then begin evidence-backed genre/knowledge curation.
+Use the completed genre crosswalk as a stable base, then mine instrument identities and reusable music/production terminology into reviewable local report files without auto-promoting corpus frequency into product knowledge.
 
 ## Current state
 
@@ -17,7 +17,9 @@ Continue from the owner's existing validated local Factory build without risking
 - Complete project license/policy texts are stored in the repository.
 - Local build tooling v2 follows the RhymeLab long-running-job standard: read-only plan, visible progress, resumable checkpoints, ordinary-rerun resume, safe interruption, stale-checkpoint rejection, integrity gates, staged artifacts, and last-known-good promotion safety.
 - Existing matching v1 corpus.sqlite is adopted rather than destructively rebuilt. Durable curation.sqlite is never replaced by a normal build.
-- Synthetic CI covers build safety plus report-driven curation prepare/apply, stale decision-bundle rejection, automatic backups, recompilation, and validation.
+- Owner-local genre crosswalk apply completed successfully: 138 decisions applied, knowledge recompiled, validation passed, and 0 genre-crosswalk candidates remain.
+- Knowledge mining now has a read-only/report-driven prepare bundle for instrument-list segments, head-token variant groups, section-aware term candidates, phrase candidates, examples, and full CSV evidence.
+- Synthetic CI covers build safety, genre curation bundles, and knowledge-mining report generation.
 
 ## Last verified checks
 
@@ -33,7 +35,7 @@ None.
 
 ## Next concrete action
 
-Owner pulls current main, runs one bundled curation prepare command, then uploads the generated `genre-crosswalk-review-v1.json` for batch review. No terminal queue dump is needed.
+Owner pulls current main and runs one bundled knowledge-mining prepare command. Upload `instrument-candidates-v1.json` and `lexicon-candidates-v1.json` for the next AI review batch; do not dump candidate lists into the terminal.
 
 ## Do not redo
 
@@ -41,6 +43,7 @@ Owner pulls current main, runs one bundled curation prepare command, then upload
 - Do not delete the existing local curation.sqlite.
 - Do not use the retired --force workflow.
 - Do not rebuild the already-valid v1 corpus merely to adopt v2 tooling.
+- Do not redo the completed 138-item genre crosswalk.
 - Do not turn mined frequency directly into approved knowledge.
 
 ## Important context
