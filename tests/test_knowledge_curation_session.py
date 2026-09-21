@@ -425,9 +425,14 @@ class KnowledgeCurationApplyTests(unittest.TestCase):
                     str(genres),
                 ],
                 cwd=ROOT,
-                check=True,
+                check=False,
                 capture_output=True,
                 text=True,
+            )
+            self.assertEqual(
+                result.returncode,
+                0,
+                msg=f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}",
             )
             self.assertIn("parameters 1/1", result.stdout)
             self.assertIn("traits 1", result.stdout)
