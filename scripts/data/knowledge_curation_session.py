@@ -511,8 +511,127 @@ def apply_bundle(curation_path: Path, bundle: dict) -> dict:
                     ),
                 )
 
+        for alias in bundle.get("instrument_aliases", []):
+            surface = alias["surface"]
+            alias_norm = norm(surface)
+            iid = alias["instrument_id"]
+            row_id = stable_row_id("instrument-alias", iid, alias_norm)
+            conn.execute(
+                """INSERT INTO instrument_alias_patch(
+                     id,instrument_id,alias_surface,alias_norm,status,revision,updated_at
+                   ) VALUES (?,?,?,?,?,1,?)
+                   ON CONFLICT(instrument_id,alias_norm,revision) DO UPDATE SET
+                     alias_surface=excluded.alias_surface,
+                     status=excluded.status,
+                     updated_at=excluded.updated_at""",
+                (
+                    row_id,
+                    iid,
+                    surface,
+                    alias.get("status", "approved"),
+                    timestamp,
+                ),
+            )
+
         for entry in bundle.get("concepts", []):
             upsert_entry(conn, bundle, entry)
+
+        for trait in bundle.get("instrument_traits", []):
+            row_id = stable_row_id(
+                "instrument-trait",
+                trait["instrument_id"],
+                trait["entry_id"],
+                trait["trait_type"],
+            )
+            conn.execute(
+                """INSERT INTO instrument_trait_patch(
+                     id,instrument_id,entry_id,trait_type,confidence,status,
+                     revision,notes,updated_at
+                   ) VALUES (?,?,?,?,?,?,1,?,?)
+                   ON CONFLICT(instrument_id,entry_id,trait_type,revision) DO UPDATE SET
+                     confidence=excluded.confidence,
+                     status=excluded.status,
+                     notes=excluded.notes,
+                     updated_at=excluded.updated_at""",
+                (
+                    row_id,
+                    trait["instrument_id"],
+                    trait["entry_id"],
+                    trait["trait_type"],
+                    trait.get("confidence"),
+                    trait.get("status", "approved"),
+                    provenance_note(bundle, trait.get("evidence")),
+                    timestamp,
+                ),
+            )
+
+        for parameter in bundle.get("parameters", []):
+            conn.execute(
+                """INSERT INTO parameter_patch(
+                     id,section_key,label,canonical_slug,value_type,easy_visible,
+                     advanced_visible,allow_custom_text,knowledge_entry_id,sort_order,
+                     status,revision,updated_at
+                   ) VALUES (?,?,?,?,?,?,?,?,?,?,?,1,?)
+                   ON CONFLICT(id) DO UPDATE SET
+                     section_key=excluded.section_key,
+                     label=excluded.label,
+                     canonical_slug=excluded.canonical_slug,
+                     value_type=excluded.value_type,
+                     easy_visible=excluded.easy_visible,
+                     advanced_visible=excluded.advanced_visible,
+                     allow_custom_text=excluded.allow_custom_text,
+                     knowledge_entry_id=excluded.knowledge_entry_id,
+                     sort_order=excluded.sort_order,
+                     status=excluded.status,
+                     updated_at=excluded.updated_at""",
+                (
+                    parameter["id"],
+                    parameter["section_key"],
+                    parameter["label"],
+                    parameter["canonical_slug"],
+                    parameter["value_type"],
+                    int(bool(parameter.get("easy_visible", False))),
+                    int(bool(parameter.get("advanced_visible", True))),
+                    int(bool(parameter.get("allow_custom_text", False))),
+                    parameter.get("knowledge_entry_id"),
+                    int(parameter.get("sort_order", 0)),
+                    parameter.get("status", "approved"),
+                    timestamp,
+                ),
+            )
+
+        for option in bundle.get("parameter_options", []):
+            conn.execute(
+                """INSERT INTO parameter_option_patch(
+                     id,parameter_id,label,canonical_slug,output_fragment,
+                     knowledge_entry_id,easy_visible,advanced_visible,sort_order,
+                     status,revision,updated_at
+                   ) VALUES (?,?,?,?,?,?,?,?,?,?,1,?)
+                   ON CONFLICT(id) DO UPDATE SET
+                     parameter_id=excluded.parameter_id,
+                     label=excluded.label,
+                     canonical_slug=excluded.canonical_slug,
+                     output_fragment=excluded.output_fragment,
+                     knowledge_entry_id=excluded.knowledge_entry_id,
+                     easy_visible=excluded.easy_visible,
+                     advanced_visible=excluded.advanced_visible,
+                     sort_order=excluded.sort_order,
+                     status=excluded.status,
+                     updated_at=excluded.updated_at""",
+                (
+                    option["id"],
+                    option["parameter_id"],
+                    option["label"],
+                    option["canonical_slug"],
+                    option["output_fragment"],
+                    option.get("knowledge_entry_id"),
+                    int(bool(option.get("easy_visible", False))),
+                    int(bool(option.get("advanced_visible", True))),
+                    int(option.get("sort_order", 0)),
+                    option.get("status", "approved"),
+                    timestamp,
+                ),
+            )
 
         conn.execute(
             """INSERT INTO curation_meta(key,value) VALUES ('last_knowledge_bundle_id',?)
@@ -535,10 +654,13 @@ def apply_bundle(curation_path: Path, bundle: dict) -> dict:
     return {
         "instrument_families": len(bundle.get("instrument_families", [])),
         "instruments": len(bundle.get("instruments", [])),
+        "instrument_aliases": len(bundle.get("instrument_aliases", [])),
+        "instrument_traits": len(bundle.get("instrument_traits", [])),
         "concepts": len(bundle.get("concepts", [])),
+        "parameters": len(bundle.get("parameters", [])),
+        "parameter_options": len(bundle.get("parameter_options", [])),
         "knowledge_entries": len(all_entries(bundle)),
     }
-
 
 def run_builder(args, reports_dir: Path, prefix: str) -> dict:
     builder = Path(__file__).resolve().parent / "build_local_data.py"
@@ -673,6 +795,8 @@ def apply_command(args) -> int:
         "[knowledge-curation] applied"
         f" · instruments {receipt['apply']['instruments']}"
         f" · concepts {receipt['apply']['concepts']}"
+        f" · parameters {receipt['apply']['parameters']}/{receipt['apply']['parameter_options']}"
+        f" · traits {receipt['apply']['instrument_traits']}"
         " · recompile + validation OK"
         f" · next review {receipt['refresh']['review_id']}"
         f" · receipt: {receipt_path}"
