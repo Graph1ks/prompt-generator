@@ -72,7 +72,7 @@ def build_corpus(c,v,g,vp,gp,vsha,gsha,deep=False):
   label=space(item["genre"]); gid=sid("genre",label); genres[label]=gid; gnorm.setdefault(lookup(label),gid)
   cur.execute("INSERT INTO genre_raw(genre_key,label,label_norm,source_ordinal,track_count_declared) VALUES (?,?,?,?,?)",(gid,label,lookup(label),i,int(item.get("track_count") or 0)))
   cur.executemany("INSERT INTO genre_major_raw(genre_key,major_key,ordinal) VALUES (?,?,?)",[(gid,majors[m],j) for j,m in enumerate(item.get("major_genres",[]),1)])
- tok=collections.Counter(); tok_tracks=collections.Counter(); gtok=collections.Counter(); gtok_tracks=collections.Counter(); phr=collections.Counter(); phr_tracks=collections.Counter(); phr_first={}; vals=collections.Counter(); val_tracks=collections.Counter(); val_example={}; seqs=collections.Counter(); neg=collections.Counter(); neg_raw={}; neg_occ=[]; vg=collections.Counter(); section_count=token_count=0
+ tok=collections.Counter(); tok_tracks=collections.Counter(); gtok=collections.Counter(); gtok_tracks=collections.Counter(); phr=collections.Counter(); phr_tracks=collections.Counter(); phr_first={}; vals=collections.Counter(); val_tracks=collections.Counter(); val_example={}; seqs=collections.Counter(); neg=collections.Counter(); neg_tracks=collections.defaultdict(set); neg_raw={}; neg_occ=[]; vg=collections.Counter(); section_count=token_count=0
  for pos,t in enumerate(v["tracks"],1):
   tid=str(t.get("id") if t.get("id") is not None else pos); genre=space(str(t.get("genre") or "")); vg[genre]+=1
   cur.execute("INSERT INTO track(track_id,source_file_id,source_ordinal,title,genre_raw,bpm,emotion_raw,style_raw,year,key_raw,reference_artist,reference_song,structured_prompt,negative_prompt,instrumental_arrangement,used,favorite) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(tid,vsid,pos,t.get("title"),genre,t.get("bpm"),t.get("emotion"),t.get("style"),t.get("year"),t.get("key"),t.get("reference_artist"),t.get("reference_song"),t.get("structured_prompt") or "",t.get("negative_prompt"),t.get("instrumental_arrangement"),int(bool(t.get("used"))),int(bool(t.get("favorite")))))
@@ -92,14 +92,14 @@ def build_corpus(c,v,g,vp,gp,vsha,gsha,deep=False):
   for k in seen_gtok: gtok_tracks[k]+=1
   for k in seen_phr: phr_tracks[k]+=1
   for i,item in enumerate((space(x) for x in NEG_RE.split(space(str(t.get("negative_prompt") or ""))) if space(x)),1):
-   n=norm(item); neg[n]+=1; neg_raw.setdefault(n,item); neg_occ.append((tid,i,item,n))
+   n=norm(item); neg[n]+=1; neg_tracks[n].add(tid); neg_raw.setdefault(n,item); neg_occ.append((tid,i,item,n))
  c.executemany("INSERT INTO token_section_stat(token_norm,canonical_key,occurrence_count,track_count) VALUES (?,?,?,?)",[(a,b,n,tok_tracks[(a,b)]) for (a,b),n in tok.items()])
  c.executemany("INSERT INTO genre_section_token_stat(vault_genre_norm,canonical_key,token_norm,occurrence_count,track_count) VALUES (?,?,?,?,?)",[(a,b,d,n,gtok_tracks[(a,b,d)]) for (a,b,d),n in gtok.items()])
  c.executemany("INSERT INTO section_value_stat(canonical_key,content_norm,content_raw_example,occurrence_count,track_count) VALUES (?,?,?,?,?)",[(a,b,val_example[(a,b)],n,val_tracks[(a,b)]) for (a,b),n in vals.items()])
  c.executemany("INSERT INTO phrase_candidate(canonical_key,n,phrase_norm,occurrence_count,track_count,first_section_id) VALUES (?,?,?,?,?,?)",[(a,n,p,count,phr_tracks[(a,n,p)],phr_first[(a,n,p)]) for (a,n,p),count in phr.items() if count>=3])
  negids={}
  for n,count in neg.items():
-  cur.execute("INSERT INTO negative_item(item_raw_example,item_norm) VALUES (?,?)",(neg_raw[n],n)); negids[n]=cur.lastrowid; cur.execute("INSERT INTO negative_item_stat(negative_item_id,occurrence_count,track_count) VALUES (?,?,?)",(cur.lastrowid,count,count))
+  cur.execute("INSERT INTO negative_item(item_raw_example,item_norm) VALUES (?,?)",(neg_raw[n],n)); negids[n]=cur.lastrowid; cur.execute("INSERT INTO negative_item_stat(negative_item_id,occurrence_count,track_count) VALUES (?,?,?)",(cur.lastrowid,count,len(neg_tracks[n])))
  c.executemany("INSERT INTO track_negative_item(track_id,negative_item_id,ordinal,item_raw) VALUES (?,?,?,?)",[(tid,negids[n],i,raw) for tid,i,raw,n in neg_occ])
  c.execute("INSERT INTO prompt_section_fts(section_id,track_id,canonical_key,raw_label,content) SELECT id,track_id,canonical_key,raw_label,content_raw FROM prompt_section")
  for seq,count in seqs.items():
@@ -111,7 +111,11 @@ def build_corpus(c,v,g,vp,gp,vsha,gsha,deep=False):
   ln=lookup(label); status="exact" if label in exact else "normalized" if ln in bynorm else "unmatched"; match=exact.get(label) or bynorm.get(ln); x[status]+=1
   cur.execute("INSERT INTO genre_crosswalk_candidate(vault_genre_raw,vault_genre_norm,vault_track_count,match_status,matched_genre_key) VALUES (?,?,?,?,?)",(label,ln,count,status,match))
  raw_labels={x[1] for t in v["tracks"] for x in sections(t.get("structured_prompt") or "")}
- prof={"track_count":len(v["tracks"]),"section_count":section_count,"token_count":token_count,"raw_section_label_count":len(raw_labels),"section_sequence_variant_count":len(seqs),"negative_unique_item_count":len(neg),"major_genre_count":len(g["major_genres"]),"taxonomy_genre_count":len(g["genres"]),"vault_genre_label_count":len(vg),"genre_crosswalk_exact_labels":x["exact"],"genre_crosswalk_normalized_labels":x["normalized"],"genre_crosswalk_unmatched_labels":x["unmatched"],"deep_token_index":deep}
+ track_match=collections.Counter()
+ for label,count in vg.items():
+  row=cur.execute("SELECT match_status FROM genre_crosswalk_candidate WHERE vault_genre_raw=?",(label,)).fetchone()
+  if row: track_match[row[0]]+=count
+ prof={"track_count":len(v["tracks"]),"section_count":section_count,"token_count":token_count,"raw_section_label_count":len(raw_labels),"section_sequence_variant_count":len(seqs),"negative_item_occurrence_count":sum(neg.values()),"negative_unique_item_count":len(neg),"major_genre_count":len(g["major_genres"]),"taxonomy_genre_count":len(g["genres"]),"vault_genre_label_count":len(vg),"genre_crosswalk_exact_labels":x["exact"],"genre_crosswalk_normalized_labels":x["normalized"],"genre_crosswalk_unmatched_labels":x["unmatched"],"genre_crosswalk_exact_tracks":track_match["exact"],"genre_crosswalk_normalized_tracks":track_match["normalized"],"genre_crosswalk_unmatched_tracks":track_match["unmatched"],"deep_token_index":deep}
  c.executemany("INSERT INTO corpus_profile(metric_key,metric_value) VALUES (?,?)",[(k,json.dumps(v)) for k,v in prof.items()]); c.commit(); return prof
 
 def build_knowledge(c,g,corpus,gsha):
