@@ -24,7 +24,9 @@ Local-only:
 - `GRAPH1KS_GENRE_MAP_FACTORY.json` when used as a build input;
 - future source packs/corpora;
 - `corpus.sqlite`;
+- `curation.sqlite`;
 - `knowledge.sqlite`;
+- local curation backups;
 - runtime SQLite/JSON/search bundles;
 - generated corpus reports and intermediate indexes.
 
@@ -50,30 +52,46 @@ Contains:
 
 This database is build-time evidence. It is not a runtime dependency.
 
-### B. `knowledge.sqlite` — canonical curated knowledge database
+### B. `curation.sqlite` — durable local authoring/curation database
 
-Purpose: represent the concepts the product understands.
+Purpose: preserve human/AI-reviewed semantic decisions across any number of Factory/corpus rebuilds.
+
+This is the only database in the v1 pipeline that is **not disposable**. Normal `--force` rebuilds never delete it.
 
 Contains:
 
-- genres and Major Genres;
-- aliases;
-- dictionary/knowledge entries;
-- term variants used for inline highlighting;
+- knowledge-entry patches and stable IDs;
+- inline-dictionary aliases/term variants;
 - beginner definitions and context definitions;
+- semantic relations;
+- explicit Vault→taxonomy genre crosswalk decisions, including composite mappings;
+- instrument/family/alias curation;
+- Advanced parameters/options;
+- Easy-mode statements/combinations;
+- a review queue for unresolved source evidence.
+
+Candidate extraction never becomes product truth merely because it is frequent. Curation records the deliberate decision.
+
+### C. `knowledge.sqlite` — disposable compiled knowledge database
+
+Purpose: merge the canonical taxonomy/bootstrap model with the current durable curation state into one queryable product-facing knowledge artifact.
+
+Contains:
+
+- the 24 Major Genres and 1,564 taxonomy genres;
+- taxonomy and curated genre aliases/mappings;
+- dictionary/knowledge entries and term variants;
+- definitions and context definitions;
 - concept relations;
 - instruments/families/aliases;
 - parameters and parameter options;
 - Easy-mode statements/combinations;
-- genre and instrument traits;
-- prompt section definitions;
-- renderer profiles;
-- exclude entries;
-- provenance/version information.
+- prompt section definitions and renderer profiles;
+- local provenance/search indexes.
 
-The initial bootstrap imports the authoritative 24 Major Genres and 1,564 taxonomy genres as knowledge entities. It does **not** pretend to have high-quality definitions for every genre yet. Definitions are a separate curation state.
+The initial bootstrap imports genre **identity**, not invented definitions. On every build, reviewed local curation is overlaid onto this generated DB. `knowledge.sqlite` can therefore be deleted and rebuilt without losing authored knowledge.
 
-### C. Runtime bundles — generated from approved knowledge
+### D. Runtime bundles — generated from approved knowledge
 
 Future local build products may include:
 
@@ -103,12 +121,18 @@ LOCAL SOURCE PACKS
       ▼
 [5] Corpus mining
       │  usage stats, n-grams, co-occurrence, candidates
-      ▼
-[6] Crosswalk / curation
-      │  aliases, concepts, definitions, approved options
-      ▼
-[7] Knowledge DB
       │
+      ├──────────────► durable curation.sqlite
+      │                 reviewed aliases / definitions /
+      │                 mappings / instruments / options /
+      │                 Easy statements
+      │
+      ▼
+[6] Knowledge compile
+      │  taxonomy/bootstrap + durable curation overlay
+      ▼
+[7] knowledge.sqlite
+      │  disposable compiled knowledge
       ▼
 [8] Runtime compile
       │  native DB + web shards
@@ -234,6 +258,8 @@ The knowledge model supports:
 
 ## 11. Knowledge lifecycle
 
+Curation and compilation are deliberately separate lifecycles. `corpus.sqlite` and `knowledge.sqlite` are disposable; `curation.sqlite` is durable and must be backed up before destructive schema/bulk changes.
+
 Every knowledge item has a status:
 
 - `candidate` — mined/imported; not automatically trusted as UI knowledge;
@@ -292,48 +318,29 @@ Exclude remains a separate output channel and is not represented as a normal str
 
 For every new source release:
 
-1. place new factories in a local source directory;
-2. run preflight and compare hashes/schema versions;
-3. build a new DB into a new temporary output directory;
-4. compare corpus profile against previous build;
-5. inspect new/removed headers, genres, aliases, high-frequency term changes, and unmatched crosswalk entries;
-6. apply reviewed curation/migration rules;
-7. validate foreign keys, uniqueness, renderer contract, and search indexes;
-8. atomically replace the previous local generated artifacts only after success.
+1. back up the durable `curation.sqlite`;
+2. place new factories in a local source directory;
+3. build the new source into a separate local build directory;
+4. validate it;
+5. diff its `corpus.sqlite` against the previous corpus;
+6. inspect changed source documents, new/removed headers, genre/taxonomy changes, and unresolved crosswalk entries;
+7. reuse the durable curation state rather than rebuilding it from Factory data;
+8. regenerate `knowledge.sqlite` by overlaying curation onto the new taxonomy/evidence;
+9. validate again before promoting the new build.
 
-Never mutate the only good DB in place during source ingestion.
+Never mutate the only good corpus in place while evaluating a source update, and never treat the durable curation DB as a generated artifact.
 
 ## 16. Local command contract
 
-Initial build:
+The canonical commands, backup procedure, validation steps, and source-diff workflow live in `docs/LOCAL_DATA_BUILD.md`.
+
+Core commands:
 
 ```bash
-python scripts/data/build_local_data.py \
-  --vault /path/to/GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz \
-  --genre-map /path/to/GRAPH1KS_GENRE_MAP_FACTORY.json \
-  --out-dir .local-data/v1 \
-  --force
-```
-
-Optional exact positional token index:
-
-```bash
-python scripts/data/build_local_data.py \
-  --vault /path/to/GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz \
-  --genre-map /path/to/GRAPH1KS_GENRE_MAP_FACTORY.json \
-  --out-dir .local-data/v1-deep \
-  --deep-token-index \
-  --force
-```
-
-Corpus inspection:
-
-```bash
-python scripts/data/query_corpus.py --db .local-data/v1/corpus.sqlite term grit
-python scripts/data/query_corpus.py --db .local-data/v1/corpus.sqlite term transient
-python scripts/data/query_corpus.py --db .local-data/v1/corpus.sqlite section drums
-python scripts/data/query_corpus.py --db .local-data/v1/corpus.sqlite genre "Hip-Hop"
-python scripts/data/query_corpus.py --db .local-data/v1/corpus.sqlite unmatched-genres
+python scripts/data/build_local_data.py --vault /path/GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz --genre-map /path/GRAPH1KS_GENRE_MAP_FACTORY.json --out-dir .local-data/current --force
+python scripts/data/validate_local_data.py --dir .local-data/current
+python scripts/data/query_corpus.py --db .local-data/current/corpus.sqlite term grit
+python scripts/data/backup_curation.py --source .local-data/current/curation.sqlite
 ```
 
 ## 17. Runtime/platform strategy
