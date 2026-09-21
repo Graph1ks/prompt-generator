@@ -119,7 +119,7 @@ It owns:
 - longest-match semantic decomposition;
 - conservative shared-head coordination for reviewed identities such as `tenor and baritone saxophones`, where both reconstructed identity phrases must already exist in the lexicon;
 - guarded hyphen-compound decomposition: exact de-hyphenated reviewed phrases can match directly, otherwise all internal components must already resolve and no more than one canonical instrument identity may be produced;
-- explicit decomposition-grammar suppression for scaffolding such as `as`, `in`, and `used`;
+- explicit decomposition-grammar suppression for reviewed scaffolding such as `as`, `in`, `used`, prepositional glue, and standalone count words;\n- Unicode-aware tokenization with stable normalization for names such as `Bağlama`, apostrophes such as `Jew's Harp`, and dotted acronyms such as `T.O.N.T.O.-style`;
 - source-expression aggregation;
 - complete `knowledge.sqlite` expression materialization.
 

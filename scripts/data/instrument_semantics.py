@@ -28,6 +28,21 @@ DECOMPOSITION_SYNTAX = {
     "as",
     "in",
     "used",
+    "for",
+    "on",
+    "from",
+    "using",
+    "including",
+    "played",
+    "sharing",
+    "one",
+    "only",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "ten",
 }
 
 
@@ -50,8 +65,20 @@ def split_instrument_segments(content: str) -> list[str]:
     return out
 
 
+_TOKEN_RE = re.compile(
+    r"(?:[^\W_]+\.){2,}[^\W_]+\.?(?:-[^\W_]+)*|[^\W_]+(?:['’][^\W_]+)*(?:-[^\W_]+(?:['’][^\W_]+)*)*",
+    re.UNICODE,
+)
+
+
 def phrase_tokens(value: str) -> tuple[str, ...]:
-    return tuple(re.findall(r"[a-z0-9]+(?:-[a-z0-9]+)*", norm(value)))
+    out = []
+    for match in _TOKEN_RE.finditer(norm(value)):
+        token = match.group(0).replace(".", "").replace("'", "").replace("’", "")
+        token = token.strip("-")
+        if token:
+            out.append(token)
+    return tuple(out)
 
 
 def expression_id(label_norm: str) -> str:
