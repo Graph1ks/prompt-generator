@@ -724,7 +724,7 @@ def prepare(args) -> int:
     corpus_path = out_dir / "corpus.sqlite"
     curation_path = out_dir / "curation.sqlite"
     knowledge_path = out_dir / "knowledge.sqlite"
-    reports_dir = out_dir / "reports" / "knowledge"
+    reports_dir = out_dir / "reports"
 
     integrity(corpus_path)
     integrity(curation_path)
@@ -787,12 +787,12 @@ def prepare(args) -> int:
     ).encode("utf-8")
     review_id = "knowledge-mining-" + hashlib.sha256(review_id_raw).hexdigest()[:24]
 
-    instrument_json = reports_dir / "instrument-candidates-v1.json"
-    lexicon_json = reports_dir / "lexicon-candidates-v1.json"
-    instrument_csv = reports_dir / "instrument-candidates-full-v1.csv"
-    lexicon_csv = reports_dir / "lexicon-candidates-full-v1.csv"
-    decomposition_json = reports_dir / "instrument-decomposition-v1.json"
-    decomposition_csv = reports_dir / "instrument-decomposition-full-v1.csv"
+    instrument_json = reports_dir / "knowledge-instrument-candidates-v1.json"
+    lexicon_json = reports_dir / "knowledge-lexicon-candidates-v1.json"
+    instrument_csv = reports_dir / "knowledge-instrument-candidates-full-v1.csv"
+    lexicon_csv = reports_dir / "knowledge-lexicon-candidates-full-v1.csv"
+    decomposition_json = reports_dir / "knowledge-instrument-decomposition-v1.json"
+    decomposition_csv = reports_dir / "knowledge-instrument-decomposition-full-v1.csv"
     summary_path = reports_dir / "knowledge-mining-summary-v1.json"
 
     write_json(
