@@ -224,8 +224,8 @@ py scripts\\data\\knowledge_completion_session.py prepare --out-dir ".local-data
 This phase is intentionally read-only. It:
 
 1. hard-gates on the owner-local database acceptance report and every acceptance invariant;
-2. reconciles accepted source/selectable/decomposition-state counts against the full decomposition JSON + CSV;
-3. fails closed when reports are missing, stale, or internally inconsistent;
+2. reconciles immutable accepted source/selectable counts against the full decomposition JSON + CSV, while treating acceptance decomposition-state counts as a historical baseline rather than a frozen semantic target;
+3. fails closed when reports are missing, source inventory drifts, or the current decomposition JSON/CSV disagree; legitimate additive curation may advance semantic/identity coverage after acceptance;
 4. groups residual semantic tokens with occurrence/track evidence;
 5. ranks rows only for **review order**, never as semantic truth;
 6. emits bounded review batches for partial/unresolved expressions;
@@ -272,7 +272,7 @@ Synthetic coverage verifies:
 - compile failures restore durable curation;
 - semantic decomposition reports work;
 - database finalizer emits one concise stdout line and detailed reports;
-- acceptance-gated semantic completion emits deterministic bounded review batches, fails closed on failed/stale acceptance inputs, and does not mutate durable curation.
+- acceptance-gated semantic completion emits deterministic bounded review batches, permits measured semantic progress after the foundation acceptance snapshot, fails closed on failed/source-drift/internally inconsistent inputs, and does not mutate durable curation.
 
 Required workflow: `Data tooling / validate`.
 
