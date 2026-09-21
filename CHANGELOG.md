@@ -6,6 +6,9 @@ This file records meaningful product, behavior, compatibility, security, data, a
 
 ### Added
 
+- Added accepted production application architecture: strict TypeScript/React/Vite/pnpm, Tauri 2 packaging direction, pure compiler boundaries, modular V'gine design system, selective Radix/shadcn boundary, centralized Motion recipes, adaptive four-chapter Studio layout, and storage/search module contracts.
+- Added Runtime Pack v1 contract/schema and a dependency-free resumable exporter from `knowledge.sqlite` with deterministic payload hashes/build IDs, staged resume, stale-work rejection, Database V1 invariant checks, atomic promotion and previous-pack retention.
+- Added synthetic Runtime Pack regression coverage for plan/no-write, source-expression preservation, no-op reruns, stale-state recovery and last-known-good retention.
 - Initialized **Graph1ks Prompt V'gine** product and UX foundation.
 - Added MusicSpec v1 semantic state contract and JSON Schema.
 - Added the Suno structured-v1 prompt renderer contract with a separate comma-delimited Exclude output and a hard 1,000-character style-prompt ceiling.
@@ -50,7 +53,8 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Public licensing is now explicitly source-available/noncommercial for third parties; project-connected donations/tips and other monetization are prohibited, while commercial rights in Graph1ks Material are reserved to Graph1ks.
 - Long-running local data jobs now follow the RhymeLab-style resumable build standard with visible progress and last-known-good artifact preservation.
 - Semantic-completion acceptance is now correctly split into immutable foundation gating vs mutable knowledge progress: post-acceptance curation may increase fully-semantic/identity coverage, while current decomposition JSON/CSV must remain internally consistent and source-expression inventory must remain unchanged.
-- Completion plans now include a read-only snapshot of the current canonical instrument families, instrument IDs, and aliases so identity/alias curation can reuse exact compiled entities instead of guessing IDs or creating duplicates.\n- Zero-residual completion plans now report `status: complete` and a terminal completion action instead of incorrectly suggesting another semantic-review round.
+- Completion plans now include a read-only snapshot of the current canonical instrument families, instrument IDs, and aliases so identity/alias curation can reuse exact compiled entities instead of guessing IDs or creating duplicates. 
+- Zero-residual completion plans now report `status: complete` and a terminal completion action instead of incorrectly suggesting another semantic-review round.
 
 ### Data / compatibility
 

@@ -533,3 +533,157 @@ Explicit/locked user intent must not be silently discarded only to satisfy the l
 - Factory preflight/validation rejects source prompts above 1,000 characters.
 - Renderer configuration carries the hard global limit and source-derived soft per-section targets.
 - Runtime/compiler/UI work must expose/manage the same budget contract.
+
+
+---
+
+## ADR-021 — Production application stack is TypeScript/React/Vite/pnpm with Tauri 2 packaging
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+Application/runtime/compiler code uses strict TypeScript. The UI uses React and Vite inside a pnpm workspace. Tauri 2 is the accepted desktop shell direction after the web foundation is stable. The core product requires no backend, hosted service, or runtime AI dependency.
+
+Dependency versions are pinned when installed and still require the normal cost/license review.
+
+### Consequences
+
+The web application remains the primary shared implementation. Desktop packaging wraps the same product architecture rather than creating a second app stack.
+
+---
+
+## ADR-022 — Runtime Pack v1 is the application data boundary
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+The normal application does not read `corpus.sqlite` and does not require SQLite-WASM to mirror `knowledge.sqlite`. Owner-local tooling compiles `knowledge.sqlite` into deterministic versioned Runtime Pack artifacts documented in `docs/RUNTIME_DATA_CONTRACT_V1.md`.
+
+### Consequences
+
+Web, Tauri and self-hosted deployments can consume the same semantic payload contract. Runtime payload shape may evolve independently of the authoring/evidence SQLite schemas.
+
+---
+
+## ADR-023 — Compiler is a pure TypeScript package
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+MusicSpec -> renderer compilation lives in a pure TypeScript package with no React, DOM, browser-storage or Tauri dependency.
+
+The compiler returns structured sections, budget state, diagnostics and compaction decisions in addition to final plaintext outputs.
+
+### Consequences
+
+Compiler behavior is deterministic/testable in isolation and reusable across web, native shell and future renderer targets.
+
+---
+
+## ADR-024 — Studio UI uses adaptive four-chapter composition and one shared picker pattern
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+The 17 renderer facets are organized into four high-level chapters: DNA, Pulse, Palette and Finish. Desktop uses a keyboard/mouse-efficient studio composition with persistent navigation/live output where space allows. Mobile uses focused work surfaces and sheets/docks.
+
+Large/explainable vocabularies use one composable search/browse picker pattern rather than per-feature dropdown implementations.
+
+### Consequences
+
+Responsive behavior changes composition, not capability. Genre, instrument-expression, knowledge and other large selectors share interaction infrastructure.
+
+---
+
+## ADR-025 — Project persistence uses a storage adapter; IndexedDB is the first web target
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+Persisted musical state remains versioned MusicSpec plus project metadata behind a `ProjectStorage` adapter. Web/PWA initially targets IndexedDB. A later Tauri-native implementation may use application data/filesystem storage behind the same interface.
+
+`localStorage` is limited to lightweight preferences.
+
+### Consequences
+
+Project persistence is portable and does not leak browser implementation details into domain state.
+
+---
+
+## ADR-026 — V'gine owns a modular design system with semantic tokens
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+Reusable UI is organized in a dedicated V'gine design-system layer: tokens -> primitives -> controls/overlays -> patterns -> studio components.
+
+Feature modules may compose these layers but must not duplicate generic buttons, chips, sheets, search fields, pickers, typography, spacing, radii, shadows or theme logic.
+
+Paradise and Ash implement the same semantic token contract.
+
+### Consequences
+
+Global visual/ergonomic changes can be made once without design drift across feature modules.
+
+---
+
+## ADR-027 — Radix may provide selected behavior primitives; shadcn is reference material, not the design foundation
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+Radix is the preferred candidate for selected complex accessibility/focus/keyboard primitives, wrapped behind V'gine components and styled entirely by V'gine.
+
+shadcn/ui is not the base component system and is not a required dependency. It may be consulted or selectively adapted only when useful; no Tailwind requirement or generic shadcn aesthetic is introduced merely to consume it.
+
+All external code/dependencies still pass cost/license review before installation/adoption.
+
+### Consequences
+
+The project can reuse difficult accessibility behavior without surrendering its visual system or architecture to a generic UI kit.
+
+---
+
+## ADR-028 — Motion is centralized as a product motion system
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+Motion for React is the selected candidate for layout/presence/gesture/drag/spring animation. Simple micro-transitions remain CSS.
+
+A shared motion package owns durations, easings, springs and named recipes such as press/select/insert/remove/swap/expand/sheet/promptDiff/layoutMorph. Every recipe has a reduced-motion behavior.
+
+### Consequences
+
+Feature modules do not invent arbitrary animation physics. Motion communicates causality and state rather than becoming decorative background activity.
+
+---
+
+## ADR-029 — No generic CSS/component-framework aesthetic in the product foundation
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+The production visual foundation is modern native CSS, CSS Modules and semantic CSS custom properties. Tailwind, MUI, Bootstrap and similar generic framework aesthetics are not adopted as the default product styling layer.
+
+### Consequences
+
+The application keeps a distinct V'gine visual language while still allowing reviewed headless/behavior primitives where technically justified.

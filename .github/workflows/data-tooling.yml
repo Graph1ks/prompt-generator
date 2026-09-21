@@ -34,6 +34,7 @@ jobs:
           python -m json.tool schema/music-spec-v1.schema.json > /dev/null
           python -m json.tool schema/knowledge-curation-decisions-v1.schema.json > /dev/null
           python -m json.tool schema/knowledge-curation-decisions-v2.schema.json > /dev/null
+          python -m json.tool schema/runtime-pack-v1.schema.json > /dev/null
 
       - name: Run synthetic local-data tests
         run: python -m unittest discover -s tests -p "test_*.py" -v

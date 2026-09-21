@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-21  
-**Current milestone:** **Database V1 complete** — move to runtime/compiler/product implementation
+**Current milestone:** **Runtime Pack v1 implemented** — owner-local real-data validation, then TypeScript compiler foundation
 
 ## Completion verdict
 
@@ -70,20 +70,28 @@ py scripts\data\database_foundation_session.py finalize `
 
 Expected result: acceptance remains `status: ok`; the compiled knowledge DB is stamped with the latest build/renderer contract. No further `knowledge_completion_session.py` review batches are expected for the current snapshot.
 
+## Runtime/application foundation now implemented
+
+- Application architecture is frozen in `docs/APPLICATION_ARCHITECTURE.md` and ADR-021 through ADR-029.
+- Runtime Pack v1 is frozen in `docs/RUNTIME_DATA_CONTRACT_V1.md` + `schema/runtime-pack-v1.schema.json`.
+- `scripts/data/export_runtime_v1.py` compiles deterministic runtime payloads from `knowledge.sqlite` with plan/status, resumable staged work, stale-source rejection, validation, atomic promotion and previous-pack retention.
+- Synthetic tests cover lossless source-expression export, no-op reruns, stale-work recovery and last-known-good retention.
+- No UI/runtime third-party packages have been installed yet; dependency versions/licenses remain gated until the TypeScript application scaffold.
+
 ## Current blocker
 
-**None in Database V1.**
+**No architecture blocker.** The new Runtime Pack exporter still needs one owner-local run against the real completed `knowledge.sqlite` so actual payload counts/sizes can be recorded before deciding whether any further sharding is justified.
 
-Future enrichment does not reopen the V1 database milestone unless it changes schema/invariants. Vocal knowledge, Easy statements, Advanced parameters/options, definitions/relations, runtime bundles, compiler code, and UI integration are Post-V1 additive work.
+Future enrichment does not reopen the V1 database milestone unless it changes schema/invariants.
 
 ## Next concrete phase
 
-Proceed to runtime/compiler implementation:
+Proceed in this order:
 
-1. compile/export the stable knowledge model into the runtime shape needed by web/native/server;
-2. implement deterministic MusicSpec -> `suno-structured-v1` rendering with the 1,000-character semantic budget;
-3. wire search/dictionary/genre/instrument-expression data into the application;
-4. build Easy/Advanced editing surfaces on the shared MusicSpec state.
+1. run Runtime Pack v1 `--plan`, export and `--status` against the real owner-local `knowledge.sqlite`; record pack sizes/counts and verify all 6,035 Factory expressions survive;
+2. scaffold the strict TypeScript/pnpm workspace and `music-spec` package;
+3. implement the pure MusicSpec -> `suno-structured-v1` compiler and 1,000-character semantic budget engine;
+4. add runtime-data/search repositories, then the modular V'gine design-system/motion foundation and Studio UI.
 
 ## Do not redo
 
@@ -104,3 +112,5 @@ Proceed to runtime/compiler implementation:
 - `docs/LOCAL_DATA_BUILD.md` — owner-local build/finalization commands
 - `docs/MUSICSPEC_V1.md` — application semantic state
 - `docs/PROMPT_FORMAT.md` — renderer contract
+- `docs/RUNTIME_DATA_CONTRACT_V1.md` — compiled application data boundary
+- `docs/APPLICATION_ARCHITECTURE.md` — production stack, module/design/motion architecture
