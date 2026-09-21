@@ -24,6 +24,7 @@ from local_data_v1_core import (
     OUTPUT_SECTIONS,
     RULES,
     SECTION_MAP,
+    STYLE_PROMPT_MAX_CHARACTERS,
     VAULT_SCHEMA,
     apply_curation,
     build_knowledge,
@@ -41,7 +42,7 @@ from local_data_v1_core import (
     tokens,
 )
 
-BUILD_REVISION = "promptvgine-local-data-build-v2-resumable-2-instrument-expressions"
+BUILD_REVISION = "promptvgine-local-data-build-v2-resumable-3-prompt-budget"
 WORK_DIR_NAME = ".build-v2"
 STAGES = [
     ("corpus_init", 10),
@@ -372,6 +373,20 @@ def preflight(vault_path: Path, genre_path: Path) -> dict:
         raise SystemExit(f"Unsupported Vault schema: {vault.get('schema')!r}")
     if genre_map.get("schema") != GENRE_SCHEMA:
         raise SystemExit(f"Unsupported genre-map schema: {genre_map.get('schema')!r}")
+    prompt_lengths = [
+        len(str(track.get("structured_prompt") or ""))
+        for track in (vault.get("tracks") or [])
+    ]
+    over_limit = [
+        (track.get("id"), len(str(track.get("structured_prompt") or "")))
+        for track in (vault.get("tracks") or [])
+        if len(str(track.get("structured_prompt") or "")) > STYLE_PROMPT_MAX_CHARACTERS
+    ]
+    if over_limit:
+        raise SystemExit(
+            "Vault structured_prompt exceeds the Suno structured-v1 "
+            f"{STYLE_PROMPT_MAX_CHARACTERS}-character limit; examples: {over_limit[:5]}"
+        )
     print("[preflight] hashing source files...", file=sys.stderr, flush=True)
     vault_sha = sha(vault_path)
     genre_sha = sha(genre_path)
@@ -383,6 +398,8 @@ def preflight(vault_path: Path, genre_path: Path) -> dict:
         "vault_bytes": vault_path.stat().st_size,
         "genre_bytes": genre_path.stat().st_size,
         "track_count": len(vault.get("tracks") or []),
+        "structured_prompt_max_characters": max(prompt_lengths, default=0),
+        "style_prompt_character_limit": STYLE_PROMPT_MAX_CHARACTERS,
         "genre_count": len(genre_map.get("genres") or []),
         "major_count": len(genre_map.get("major_genres") or []),
     }
@@ -403,6 +420,8 @@ def show_plan(info: dict, out_dir: Path) -> None:
                 "tracks": info["track_count"],
                 "schema": info["vault"].get("schema"),
                 "version": info["vault"].get("version"),
+                "structured_prompt_max_characters": info["structured_prompt_max_characters"],
+                "style_prompt_character_limit": info["style_prompt_character_limit"],
             },
             "genre_map": {
                 "bytes": info["genre_bytes"],
@@ -996,6 +1015,23 @@ def validate_stage(state: sqlite3.Connection, corpus_path: Path, knowledge_path:
             raise RuntimeError(f"genre count mismatch: corpus={corpus_genres} knowledge={knowledge_genres}")
         if knowledge.execute("SELECT COUNT(*) FROM prompt_section_definition WHERE lower(output_label)='exclude'").fetchone()[0]:
             raise RuntimeError("Exclude must not be a structured prompt section")
+        source_over_limit = corpus.execute(
+            "SELECT COUNT(*) FROM track WHERE length(structured_prompt)>?",
+            (STYLE_PROMPT_MAX_CHARACTERS,),
+        ).fetchone()[0]
+        if source_over_limit:
+            raise RuntimeError(
+                f"{source_over_limit} source structured prompts exceed "
+                f"{STYLE_PROMPT_MAX_CHARACTERS} characters"
+            )
+        renderer_budget = knowledge.execute(
+            "SELECT max_characters FROM renderer_profile WHERE id='suno-structured-v1'"
+        ).fetchone()
+        if not renderer_budget or renderer_budget[0] != STYLE_PROMPT_MAX_CHARACTERS:
+            raise RuntimeError(
+                "suno-structured-v1 renderer budget does not match "
+                f"{STYLE_PROMPT_MAX_CHARACTERS} characters"
+            )
         source_expression_count = len(collect_source_instrument_expressions(corpus))
         knowledge_expression_count = knowledge.execute(
             "SELECT COUNT(*) FROM instrument_expression WHERE source_kind='factory'"
@@ -1036,6 +1072,7 @@ def collect_knowledge_profile(path: Path) -> dict:
             "instrument_expression_partial": conn.execute("SELECT COUNT(*) FROM instrument_expression WHERE decomposition_state='partial' AND status<>'deprecated'").fetchone()[0],
             "instrument_expression_unresolved": conn.execute("SELECT COUNT(*) FROM instrument_expression WHERE decomposition_state='unresolved' AND status<>'deprecated'").fetchone()[0],
             "renderer_sections": conn.execute("SELECT COUNT(*) FROM renderer_section WHERE renderer_profile_id='suno-structured-v1'").fetchone()[0],
+            "renderer_max_characters": conn.execute("SELECT max_characters FROM renderer_profile WHERE id='suno-structured-v1'").fetchone()[0],
         }
     finally:
         conn.close()
