@@ -4,6 +4,8 @@
     { "path": "./packages/music-spec" },
     { "path": "./packages/compiler" },
     { "path": "./packages/runtime-data" },
-    { "path": "./packages/search" }
+    { "path": "./packages/search" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/motion" }
   ]
 }
