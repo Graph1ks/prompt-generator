@@ -228,9 +228,10 @@ This phase is intentionally read-only. It:
 3. fails closed when reports are missing, source inventory drifts, or the current decomposition JSON/CSV disagree; legitimate additive curation may advance semantic/identity coverage after acceptance;
 4. groups residual semantic tokens with occurrence/track evidence;
 5. ranks rows only for **review order**, never as semantic truth;
-6. emits bounded review batches for partial/unresolved expressions;
-7. leaves `curation.sqlite` untouched;
-8. never removes, hides, demotes, or replaces any source-backed `instrument_expression`.
+6. snapshots the current compiled canonical instrument/family/alias identity catalog into the completion plan so identity decisions can reuse exact IDs instead of guessing or duplicating entities;
+7. emits bounded review batches for partial/unresolved expressions;
+8. leaves `curation.sqlite` untouched;
+9. never removes, hides, demotes, or replaces any source-backed `instrument_expression`.
 
 Primary local outputs:
 
@@ -272,7 +273,7 @@ Synthetic coverage verifies:
 - compile failures restore durable curation;
 - semantic decomposition reports work;
 - database finalizer emits one concise stdout line and detailed reports;
-- acceptance-gated semantic completion emits deterministic bounded review batches, permits measured semantic progress after the foundation acceptance snapshot, fails closed on failed/source-drift/internally inconsistent inputs, and does not mutate durable curation.
+- acceptance-gated semantic completion emits deterministic bounded review batches, permits measured semantic progress after the foundation acceptance snapshot, captures current canonical instrument/family/alias IDs for safe identity curation, fails closed on failed/source-drift/internally inconsistent inputs, and does not mutate durable curation.
 
 Required workflow: `Data tooling / validate`.
 
