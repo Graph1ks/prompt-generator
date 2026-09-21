@@ -150,7 +150,9 @@ After the genre crosswalk is reviewed/applied, prepare the next evidence bundle 
 py scripts\data\knowledge_mining_session.py prepare --out-dir ".local-data\current"
 ```
 
-The command integrity-checks corpus + curation, creates an integrity-checked curation backup, mines instrument-list segments plus head-token variant groups, mines section-aware terms and repeated 2–4 word phrases, marks already-curated surfaces, and writes prioritized JSON reports plus full CSV evidence. It does **not** mutate curation or auto-promote candidates.
+The command integrity-checks corpus + curation + compiled knowledge, creates an integrity-checked curation backup, mines instrument-list segments plus head-token variant groups, mines section-aware terms and repeated 2–4 word phrases, and writes prioritized JSON reports plus full CSV evidence. It does **not** mutate curation or auto-promote candidates.
+
+Instrument mining is semantic-residual driven. Every source segment is decomposed with longest-match semantics against compiled canonical instruments and concepts. Fully explained segments are removed from the primary review queue. Semantic-only sound layers such as pads/effects/noise may be fully explained without being forced into fake instrument identities.
 
 Primary review files:
 
@@ -164,6 +166,8 @@ Full local evidence:
 ```text
 .local-data\current\reports\knowledge\instrument-candidates-full-v1.csv
 .local-data\current\reports\knowledge\lexicon-candidates-full-v1.csv
+.local-data\current\reports\knowledge\instrument-decomposition-v1.json
+.local-data\current\reports\knowledge\instrument-decomposition-full-v1.csv
 .local-data\current\reports\knowledge\knowledge-mining-summary-v1.json
 ```
 
@@ -186,6 +190,26 @@ The apply command verifies source/review fingerprints and exact reviewed-report 
 New mining reports include a semantic curation fingerprint so future decision bundles are rejected if durable curation changes after review. The first pre-fingerprint report can still be applied only when its exact report hashes and source fingerprints match.
 
 Phrase prioritization deliberately excludes Instruments-list adjacency, Key/Mode literals, boundary connectors, and common grammatical scaffolding. Mined phrases remain evidence until reviewed.
+
+## Scalable instrument ontology v2
+
+Reviewed Instruments work can use a scoped v2 bundle. This lets one large Instruments-only decision set add canonical instruments, aliases, semantic concepts, intrinsic instrument traits, Advanced parameters, and parameter options without requiring an unrelated lexicon report hash.
+
+Save the reviewed owner-local bundle as:
+
+```text
+.local-data\current\reports\knowledge\instrument-ontology-decisions-v2.json
+```
+
+Apply it with one command:
+
+```powershell
+py scripts\data\knowledge_curation_session.py apply --out-dir ".local-data\current" --bundle ".local-data\current\reports\knowledge\instrument-ontology-decisions-v2.json" --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json"
+```
+
+The command validates the exact reviewed report hash + source fingerprints + curation fingerprint, backs up durable curation, applies additive curation-schema migrations, writes the bundle transactionally, recompiles knowledge, validates, restores/recompiles recovery state on failure, and refreshes the residual-only mining reports.
+
+The current v2 ontology model deliberately separates instrument identity from source/role/processing/articulation/timbre/density/register/voice-architecture/arrangement/style modifiers. Do not convert compound source strings directly into independent instrument options.
 
 ## Inspect corpus evidence
 
