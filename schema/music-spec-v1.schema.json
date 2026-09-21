@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://graph1ks.local/schemas/music-spec-v1.schema.json",
+  "title": "Graph1ks Prompt V'gine MusicSpec v1",
+  "type": "object",
+  "required": ["schema_version", "genre_influences", "facets", "exclude"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "music-spec-v1" },
+    "genre_influences": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["role", "genre_id", "routing", "locked"],
+        "additionalProperties": false,
+        "properties": {
+          "role": { "enum": ["foundation", "fusion", "accent"] },
+          "genre_id": { "type": "string", "minLength": 1 },
+          "routing": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "enum": ["genre", "era", "bpm", "key_mode", "groove", "melody", "harmony", "drums", "bass", "instruments", "exciters", "texture", "vocal", "dynamics", "space_mix", "production", "structure"]
+            }
+          },
+          "locked": { "type": "boolean" }
+        }
+      }
+    },
+    "facets": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/facetState" }
+    },
+    "exclude": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text", "origin", "locked"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": ["string", "null"] },
+          "text": { "type": "string", "minLength": 1 },
+          "origin": { "$ref": "#/$defs/origin" },
+          "locked": { "type": "boolean" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "origin": {
+      "enum": ["user", "statement", "genre_suggestion", "derived", "imported", "freeform"]
+    },
+    "selection": {
+      "type": "object",
+      "required": ["kind", "value", "origin", "locked"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": ["string", "null"] },
+        "kind": { "enum": ["statement", "option", "concept", "freeform"] },
+        "value": { "type": "string" },
+        "origin": { "$ref": "#/$defs/origin" },
+        "locked": { "type": "boolean" }
+      }
+    },
+    "facetState": {
+      "type": "object",
+      "required": ["locked", "selections", "custom_text"],
+      "additionalProperties": false,
+      "properties": {
+        "locked": { "type": "boolean" },
+        "selections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/selection" }
+        },
+        "custom_text": { "type": ["string", "null"] }
+      }
+    }
+  }
+}
