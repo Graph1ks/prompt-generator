@@ -123,9 +123,9 @@ class KnowledgeCurationApplyTests(unittest.TestCase):
         return vault, genres, out
 
     def bundle(self, out: Path):
-        reports = out / "reports" / "knowledge"
-        instrument_path = reports / "instrument-candidates-v1.json"
-        lexicon_path = reports / "lexicon-candidates-v1.json"
+        reports = out / "reports"
+        instrument_path = reports / "knowledge-instrument-candidates-v1.json"
+        lexicon_path = reports / "knowledge-lexicon-candidates-v1.json"
         instrument = json.loads(instrument_path.read_text(encoding="utf-8"))
         return {
             "schema": "promptvgine-knowledge-curation-decisions-v1",
@@ -219,7 +219,7 @@ class KnowledgeCurationApplyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             vault, genres, out = self.setup_local(Path(td))
             bundle = self.bundle(out)
-            bundle_path = out / "reports" / "knowledge" / "knowledge-curation-decisions-v1.json"
+            bundle_path = out / "reports" / "knowledge-curation-decisions-v1.json"
             bundle_path.write_text(json.dumps(bundle, indent=2), encoding="utf-8")
             result = subprocess.run(
                 [
@@ -276,7 +276,7 @@ class KnowledgeCurationApplyTests(unittest.TestCase):
                 knowledge.close()
 
             refreshed = json.loads(
-                (out / "reports" / "knowledge" / "lexicon-candidates-v1.json").read_text(
+                (out / "reports" / "knowledge-lexicon-candidates-v1.json").read_text(
                     encoding="utf-8"
                 )
             )
@@ -288,8 +288,8 @@ class KnowledgeCurationApplyTests(unittest.TestCase):
     def test_v2_scoped_instrument_bundle_compiles_traits_and_parameters(self):
         with tempfile.TemporaryDirectory() as td:
             vault, genres, out = self.setup_local(Path(td))
-            reports = out / "reports" / "knowledge"
-            instrument_path = reports / "instrument-candidates-v1.json"
+            reports = out / "reports"
+            instrument_path = reports / "knowledge-instrument-candidates-v1.json"
             instrument_report = json.loads(instrument_path.read_text(encoding="utf-8"))
             bundle = {
                 "schema": "promptvgine-knowledge-curation-decisions-v2",
@@ -473,8 +473,8 @@ class KnowledgeCurationApplyTests(unittest.TestCase):
     def test_compound_playing_expression_stays_selectable_and_links_semantics(self):
         with tempfile.TemporaryDirectory() as td:
             vault, genres, out = self.setup_local(Path(td))
-            reports = out / "reports" / "knowledge"
-            instrument_path = reports / "instrument-candidates-v1.json"
+            reports = out / "reports"
+            instrument_path = reports / "knowledge-instrument-candidates-v1.json"
             instrument_report = json.loads(instrument_path.read_text(encoding="utf-8"))
 
             def concept(eid, label, slug, entry_type):
@@ -630,7 +630,7 @@ class KnowledgeCurationApplyTests(unittest.TestCase):
             finally:
                 curation.close()
 
-            bundle_path = out / "reports" / "knowledge" / "knowledge-curation-decisions-v1.json"
+            bundle_path = out / "reports" / "knowledge-curation-decisions-v1.json"
             bundle_path.write_text(json.dumps(bundle, indent=2), encoding="utf-8")
             result = subprocess.run(
                 [
@@ -659,7 +659,7 @@ class KnowledgeCurationApplyTests(unittest.TestCase):
             vault, genres, out = self.setup_local(Path(td))
             bundle = self.bundle(out)
             before = (out / "curation.sqlite").read_bytes()
-            bundle_path = out / "reports" / "knowledge" / "knowledge-curation-decisions-v1.json"
+            bundle_path = out / "reports" / "knowledge-curation-decisions-v1.json"
             bundle_path.write_text(json.dumps(bundle, indent=2), encoding="utf-8")
             result = subprocess.run(
                 [
