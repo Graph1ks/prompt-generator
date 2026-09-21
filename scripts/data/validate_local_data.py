@@ -4,6 +4,8 @@ from __future__ import annotations
 import argparse, sqlite3
 from pathlib import Path
 
+from instrument_semantics import collect_source_instrument_expressions
+
 def connect(path):
     if not path.is_file(): raise FileNotFoundError(path)
     c=sqlite3.connect(path); c.row_factory=sqlite3.Row; c.execute("PRAGMA foreign_keys=ON"); return c
@@ -25,6 +27,12 @@ def main():
         if knowledge.execute("SELECT COUNT(*) FROM major_genre").fetchone()[0]!=rm: errors.append("knowledge: major genre count differs from corpus taxonomy")
         if knowledge.execute("SELECT COUNT(*) FROM renderer_profile WHERE active=1").fetchone()[0]!=1: errors.append("knowledge: expected exactly one active renderer")
         if knowledge.execute("SELECT COUNT(*) FROM prompt_section_definition WHERE lower(output_label)='exclude'").fetchone()[0]: errors.append("knowledge: Exclude must not be a structured prompt section")
+        source_expressions=len(collect_source_instrument_expressions(corpus))
+        knowledge_expressions=knowledge.execute("SELECT COUNT(*) FROM instrument_expression WHERE source_kind='factory'").fetchone()[0]
+        selectable_expressions=knowledge.execute("SELECT COUNT(*) FROM instrument_expression WHERE source_kind='factory' AND selectable=1 AND status<>'deprecated'").fetchone()[0]
+        if knowledge_expressions!=source_expressions: errors.append(f"knowledge: instrument expression count differs from corpus source ({knowledge_expressions}!={source_expressions})")
+        if selectable_expressions!=source_expressions: errors.append(f"knowledge: not all source instrument expressions are selectable ({selectable_expressions}!={source_expressions})")
+        if knowledge.execute("SELECT COUNT(*) FROM instrument_expression WHERE json_valid(residual_json)=0").fetchone()[0]: errors.append("knowledge: invalid instrument expression residual_json")
         row=curation.execute("SELECT value FROM curation_meta WHERE key='schema_version'").fetchone()
         if not row or row[0]!="curation-v1": errors.append("curation: unexpected schema version")
     finally: corpus.close(); knowledge.close(); curation.close()
