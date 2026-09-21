@@ -23,11 +23,11 @@ Apply the first high-confidence semantic knowledge batch derived from the upload
 
 ## Last verified checks
 
-- GitHub Actions `validate` passes with the knowledge-c​​uration apply regression suite.
+- GitHub Actions `validate` passes with the knowledge-curation apply regression suite.
 - Synthetic apply compiles approved instruments/concepts into `knowledge.sqlite` and refreshes mining reports.
 - Synthetic stale-curation protection rejects reviewed bundles after durable curation changes.
 - Synthetic compile failure restores durable curation from backup.
-- Existing build/resume, genre-c​​uration, and mining regression suites remain green.
+- Existing build/resume, genre-curation, and mining regression suites remain green.
 
 ## Current blocker
 
