@@ -1,8 +1,8 @@
-# Handover — Database V1 Complete
+# Handover — Runtime Pack V1 Foundation
 
 **Last updated:** 2026-09-21  
-**Handoff target:** next development thread  
-**Milestone:** Database V1 is closed; next work is runtime/compiler/product implementation
+**Handoff target:** owner-local runtime validation, then TypeScript compiler/application foundation  
+**Milestone:** Database V1 remains closed; Runtime Pack v1 contract/export implementation is now present
 
 ## Read this first
 
@@ -15,7 +15,9 @@ Read in this order:
 5. `docs/DATA_ARCHITECTURE.md`
 6. `docs/MUSICSPEC_V1.md`
 7. `docs/PROMPT_FORMAT.md`
-8. `docs/LOCAL_DATA_BUILD.md` only when operating the local databases
+8. `docs/RUNTIME_DATA_CONTRACT_V1.md`
+9. `docs/APPLICATION_ARCHITECTURE.md`
+10. `docs/LOCAL_DATA_BUILD.md` only when operating the local databases
 
 Owner workspace: `D:\prompt-engine`.
 
@@ -132,17 +134,30 @@ This should only recompile/validate generated knowledge as required. It must pre
 
 Future Factory versions are handled by separate snapshot build + diff review, not by reopening old evidence blindly.
 
+## Runtime Pack v1 implementation now present
+
+Tracked implementation:
+
+- `docs/RUNTIME_DATA_CONTRACT_V1.md`
+- `schema/runtime-pack-v1.schema.json`
+- `scripts/data/export_runtime_v1.py`
+- `tests/test_runtime_export_v1.py`
+
+The exporter writes `core.json`, `genres.json`, `instruments.json`, `instrument-expressions.json`, `editor.json`, `knowledge.json`, `search.json` and `manifest.json`. It is deterministic, resumable at payload-stage boundaries, rejects stale partial work, validates Database V1 expression/budget invariants and retains the last promoted pack during replacement.
+
+No React/Radix/Motion/Tauri packages have been installed yet.
+
 ## Next-thread mission
 
-The next thread should treat Database V1 as an accepted dependency and move upward in the stack.
+Treat Database V1 and Runtime Pack v1 as accepted dependencies and move upward in the stack.
 
 Recommended order:
 
-1. **Runtime data contract/export** — decide the minimal compiled payload/shards the web/native app consumes from `knowledge.sqlite`.
-2. **MusicSpec compiler** — implement deterministic TypeScript rendering from shared semantic state.
-3. **1,000-character budget engine** — preserve explicit/locked intent, compact lower-priority derived/redundant material, keep complete bracketed sections.
-4. **Search + knowledge lookup** — expose genre, instrument-expression and dictionary search without shipping the heavy corpus DB.
-5. **Easy/Advanced UI** — both edit the same MusicSpec; no duplicate hidden prompt state.
+1. **Owner-local Runtime Pack validation** — run plan/export/status against the real `knowledge.sqlite`; record actual file sizes/counts and confirm 6,035 Factory expressions.
+2. **TypeScript workspace + MusicSpec package** — strict TS/pnpm foundation and schema-compatible types/migrations.
+3. **MusicSpec compiler** — deterministic renderer with structured compilation result.
+4. **1,000-character budget engine** — preserve explicit/locked intent, compact lower-priority derived/redundant material, keep complete bracketed sections.
+5. **Search + design-system/application foundation** — runtime repository/search worker, then V'gine UI/motion modules and Easy/Advanced surfaces.
 
 ## Post-V1 enrichment is allowed but is not a blocker
 
