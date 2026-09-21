@@ -1,7 +1,8 @@
 # Project Status
 
 **Last updated:** 2026-09-21  
-**Last known good implementation commit:** `e6b85a5d6e4c89058fa79f05296eb605ed10848d` — synthetic data-tooling CI passed on GitHub Actions  
+**Foundation merged:** PR #1 → `5d8bc38797d88eb3487a35abea263d42a225b41a`  
+**Verification:** post-merge `validate` GitHub Actions run passed  
 **Current phase/milestone:** foundation complete; ready for owner-local Factory build and curation
 
 ## Current objective
@@ -23,7 +24,7 @@ Hand off a reproducible, zero-paid-service local data foundation so the owner ca
 
 ## Last verified checks
 
-- GitHub Actions `Data tooling` on implementation commit `e6b85a5...` — **success**.
+- Foundation PR #1 merged to `main`; post-merge required `validate` check — **success**.
 - Local real-source validation during foundation development — 10,043 tracks, 115,736 structured sections, 852,459 tokens, 24 Major Genres, 1,564 taxonomy genres; all generated SQLite integrity checks passed.
 - Durable curation preservation smoke test — curated `Grit` entry/definition survived `--force` rebuild and compiled into `knowledge.sqlite`.
 - Same-snapshot corpus diff smoke test — zero additions/removals/changes.

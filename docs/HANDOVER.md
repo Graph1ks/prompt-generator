@@ -1,7 +1,7 @@
 # Handover
 
 **Last updated:** 2026-09-21  
-**Current phase/milestone:** Prompt V'gine product/data foundation complete; next phase is owner-local evidence build and curation.
+**Current phase/milestone:** Prompt V'gine product/data foundation merged to `main`; next phase is owner-local evidence build and curation.
 
 ## Current objective
 
@@ -10,6 +10,8 @@ The repository is prepared so a future developer/agent can work on Prompt V'gine
 The next meaningful work should happen from a local clone with the owner's Factory files.
 
 ## What was just completed
+
+- Foundation PR #1 was squash-merged to `main` as `5d8bc38797d88eb3487a35abea263d42a225b41a`; the required post-merge `validate` GitHub Actions check passed.
 
 - Converted the generic repository template into the Graph1ks Prompt V'gine project.
 - Captured the accepted UX/product design, including Easy/Advanced shared state, 1–3 Genre Influences, mobile-first picker UX, inline knowledge dictionary, quality checks, two visual palette directions, prompt diff/highlighting behavior, and accessibility constraints.
@@ -173,7 +175,7 @@ python scripts/data/build_local_data.py \
 python scripts/data/validate_local_data.py --dir .local-data/current
 ```
 
-GitHub Actions `Data tooling` passed on implementation commit `e6b85a5d6e4c89058fa79f05296eb605ed10848d`.
+Foundation PR #1 and the resulting `main` commit passed the required `validate` GitHub Actions check.
 
 During foundation development the real-source equivalent pipeline also passed SQLite integrity, curation-preservation, query, backup, and same-snapshot diff smoke tests.
 
