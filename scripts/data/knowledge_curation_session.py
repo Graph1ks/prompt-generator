@@ -26,9 +26,9 @@ BUNDLE_SCHEMAS = {
     "promptvgine-knowledge-curation-decisions-v2",
 }
 REPORT_FILES = {
-    "instrument": Path("knowledge") / "instrument-candidates-v1.json",
-    "lexicon": Path("knowledge") / "lexicon-candidates-v1.json",
-    "completion_plan": Path("knowledge-completion") / "knowledge-completion-plan-v1.json",
+    "instrument": Path("knowledge-instrument-candidates-v1.json"),
+    "lexicon": Path("knowledge-lexicon-candidates-v1.json"),
+    "completion_plan": Path("knowledge-completion-plan-v1.json"),
 }
 
 
@@ -676,7 +676,7 @@ def apply_bundle(curation_path: Path, bundle: dict) -> dict:
         "knowledge_entries": len(all_entries(bundle)),
     }
 
-def run_builder(args, reports_dir: Path, prefix: str) -> dict:
+def run_builder(args, logs_dir: Path, prefix: str) -> dict:
     builder = Path(__file__).resolve().parent / "build_local_data.py"
     validator = Path(__file__).resolve().parent / "validate_local_data.py"
     build = subprocess.run(
@@ -693,7 +693,7 @@ def run_builder(args, reports_dir: Path, prefix: str) -> dict:
         text=True,
         stdout=subprocess.PIPE,
     )
-    build_path = reports_dir / f"{prefix}-build-output.json.txt"
+    build_path = logs_dir / f"{prefix}-build-output.json.txt"
     build_path.write_text(build.stdout or "", encoding="utf-8")
     if build.returncode != 0:
         raise RuntimeError(f"knowledge recompile failed with exit code {build.returncode}")
@@ -704,7 +704,7 @@ def run_builder(args, reports_dir: Path, prefix: str) -> dict:
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
-    validate_path = reports_dir / f"{prefix}-validation.txt"
+    validate_path = logs_dir / f"{prefix}-validation.txt"
     validate_path.write_text(validate.stdout or "", encoding="utf-8")
     if validate.returncode != 0:
         raise RuntimeError(f"post-apply validation failed with exit code {validate.returncode}")
@@ -716,7 +716,7 @@ def run_builder(args, reports_dir: Path, prefix: str) -> dict:
     }
 
 
-def refresh_reports(out_dir: Path, reports_dir: Path) -> dict:
+def refresh_reports(out_dir: Path, logs_dir: Path) -> dict:
     miner = Path(__file__).resolve().parent / "knowledge_mining_session.py"
     result = subprocess.run(
         [
@@ -730,11 +730,11 @@ def refresh_reports(out_dir: Path, reports_dir: Path) -> dict:
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
-    path = reports_dir / "last-refresh.txt"
+    path = logs_dir / "knowledge-last-refresh.txt"
     path.write_text(result.stdout or "", encoding="utf-8")
     if result.returncode != 0:
         raise RuntimeError(f"post-apply knowledge report refresh failed: {result.returncode}")
-    summary_path = out_dir / "reports" / "knowledge" / "knowledge-mining-summary-v1.json"
+    summary_path = out_dir / "reports" / "knowledge-mining-summary-v1.json"
     summary = read_json(summary_path)
     return {
         "returncode": result.returncode,
@@ -748,8 +748,10 @@ def apply_command(args) -> int:
     out_dir = args.out_dir.resolve()
     corpus_path = out_dir / "corpus.sqlite"
     curation_path = out_dir / "curation.sqlite"
-    reports_dir = out_dir / "reports" / "knowledge"
+    reports_dir = out_dir / "reports"
+    logs_dir = out_dir / "logs"
     reports_dir.mkdir(parents=True, exist_ok=True)
+    logs_dir.mkdir(parents=True, exist_ok=True)
 
     integrity(corpus_path)
     integrity(curation_path)
@@ -770,12 +772,12 @@ def apply_command(args) -> int:
         "preflight": validation,
         "status": "running",
     }
-    receipt_path = reports_dir / "last-knowledge-curation-apply-receipt.json"
+    receipt_path = reports_dir / "knowledge-last-curation-apply-receipt.json"
 
     try:
         receipt["apply"] = apply_bundle(curation_path, bundle)
-        receipt["compile"] = run_builder(args, reports_dir, "last-knowledge-curation")
-        receipt["refresh"] = refresh_reports(out_dir, reports_dir)
+        receipt["compile"] = run_builder(args, logs_dir, "knowledge-last-curation")
+        receipt["refresh"] = refresh_reports(out_dir, logs_dir)
         receipt["status"] = "ok"
         receipt["completed_at"] = utc_now()
     except Exception as exc:
@@ -786,7 +788,7 @@ def apply_command(args) -> int:
             recovery["curation_restore"] = "ok"
             try:
                 recovery["compile"] = run_builder(
-                    args, reports_dir, "last-knowledge-curation-recovery"
+                    args, logs_dir, "knowledge-last-curation-recovery"
                 )
             except Exception as rebuild_exc:
                 recovery["compile_error"] = str(rebuild_exc)
