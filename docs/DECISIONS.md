@@ -284,7 +284,7 @@ The v2 local builder uses ignored `.build-v2/state.sqlite` plus staged SQLite wo
 
 ## ADR-014 — Instrument identities are canonical entities; descriptors stay composable
 
-**Status:** accepted  
+**Status:** accepted for canonical identity; product-option consequence superseded by ADR-018  
 **Date:** 2026-09-21
 
 ### Context
@@ -303,10 +303,11 @@ Broad groups such as Strings, Brass Section, Woodwind Section, Keyboards, Drums,
 
 ### Consequences
 
-- Corpus segments remain evidence, not direct UI options.
-- "clean electric guitar" can decompose into Electric Guitar + Clean rather than becoming a permanent standalone instrument.
-- The runtime can explain/highlight both the instrument and its modifiers.
-- Search aliases can recognize source wording without multiplying canonical entities.
+- Canonical instrument identity remains compact and composable.
+- "clean electric guitar" can decompose into Electric Guitar + Clean without creating a second canonical Electric Guitar identity.
+- **ADR-018 supersedes the earlier implication that the full source phrase is not a direct product option.** The complete source expression remains a first-class selectable/renderable row.
+- The runtime can explain/highlight both the full expression and its instrument/modifier semantics.
+- Search aliases and expression links can recognize source wording without multiplying canonical identities.
 
 ---
 
@@ -364,9 +365,11 @@ The report distinguishes:
 - `fully_identity_decomposed`: the segment is fully semantic and includes at least one canonical instrument identity;
 - unresolved residuals: semantic tokens for which curated knowledge is still missing.
 
-The primary review queue contains only unresolved semantic residuals. Fully semantic segments are removed from the review queue even when the original compound source string was never curated verbatim.
+The primary **semantic curation review queue** contains only unresolved semantic residuals. Fully semantic segments are removed from that review queue even when the original compound source string was never curated verbatim.
 
-Semantic-only layers are valid. They are not converted into fake instrument entities just to satisfy an identity metric.
+This queue optimization does not control product availability. ADR-018 requires every source-backed Instruments expression to remain materialized and selectable regardless of decomposition state.
+
+Semantic-only layers are valid and do not require a canonical instrument identity merely to satisfy an identity metric.
 
 ### Consequences
 
@@ -406,3 +409,80 @@ Before applying a bundle, the operator flow validates the reviewed report/source
 ### Consequences
 
 A single reviewed Instruments batch can materially expand the ontology and its editor controls without manual SQL or chains of tiny apply steps, while retaining the existing local-data safety contract.
+
+
+---
+
+## ADR-018 — Every source Instruments expression is a first-class selectable database entity
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Context
+
+The source Instruments section does not only name instrument identities. It also contains musically meaningful complete expressions describing how an instrument or sound layer is played, voiced, processed, arranged, or positioned, for example:
+
+- `clean electric guitar`;
+- `distorted rhythm guitar`;
+- `muted trumpet`;
+- `restrained strings`;
+- `programmed drums`;
+- `warm pad`;
+- `noise sweeps`.
+
+Treating those strings only as mining evidence would throw away useful user-facing choices. Treating every string as a new **canonical instrument identity** would also be wrong because the phrases often combine one stable instrument identity with reusable musical semantics.
+
+### Decision
+
+Use two simultaneous Instruments layers in compiled knowledge.
+
+#### 1. `instrument_expression`
+
+Every comma/semicolon-delimited source Instruments segment is materialized as a first-class selectable expression.
+
+Each expression preserves:
+
+- exact source-facing label/output wording;
+- normalized lookup form;
+- source occurrence and track counts;
+- selectable status;
+- provenance;
+- semantic-decomposition state;
+- semantic coverage;
+- residual terms.
+
+All source-backed expressions are product options regardless of whether their semantics are fully understood.
+
+#### 2. Canonical identity + concepts
+
+The same expression may additionally link to:
+
+- canonical instrument identities through `instrument_expression_instrument`;
+- reusable semantic concepts through `instrument_expression_concept`;
+- one base instrument when exactly one identity resolves.
+
+Example:
+
+`clean rhythm electric guitar`
+
+remains a selectable/renderable expression while also linking to Electric Guitar + Clean + Rhythm.
+
+Semantic decomposition is additive metadata. It must never delete, hide, replace, or normalize away the source expression.
+
+### Validation contract
+
+Knowledge compilation fails acceptance when:
+
+- the count of materialized factory expressions differs from the corpus source-expression count;
+- any source expression is non-selectable;
+- source output wording is not preserved.
+
+The current Factory snapshot contains 6,035 unique source Instruments expressions, so the real compiled database is expected to contain all 6,035 after owner-local finalization.
+
+### Consequences
+
+- Users retain the full source vocabulary, including meaningful playing/processing variants.
+- Canonical identities stay stable for grouping/search while expressions stay rich and specific.
+- Semantic curation can scale through reusable concepts without shrinking the selectable option space.
+- Residual-only mining reduces **review work**, not the database catalog.
+- Future UI/runtime work can search/browse full expressions while still exposing structured instrument identity and semantic metadata.
