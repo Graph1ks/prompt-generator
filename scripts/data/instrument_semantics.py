@@ -25,6 +25,9 @@ DECOMPOSITION_SYNTAX = {
     "dual",
     "second",
     "additional",
+    "as",
+    "in",
+    "used",
 }
 
 
