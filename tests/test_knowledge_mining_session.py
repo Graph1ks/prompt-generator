@@ -116,6 +116,79 @@ GENRES = {
 
 
 class KnowledgeMiningSessionTests(unittest.TestCase):
+    def test_hyphen_compound_reuses_exact_reviewed_phrase(self):
+        instrument = {
+            "kind": "instrument",
+            "id": "instrument:pedal-steel-guitar",
+            "label": "Pedal Steel Guitar",
+            "role": "identity",
+        }
+        result = decompose_surface(
+            "pedal-steel accents",
+            {("pedal", "steel"): instrument},
+            {
+                ("accents",): {
+                    "kind": "concept",
+                    "id": "concept:accents",
+                    "label": "Accents",
+                    "role": "arrangement_role",
+                }
+            },
+        )
+        self.assertEqual(result["residual_tokens"], [])
+        self.assertEqual(result["instrument_ids"], ["instrument:pedal-steel-guitar"])
+        self.assertTrue(
+            any(
+                match.get("inference") == "hyphen_reconstructed_phrase"
+                for match in result["matches"]
+            )
+        )
+
+    def test_hyphen_compound_can_combine_one_identity_with_reviewed_concept(self):
+        result = decompose_surface(
+            "clean-guitar",
+            {
+                ("guitar",): {
+                    "kind": "instrument",
+                    "id": "instrument:guitar",
+                    "label": "Guitar",
+                    "role": "identity",
+                }
+            },
+            {
+                ("clean",): {
+                    "kind": "concept",
+                    "id": "concept:clean",
+                    "label": "Clean",
+                    "role": "timbre_descriptor",
+                }
+            },
+        )
+        self.assertEqual(result["residual_tokens"], [])
+        self.assertEqual(result["instrument_ids"], ["instrument:guitar"])
+        self.assertEqual(result["concept_ids"], ["concept:clean"])
+        self.assertTrue(result["fully_identity_decomposed"])
+
+    def test_hyphen_compound_refuses_two_instrument_identities(self):
+        def instrument(iid, label):
+            return {
+                "kind": "instrument",
+                "id": iid,
+                "label": label,
+                "role": "identity",
+            }
+
+        result = decompose_surface(
+            "brass-synth",
+            {
+                ("brass",): instrument("instrument:brass-section", "Brass Section"),
+                ("synth",): instrument("instrument:synthesizer", "Synthesizer"),
+            },
+            {},
+        )
+        self.assertEqual(result["instrument_ids"], [])
+        self.assertEqual(result["residual_tokens"], ["brass-synth"])
+        self.assertFalse(result["fully_semantic"])
     def test_shared_head_coordination_resolves_only_reviewed_instrument_phrases(self):
         def instrument(iid, label):
             return {
