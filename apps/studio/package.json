@@ -10,8 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vgine/compiler": "workspace:*",
     "@vgine/motion": "workspace:*",
     "@vgine/music-spec": "workspace:*",
+    "@vgine/runtime-data": "workspace:*",
+    "@vgine/search": "workspace:*",
     "@vgine/ui": "workspace:*",
     "react": "19.3.0",
     "react-dom": "19.3.0"

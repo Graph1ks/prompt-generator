@@ -120,31 +120,46 @@ SearchResponse
 
 The same pure handler can run synchronously in tests or behind a Web Worker later.
 
-## 7. Performance gate
+## 7. Performance gate — accepted baseline
 
-The real Runtime Pack currently contains **10,348 search documents**.
-
-Before adopting a search/index dependency, benchmark the in-house v1 kernel against the real payload:
-
-```powershell
-pnpm bench:search
-```
-
-Default input:
+The owner-local benchmark against the real current Runtime Pack completed on 2026-09-21:
 
 ```text
-.local-data/current/runtime-v1/search.json
+documents: 10,348
+index build: 92.014 ms
+query samples: 100
+
+query latency:
+  min:    2.155 ms
+  median: 4.900 ms
+  P90:    9.462 ms
+  P95:   10.117 ms
+  P99:   14.472 ms
+  max:   14.472 ms
 ```
 
-The benchmark reports:
+Representative result counts:
 
-- document count;
-- index-build time;
-- 100 query samples;
-- median/P90/P95/P99/max query latency;
-- result counts for representative queries.
+```text
+boom bap:      7
+guitar:       50
+electric guit:50
+transient:     1
+warm:         48
+drum:         50
+vocal:        10
+ambient:      50
+bass:         50
+clean:        50
+```
 
-Only measured shortcomings justify an external search dependency or a more complex precompiled index.
+### Decision
+
+The dependency-free v1 search kernel is accepted for the current 10,348-document payload.
+
+Do not add a fuzzy/index/search dependency or hosted search service for baseline performance. The ~92 ms index build is a one-time Runtime-load cost; Studio builds the index once and reuses it. Interactive Genre search uses React deferred updates.
+
+The Worker request/response boundary remains available, but current query measurements do not justify Worker complexity by themselves. Revisit only if real application profiling shows input/frame regressions after richer result rendering.
 
 ## 8. Current dependency state
 
@@ -160,10 +175,10 @@ All four packages compile under the existing pinned Node/pnpm/TypeScript toolcha
 
 ## 9. Next layer
 
-After real-payload search benchmarking:
+The benchmark gate is closed. Current priorities:
 
-1. decide whether the simple search kernel is sufficient;
-2. add detailed runtime repositories lazily where UI features need them;
-3. establish V'gine semantic design tokens and motion recipes;
-4. scaffold the React/Vite Studio shell;
-5. place search behind a Worker when application profiling justifies the boundary.
+1. reuse the same search/index contract across the production Genre and Instruments pickers;
+2. add detailed Runtime Pack repositories lazily where UI features need them;
+3. keep result DOM bounded/progressive rather than mounting full vocabularies;
+4. place search behind a Worker only when application profiling justifies the boundary;
+5. do not introduce a new search dependency without a measured ranking or latency requirement the current kernel cannot satisfy.

@@ -196,14 +196,15 @@ Important durable design documents:
 - `docs/COMPILER_V1.md`
 - `docs/RUNTIME_SEARCH_V1.md`
 - `docs/DESIGN_SYSTEM_V1.md`
+- `docs/STUDIO_RUNTIME_GENRE_V1.md`
 - `docs/LOCAL_OUTPUT_LAYOUT.md`
 
 ## Current priorities
 
 Database V1 is complete for the current Factory snapshot. Current priorities are now:
 
-1. Validate Runtime Pack v1 against the real owner-local `knowledge.sqlite` and record size/count findings.
-2. Measure the dependency-free local search kernel against the real 10,348-document Runtime Pack before adding any search dependency.
-3. Wire validated Runtime Pack/search data into the implemented React/Vite Studio shell and build the production Genre picker.
-4. Connect shared MusicSpec state to the pure compiler/live budget pane, then wire instrument-expression and dictionary/search data into the editor.
+1. Generalize the production Genre picker mechanics into reusable V'gine picker/search-result patterns.
+2. Add lazy Runtime Pack repositories and the production Instruments picker over all 6,035 source expressions.
+3. Add knowledge detail/dictionary surfaces and ProjectStorage/IndexedDB persistence around shared MusicSpec state.
+4. Expand the remaining Easy/Advanced facet controls while preserving the pure compiler/live budget path.
 5. Continue Vocal/statements/parameters/definitions as additive Post-V1 enrichment, not as a reason to reopen the completed database milestone.

@@ -1,8 +1,8 @@
-# Handover — React/Vite Studio Shell
+# Handover — Runtime-backed Genre Studio
 
 **Last updated:** 2026-09-21  
-**Handoff target:** real Runtime Pack/search wiring + first production Genre picker  
-**Milestone:** Database V1 remains closed; domain/runtime/compiler/search/design foundations plus a production-buildable React/Vite Studio shell are implemented
+**Handoff target:** reusable picker pattern + Instruments/knowledge runtime controls  
+**Milestone:** Database V1 remains closed; the React/Vite Studio now consumes the real Runtime Pack, edits Genre influences in MusicSpec and renders the production compiler preview
 
 ## Read this first
 
@@ -20,8 +20,9 @@ Read in this order:
 10. `docs/COMPILER_V1.md`
 11. `docs/RUNTIME_SEARCH_V1.md`
 12. `docs/DESIGN_SYSTEM_V1.md`
-13. `docs/LOCAL_OUTPUT_LAYOUT.md` when operating local reports/logs
-14. `docs/LOCAL_DATA_BUILD.md` only when operating the local databases
+13. `docs/STUDIO_RUNTIME_GENRE_V1.md`
+14. `docs/LOCAL_OUTPUT_LAYOUT.md` when operating local reports/logs
+15. `docs/LOCAL_DATA_BUILD.md` only when operating the local databases
 
 Owner workspace: `D:\prompt-engine`.
 
@@ -172,7 +173,9 @@ The TypeScript foundation now adds:
 
 `packages/ui` now provides the semantic token contract, Paradise/Ash themes and the first React primitives. `packages/motion` centralizes causal motion recipes and reduced-motion behavior.
 
-`apps/studio` is now a responsive React/Vite shell using reviewed exact versions: React/React DOM 19.3.0, Vite 8.3.0 and @vitejs/plugin-react 6.1.1. It intentionally does not invent missing editor content and does not yet add Router, Radix, Motion-for-React, Zustand or TanStack.
+`apps/studio` now stages/loads the owner-local Runtime Pack, validates the bootstrap payload, builds one shared local search index, browses/searches the real 24 Major Genres + 1,564 taxonomy genres, creates/updates Foundation/Fusion/Accent MusicSpec state, and renders the pure compiler live prompt/budget output. It intentionally does not invent missing editor content and still does not add Router, Radix, Motion-for-React, Zustand or TanStack.
+
+Real search benchmark acceptance: 10,348 documents; 92.014 ms index build; median 4.900 ms; P95 10.117 ms; P99/max 14.472 ms. Keep the dependency-free kernel unless later profiling proves a concrete need.
 
 ## Next-thread mission
 
@@ -180,11 +183,11 @@ Treat Database V1 and Runtime Pack v1 as accepted dependencies and move upward i
 
 Recommended order:
 
-1. **Real search benchmark** — run `pnpm bench:search` against `.local-data/current/runtime-v1/search.json`; record index-build and P50/P90/P95/P99/max query latency.
-2. **Runtime Pack -> Studio wiring** — load validated bootstrap data through `@vgine/runtime-data`; do not let React parse raw pack JSON directly.
-3. **Production Genre picker** — major-genre browsing + search + 1–3 Foundation/Fusion/Accent selections backed by stable IDs and shared MusicSpec.
-4. **Compiler preview integration** — MusicSpec -> pure compiler -> live prompt/budget/diagnostics; rendered strings remain output only.
-5. **Search worker integration / editor enrichment** — add Worker transport only if profiling justifies it; parameters/statements/Exclude remain additive Post-V1 work.
+1. **Reusable Picker pattern** — generalize the proven Genre browse/search/bounded-result mechanics without coupling the pattern to genre semantics.
+2. **Instrument-expression repository + picker** — load the detailed expression payload lazily and expose all 6,035 source expressions with stable IDs/search.
+3. **Knowledge detail surfaces** — lazy-load dictionary entries/context only when the UI requests them.
+4. **Project persistence** — add IndexedDB behind the documented ProjectStorage interface; persist MusicSpec, never rendered prompt text as source truth.
+5. **Remaining facets / editor enrichment** — expand controls incrementally; add Radix/Motion-for-React only where a concrete interaction warrants the dependency.
 
 ## Post-V1 enrichment is allowed but is not a blocker
 

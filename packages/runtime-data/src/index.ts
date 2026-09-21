@@ -30,6 +30,13 @@ export interface RuntimeManifest {
   readonly files: Readonly<Record<RuntimePayloadFileName, RuntimeManifestFile>>;
 }
 
+export interface RuntimeMajorGenre {
+  readonly id: string;
+  readonly label: string;
+  readonly source_ordinal: number;
+  readonly knowledge_entry_id: string | null;
+}
+
 export interface RuntimeCoreSection {
   readonly key: string;
   readonly label: string;
@@ -63,7 +70,7 @@ export interface RuntimeRendererProfile {
 
 export interface RuntimeCorePayload {
   readonly schema: "vgine-runtime-core-v1";
-  readonly major_genres: readonly Readonly<Record<string, unknown>>[];
+  readonly major_genres: readonly RuntimeMajorGenre[];
   readonly sections: readonly RuntimeCoreSection[];
   readonly renderer_profiles: readonly RuntimeRendererProfile[];
 }
@@ -276,9 +283,16 @@ export function parseRuntimeCore(value: unknown): RuntimeCorePayload {
   const root = asRecord(value, "core");
   assertSchema(root, "vgine-runtime-core-v1", "core");
 
-  const majorGenres = asArray(root.major_genres, "core.major_genres").map((entry, index) =>
-    asRecord(entry, `core.major_genres[${index}]`),
-  );
+  const majorGenres = asArray(root.major_genres, "core.major_genres").map((entry, index) => {
+    const path = `core.major_genres[${index}]`;
+    const row = asRecord(entry, path);
+    return {
+      id: asString(row.id, `${path}.id`),
+      label: asString(row.label, `${path}.label`),
+      source_ordinal: asInteger(row.source_ordinal, `${path}.source_ordinal`),
+      knowledge_entry_id: asNullableString(row.knowledge_entry_id, `${path}.knowledge_entry_id`),
+    };
+  });
 
   const sections = asArray(root.sections, "core.sections").map((entry, index) => {
     const row = asRecord(entry, `core.sections[${index}]`);

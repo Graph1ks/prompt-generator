@@ -34,7 +34,7 @@ function payloads() {
     "manifest.json": manifest(),
     "core.json": {
       schema: "vgine-runtime-core-v1",
-      major_genres: [{ id: "major:hip-hop", label: "Hip-Hop" }],
+      major_genres: [{ id: "major:hip-hop", label: "Hip-Hop", source_ordinal: 1, knowledge_entry_id: null }],
       sections: [
         {
           key: "genre",
