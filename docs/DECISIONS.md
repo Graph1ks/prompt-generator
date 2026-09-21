@@ -337,3 +337,72 @@ The first legacy mining report generated before semantic curation fingerprints i
 - File-based AI handoff remains practical without weakening local data safety.
 - Ordinary curation does not require manual SQL or copy/paste queues.
 - Reviewed decisions fail closed when their evidence snapshot becomes stale.
+
+
+---
+
+## ADR-016 — Instruments mining is semantic-residual driven, not raw-string driven
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Context
+
+The Instruments corpus contains thousands of unique phrases, but most are compositions of a smaller semantic vocabulary: instrument identity, source type, role, articulation, processing, timbre, density, register, arrangement behavior, and style color.
+
+Exact-string review therefore scales badly. A phrase such as `clean rhythm electric guitar` should not require a new entity when `Electric Guitar`, `Clean`, and `Rhythm` already exist.
+
+Some valid Instruments-section layers are not instruments at all: pads, effects, sweeps, noise, stabs, texture layers, and similar production elements.
+
+### Decision
+
+Mining resolves every Instruments source segment against compiled knowledge using longest-match semantic decomposition.
+
+The report distinguishes:
+
+- `fully_semantic`: every semantic token is explained by curated instruments/concepts;
+- `fully_identity_decomposed`: the segment is fully semantic and includes at least one canonical instrument identity;
+- unresolved residuals: semantic tokens for which curated knowledge is still missing.
+
+The primary review queue contains only unresolved semantic residuals. Fully semantic segments are removed from the review queue even when the original compound source string was never curated verbatim.
+
+Semantic-only layers are valid. They are not converted into fake instrument entities just to satisfy an identity metric.
+
+### Consequences
+
+- Curation scales with semantic vocabulary growth rather than raw phrase count.
+- One concept can resolve hundreds of source variants.
+- Canonical instrument catalogs stay compact while source wording remains recognizable.
+- Advanced Instruments controls can reuse the same concepts through parameter/options.
+- Future Factory growth is measured by new residual semantics, not by new string combinations.
+
+---
+
+## ADR-017 — Instrument ontology decisions may be scoped and compositional
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Context
+
+Large coherent Instruments curation batches need to add more than new instrument identities. They may also add aliases to existing entities, reusable concepts, intrinsic traits, and Advanced parameter dimensions/options. Requiring an unrelated lexicon report in every decision bundle creates artificial coupling.
+
+### Decision
+
+Knowledge decision bundle v2 supports report-scoped review hashes and can transactionally carry:
+
+- instrument families;
+- new canonical instruments;
+- aliases for existing or new instruments;
+- reusable knowledge concepts;
+- instrument-trait relations;
+- parameters;
+- parameter options.
+
+Durable `instrument_trait_patch` state is additive and compiles into the existing `knowledge.instrument_trait` table.
+
+Before applying a bundle, the operator flow validates the reviewed report/source/curation fingerprints and creates a verified curation backup. Additive curation-schema migration occurs only after that backup. Compile/validation failure restores durable curation and attempts recovery compilation.
+
+### Consequences
+
+A single reviewed Instruments batch can materially expand the ontology and its editor controls without manual SQL or chains of tiny apply steps, while retaining the existing local-data safety contract.
