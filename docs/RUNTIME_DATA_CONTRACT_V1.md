@@ -209,7 +209,7 @@ py scripts\data\export_runtime_v1.py `
 
 The exporter writes to `runtime-v1.work`, checkpoints completed payload stages in `state.json`, validates the finished work, then promotes atomically. An existing promoted pack is retained as `runtime-v1.previous` during replacement.
 
-The real DB/source files and generated packs remain ignored local artifacts.
+The real DB/source files and generated packs remain ignored local artifacts. A normal export also writes its machine-readable operation result to `.local-data/current/reports/runtime-export-v1.json`; `--report` is only an override.
 
 ## 8. Validation gates
 
