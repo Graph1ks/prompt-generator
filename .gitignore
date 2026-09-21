@@ -84,3 +84,7 @@ __pycache__/
 
 # Keep intentional placeholders
 !.gitkeep
+
+# Generated Studio runtime pack staging
+apps/studio/public/runtime-v1/
+apps/studio/public/runtime-v1.work/
