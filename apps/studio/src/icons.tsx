@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { ReactNode, SVGProps } from "react";
 
 type IconName =
   | "arrow"
@@ -13,7 +13,7 @@ type IconName =
   | "spark"
   | "theme";
 
-const paths: Readonly<Record<IconName, React.ReactNode>> = {
+const paths: Readonly<Record<IconName, ReactNode>> = {
   arrow: <><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></>,
   back: <><path d="M19 12H5" /><path d="m11 6-6 6 6 6" /></>,
   check: <path d="m5 12 4 4L19 6" />,
