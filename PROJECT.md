@@ -126,9 +126,9 @@ Commercial exploitation of Graph1ks Material is reserved to Graph1ks. The reposi
 
 ### Contribution model
 
-**External contributions accepted?** no by default; only explicitly invited/authorized contributions  
-**Contributor mechanism:** none currently; do not add a CLA unless outside contributions become a real requirement  
-**Why:** solo-dev, owner-controlled project; preserve owner commercial rights and avoid unnecessary contributor-rights complexity
+**External contributions accepted?** no under the current project model  
+**Contributor mechanism:** none currently; if outside code/documentation contributions are ever enabled, define contributor-rights terms before merging any contribution  
+**Why:** solo-dev, owner-controlled project; keep authorship and commercial rights in Graph1ks Material centralized
 
 ## Dependency policy
 
