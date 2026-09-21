@@ -285,6 +285,186 @@ class KnowledgeCurationApplyTests(unittest.TestCase):
                 "swing", {x["normalized"] for x in refreshed["prioritized_terms"]}
             )
 
+    def test_v2_scoped_instrument_bundle_compiles_traits_and_parameters(self):
+        with tempfile.TemporaryDirectory() as td:
+            vault, genres, out = self.setup_local(Path(td))
+            reports = out / "reports" / "knowledge"
+            instrument_path = reports / "instrument-candidates-v1.json"
+            instrument_report = json.loads(instrument_path.read_text(encoding="utf-8"))
+            bundle = {
+                "schema": "promptvgine-knowledge-curation-decisions-v2",
+                "bundle_id": "synthetic-instrument-ontology-v2",
+                "review_id": instrument_report["review_id"],
+                "curation_fingerprint": instrument_report["curation_fingerprint"],
+                "source": {
+                    "prompt_vault_sha256": instrument_report["source"]["prompt_vault"]["sha256"],
+                    "genre_map_sha256": instrument_report["source"]["genre_map"]["sha256"],
+                },
+                "report_sha256": {"instrument": sha(instrument_path)},
+                "instrument_families": [
+                    {"id": "family:electronic", "label": "Electronic", "status": "approved"}
+                ],
+                "instruments": [
+                    {
+                        "id": "instrument:synth-bass",
+                        "label": "Synth Bass",
+                        "label_norm": "synth bass",
+                        "family_id": "family:electronic",
+                        "status": "approved",
+                        "entry": {
+                            "entry_id": "instrument:synth-bass",
+                            "entry_type": "instrument",
+                            "canonical_label": "Synth Bass",
+                            "canonical_slug": "synth-bass",
+                            "status": "approved",
+                            "difficulty": "beginner",
+                            "variants": [
+                                {
+                                    "surface": "synth bass",
+                                    "match_kind": "phrase",
+                                    "match_priority": 200,
+                                    "is_primary": True,
+                                }
+                            ],
+                            "definitions": [
+                                {
+                                    "kind": "one_liner",
+                                    "text": "A synthesizer configured for bass-register parts.",
+                                    "status": "approved",
+                                }
+                            ],
+                            "contexts": [],
+                        },
+                        "aliases": [{"surface": "bass synth"}],
+                    }
+                ],
+                "instrument_aliases": [
+                    {
+                        "instrument_id": "instrument:synth-bass",
+                        "surface": "synth-bass",
+                        "status": "approved",
+                    }
+                ],
+                "concepts": [
+                    {
+                        "entry_id": "concept:synthetic-test",
+                        "entry_type": "source_character",
+                        "canonical_label": "Synthetic Test",
+                        "canonical_slug": "synthetic-test",
+                        "status": "approved",
+                        "difficulty": "beginner",
+                        "variants": [
+                            {
+                                "surface": "synthetic-test",
+                                "match_kind": "word",
+                                "match_priority": 200,
+                                "is_primary": True,
+                            }
+                        ],
+                        "definitions": [
+                            {
+                                "kind": "one_liner",
+                                "text": "Generated primarily through synthesis.",
+                                "status": "approved",
+                            }
+                        ],
+                        "contexts": [],
+                    }
+                ],
+                "instrument_traits": [
+                    {
+                        "instrument_id": "instrument:synth-bass",
+                        "entry_id": "concept:synthetic-test",
+                        "trait_type": "source",
+                        "confidence": 1.0,
+                        "status": "approved",
+                    }
+                ],
+                "parameters": [
+                    {
+                        "id": "parameter:instrument-source-test",
+                        "section_key": "instruments",
+                        "label": "Instrument Source Test",
+                        "canonical_slug": "instrument-source-test",
+                        "value_type": "multi",
+                        "easy_visible": False,
+                        "advanced_visible": True,
+                        "allow_custom_text": False,
+                        "status": "approved",
+                    }
+                ],
+                "parameter_options": [
+                    {
+                        "id": "option:instrument-source-test:synthetic",
+                        "parameter_id": "parameter:instrument-source-test",
+                        "label": "Synthetic",
+                        "canonical_slug": "synthetic",
+                        "output_fragment": "synthetic",
+                        "knowledge_entry_id": "concept:synthetic-test",
+                        "easy_visible": False,
+                        "advanced_visible": True,
+                        "sort_order": 10,
+                        "status": "approved",
+                    }
+                ],
+            }
+            bundle_path = reports / "knowledge-curation-decisions-v2.json"
+            bundle_path.write_text(json.dumps(bundle, indent=2), encoding="utf-8")
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(APPLY),
+                    "apply",
+                    "--out-dir",
+                    str(out),
+                    "--bundle",
+                    str(bundle_path),
+                    "--vault",
+                    str(vault),
+                    "--genre-map",
+                    str(genres),
+                ],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            self.assertIn("parameters 1/1", result.stdout)
+            self.assertIn("traits 1", result.stdout)
+
+            knowledge = sqlite3.connect(out / "knowledge.sqlite")
+            try:
+                self.assertEqual(
+                    knowledge.execute(
+                        "select count(*) from instrument where id='instrument:synth-bass'"
+                    ).fetchone()[0],
+                    1,
+                )
+                self.assertEqual(
+                    knowledge.execute(
+                        "select count(*) from instrument_alias where alias_norm='synth-bass'"
+                    ).fetchone()[0],
+                    1,
+                )
+                self.assertEqual(
+                    knowledge.execute(
+                        """select count(*) from instrument_trait
+                           where instrument_id='instrument:synth-bass'
+                             and entry_id='concept:synthetic-test'"""
+                    ).fetchone()[0],
+                    1,
+                )
+                self.assertEqual(
+                    knowledge.execute(
+                        """select count(*) from parameter_option
+                           where id='option:instrument-source-test:synthetic'
+                             and status='approved'"""
+                    ).fetchone()[0],
+                    1,
+                )
+            finally:
+                knowledge.close()
+
     def test_stale_curation_fingerprint_is_rejected(self):
         with tempfile.TemporaryDirectory() as td:
             vault, genres, out = self.setup_local(Path(td))
