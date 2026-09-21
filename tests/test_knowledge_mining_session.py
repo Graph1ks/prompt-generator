@@ -8,6 +8,10 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts" / "data"))
+
+from instrument_semantics import decompose_surface
+
 BUILDER = ROOT / "scripts" / "data" / "build_local_data.py"
 MINER = ROOT / "scripts" / "data" / "knowledge_mining_session.py"
 
@@ -112,6 +116,76 @@ GENRES = {
 
 
 class KnowledgeMiningSessionTests(unittest.TestCase):
+    def test_shared_head_coordination_resolves_only_reviewed_instrument_phrases(self):
+        def instrument(iid, label):
+            return {
+                "kind": "instrument",
+                "id": iid,
+                "label": label,
+                "role": "identity",
+            }
+
+        phrases = {
+            ("saxophones",): instrument("instrument:saxophone", "Saxophone"),
+            ("alto", "saxophones"): instrument(
+                "instrument:alto-saxophone", "Alto Saxophone"
+            ),
+            ("tenor", "saxophones"): instrument(
+                "instrument:tenor-saxophone", "Tenor Saxophone"
+            ),
+            ("baritone", "saxophones"): instrument(
+                "instrument:baritone-saxophone", "Baritone Saxophone"
+            ),
+        }
+
+        result = decompose_surface(
+            "alto tenor and baritone saxophones",
+            phrases,
+            {},
+        )
+        self.assertEqual(result["residual_tokens"], [])
+        self.assertEqual(
+            result["instrument_ids"],
+            [
+                "instrument:alto-saxophone",
+                "instrument:tenor-saxophone",
+                "instrument:baritone-saxophone",
+            ],
+        )
+        self.assertTrue(result["fully_identity_decomposed"])
+        inferred = [
+            match
+            for match in result["matches"]
+            if match.get("inference") == "coordinated_shared_head"
+        ]
+        self.assertEqual(
+            [match["surface"] for match in inferred],
+            ["alto saxophones", "tenor saxophones"],
+        )
+
+    def test_shared_head_coordination_does_not_invent_unknown_identity(self):
+        def instrument(iid, label):
+            return {
+                "kind": "instrument",
+                "id": iid,
+                "label": label,
+                "role": "identity",
+            }
+
+        phrases = {
+            ("saxophones",): instrument("instrument:saxophone", "Saxophone"),
+            ("baritone", "saxophones"): instrument(
+                "instrument:baritone-saxophone", "Baritone Saxophone"
+            ),
+        }
+        result = decompose_surface(
+            "warm and baritone saxophones",
+            phrases,
+            {},
+        )
+        self.assertEqual(result["instrument_ids"], ["instrument:baritone-saxophone"])
+        self.assertEqual(result["residual_tokens"], ["warm"])
+        self.assertFalse(result["fully_semantic"])
     def setup_local(self, tmp: Path):
         vault = tmp / "vault.json.gz"
         genres = tmp / "genres.json"
