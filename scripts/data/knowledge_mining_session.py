@@ -42,7 +42,7 @@ INTERNAL_SCAFFOLD = {"with","by","to","from","into","via"}
 CURATION_HASH_TABLES = [
     "entry_patch","term_variant_patch","definition_patch","context_definition_patch",
     "relation_patch","genre_crosswalk_decision","instrument_family_patch","instrument_patch",
-    "instrument_alias_patch","parameter_patch","parameter_option_patch","statement_patch",
+    "instrument_alias_patch","instrument_trait_patch","parameter_patch","parameter_option_patch","statement_patch",
     "statement_concept_patch","statement_option_patch","candidate_review",
 ]
 
