@@ -1,6 +1,6 @@
 # Prompt V'gine — Local Data Architecture
 
-**Status:** v2 data foundation  
+**Status:** **Database V1 complete**; architecture retained for runtime/product work  
 **Hard rule:** raw factories, generated databases, generated indexes, and compiled runtime data stay local and are not committed to GitHub.
 
 ## 1. Why this is split from application source
@@ -29,6 +29,10 @@ Local-only:
 - local curation backups;
 - runtime SQLite/JSON/search bundles;
 - generated corpus reports and intermediate indexes.
+
+## Canonical Database V1 inventory
+
+For the completed milestone, exact table purposes, V1 completion counts, hard invariants and next-thread boundary are documented in **`docs/DATABASE_V1.md`**. This architecture document explains lifecycle/design; `DATABASE_V1.md` is the concise operational/table map.
 
 ## 2. Data products
 

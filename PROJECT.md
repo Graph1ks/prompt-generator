@@ -5,7 +5,7 @@
 **Name:** Graph1ks Prompt V'gine  
 **One-line purpose:** A visual music-specification editor and knowledge-rich prompt compiler for building precise Suno prompts without requiring users to already speak producer jargon.  
 **Primary users:** Suno users from beginners through advanced musicians/producers.  
-**Project stage:** prototype / architecture foundation  
+**Project stage:** Database V1 complete; runtime/compiler + application implementation  
 **Target platforms:** web/PWA, Windows/macOS/Linux desktop via Tauri or equivalent lightweight web-native shell, self-hosted/static server deployment  
 **Versioning/release model:** SemVer  
 **Changelog:** enabled
@@ -180,6 +180,7 @@ Operational current state lives in `STATUS.md`. Detailed continuation context li
 Important durable design documents:
 
 - `docs/PRODUCT_UX_FOUNDATION.md`
+- `docs/DATABASE_V1.md`
 - `docs/DATA_ARCHITECTURE.md`
 - `docs/KNOWLEDGE_LAYER.md`
 - `docs/PROMPT_CORPUS_PROFILE.md`
@@ -188,7 +189,10 @@ Important durable design documents:
 
 ## Current priorities
 
-1. Continue from the completed local genre crosswalk with report-driven instrument and lexicon mining/curation.
-2. Curate instruments, descriptors, parameters, reusable statements, and dictionary entries without promoting raw frequency directly to product truth.
-3. Implement the documented MusicSpec/compiler contracts in TypeScript.
+Database V1 is complete for the current Factory snapshot. Current priorities are now:
+
+1. Define/compile the runtime data contract/shards from `knowledge.sqlite` for web/native/server consumption.
+2. Implement the documented MusicSpec -> `suno-structured-v1` compiler in TypeScript, including deterministic semantic enforcement of the 1,000-character budget.
+3. Wire compiled genre, instrument-expression and dictionary/search data into the application.
 4. Build the first production-quality Easy/Advanced editor and inline knowledge interaction on top of the stable semantic model.
+5. Continue Vocal/statements/parameters/definitions as additive Post-V1 enrichment, not as a reason to reopen the completed database milestone.

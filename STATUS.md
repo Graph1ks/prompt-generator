@@ -1,74 +1,106 @@
 # Project Status
 
-**Last updated:** 2026-09-21
-**Current phase/milestone:** database-first Instruments foundation complete; acceptance-gated semantic completion tooling ready
+**Last updated:** 2026-09-21  
+**Current milestone:** **Database V1 complete** — move to runtime/compiler/product implementation
 
-## Current objective
+## Completion verdict
 
-Make the database complete before UI/runtime work: preserve every source-backed Instruments phrase as a first-class selectable expression while also linking canonical instrument identity and reusable playing/processing/arrangement semantics underneath it.
+Database V1 is complete as Prompt V'gine's reproducible data foundation.
 
-## Current state
+The Instruments semantic-completion phase is closed for the current Factory snapshot: every source-backed Instruments expression is preserved as a first-class selectable/renderable entity and every one is fully semantically explained. Remaining identity-only gaps are not errors; semantic-only sound layers are valid by design.
 
-- Owner-local Windows workspace: `D:\prompt-engine`.
-- Real Factory files and generated databases/reports remain local-only.
-- Validated evidence baseline: 10,043 tracks, 115,736 sections, 852,459 tokens, 24 Major Genres, 1,564 taxonomy genres.
-- Genre crosswalk is complete locally: 138 decisions applied and 0 unresolved genre candidates remain.
-- Current Factory evidence contains 6,035 unique comma/semicolon-delimited Instruments expressions.
-- The database contract now requires **all source Instruments expressions** to be materialized into `knowledge.instrument_expression`, remain `selectable=1`, and preserve their original render/output wording.
-- Compound expressions such as `clean electric guitar`, `muted trumpet`, `restrained strings`, `programmed drums`, `warm pad`, etc. are **not discarded**. They are product-level options describing how an instrument/layer is played, voiced, processed, or arranged.
-- Canonical instrument identity remains a second layer for grouping/search/explanation. Expression decomposition is additive metadata only.
-- `instrument_expression_instrument` links source expressions to resolved canonical instrument identities.
-- `instrument_expression_concept` links the same expression to reusable playing/processing/role/timbre/etc. concepts.
-- Expressions can be `identity`, `semantic`, `partial`, or `unresolved`; none of those states removes a source-backed expression from the selectable database.
-- Instrument decomposition now supports conservative coordinated shared-head inference: e.g. `tenor and baritone saxophones` may resolve both identities only when the shared head and each reconstructed phrase already exist in the reviewed instrument lexicon. It never invents a new identity from coordination.
-- Unresolved hyphen compounds now get a guarded second pass: exact de-hyphenated reviewed phrases may match directly, or their components may compose only when every component is already semantically known and at most one canonical instrument identity would result.\n- Instrument tokenization now preserves Unicode words, normalizes apostrophes/dotted acronyms deterministically, and suppresses only explicitly reviewed grammar/count scaffolding from residual semantics.
-- Residual-only mining applies only to **future semantic curation review**, not to product availability. Fully understood expressions leave the review queue but stay in `knowledge.sqlite`.\n- The source Factory establishes a hard 1,000-character `structured_prompt` ceiling: all 10,043 current prompts comply (median 716, P90 898, P95 936, P99 982, max 1,000). `suno-structured-v1` now carries this hard budget plus source-derived P90 soft targets per section.
-- Instrument ontology v2 also supports durable `instrument_trait_patch`, scoped decision bundles, aliases, Advanced instrument parameters/options, and compiled instrument traits.
-- Build revision is now `promptvgine-local-data-build-v2-resumable-3-prompt-budget`.
-- Completed old checkpoints can advance to the new compiler revision without rebuilding the corpus or deleting durable curation.
-- `database_foundation_session.py finalize` runs build/recompile + validation + mining refresh + acceptance reporting as one solo-dev phase and keeps verbose subprocess output in report files.
-- Knowledge apply remains backup-first, hash/fingerprint-bound, transactional, automatically recompiled/validated, rollback-safe, and report-refreshing.
-- `knowledge_completion_session.py prepare` is the next repository-side database phase: it refuses to run until the owner-local database acceptance is `ok`, uses acceptance as the immutable foundation/source-inventory gate, validates the fresh decomposition export against itself, allows legitimate semantic coverage to advance after curation, snapshots the current canonical instrument/family/alias identity catalog into the hash-bound plan, writes SHA-addressed residual-semantic review batches, and generates a v2 decision template without mutating curation or changing the source-expression catalog. When residual coverage reaches zero it now emits `status: complete`, zero batches, and a terminal completion action instead of suggesting further review.
+## Last owner-local completion snapshot
 
-## Last verified checks
+- Factory tracks: **10,043**
+- Parsed structured-prompt sections: **115,736**
+- Structured-prompt tokens: **852,459**
+- Major Genres: **24**
+- Taxonomy genres/subgenres: **1,564**
+- Genre crosswalk: **138 reviewed decisions, 0 unresolved candidates**
+- Source-backed Instruments expressions: **6,035**
+- Fully semantic Instruments expressions: **6,035 / 6,035 (100%)**
+- Semantic residual expressions: **0**
+- Fully identity-decomposed expressions: **4,472 / 6,035 (~74.1%)**
+- Canonical instrument families: **9**
+- Canonical instrument entities: **164**
+- Active instrument aliases: **161**
 
-- GitHub Actions `validate` passes on the complete source-expression materialization implementation.
-- Synthetic build tests require every source Instruments expression to exist in `knowledge.sqlite`, be selectable, and preserve exact output text.
-- Synthetic knowledge-c​​uration tests verify that a compound expression such as `clean rhythm electric guitar` remains selectable while linking Electric Guitar + Clean + Rhythm semantics.
-- Synthetic v2 scoped apply covers instrument aliases, traits, parameters/options, compile, and validation.
-- Synthetic mining covers semantic-vs-identity decomposition reports, reviewed shared-head coordination, guarded hyphen decomposition, negative non-inference cases, and explicit grammar-scaffolding suppression.
-- Synthetic revision-upgrade coverage verifies a completed older checkpoint can recompile knowledge without rebuilding the promoted corpus.
-- Bundled database-finalization coverage verifies one concise terminal summary plus detailed report/log files.
-- Semantic-completion planner coverage verifies successful acceptance produces deterministic bounded batches, failed acceptance/stale decomposition fail closed, post-acceptance semantic progress is accepted and reported as baseline-vs-current deltas, the current canonical instrument/family/alias catalog is captured for identity review, durable curation bytes remain unchanged, and completion-plan hashes are accepted as first-class v2 review bindings.
+`fully_identity_decomposed` is intentionally stricter than semantic completion. Do not invent fake identities merely to raise that metric.
+
+## Database layout
+
+Prompt V'gine uses three local SQLite products:
+
+1. `corpus.sqlite` — disposable Factory evidence/mining database;
+2. `curation.sqlite` — **durable** reviewed authoring/curation state; never replace during normal rebuilds;
+3. `knowledge.sqlite` — disposable compiled product knowledge/runtime source.
+
+The canonical table-by-table overview and invariants live in **`docs/DATABASE_V1.md`**.
+
+## Completed V1 guarantees
+
+- All 6,035 source Instruments expressions are materialized and remain selectable.
+- Original source-facing expression/output wording is preserved.
+- Canonical identities + semantic concepts are additive metadata only.
+- Genre crosswalk is complete for the current snapshot.
+- Instruments semantic residual queue is empty.
+- Shared-head coordination, guarded hyphen decomposition, Unicode/apostrophe/acronym tokenization, and explicit grammar scaffolding are covered by synthetic regression tests.
+- Durable curation is backup-first, fingerprint/hash-bound, transactional, recompiled/validated automatically, and rollback-safe.
+- Long-running builds are resumable and preserve last-known-good promoted artifacts.
+- `suno-structured-v1` has a hard **1,000-character** style-prompt ceiling; current Factory maximum is exactly 1,000 and no source prompt exceeds it.
+- Exclude remains a separate output channel and does not consume the style-prompt budget.
+
+## Current build/compiler revision
+
+`promptvgine-local-data-build-v2-resumable-3-prompt-budget`
+
+Current repository-side database tooling is complete for V1. If the owner-local generated DBs have not yet been recompiled after the latest renderer-budget/schema merge, run the bundled finalizer once. That is synchronization/final validation, **not another curation phase**.
+
+## Owner-local final synchronization
+
+```powershell
+Set-Location D:\prompt-engine
+git pull
+
+py scripts\data\database_foundation_session.py finalize `
+  --out-dir ".local-data\current" `
+  --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" `
+  --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json"
+```
+
+Expected result: acceptance remains `status: ok`; the compiled knowledge DB is stamped with the latest build/renderer contract. No further `knowledge_completion_session.py` review batches are expected for the current snapshot.
 
 ## Current blocker
 
-Repository-side database foundation has no blocker. The real owner-local databases still need one bundled finalization run after merge because GitHub intentionally does not contain the real Factory/database files.
+**None in Database V1.**
 
-## Next concrete action
+Future enrichment does not reopen the V1 database milestone unless it changes schema/invariants. Vocal knowledge, Easy statements, Advanced parameters/options, definitions/relations, runtime bundles, compiler code, and UI integration are Post-V1 additive work.
 
-Owner pulls current `main` and runs the bundled database finalizer from `docs/LOCAL_DATA_BUILD.md`. Only when `reports/database/database-foundation-acceptance-v1.json` reports `status: ok`, run `knowledge_completion_session.py prepare`; review its bounded residual-semantic batches and encode accepted additive ontology/concept decisions through the existing v2 curation workflow.
+## Next concrete phase
+
+Proceed to runtime/compiler implementation:
+
+1. compile/export the stable knowledge model into the runtime shape needed by web/native/server;
+2. implement deterministic MusicSpec -> `suno-structured-v1` rendering with the 1,000-character semantic budget;
+3. wire search/dictionary/genre/instrument-expression data into the application;
+4. build Easy/Advanced editing surfaces on the shared MusicSpec state.
 
 ## Do not redo
 
-- Do not upload Factory/generated DB/report data to GitHub.
-- Do not delete durable `curation.sqlite`.
-- Do not use the retired `--force` workflow.
 - Do not redo the completed genre crosswalk.
-- Do not collapse 6,035 source expressions into only a small canonical-instrument list.
-- Do not call compound playing/processing expressions disposable “pseudo instruments”.
-- Do not remove fully-semantic expressions from the product database; only remove them from further semantic-review queues.
-- Do not treat corpus frequency as automatic musical truth.
+- Do not reopen the 6,035-expression semantic review merely because identity coverage is below 100%.
+- Do not collapse source expressions into the canonical-instrument list.
+- Do not remove semantic-only sound layers.
+- Do not delete/replace durable `curation.sqlite`.
+- Do not commit Factory/generated DB/report/backup artifacts.
+- Do not promote corpus frequency to semantic truth.
+- Do not implement the 1,000-character limit as blind `prompt[:1000]` truncation.
 
-## Important context
+## Canonical continuation docs
 
-The database is deliberately two-layered:
-
-1. **instrument expression** = the actual selectable/renderable source phrase;
-2. **canonical instrument + semantic concepts** = structured meaning underneath that phrase.
-
-This preserves the full source vocabulary while still enabling clean search, dictionary explanations, Advanced controls, relations, and future recombination.
-
-The semantic-completion planner operates only on review work. It does not remove fully understood expressions, demote unresolved expressions, or make frequency-based semantic decisions.
-
-For the owner-local finalization and completion commands read `docs/LOCAL_DATA_BUILD.md`.
+- `docs/DATABASE_V1.md` — completed DB structure/table map/invariants
+- `docs/HANDOVER.md` — next-thread handoff
+- `docs/DATA_ARCHITECTURE.md` — lifecycle/architecture
+- `docs/LOCAL_DATA_BUILD.md` — owner-local build/finalization commands
+- `docs/MUSICSPEC_V1.md` — application semantic state
+- `docs/PROMPT_FORMAT.md` — renderer contract
