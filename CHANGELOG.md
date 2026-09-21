@@ -18,6 +18,7 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Added a self-contained noncommercial source license, commercial-rights policy, copyright notice, licensing map, third-party notice ledger, and data-source redistribution boundary.
 - Added resumable v2 local build state, staged work artifacts, source/build fingerprinting, read-only plan/status commands, safe pause/resume, stale-checkpoint rejection, and loss-safe promotion.
 - Added bundled report-driven genre curation: automatic backup, full JSON/CSV review export, decision-bundle freshness/target validation, transactional apply, automatic knowledge recompile/validation, rollback on failure, receipts, and refreshed reports.
+- Added bundled instrument/lexicon mining reports with curation-aware filtering, instrument segment/head-token evidence, section-aware term/phrase evidence, source examples, full CSV exports, automatic local curation backup, and concise terminal output.
 
 ### Changed
 
