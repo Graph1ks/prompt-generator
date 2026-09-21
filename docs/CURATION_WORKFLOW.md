@@ -4,7 +4,21 @@
 
 Prompt V'gine separates *evidence* from *accepted knowledge*. The corpus may suggest useful language; the curation DB records the deliberate decisions that the product may later expose.
 
-## 1. Before curation
+## 1. Preferred solo-dev workflow
+
+For routine curation, use the bundled report/apply workflow instead of manual query-by-query terminal inspection.
+
+Prepare the full review package:
+
+```powershell
+py scripts\data\curation_session.py prepare --out-dir ".local-data\current"
+```
+
+Upload/review `reports/curation/genre-crosswalk-review-v1.json`. A reviewed `genre-crosswalk-decisions-v1.json` can then be applied transactionally with `curation_session.py apply`, which backs up curation, recompiles knowledge, validates, rolls back on failure, and refreshes reports.
+
+The lower-level commands below remain expert/debug tools.
+
+## 2. Before manual curation
 
 Build and validate:
 
@@ -18,7 +32,7 @@ python scripts/data/validate_local_data.py --dir .local-data/current
 python scripts/data/backup_curation.py --source .local-data/current/curation.sqlite
 ```
 
-## 2. Evidence first
+## 3. Evidence first
 
 Use `query_corpus.py` before writing a concept.
 
@@ -34,7 +48,7 @@ python scripts/data/query_corpus.py --db .local-data/current/corpus.sqlite candi
 
 Frequency is evidence, not approval. Grammatical fragments such as `kick and` can be frequent while being useless as product concepts.
 
-## 3. Knowledge entry
+## 4. Knowledge entry
 
 A new semantic concept starts in `entry_patch`.
 
@@ -50,7 +64,7 @@ difficulty:      beginner
 
 Stable IDs should describe the concept rather than a temporary sentence. Once a stable ID is used in projects/relations, rename the display label rather than replacing the ID.
 
-## 4. Inline dictionary variants
+## 5. Inline dictionary variants
 
 `term_variant_patch` connects visible words/phrases to an entry.
 
@@ -64,7 +78,7 @@ Longest phrase matching wins in the future UI, so a specific phrase such as `Dar
 
 Term variants are locale-aware.
 
-## 5. Definitions
+## 6. Definitions
 
 Definitions are layered.
 
@@ -88,7 +102,7 @@ Definitions are layered.
 
 Do not explain one unknown term using several equally unknown terms. If specialist terminology is necessary, those words should themselves become dictionary concepts.
 
-## 6. Current-project explanation
+## 7. Current-project explanation
 
 Do **not** store every possible “what this means in your song” sentence in the DB.
 
@@ -102,7 +116,7 @@ That third explanation layer is generated later from:
 
 Static curation supplies the trustworthy building blocks.
 
-## 7. Genre crosswalk decisions
+## 8. Genre crosswalk decisions
 
 The first real build seeds unresolved Vault genre labels into `candidate_review`.
 
@@ -120,7 +134,7 @@ A composite can use multiple rows with the same `source_norm` and different `ord
 
 Do not turn `Pop Soul` into `Pop` simply because string matching finds one word.
 
-## 8. Instruments
+## 9. Instruments
 
 Instrument identity is separate from how it is played/processed.
 
@@ -132,7 +146,7 @@ Curate separately:
 
 Then model descriptors such as attack, sustain, register, articulation, saturation, width, and role as concepts/options—not as part of the instrument name.
 
-## 9. Advanced parameters/options
+## 10. Advanced parameters/options
 
 `parameter_patch` defines a controllable musical dimension assigned to one prompt section.
 
@@ -160,7 +174,7 @@ No user-facing fake percentages are required unless a real numeric value has mus
 
 Candidate parameters are not compiled as active controls until reviewed/approved.
 
-## 10. Easy statements
+## 11. Easy statements
 
 `statement_patch` contains reviewed phrases/combinations for Easy mode.
 
@@ -177,7 +191,7 @@ A statement can link to concepts/options through:
 
 This is what keeps Easy and Advanced reversible views of the same semantic state instead of two unrelated prompt systems.
 
-## 11. Rebuild after curation
+## 12. Rebuild after curation
 
 After changing `curation.sqlite`, rerun the normal builder command. The v2 builder detects the curation fingerprint change, keeps the corpus, and recompiles the affected knowledge stages.
 
@@ -192,7 +206,7 @@ The builder:
 
 Then validate again.
 
-## 12. Status discipline
+## 13. Status discipline
 
 Use curation statuses deliberately:
 
