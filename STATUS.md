@@ -77,6 +77,7 @@ Expected result: acceptance remains `status: ok`; the compiled knowledge DB is s
 - `scripts/data/export_runtime_v1.py` compiles deterministic runtime payloads from `knowledge.sqlite` with plan/status, resumable staged work, stale-source rejection, validation, atomic promotion and previous-pack retention.
 - Synthetic tests cover lossless source-expression export, no-op reruns, stale-work recovery and last-known-good retention.
 - No UI/runtime third-party packages have been installed yet; dependency versions/licenses remain gated until the TypeScript application scaffold.
+- Local operator outputs are standardized: flat `reports/`, separate `logs/`, durable `.local-data/backups/`; legacy nested report folders have a safe plan/apply migrator.
 
 ## Current blocker
 
@@ -114,3 +115,4 @@ Proceed in this order:
 - `docs/PROMPT_FORMAT.md` — renderer contract
 - `docs/RUNTIME_DATA_CONTRACT_V1.md` — compiled application data boundary
 - `docs/APPLICATION_ARCHITECTURE.md` — production stack, module/design/motion architecture
+- `docs/LOCAL_OUTPUT_LAYOUT.md` — canonical local reports/logs/backups layout
