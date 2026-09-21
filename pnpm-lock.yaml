@@ -14,12 +14,21 @@ importers:
 
   apps/studio:
     dependencies:
+      '@vgine/compiler':
+        specifier: workspace:*
+        version: link:../../packages/compiler
       '@vgine/motion':
         specifier: workspace:*
         version: link:../../packages/motion
       '@vgine/music-spec':
         specifier: workspace:*
         version: link:../../packages/music-spec
+      '@vgine/runtime-data':
+        specifier: workspace:*
+        version: link:../../packages/runtime-data
+      '@vgine/search':
+        specifier: workspace:*
+        version: link:../../packages/search
       '@vgine/ui':
         specifier: workspace:*
         version: link:../../packages/ui
