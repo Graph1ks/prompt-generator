@@ -322,21 +322,50 @@ def prepare(args) -> int:
 
     fully_semantic = [row for row in rows if row["fully_semantic"]]
     residual = [row for row in rows if not row["fully_semantic"]]
-    expected_fully_semantic = (
+    fully_identity_decomposed = [
+        row for row in rows if row["fully_identity_decomposed"]
+    ]
+    try:
+        reported_fully_semantic = int(decomposition.get("fully_semantic_unique"))
+        reported_fully_identity = int(
+            decomposition.get("fully_identity_decomposed_unique")
+        )
+    except (TypeError, ValueError) as exc:
+        raise SystemExit(
+            "decomposition report has invalid current semantic/identity counts"
+        ) from exc
+    if reported_fully_semantic != len(fully_semantic):
+        raise SystemExit(
+            "current decomposition JSON/CSV fully-semantic counts do not match"
+        )
+    if reported_fully_identity != len(fully_identity_decomposed):
+        raise SystemExit(
+            "current decomposition JSON/CSV identity-decomposition counts do not match"
+        )
+    if len(fully_semantic) + len(residual) != expected:
+        raise SystemExit(
+            "current decomposition semantic partition does not match accepted source count"
+        )
+
+    # The acceptance report is a foundation snapshot. Durable additive curation is
+    # expected to advance semantic coverage after that snapshot, so its old
+    # identity/semantic/partial/unresolved distribution must not gate current
+    # decomposition. Only immutable source/selectability foundation invariants are
+    # reconciled against acceptance; semantic progress is measured against it.
+    acceptance_fully_semantic = (
         accepted["states"]["identity"] + accepted["states"]["semantic"]
     )
-    if len(fully_semantic) != expected_fully_semantic:
-        raise SystemExit(
-            "full decomposition semantic count does not match accepted identity+semantic states"
-        )
-    if len(residual) != accepted["semantic_residual"]:
-        raise SystemExit(
-            "full decomposition residual count does not match accepted partial+unresolved count"
-        )
+    semantic_progress = {
+        "acceptance_fully_semantic_expressions": acceptance_fully_semantic,
+        "acceptance_semantic_residual_expressions": accepted["semantic_residual"],
+        "fully_semantic_delta": len(fully_semantic) - acceptance_fully_semantic,
+        "semantic_residual_delta": len(residual) - accepted["semantic_residual"],
+    }
+
     missing_residual = [row["surface"] for row in residual if not row["residual_tokens"]]
     if missing_residual:
         raise SystemExit(
-            "partial/unresolved decomposition rows must carry residual tokens; "
+            "semantic-residual decomposition rows must carry residual tokens; "
             f"examples: {missing_residual[:5]}"
         )
 
@@ -416,7 +445,12 @@ def prepare(args) -> int:
             "source_instrument_expressions": expected,
             "fully_semantic_expressions": len(fully_semantic),
             "semantic_residual_expressions": len(residual),
+            "current_fully_identity_decomposed_expressions": len(
+                fully_identity_decomposed
+            ),
             "decomposition_states": accepted["states"],
+            "decomposition_states_source": "acceptance_baseline",
+            "semantic_progress_since_acceptance": semantic_progress,
             "residual_token_groups": len(groups),
             "batch_size": args.batch_size,
             "batch_count": batch_count,
@@ -426,6 +460,7 @@ def prepare(args) -> int:
             "source_expression_inventory_unchanged": True,
             "curation_mutated": False,
             "canonical_identity_and_concepts_are_additive_metadata": True,
+            "semantic_coverage_may_advance_after_acceptance": True,
             "frequency_is_review_priority_evidence_only": True,
         },
         "top_residual_token_groups": groups[:100],
