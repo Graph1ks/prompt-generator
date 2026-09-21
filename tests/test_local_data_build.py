@@ -360,6 +360,16 @@ class LocalDataBuildTests(unittest.TestCase):
             finally:
                 state.close()
 
+            knowledge = sqlite3.connect(out / "knowledge.sqlite")
+            try:
+                knowledge.execute(
+                    "update build_meta set value=? where key='build_revision'",
+                    ("promptvgine-local-data-build-v2-resumable-1",),
+                )
+                knowledge.commit()
+            finally:
+                knowledge.close()
+
             _, result = self.run_builder(tmp)
             self.assertEqual(
                 result.returncode,
