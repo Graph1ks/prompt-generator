@@ -29,7 +29,7 @@ VAULT = {
             "key": "C minor",
             "reference_artist": None,
             "reference_song": None,
-            "structured_prompt": "[Genre: Boom Bap]\n[BPM: 90]\n[Key/Mode: C minor]\n[Groove: laid-back swing, firm backbeat]\n[Drums: dry snare, rounded kick]\n[Bass: warm electric bass, short attack]\n[Space/Mix: dry center, controlled low end]",
+            "structured_prompt": "[Genre: Boom Bap]\n[BPM: 90]\n[Key/Mode: C minor]\n[Groove: laid-back swing, firm backbeat]\n[Drums: dry snare, rounded kick]\n[Bass: warm electric bass, short attack]\n[Instruments: electric guitar, clean rhythm guitar, piano]\n[Space/Mix: dry center, controlled low end]",
             "negative_prompt": "vocals, huge reverb",
             "instrumental_arrangement": "[Intro: four bars]",
             "used": True,
@@ -46,7 +46,7 @@ VAULT = {
             "key": "D minor",
             "reference_artist": None,
             "reference_song": None,
-            "structured_prompt": "[Genre: Dark Jazz]\n[Era: modern studio production]\n[BPM: 76]\n[Key/Mode: D minor]\n[Melody: muted trumpet carries a short motif]\n[Harmony: suspended minor harmony]\n[Texture: subtle tape grit]\n[Production: softened transients]",
+            "structured_prompt": "[Genre: Dark Jazz]\n[Era: modern studio production]\n[BPM: 76]\n[Key/Mode: D minor]\n[Melody: muted trumpet carries a short motif]\n[Harmony: suspended minor harmony]\n[Instruments: muted trumpet, restrained strings, warm pad]\n[Texture: subtle tape grit]\n[Production: softened transients]",
             "negative_prompt": "bright supersaws, trap hats",
             "instrumental_arrangement": "[Intro: four bars]",
             "used": False,
@@ -109,6 +109,18 @@ class LocalDataBuildTests(unittest.TestCase):
                 self.assertEqual(c.execute("select count(*) from track").fetchone()[0], 2)
                 self.assertEqual(c.execute("select count(*) from token_occurrence").fetchone()[0] > 0, True)
                 self.assertEqual(k.execute("select count(*) from genre").fetchone()[0], 2)
+                self.assertEqual(
+                    k.execute("select count(*) from instrument_expression").fetchone()[0],
+                    6,
+                )
+                self.assertEqual(
+                    k.execute("select count(*) from instrument_expression where selectable=1 and status='source'").fetchone()[0],
+                    6,
+                )
+                self.assertEqual(
+                    k.execute("select output_text from instrument_expression where label_norm='clean rhythm guitar'").fetchone()[0],
+                    "clean rhythm guitar",
+                )
                 self.assertEqual(
                     k.execute("select count(*) from prompt_section_definition where lower(output_label)='exclude'").fetchone()[0],
                     0,
@@ -293,7 +305,7 @@ class LocalDataBuildTests(unittest.TestCase):
                 self.assertEqual(c.execute("select count(*) from track").fetchone()[0], 2)
                 self.assertEqual(
                     k.execute("select value from build_meta where key='build_revision'").fetchone()[0],
-                    "promptvgine-local-data-build-v2-resumable-1",
+                    "promptvgine-local-data-build-v2-resumable-2-instrument-expressions",
                 )
             finally:
                 c.close()
