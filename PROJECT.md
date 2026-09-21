@@ -5,7 +5,7 @@
 **Name:** Graph1ks Prompt V'gine  
 **One-line purpose:** A visual music-specification editor and knowledge-rich prompt compiler for building precise Suno prompts without requiring users to already speak producer jargon.  
 **Primary users:** Suno users from beginners through advanced musicians/producers.  
-**Project stage:** prototype / architecture foundation  
+**Project stage:** Database V1 complete; runtime/compiler + application implementation  
 **Target platforms:** web/PWA, Windows/macOS/Linux desktop via Tauri or equivalent lightweight web-native shell, self-hosted/static server deployment  
 **Versioning/release model:** SemVer  
 **Changelog:** enabled
@@ -180,7 +180,7 @@ Operational current state lives in `STATUS.md`. Detailed continuation context li
 Important durable design documents:
 
 - `docs/PRODUCT_UX_FOUNDATION.md`
-- `docs/DATA_ARCHITECTURE.md`
+- `docs/DATABASE_V1.md`\n- `docs/DATA_ARCHITECTURE.md`
 - `docs/KNOWLEDGE_LAYER.md`
 - `docs/PROMPT_CORPUS_PROFILE.md`
 - `docs/LOCAL_DATA_BUILD.md`
