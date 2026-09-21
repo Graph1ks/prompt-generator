@@ -486,3 +486,50 @@ The current Factory snapshot contains 6,035 unique source Instruments expression
 - Semantic curation can scale through reusable concepts without shrinking the selectable option space.
 - Residual-only mining reduces **review work**, not the database catalog.
 - Future UI/runtime work can search/browse full expressions while still exposing structured instrument identity and semantic metadata.
+
+---
+
+## ADR-019 — Database V1 closes at full semantic coverage, not 100% identity coverage
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Context
+
+The current Factory contains 6,035 first-class Instruments expressions. Semantic completion reached 6,035 / 6,035 with zero residuals, while 4,472 expressions are fully identity-decomposed. Some valid sound layers are semantic-only and do not represent a physical/canonical instrument identity.
+
+### Decision
+
+Declare Database V1 complete when the source inventory is losslessly materialized/selectable, genre crosswalk is complete, semantic residuals are zero, build/curation/validation invariants pass, and the renderer/database contracts are fixed.
+
+Do **not** require 100% canonical identity coverage. Semantic-only expressions are valid product data and must not be forced into fabricated identities.
+
+### Consequences
+
+- Database V1 is an accepted dependency for runtime/compiler/UI work.
+- Future Vocal/statements/parameters/definitions/relations enrichment is additive Post-V1 work.
+- A future database milestone is justified by schema/invariant changes or new source requirements, not ordinary enrichment.
+- `docs/DATABASE_V1.md` is the canonical table/role/invariant overview.
+
+---
+
+## ADR-020 — Suno structured-v1 uses a hard 1,000-character semantic budget
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Context
+
+All 10,043 Factory `structured_prompt` values are <=1,000 characters; the observed maximum is exactly 1,000. The source distribution and per-section P90 lengths indicate intentional budgeting rather than mid-string truncation.
+
+### Decision
+
+`suno-structured-v1` has `max_characters=1000`. The renderer must budget/compact semantics before final serialization, preserve complete bracketed sections, keep Exclude separate, and never implement overflow as blind final-string slicing.
+
+Explicit/locked user intent must not be silently discarded only to satisfy the limit; impossible protected-content combinations require a diagnostic/user choice.
+
+### Consequences
+
+- Factory preflight/validation rejects source prompts above 1,000 characters.
+- Renderer configuration carries the hard global limit and source-derived soft per-section targets.
+- Runtime/compiler/UI work must expose/manage the same budget contract.
