@@ -18,10 +18,10 @@ from knowledge_mining_session import sha256_file
 class KnowledgeCompletionSessionTests(unittest.TestCase):
     def write_fixture(self, root: Path):
         out = root / "out"
-        database = out / "reports" / "database"
-        knowledge = out / "reports" / "knowledge"
-        database.mkdir(parents=True)
-        knowledge.mkdir(parents=True)
+        reports = out / "reports"
+        reports.mkdir(parents=True)
+        database = reports
+        knowledge = reports
         acceptance = {
             "schema": "promptvgine-database-foundation-acceptance-v1",
             "status": "ok",
@@ -62,9 +62,9 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
             "fully_semantic_unique": 2,
             "fully_identity_decomposed_unique": 1,
         }
-        decomposition_path = knowledge / "instrument-decomposition-v1.json"
+        decomposition_path = knowledge / "knowledge-instrument-decomposition-v1.json"
         decomposition_path.write_text(json.dumps(decomposition, indent=2), encoding="utf-8")
-        csv_path = knowledge / "instrument-decomposition-full-v1.csv"
+        csv_path = knowledge / "knowledge-instrument-decomposition-full-v1.csv"
         rows = [
             {
                 "candidate_id": "instrument-segment:1",
@@ -219,7 +219,7 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
             self.assertIn("[knowledge-completion] prepared", result.stdout)
             self.assertEqual(curation.read_bytes(), before)
 
-            reports = out / "reports" / "knowledge-completion"
+            reports = out / "reports"
             plan = json.loads(
                 (reports / "knowledge-completion-plan-v1.json").read_text(encoding="utf-8")
             )
@@ -248,7 +248,7 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
                 plan["contract"]["canonical_identity_and_concepts_are_additive_metadata"]
             )
 
-            batches = sorted((reports / "batches").glob("*.json"))
+            batches = sorted((reports).glob("knowledge-completion-batch-*-v1.json"))
             self.assertEqual(len(batches), 2)
             self.assertEqual(len(plan["reports"]["review_batches"]), 2)
             for item in plan["reports"]["review_batches"]:
@@ -261,7 +261,7 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
                 self.assertTrue(batch["rows"][0]["residual_tokens"])
                 surfaces.append(batch["rows"][0]["surface"])
             self.assertCountEqual(surfaces, ["muted silver trumpet", "glass cloud"])
-            self.assertTrue((reports / "residual-token-groups-v1.csv").is_file())
+            self.assertTrue((reports / "knowledge-completion-residual-token-groups-v1.csv").is_file())
             template_path = reports / "knowledge-curation-decisions-v2.template.json"
             template = json.loads(template_path.read_text(encoding="utf-8"))
             self.assertEqual(template["schema"], "promptvgine-knowledge-curation-decisions-v2")
@@ -273,7 +273,7 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             out, _, _ = self.write_fixture(Path(td))
             csv_path = (
-                out / "reports" / "knowledge" / "instrument-decomposition-full-v1.csv"
+                out / "reports" / "knowledge-instrument-decomposition-full-v1.csv"
             )
             with csv_path.open("r", newline="", encoding="utf-8-sig") as f:
                 rows = list(csv.DictReader(f))
@@ -290,7 +290,7 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
                 writer.writerows(rows)
 
             decomposition_path = (
-                out / "reports" / "knowledge" / "instrument-decomposition-v1.json"
+                out / "reports" / "knowledge-instrument-decomposition-v1.json"
             )
             decomposition = json.loads(decomposition_path.read_text(encoding="utf-8"))
             decomposition["fully_semantic_unique"] = 4
@@ -309,7 +309,6 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
                 (
                     out
                     / "reports"
-                    / "knowledge-completion"
                     / "knowledge-completion-plan-v1.json"
                 ).read_text(encoding="utf-8")
             )
@@ -323,7 +322,7 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             out, _, _ = self.write_fixture(Path(td))
             csv_path = (
-                out / "reports" / "knowledge" / "instrument-decomposition-full-v1.csv"
+                out / "reports" / "knowledge-instrument-decomposition-full-v1.csv"
             )
             with csv_path.open("r", newline="", encoding="utf-8-sig") as f:
                 rows = list(csv.DictReader(f))
@@ -338,7 +337,7 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
                 writer.writerows(rows)
 
             decomposition_path = (
-                out / "reports" / "knowledge" / "instrument-decomposition-v1.json"
+                out / "reports" / "knowledge-instrument-decomposition-v1.json"
             )
             decomposition = json.loads(decomposition_path.read_text(encoding="utf-8"))
             decomposition["fully_semantic_unique"] = 3
@@ -356,7 +355,6 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
                 (
                     out
                     / "reports"
-                    / "knowledge-completion"
                     / "knowledge-completion-plan-v1.json"
                 ).read_text(encoding="utf-8")
             )
@@ -387,7 +385,6 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
             plan_path = (
                 out
                 / "reports"
-                / "knowledge-completion"
                 / "knowledge-completion-plan-v1.json"
             )
             state = load_review_state(
@@ -408,13 +405,13 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("acceptance is not ok", result.stderr.casefold())
             self.assertFalse(
-                (out / "reports" / "knowledge-completion" / "knowledge-completion-plan-v1.json").exists()
+                (out / "reports" / "knowledge-completion-plan-v1.json").exists()
             )
 
     def test_prepare_fails_closed_on_stale_decomposition_counts(self):
         with tempfile.TemporaryDirectory() as td:
             out, _, _ = self.write_fixture(Path(td))
-            path = out / "reports" / "knowledge" / "instrument-decomposition-v1.json"
+            path = out / "reports" / "knowledge-instrument-decomposition-v1.json"
             decomposition = json.loads(path.read_text(encoding="utf-8"))
             decomposition["unique_segment_count"] = 3
             path.write_text(json.dumps(decomposition, indent=2), encoding="utf-8")

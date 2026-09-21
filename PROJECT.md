@@ -145,6 +145,7 @@ Project-specific additions to `AGENTS.md`:
 - Radix may be adopted selectively behind V'gine wrappers; shadcn is reference material rather than the base system.
 - Motion for React is the selected motion-engine candidate; actual package versions still require dependency/license review.
 - Final font/icon/motion/UI dependencies require explicit dependency/asset review.
+- Local operator outputs follow one canonical layout: flat `current/reports/` for review artifacts, `current/logs/` for technical logs, and `.local-data/backups/` for safety copies.
 
 ## Data sources
 
@@ -191,6 +192,7 @@ Important durable design documents:
 - `docs/DECISIONS.md`
 - `docs/APPLICATION_ARCHITECTURE.md`
 - `docs/RUNTIME_DATA_CONTRACT_V1.md`
+- `docs/LOCAL_OUTPUT_LAYOUT.md`
 
 ## Current priorities
 

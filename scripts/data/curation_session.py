@@ -307,8 +307,8 @@ def build_review_report(corpus_path: Path, curation_path: Path) -> dict:
 
 def write_report_files(report: dict, reports_dir: Path) -> tuple[Path, Path, Path]:
     reports_dir.mkdir(parents=True, exist_ok=True)
-    json_path = reports_dir / "genre-crosswalk-review-v1.json"
-    csv_path = reports_dir / "genre-crosswalk-review-v1.csv"
+    json_path = reports_dir / "curation-genre-crosswalk-review-v1.json"
+    csv_path = reports_dir / "curation-genre-crosswalk-review-v1.csv"
     summary_path = reports_dir / "curation-session-summary.json"
 
     tmp = json_path.with_suffix(".tmp")
@@ -356,7 +356,7 @@ def write_report_files(report: dict, reports_dir: Path) -> tuple[Path, Path, Pat
         "review_json": str(json_path),
         "review_csv": str(csv_path),
         "review_json_sha256": sha256_file(json_path),
-        "next_expected_file": str(reports_dir / "genre-crosswalk-decisions-v1.json"),
+        "next_expected_file": str(reports_dir / "curation-genre-crosswalk-decisions-v1.json"),
     }
     tmp = summary_path.with_suffix(".tmp")
     tmp.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -373,7 +373,7 @@ def prepare(args) -> int:
 
     backup = backup_sqlite(curation_path, out_dir.parent / "backups")
     report = build_review_report(corpus_path, curation_path)
-    reports_dir = out_dir / "reports" / "curation"
+    reports_dir = out_dir / "reports"
     json_path, csv_path, summary_path = write_report_files(report, reports_dir)
 
     print(
@@ -555,7 +555,7 @@ def restore_backup(backup: Path, target: Path) -> None:
     integrity(target)
 
 
-def run_recompile(args, reports_dir: Path) -> dict:
+def run_recompile(args, logs_dir: Path) -> dict:
     builder = Path(__file__).resolve().parent / "build_local_data.py"
     validator = Path(__file__).resolve().parent / "validate_local_data.py"
     cmd = [
@@ -569,7 +569,7 @@ def run_recompile(args, reports_dir: Path) -> dict:
         str(args.out_dir.resolve()),
     ]
     result = subprocess.run(cmd, text=True, stdout=subprocess.PIPE)
-    build_stdout_path = reports_dir / "last-recompile-output.json.txt"
+    build_stdout_path = logs_dir / "curation-last-recompile-output.json.txt"
     build_stdout_path.write_text(result.stdout or "", encoding="utf-8")
     if result.returncode != 0:
         raise RuntimeError(f"knowledge recompile failed with exit code {result.returncode}")
@@ -580,7 +580,7 @@ def run_recompile(args, reports_dir: Path) -> dict:
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
-    validate_path = reports_dir / "last-validation.txt"
+    validate_path = logs_dir / "curation-last-validation.txt"
     validate_path.write_text(validate.stdout or "", encoding="utf-8")
     if validate.returncode != 0:
         raise RuntimeError(f"post-apply validation failed with exit code {validate.returncode}")
@@ -603,8 +603,10 @@ def apply_bundle(args) -> int:
     out_dir = args.out_dir.resolve()
     corpus_path = out_dir / "corpus.sqlite"
     curation_path = out_dir / "curation.sqlite"
-    reports_dir = out_dir / "reports" / "curation"
+    reports_dir = out_dir / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
+    logs_dir = out_dir / "logs"
+    logs_dir.mkdir(parents=True, exist_ok=True)
 
     integrity(corpus_path)
     integrity(curation_path)
@@ -625,11 +627,11 @@ def apply_bundle(args) -> int:
         "candidate_count": len(validated),
         "status": "running",
     }
-    receipt_path = reports_dir / "last-apply-receipt.json"
+    receipt_path = reports_dir / "curation-last-apply-receipt.json"
 
     try:
         receipt["apply"] = apply_decisions(curation_path, validated)
-        receipt["recompile"] = run_recompile(args, reports_dir)
+        receipt["recompile"] = run_recompile(args, logs_dir)
         receipt["status"] = "ok"
         receipt["completed_at"] = utc_now()
     except Exception as exc:

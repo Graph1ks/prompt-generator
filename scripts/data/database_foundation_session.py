@@ -27,15 +27,15 @@ def read_meta(conn: sqlite3.Connection) -> dict[str, str]:
     return {row[0]: row[1] for row in conn.execute("SELECT key,value FROM build_meta")}
 
 
-def run_logged(name: str, cmd: list[str], report_dir: Path) -> dict:
+def run_logged(name: str, cmd: list[str], logs_dir: Path) -> dict:
     result = subprocess.run(
         cmd,
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
-    stdout_path = report_dir / f"{name}.stdout.txt"
-    stderr_path = report_dir / f"{name}.stderr.txt"
+    stdout_path = logs_dir / f"database-{name}.stdout.txt"
+    stderr_path = logs_dir / f"database-{name}.stderr.txt"
     stdout_path.write_text(result.stdout or "", encoding="utf-8")
     stderr_path.write_text(result.stderr or "", encoding="utf-8")
     return {
@@ -202,8 +202,10 @@ def main() -> int:
     args = ap.parse_args()
 
     out_dir = args.out_dir.resolve()
-    report_dir = out_dir / "reports" / "database"
-    report_dir.mkdir(parents=True, exist_ok=True)
+    reports_dir = out_dir / "reports"
+    logs_dir = out_dir / "logs"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    logs_dir.mkdir(parents=True, exist_ok=True)
     scripts = Path(__file__).resolve().parent
 
     steps = []
@@ -220,7 +222,7 @@ def main() -> int:
                 "--out-dir",
                 str(out_dir),
             ],
-            report_dir,
+            logs_dir,
         )
     )
     if steps[-1]["returncode"] != 0:
@@ -230,7 +232,7 @@ def main() -> int:
             "failed_step": steps[-1]["name"],
             "steps": steps,
         }
-        path = report_dir / "database-foundation-session-v1.json"
+        path = reports_dir / "database-foundation-session-v1.json"
         path.write_text(json.dumps(status, indent=2) + "\n", encoding="utf-8")
         print(f"[database-foundation] FAILED · report: {path}")
         return 1
@@ -244,7 +246,7 @@ def main() -> int:
                 "--dir",
                 str(out_dir),
             ],
-            report_dir,
+            logs_dir,
         )
     )
     if steps[-1]["returncode"] != 0:
@@ -254,7 +256,7 @@ def main() -> int:
             "failed_step": steps[-1]["name"],
             "steps": steps,
         }
-        path = report_dir / "database-foundation-session-v1.json"
+        path = reports_dir / "database-foundation-session-v1.json"
         path.write_text(json.dumps(status, indent=2) + "\n", encoding="utf-8")
         print(f"[database-foundation] FAILED · report: {path}")
         return 1
@@ -269,7 +271,7 @@ def main() -> int:
                 "--out-dir",
                 str(out_dir),
             ],
-            report_dir,
+            logs_dir,
         )
     )
     if steps[-1]["returncode"] != 0:
@@ -279,14 +281,14 @@ def main() -> int:
             "failed_step": steps[-1]["name"],
             "steps": steps,
         }
-        path = report_dir / "database-foundation-session-v1.json"
+        path = reports_dir / "database-foundation-session-v1.json"
         path.write_text(json.dumps(status, indent=2) + "\n", encoding="utf-8")
         print(f"[database-foundation] FAILED · report: {path}")
         return 1
 
     acceptance = collect_acceptance(out_dir)
     acceptance["steps"] = steps
-    acceptance_path = report_dir / "database-foundation-acceptance-v1.json"
+    acceptance_path = reports_dir / "database-foundation-acceptance-v1.json"
     acceptance_path.write_text(
         json.dumps(acceptance, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
@@ -299,7 +301,7 @@ def main() -> int:
         "acceptance_report": str(acceptance_path),
         "steps": steps,
     }
-    session_path = report_dir / "database-foundation-session-v1.json"
+    session_path = reports_dir / "database-foundation-session-v1.json"
     session_path.write_text(
         json.dumps(session, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",

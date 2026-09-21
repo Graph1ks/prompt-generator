@@ -423,12 +423,7 @@ class LocalDataBuildTests(unittest.TestCase):
                 1,
             )
             self.assertIn("[database-foundation] OK", result.stdout)
-            report_path = (
-                out
-                / "reports"
-                / "database"
-                / "database-foundation-acceptance-v1.json"
-            )
+            report_path = out / "reports" / "database-foundation-acceptance-v1.json"
             self.assertTrue(report_path.is_file())
             report = json.loads(report_path.read_text(encoding="utf-8"))
             self.assertEqual(report["status"], "ok")
@@ -447,10 +442,10 @@ class LocalDataBuildTests(unittest.TestCase):
                 report["invariants"]["all_source_output_text_preserved"]
             )
             self.assertTrue(
-                (out / "reports" / "database" / "01-build.stdout.txt").is_file()
+                (out / "logs" / "database-01-build.stdout.txt").is_file()
             )
             self.assertTrue(
-                (out / "reports" / "database" / "03-knowledge-mining.stdout.txt").is_file()
+                (out / "logs" / "database-03-knowledge-mining.stdout.txt").is_file()
             )
 
     def test_renderer_profile_carries_source_derived_character_budget(self):

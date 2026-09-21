@@ -336,10 +336,10 @@ def write_groups_csv(path: Path, groups: list[dict]) -> None:
             )
 
 
-def clear_old_batches(batch_dir: Path) -> None:
-    if not batch_dir.exists():
+def clear_old_batches(reports_dir: Path) -> None:
+    if not reports_dir.exists():
         return
-    for path in batch_dir.glob("instrument-semantic-review-batch-*-v1.json"):
+    for path in reports_dir.glob("knowledge-completion-batch-*-v1.json"):
         if path.is_file():
             path.unlink()
 
@@ -349,17 +349,17 @@ def prepare(args) -> int:
     acceptance_path = (
         args.acceptance.resolve()
         if args.acceptance
-        else out_dir / "reports" / "database" / "database-foundation-acceptance-v1.json"
+        else out_dir / "reports" / "database-foundation-acceptance-v1.json"
     )
     decomposition_json_path = (
         args.decomposition_json.resolve()
         if args.decomposition_json
-        else out_dir / "reports" / "knowledge" / "instrument-decomposition-v1.json"
+        else out_dir / "reports" / "knowledge-instrument-decomposition-v1.json"
     )
     decomposition_csv_path = (
         args.decomposition_csv.resolve()
         if args.decomposition_csv
-        else out_dir / "reports" / "knowledge" / "instrument-decomposition-full-v1.csv"
+        else out_dir / "reports" / "knowledge-instrument-decomposition-full-v1.csv"
     )
     knowledge_db_path = (
         args.knowledge_db.resolve()
@@ -455,10 +455,9 @@ def prepare(args) -> int:
     )
     groups = build_residual_groups(residual)
 
-    reports_dir = out_dir / "reports" / "knowledge-completion"
-    batch_dir = reports_dir / "batches"
-    clear_old_batches(batch_dir)
-    batch_dir.mkdir(parents=True, exist_ok=True)
+    reports_dir = out_dir / "reports"
+    clear_old_batches(reports_dir)
+    reports_dir.mkdir(parents=True, exist_ok=True)
     batch_count = math.ceil(len(residual) / args.batch_size) if residual else 0
     acceptance_sha = sha256_file(acceptance_path)
     decomposition_json_sha = sha256_file(decomposition_json_path)
@@ -471,7 +470,7 @@ def prepare(args) -> int:
     for batch_index in range(batch_count):
         start = batch_index * args.batch_size
         batch_rows = residual[start : start + args.batch_size]
-        path = batch_dir / f"instrument-semantic-review-batch-{batch_index + 1:03d}-v1.json"
+        path = reports_dir / f"knowledge-completion-batch-{batch_index + 1:03d}-v1.json"
         write_json(
             path,
             {
@@ -496,7 +495,7 @@ def prepare(args) -> int:
         )
         batch_reports.append({"path": str(path), "sha256": sha256_file(path)})
 
-    groups_path = reports_dir / "residual-token-groups-v1.csv"
+    groups_path = reports_dir / "knowledge-completion-residual-token-groups-v1.csv"
     write_groups_csv(groups_path, groups)
     plan_path = reports_dir / "knowledge-completion-plan-v1.json"
     plan = {

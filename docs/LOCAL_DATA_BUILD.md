@@ -83,10 +83,10 @@ This command is read-only with respect to the databases. It verifies the success
 Local outputs:
 
 ```text
-.local-data\\current\\reports\\knowledge-completion\\knowledge-completion-plan-v1.json
-.local-data\\current\\reports\\knowledge-completion\\residual-token-groups-v1.csv
-.local-data\\current\\reports\\knowledge-completion\\batches\\instrument-semantic-review-batch-###-v1.json
-.local-data\\current\\reports\\knowledge-completion\\knowledge-curation-decisions-v2.template.json
+.local-data\\current\\reports\\knowledge-completion-plan-v1.json
+.local-data\\current\\reports\\knowledge-completion-residual-token-groups-v1.csv
+.local-data\\current\\reports\\knowledge-completion-batch-###-v1.json
+.local-data\\current\\reports\\knowledge-curation-decisions-v2.template.json
 ```
 
 The batches contain exact source expression wording plus current resolved instrument/concept IDs, residual tokens, coverage, occurrence/track evidence, and deterministic **review priority**. Frequency affects review order only; it never auto-approves semantics.
@@ -129,8 +129,12 @@ py scripts\data\backup_curation.py --source ".local-data\current\curation.sqlite
   knowledge.sqlite              # promoted compiled knowledge DB
   corpus.previous.sqlite        # retained previous corpus after a fresh corpus promotion, when applicable
   knowledge.previous.sqlite     # retained previous compiled knowledge after replacement, when applicable
-  reports/
+  reports/                      # flat review/result artifacts; see docs/LOCAL_OUTPUT_LAYOUT.md
     corpus-profile.json
+    database-foundation-acceptance-v1.json
+    knowledge-mining-summary-v1.json
+    runtime-export-v1.json
+  logs/                         # technical stdout/stderr/validation/recovery output
   .build-v2/
     state.sqlite                # resumable machine-readable checkpoint
     corpus.building.sqlite      # incomplete work only, when corpus is being rebuilt
@@ -218,18 +222,18 @@ Instrument mining is semantic-residual driven. Every source segment is decompose
 Primary review files:
 
 ```text
-.local-data\current\reports\knowledge\instrument-candidates-v1.json
-.local-data\current\reports\knowledge\lexicon-candidates-v1.json
+.local-data\current\reports\knowledge-instrument-candidates-v1.json
+.local-data\current\reports\knowledge-lexicon-candidates-v1.json
 ```
 
 Full local evidence:
 
 ```text
-.local-data\current\reports\knowledge\instrument-candidates-full-v1.csv
-.local-data\current\reports\knowledge\lexicon-candidates-full-v1.csv
-.local-data\current\reports\knowledge\instrument-decomposition-v1.json
-.local-data\current\reports\knowledge\instrument-decomposition-full-v1.csv
-.local-data\current\reports\knowledge\knowledge-mining-summary-v1.json
+.local-data\current\reports\knowledge-instrument-candidates-full-v1.csv
+.local-data\current\reports\knowledge-lexicon-candidates-full-v1.csv
+.local-data\current\reports\knowledge-instrument-decomposition-v1.json
+.local-data\current\reports\knowledge-instrument-decomposition-full-v1.csv
+.local-data\current\reports\knowledge-mining-summary-v1.json
 ```
 
 ## Bundled knowledge curation apply
@@ -237,13 +241,13 @@ Full local evidence:
 After AI/human review, place the reviewed decision bundle at:
 
 ```text
-.local-data\current\reports\knowledge\knowledge-curation-decisions-v1.json
+.local-data\current\reports\knowledge-curation-decisions-v1.json
 ```
 
 Apply the whole reviewed batch with one command:
 
 ```powershell
-py scripts\data\knowledge_curation_session.py apply --out-dir ".local-data\current" --bundle ".local-data\current\reports\knowledge\knowledge-curation-decisions-v1.json" --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json"
+py scripts\data\knowledge_curation_session.py apply --out-dir ".local-data\current" --bundle ".local-data\current\reports\knowledge-curation-decisions-v1.json" --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json"
 ```
 
 The apply command verifies source/review fingerprints and exact reviewed-report hashes, creates a curation backup, applies instrument families/instruments/aliases/dictionary entries in one transaction, recompiles knowledge, validates the promoted databases, restores curation and recompiles recovery state if the operation fails, writes a receipt, and refreshes the next mining reports.
@@ -259,13 +263,13 @@ Reviewed Instruments work can use a scoped v2 bundle. This lets one large Instru
 Save the reviewed owner-local bundle as:
 
 ```text
-.local-data\current\reports\knowledge\instrument-ontology-decisions-v2.json
+.local-data\current\reports\instrument-ontology-decisions-v2.json
 ```
 
 Apply it with one command:
 
 ```powershell
-py scripts\data\knowledge_curation_session.py apply --out-dir ".local-data\current" --bundle ".local-data\current\reports\knowledge\instrument-ontology-decisions-v2.json" --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json"
+py scripts\data\knowledge_curation_session.py apply --out-dir ".local-data\current" --bundle ".local-data\current\reports\instrument-ontology-decisions-v2.json" --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json"
 ```
 
 The command validates the exact reviewed report hash + source fingerprints + curation fingerprint, backs up durable curation, applies additive curation-schema migrations, writes the bundle transactionally, recompiles knowledge, validates, restores/recompiles recovery state on failure, and refreshes the residual-only mining reports.
@@ -320,19 +324,19 @@ That single command:
 Primary handoff file for AI/human review:
 
 ```text
-.local-data\current\reports\curation\genre-crosswalk-review-v1.json
+.local-data\current\reports\curation-genre-crosswalk-review-v1.json
 ```
 
 After a reviewed decision bundle exists at:
 
 ```text
-.local-data\current\reports\curation\genre-crosswalk-decisions-v1.json
+.local-data\current\reports\curation-genre-crosswalk-decisions-v1.json
 ```
 
 apply the entire reviewed batch with one command:
 
 ```powershell
-py scripts\data\curation_session.py apply --out-dir ".local-data\current" --bundle ".local-data\current\reports\curation\genre-crosswalk-decisions-v1.json" --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json"
+py scripts\data\curation_session.py apply --out-dir ".local-data\current" --bundle ".local-data\current\reports\curation-genre-crosswalk-decisions-v1.json" --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json"
 ```
 
 The apply bundle automatically:

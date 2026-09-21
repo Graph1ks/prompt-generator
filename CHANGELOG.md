@@ -9,6 +9,7 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Added accepted production application architecture: strict TypeScript/React/Vite/pnpm, Tauri 2 packaging direction, pure compiler boundaries, modular V'gine design system, selective Radix/shadcn boundary, centralized Motion recipes, adaptive four-chapter Studio layout, and storage/search module contracts.
 - Added Runtime Pack v1 contract/schema and a dependency-free resumable exporter from `knowledge.sqlite` with deterministic payload hashes/build IDs, staged resume, stale-work rejection, Database V1 invariant checks, atomic promotion and previous-pack retention.
 - Added synthetic Runtime Pack regression coverage for plan/no-write, source-expression preservation, no-op reruns, stale-state recovery and last-known-good retention.
+- Standardized local operator outputs into one flat `reports/` directory plus separate `logs/` and durable backups; added a conflict-safe one-time migrator for legacy nested report folders.
 - Initialized **Graph1ks Prompt V'gine** product and UX foundation.
 - Added MusicSpec v1 semantic state contract and JSON Schema.
 - Added the Suno structured-v1 prompt renderer contract with a separate comma-delimited Exclude output and a hard 1,000-character style-prompt ceiling.
