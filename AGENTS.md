@@ -45,6 +45,8 @@ Default behavior:
 - Escalate decisions that are expensive to reverse, materially change product scope, create licensing obligations, expose data, or introduce meaningful security risk.
 - Prefer finishing one coherent slice over leaving many partially completed slices.
 - Keep explanations concise unless deeper analysis is needed for a material decision.
+- Prefer bundled solo-dev commands that complete a coherent prepare/apply/validate slice over chains of manual micro-steps.
+- Commands that produce large diagnostic/review payloads should write machine-readable report files and print only a concise terminal summary; reserve verbose console output for live progress/errors.
 
 Do not trade correctness for speed. Gain speed by reducing ceremony, avoiding duplicated work, batching related operations, and choosing appropriately scoped solutions.
 
