@@ -268,6 +268,7 @@ export function App() {
               {runtime.status === "ready" && activeFacet === "genre" && (
                 <GenrePicker
                   runtime={runtime.value.bootstrap}
+                  searchIndex={runtime.value.searchIndex}
                   spec={spec}
                   activeRole={activeGenreRole}
                   onRoleChange={setActiveGenreRole}
