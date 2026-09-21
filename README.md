@@ -37,13 +37,24 @@ python scripts/data/build_local_data.py \
   --force
 ```
 
-Then inspect it:
+This creates local `corpus.sqlite`, durable `curation.sqlite`, compiled `knowledge.sqlite`, and a local build report.
+
+Then validate/inspect it:
 
 ```bash
 python scripts/data/query_corpus.py --db .local-data/current/corpus.sqlite term grit
 python scripts/data/query_corpus.py --db .local-data/current/corpus.sqlite section drums
 python scripts/data/query_corpus.py --db .local-data/current/corpus.sqlite unmatched-genres
+python scripts/data/validate_local_data.py --dir .local-data/current
 ```
+
+Before bulk curation or schema work:
+
+```bash
+python scripts/data/backup_curation.py --source .local-data/current/curation.sqlite
+```
+
+When Factory files change, build a second snapshot and compare it with `scripts/data/diff_local_data.py`.
 
 See `docs/LOCAL_DATA_BUILD.md` and `docs/DATA_ARCHITECTURE.md`.
 
@@ -68,6 +79,8 @@ The database itself is not committed. Aggregate architecture findings are record
 5. `docs/PRODUCT_UX_FOUNDATION.md`
 6. `docs/DATA_ARCHITECTURE.md`
 7. `docs/KNOWLEDGE_LAYER.md`
+8. `docs/MUSICSPEC_V1.md`
+9. `docs/PROMPT_FORMAT.md`
 
 Then inspect the current Git state and run the relevant fixture/local verification before changing code.
 
