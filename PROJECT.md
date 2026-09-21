@@ -34,7 +34,7 @@
 - Easy mode with curated words/combination statements.
 - Advanced mode with granular parameters, explicit routing/ownership, and custom section input.
 - Shared semantic MusicSpec state across Easy and Advanced modes.
-- Structured Suno prompt rendering using source-compatible `[Header: content]` sections.
+- Structured Suno prompt rendering using source-compatible `[Header: content]` sections with a hard 1,000-character style-prompt ceiling derived from the Factory contract.
 - Separate comma-delimited Exclude output.
 - Site-wide inline music dictionary / knowledge layer with beginner/context/current-project explanations.
 - Every source Instruments phrase is preserved as a first-class selectable expression; canonical instrument identity is separately linked to role, register, articulation, envelope/behavior, processing, performance, and space semantics.
@@ -81,7 +81,7 @@ The current local-data builder implements this contract with `.build-v2/state.sq
 
 ### Architecture constraints
 
-- MusicSpec/semantic state is the source of truth; rendered Suno text is an output format.
+- MusicSpec/semantic state is the source of truth; rendered Suno text is an output format. The `suno-structured-v1` renderer must deterministically stay at or below 1,000 characters without blind final-string truncation.
 - Keep raw source evidence lossless before applying normalization/curation.
 - Never overwrite durable `curation.sqlite` during a Factory rebuild; generated corpus/knowledge are replaceable, curation is not.
 - Do not couple semantic knowledge to a single Suno renderer version.
