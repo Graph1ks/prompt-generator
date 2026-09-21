@@ -176,7 +176,7 @@ Minimum foundation checks:
 - no raw factory/database/generated bundle is tracked by Git
 - renderer contract emits bracketed prompt sections and separate unbracketed comma-list Exclude
 - dependency license/cost review for new runtime dependencies
-- responsive/keyboard/touch QA when UI implementation begins
+- responsive/keyboard/touch QA for the Studio shell and every new interactive primitive/picker
 
 ## Continuity
 
@@ -204,6 +204,6 @@ Database V1 is complete for the current Factory snapshot. Current priorities are
 
 1. Validate Runtime Pack v1 against the real owner-local `knowledge.sqlite` and record size/count findings.
 2. Measure the dependency-free local search kernel against the real 10,348-document Runtime Pack before adding any search dependency.
-3. Review/pin React + Vite and build the first Studio shell on the implemented V'gine design/motion and domain/runtime packages.
-4. Wire Runtime Pack genre, instrument-expression and dictionary/search data into the production editor.
+3. Wire validated Runtime Pack/search data into the implemented React/Vite Studio shell and build the production Genre picker.
+4. Connect shared MusicSpec state to the pure compiler/live budget pane, then wire instrument-expression and dictionary/search data into the editor.
 5. Continue Vocal/statements/parameters/definitions as additive Post-V1 enrichment, not as a reason to reopen the completed database milestone.

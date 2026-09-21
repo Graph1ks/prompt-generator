@@ -9,12 +9,14 @@
     "pnpm": "11.27.1"
   },
   "scripts": {
-    "build": "tsc -b",
-    "typecheck": "tsc -b --pretty false",
-    "pretest": "pnpm run build",
+    "dev": "pnpm --filter @vgine/studio dev",
+    "build": "pnpm run build:packages && pnpm run build:studio",
+    "build:packages": "tsc -b",
+    "build:studio": "pnpm --filter @vgine/studio build",
+    "typecheck": "tsc -b --pretty false && pnpm --filter @vgine/studio typecheck",
     "test": "node --test packages/*/test/*.test.mjs",
-    "check": "pnpm run typecheck && pnpm test",
-    "bench:search": "pnpm run build && node packages/search/bench/search.bench.mjs",
+    "check": "pnpm run build && pnpm test",
+    "bench:search": "pnpm run build:packages && node packages/search/bench/search.bench.mjs",
     "clean": "tsc -b --clean"
   },
   "devDependencies": {
