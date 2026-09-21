@@ -45,6 +45,7 @@ Then validate/inspect it:
 python scripts/data/query_corpus.py --db .local-data/current/corpus.sqlite term grit
 python scripts/data/query_corpus.py --db .local-data/current/corpus.sqlite section drums
 python scripts/data/query_corpus.py --db .local-data/current/corpus.sqlite unmatched-genres
+python scripts/data/query_curation.py --db .local-data/current/curation.sqlite queue --type genre_crosswalk
 python scripts/data/validate_local_data.py --dir .local-data/current
 ```
 
@@ -79,8 +80,9 @@ The database itself is not committed. Aggregate architecture findings are record
 5. `docs/PRODUCT_UX_FOUNDATION.md`
 6. `docs/DATA_ARCHITECTURE.md`
 7. `docs/KNOWLEDGE_LAYER.md`
-8. `docs/MUSICSPEC_V1.md`
-9. `docs/PROMPT_FORMAT.md`
+8. `docs/CURATION_WORKFLOW.md`
+9. `docs/MUSICSPEC_V1.md`
+10. `docs/PROMPT_FORMAT.md`
 
 Then inspect the current Git state and run the relevant fixture/local verification before changing code.
 
