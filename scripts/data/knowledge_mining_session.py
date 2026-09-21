@@ -673,24 +673,54 @@ def write_lexicon_csv(path: Path, terms: list[dict], phrases: list[dict]) -> Non
             )
 
 
+
+def write_decomposition_csv(path: Path, rows: list[dict]) -> None:
+    with path.open("w", newline="", encoding="utf-8-sig") as f:
+        w = csv.writer(f)
+        w.writerow(
+            [
+                "candidate_id","surface","occurrence_count","track_count","coverage",
+                "fully_decomposed","instrument_ids","concept_ids","residual_tokens",
+            ]
+        )
+        for row in rows:
+            w.writerow(
+                [
+                    row["candidate_id"],
+                    row["surface"],
+                    row["occurrence_count"],
+                    row["track_count"],
+                    row["coverage"],
+                    row["fully_decomposed"],
+                    "|".join(row["instrument_ids"]),
+                    "|".join(row["concept_ids"]),
+                    "|".join(row["residual_tokens"]),
+                ]
+            )
+
 def prepare(args) -> int:
     out_dir = args.out_dir.resolve()
     corpus_path = out_dir / "corpus.sqlite"
     curation_path = out_dir / "curation.sqlite"
+    knowledge_path = out_dir / "knowledge.sqlite"
     reports_dir = out_dir / "reports" / "knowledge"
 
     integrity(corpus_path)
     integrity(curation_path)
+    integrity(knowledge_path)
     backup = backup_sqlite(curation_path, out_dir.parent / "backups")
 
-    with open_ro(corpus_path) as corpus, open_ro(curation_path) as curation:
+    with open_ro(corpus_path) as corpus, open_ro(curation_path) as curation, open_ro(knowledge_path) as knowledge:
         sources = source_meta(corpus)
         curation_sha = curation_fingerprint(curation)
         curated_instruments, curated_concepts = curated_surfaces(curation)
         instruments = instrument_report(corpus, curated_instruments, args.instrument_limit)
         lexicon = lexicon_report(corpus, curated_concepts, args.term_limit, args.phrase_limit)
+        full_instrument_rows = instruments["_full_rows"]
+        decomposition = instrument_decomposition_report(knowledge, full_instrument_rows)
 
     full_instrument_rows = instruments.pop("_full_rows")
+    full_decomposition_rows = decomposition.pop("_full_rows")
     full_terms = lexicon.pop("_full_terms")
     full_phrases = lexicon.pop("_full_phrases")
 
@@ -713,6 +743,8 @@ def prepare(args) -> int:
     lexicon_json = reports_dir / "lexicon-candidates-v1.json"
     instrument_csv = reports_dir / "instrument-candidates-full-v1.csv"
     lexicon_csv = reports_dir / "lexicon-candidates-full-v1.csv"
+    decomposition_json = reports_dir / "instrument-decomposition-v1.json"
+    decomposition_csv = reports_dir / "instrument-decomposition-full-v1.csv"
     summary_path = reports_dir / "knowledge-mining-summary-v1.json"
 
     write_json(
@@ -739,9 +771,22 @@ def prepare(args) -> int:
             **lexicon,
         },
     )
+    write_json(
+        decomposition_json,
+        {
+            "schema": "promptvgine-instrument-decomposition-review-v1",
+            "report_kind": "instrument_decomposition",
+            "review_id": review_id,
+            "generated_at": generated_at,
+            "source": sources,
+            "curation_fingerprint": curation_sha,
+            **decomposition,
+        },
+    )
     reports_dir.mkdir(parents=True, exist_ok=True)
     write_instrument_csv(instrument_csv, full_instrument_rows)
     write_lexicon_csv(lexicon_csv, full_terms, full_phrases)
+    write_decomposition_csv(decomposition_csv, full_decomposition_rows)
 
     summary = {
         "schema": "promptvgine-knowledge-mining-summary-v1",
@@ -755,10 +800,15 @@ def prepare(args) -> int:
             "lexicon_review": str(lexicon_json),
             "instrument_full_csv": str(instrument_csv),
             "lexicon_full_csv": str(lexicon_csv),
+            "instrument_decomposition": str(decomposition_json),
+            "instrument_decomposition_full_csv": str(decomposition_csv),
         },
         "counts": {
             "instrument_unique_segments": len(full_instrument_rows),
             "instrument_prioritized": len(instruments["prioritized_candidates"]),
+            "instrument_fully_decomposed_unique": decomposition["fully_decomposed_unique"],
+            "instrument_fully_decomposed_unique_ratio": decomposition["fully_decomposed_unique_ratio"],
+            "instrument_fully_decomposed_occurrence_ratio": decomposition["fully_decomposed_occurrence_ratio"],
             "term_candidates_before_limit": lexicon["term_candidate_count_before_limit"],
             "term_prioritized": len(lexicon["prioritized_terms"]),
             "phrase_candidates_before_limit": lexicon["phrase_candidate_count_before_limit"],
@@ -769,6 +819,8 @@ def prepare(args) -> int:
             "lexicon_review": sha256_file(lexicon_json),
             "instrument_full_csv": sha256_file(instrument_csv),
             "lexicon_full_csv": sha256_file(lexicon_csv),
+            "instrument_decomposition": sha256_file(decomposition_json),
+            "instrument_decomposition_full_csv": sha256_file(decomposition_csv),
         },
         "next_step": "AI/human review of the JSON reports; no candidate is promoted automatically.",
     }
@@ -777,6 +829,7 @@ def prepare(args) -> int:
     print(
         "[knowledge-mining] prepared"
         f" · instruments {summary['counts']['instrument_prioritized']}/{summary['counts']['instrument_unique_segments']}"
+        f" · decomposed {summary['counts']['instrument_fully_decomposed_unique_ratio']:.1%} unique"
         f" · terms {summary['counts']['term_prioritized']}"
         f" · phrases {summary['counts']['phrase_prioritized']}"
         f" · backup OK"
