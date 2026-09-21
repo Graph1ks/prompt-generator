@@ -142,6 +142,31 @@ py scripts\data\build_local_data.py --vault ".local-data\source\GRAPH1KS_PUBLIC_
 
 The existing promoted corpus remains untouched until the new work artifact passes validation. On successful promotion, the former corpus is retained as `corpus.previous.sqlite`.
 
+## Bundled instrument + lexicon mining — preferred next phase
+
+After the genre crosswalk is reviewed/applied, prepare the next evidence bundle with one command:
+
+```powershell
+py scripts\data\knowledge_mining_session.py prepare --out-dir ".local-data\current"
+```
+
+The command integrity-checks corpus + curation, creates an integrity-checked curation backup, mines instrument-list segments plus head-token variant groups, mines section-aware terms and repeated 2–4 word phrases, marks already-curated surfaces, and writes prioritized JSON reports plus full CSV evidence. It does **not** mutate curation or auto-promote candidates.
+
+Primary review files:
+
+```text
+.local-data\current\reports\knowledge\instrument-candidates-v1.json
+.local-data\current\reports\knowledge\lexicon-candidates-v1.json
+```
+
+Full local evidence:
+
+```text
+.local-data\current\reports\knowledge\instrument-candidates-full-v1.csv
+.local-data\current\reports\knowledge\lexicon-candidates-full-v1.csv
+.local-data\current\reports\knowledge\knowledge-mining-summary-v1.json
+```
+
 ## Inspect corpus evidence
 
 ```powershell
