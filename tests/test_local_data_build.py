@@ -71,9 +71,11 @@ class LocalDataBuildTests(unittest.TestCase):
     def write_sources(self, tmp: Path, vault_data=None):
         vault = tmp / "vault.json.gz"
         genres = tmp / "genres.json"
-        with gzip.open(vault, "wt", encoding="utf-8") as f:
-            json.dump(vault_data or VAULT, f)
-        genres.write_text(json.dumps(GENRES), encoding="utf-8")
+        if vault_data is not None or not vault.exists():
+            with gzip.open(vault, "wt", encoding="utf-8") as f:
+                json.dump(vault_data or VAULT, f)
+        if not genres.exists():
+            genres.write_text(json.dumps(GENRES), encoding="utf-8")
         return vault, genres
 
     def run_builder(self, tmp: Path, extra=None, vault_data=None, check=True):
