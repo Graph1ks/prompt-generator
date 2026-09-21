@@ -33,6 +33,7 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Added end-to-end completion-review binding: every semantic-review batch is SHA-addressed in the completion plan, a v2 decision template binds to the exact plan hash, and `knowledge_curation_session.py` verifies `completion_plan` as a supported reviewed artifact before durable mutation.
 - Added conservative coordinated shared-head instrument decomposition: phrases such as `tenor and baritone saxophones` can reuse a reviewed shared head only when all inferred instrument phrases already exist in the canonical/alias lexicon; unknown combinations remain residual.
 - Added explicit decomposition grammar scaffolding for `as`, `in`, and `used` so sentence structure does not masquerade as missing instrument semantics.
+- Added guarded hyphen-compound decomposition: exact reviewed de-hyphenated phrases are reused, while component-level inference requires complete reviewed coverage and refuses compounds that would imply multiple instrument identities.
 - Build revision advanced to `promptvgine-local-data-build-v2-resumable-2-instrument-expressions`; completed older checkpoints can advance knowledge stages without rebuilding a matching promoted corpus.
 
 ### Changed
