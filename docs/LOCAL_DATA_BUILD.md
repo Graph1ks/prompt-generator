@@ -2,7 +2,9 @@
 
 Prompt V'gine source factories, generated databases, checkpoints, reports, and curation backups are **local-only**. GitHub contains only reproducible schemas/tools/docs/tests.
 
-The local build follows the same long-job safety standard used by RhymeLab: visible progress, persisted checkpoints, ordinary-rerun resume, source/build fingerprint binding, validation before promotion, and no implicit destruction of the last known-good data.\n\n**Database V1 is complete for the current Factory snapshot.** The commands below remain the canonical maintenance/update workflow. The table-by-table database map and completion boundary are in `docs/DATABASE_V1.md`.
+The local build follows the same long-job safety standard used by RhymeLab: visible progress, persisted checkpoints, ordinary-rerun resume, source/build fingerprint binding, validation before promotion, and no implicit destruction of the last known-good data.
+
+**Database V1 is complete for the current Factory snapshot.** The commands below remain the canonical maintenance/update workflow. The table-by-table database map and completion boundary are in `docs/DATABASE_V1.md`.
 
 ## Windows 11 / PowerShell — owner path
 
