@@ -5,17 +5,10 @@ import type {
   GenreInfluenceRole,
   MusicSpec,
 } from "@vgine/music-spec";
-import {
-  Button,
-  Cluster,
-  Stack,
-  Surface,
-  Text,
-  isVgineTheme,
-  type VgineTheme,
-} from "@vgine/ui";
+import { isVgineTheme, type VgineTheme } from "@vgine/ui";
 
 import { GenrePicker } from "./genre-picker.js";
+import { Icon } from "./icons.js";
 import { loadStudioRuntime, type StudioRuntime } from "./runtime-client.js";
 import { FACET_LABELS, STUDIO_CHAPTERS } from "./studio-config.js";
 
@@ -25,6 +18,27 @@ type RuntimeState =
   | { readonly status: "loading" }
   | { readonly status: "ready"; readonly value: StudioRuntime }
   | { readonly status: "error"; readonly message: string };
+
+type OutputTab = "style" | "exclude";
+
+const CHAPTER_COPY = {
+  dna: {
+    title: "Wo soll die Reise hingehen?",
+    description: "Ein Fundament. Bis zu zwei neue Perspektiven.",
+  },
+  pulse: {
+    title: "Gib deinem Sound einen Puls.",
+    description: "Tempo ist eine Zahl. Groove ist ein Gefühl.",
+  },
+  palette: {
+    title: "Jetzt wird es dein Sound.",
+    description: "Instrument, Rolle und Charakter bleiben frei kombinierbar.",
+  },
+  finish: {
+    title: "Der letzte Schliff.",
+    description: "Nähe, Tiefe, Dynamik. Die Details machen den Unterschied.",
+  },
+} as const;
 
 function initialTheme(): VgineTheme {
   const stored = globalThis.localStorage?.getItem(THEME_KEY);
@@ -49,19 +63,30 @@ async function copyText(text: string): Promise<void> {
   if (!copied) throw new Error("Clipboard copy failed");
 }
 
+function coverLines(label: string): readonly [string, string] {
+  const words = label.split(/\s+/u).filter(Boolean);
+  if (words.length <= 1) return [label || "Build", "your sound."];
+  const split = Math.ceil(words.length / 2);
+  return [words.slice(0, split).join(" "), words.slice(split).join(" ")];
+}
+
 export function App() {
   const [theme, setTheme] = useState<VgineTheme>(initialTheme);
   const [chapterId, setChapterId] = useState(STUDIO_CHAPTERS[0].id);
-  const [activeFacet, setActiveFacet] = useState<FacetKey>("genre");
   const [activeGenreRole, setActiveGenreRole] =
     useState<GenreInfluenceRole>("foundation");
   const [spec, setSpec] = useState<MusicSpec | null>(null);
   const [runtime, setRuntime] = useState<RuntimeState>({ status: "loading" });
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const [outputTab, setOutputTab] = useState<OutputTab>("style");
+  const [assistOn, setAssistOn] = useState(true);
+  const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
+  const [previewPulse, setPreviewPulse] = useState(false);
 
   const chapter =
     STUDIO_CHAPTERS.find((candidate) => candidate.id === chapterId) ??
     STUDIO_CHAPTERS[0];
+  const chapterCopy = CHAPTER_COPY[chapter.id];
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -98,32 +123,51 @@ export function App() {
     return compileMusicSpec(spec, runtime.value.compilerKnowledge);
   }, [runtime, spec]);
 
+  useEffect(() => {
+    if (!compilation?.styleText) return;
+    setPreviewPulse(true);
+    const timer = window.setTimeout(() => setPreviewPulse(false), 900);
+    return () => window.clearTimeout(timer);
+  }, [compilation?.styleText]);
+
+  const selectedGenreLabels = useMemo(
+    () =>
+      spec?.genre_influences.map(
+        (entry) => genreLabels.get(entry.genre_id) ?? entry.genre_id,
+      ) ?? [],
+    [genreLabels, spec],
+  );
+
+  const [coverLineOne, coverLineTwo] = coverLines(
+    selectedGenreLabels[0] ?? "Build your sound",
+  );
+  const budgetUsed = compilation?.budget.used ?? 0;
+  const budgetMax = compilation?.budget.max || 1000;
+  const budgetPercent = Math.min(100, Math.max(0, (budgetUsed / budgetMax) * 100));
+
   function chooseChapter(nextId: (typeof STUDIO_CHAPTERS)[number]["id"]) {
-    const next = STUDIO_CHAPTERS.find((candidate) => candidate.id === nextId);
-    if (!next) return;
-    setChapterId(next.id);
-    setActiveFacet(next.facets[0]);
+    setChapterId(nextId);
+    setMobilePreviewOpen(false);
   }
 
   function facetSummary(facet: FacetKey): string {
     if (facet === "genre") {
-      if (spec === null) return "Choose Foundation";
-      return spec.genre_influences
-        .map((entry) => genreLabels.get(entry.genre_id) ?? entry.genre_id)
-        .join(" · ");
+      return selectedGenreLabels.length
+        ? selectedGenreLabels.join(" · ")
+        : "Noch nicht gewählt";
     }
-
-    const facetState = spec?.facets[facet];
-    if (!facetState) return "Not set";
-    const count =
-      facetState.selections.length + (facetState.custom_text?.trim() ? 1 : 0);
-    return count === 0 ? "Not set" : count === 1 ? "1 choice" : String(count) + " choices";
+    const state = spec?.facets[facet];
+    if (!state) return "Noch nicht gesetzt";
+    const count = state.selections.length + (state.custom_text?.trim() ? 1 : 0);
+    return count === 0 ? "Noch nicht gesetzt" : count + " Auswahl";
   }
 
   async function copyPrompt() {
-    if (!compilation?.styleText) return;
+    const value =
+      outputTab === "exclude" ? compilation?.excludeText : compilation?.styleText;
+    if (!value) return;
     try {
-      await copyText(compilation.styleText);
+      await copyText(value);
       setCopyState("copied");
       window.setTimeout(() => setCopyState("idle"), 1200);
     } catch {
@@ -132,140 +176,165 @@ export function App() {
     }
   }
 
-  const runtimeBadge =
+  const runtimeLabel =
     runtime.status === "ready"
-      ? runtime.value.bootstrap.genres.genres.length.toLocaleString() + " genres"
+      ? runtime.value.bootstrap.genres.genres.length.toLocaleString() +
+        " Genres verbunden"
       : runtime.status === "loading"
-        ? "Loading runtime"
-        : "Runtime unavailable";
+        ? "Runtime wird geladen"
+        : "Runtime nicht verfügbar";
+
+  const nextChapter =
+    STUDIO_CHAPTERS[
+      Math.min(
+        STUDIO_CHAPTERS.length - 1,
+        STUDIO_CHAPTERS.findIndex((entry) => entry.id === chapter.id) + 1,
+      )
+    ];
 
   return (
     <div className="studio-shell">
-      <header className="studio-header">
-        <Cluster gap="4">
-          <div className="brand-mark" aria-hidden="true">V</div>
+      <header className="topbar">
+        <div className="brand">
+          <div className="brandmark">v</div>
           <div>
-            <div className="brand-title">Prompt V&apos;gine</div>
-            <Text as="small" tone="muted" size="xs">
-              {runtimeBadge}
-            </Text>
+            <div className="brand-name">V&apos;GINE</div>
+            <div className="brand-sub">BY GRAPH1KS</div>
           </div>
-        </Cluster>
+        </div>
 
-        <Cluster gap="2">
-          <Text as="small" tone="muted" size="xs" className="desktop-only">
-            MusicSpec · deterministic compiler
-          </Text>
-          <Button
-            size="sm"
-            tone="ghost"
-            aria-label="Switch color theme"
+        <div className="top-divider" />
+        <span className="top-label">Dein persönliches Sound-Studio</span>
+
+        <div className="top-actions">
+          <span className="save-status">{runtimeLabel}</span>
+          <button
+            type="button"
+            className="icon-btn"
+            aria-label="Farbschema wechseln"
+            title="Farbschema wechseln"
             onClick={() =>
               setTheme((current) => (current === "paradise" ? "ash" : "paradise"))
             }
           >
-            {theme === "paradise" ? "Ash" : "Paradise"}
-          </Button>
-          <Button
-            size="sm"
-            tone="accent"
-            disabled={!compilation?.budget.valid}
+            <Icon name="theme" />
+          </button>
+          <button
+            type="button"
+            className={assistOn ? "btn assist-toggle active" : "btn assist-toggle"}
+            aria-pressed={assistOn}
+            onClick={() => setAssistOn((current) => !current)}
+          >
+            <Icon name="help" />
+            Erklärmodus <span>{assistOn ? "an" : "aus"}</span>
+          </button>
+          <button
+            type="button"
+            className="btn primary"
+            disabled={!compilation?.styleText}
             onClick={copyPrompt}
           >
-            {copyState === "copied" ? "Copied" : "Export"}
-          </Button>
-        </Cluster>
+            <Icon name="copy" />
+            {copyState === "copied" ? "Kopiert" : "Prompt kopieren"}
+          </button>
+        </div>
       </header>
 
-      <main className="studio-main">
-        <nav className="chapter-rail" aria-label="Studio chapters">
-          {STUDIO_CHAPTERS.map((item, index) => {
-            const active = item.id === chapter.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                className="chapter-button"
-                data-active={active || undefined}
-                aria-current={active ? "step" : undefined}
-                onClick={() => chooseChapter(item.id)}
-              >
-                <span className="chapter-index">0{index + 1}</span>
-                <span className="chapter-label">{item.shortLabel}</span>
-              </button>
-            );
-          })}
-        </nav>
-
-        <section className="workspace" aria-labelledby="workspace-title">
-          <div className="workspace-heading">
-            <Stack gap="2">
-              <Text as="small" tone="accent" size="xs">
-                {chapter.shortLabel.toUpperCase()}
-              </Text>
-              <h1 id="workspace-title">{chapter.label}</h1>
-              <Text as="p" tone="muted" size="sm">
-                {chapter.description}
-              </Text>
-            </Stack>
-
-            <div className="chapter-status" aria-label="Active facet">
-              <span>Editing</span>
-              <strong>{FACET_LABELS[activeFacet]}</strong>
+      <div className="app">
+        <section className="intro">
+          <div>
+            <div className="eyebrow">Weniger Syntax. Mehr Musik.</div>
+            <h1>
+              Dein Sound. <em>Deine Regeln.</em>
+            </h1>
+            <p>Verbinde Genres. Gib ihnen Charakter. Bau deinen Prompt.</p>
+          </div>
+          <div className="intro-right">
+            <div className="preset-dots" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </div>
+            <div className="intro-note">
+              Drei Einflüsse.
+              <br />
+              Unendlich viele Richtungen.
             </div>
           </div>
+        </section>
 
-          <div className="facet-grid">
-            {chapter.facets.map((facet) => (
-              <button
-                key={facet}
-                type="button"
-                className="facet-card"
-                data-active={facet === activeFacet || undefined}
-                onClick={() => setActiveFacet(facet)}
-              >
-                <span className="facet-card-copy">
-                  <span className="facet-label">{FACET_LABELS[facet]}</span>
-                  <span className="facet-value">{facetSummary(facet)}</span>
+        <div className="layout">
+          <main
+            className={mobilePreviewOpen ? "editor mobile-hidden" : "editor"}
+            id="editor"
+          >
+            <nav className="steps" aria-label="Sound bearbeiten">
+              {STUDIO_CHAPTERS.map((item, index) => {
+                const active = item.id === chapter.id;
+                const currentIndex = STUDIO_CHAPTERS.findIndex(
+                  (candidate) => candidate.id === chapter.id,
+                );
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={
+                      active
+                        ? "step active"
+                        : index < currentIndex
+                          ? "step done"
+                          : "step"
+                    }
+                    aria-current={active ? "step" : undefined}
+                    onClick={() => chooseChapter(item.id)}
+                  >
+                    <span className="num">0{index + 1}</span>
+                    {item.label}
+                  </button>
+                );
+              })}
+            </nav>
+
+            <section className="stage" key={chapter.id}>
+              <div className="section-head">
+                <div>
+                  <h2>{chapterCopy.title}</h2>
+                  <p>{chapterCopy.description}</p>
+                </div>
+                <span className="section-index">
+                  0
+                  {STUDIO_CHAPTERS.findIndex((item) => item.id === chapter.id) + 1}
+                  {" / 04"}
                 </span>
-                <span className="facet-arrow" aria-hidden="true">→</span>
-              </button>
-            ))}
-          </div>
-
-          <Surface elevation="raised" className="inspector">
-            <Stack gap="4">
-              <Cluster gap="2">
-                <span className="status-dot" aria-hidden="true" />
-                <Text as="small" tone="muted" size="xs">
-                  ACTIVE FACET
-                </Text>
-              </Cluster>
-              <h2>{FACET_LABELS[activeFacet]}</h2>
+              </div>
 
               {runtime.status === "loading" && (
-                <div className="runtime-state">
-                  <Text as="p" tone="muted" size="sm">
-                    Loading and validating the local Runtime Pack…
-                  </Text>
+                <div className="field-card runtime-card">
+                  <span className="runtime-spinner" aria-hidden="true" />
+                  <div>
+                    <strong>Runtime Pack wird validiert.</strong>
+                    <p>
+                      Genres, Suchindex und Compilerwissen werden lokal geladen.
+                    </p>
+                  </div>
                 </div>
               )}
 
               {runtime.status === "error" && (
-                <div className="runtime-state runtime-state-error">
-                  <Text as="strong" size="sm">
-                    Runtime Pack unavailable
-                  </Text>
-                  <Text as="p" tone="muted" size="sm">
-                    Run <code>pnpm runtime:stage</code> from the repository root, then reload the Studio.
-                  </Text>
-                  <Text as="small" tone="muted" size="xs">
-                    {runtime.message}
-                  </Text>
+                <div className="field-card runtime-card error">
+                  <Icon name="info" />
+                  <div>
+                    <strong>Runtime Pack nicht verfügbar.</strong>
+                    <p>
+                      Führe <code>pnpm runtime:stage</code> aus und lade das Studio
+                      neu.
+                    </p>
+                    <small>{runtime.message}</small>
+                  </div>
                 </div>
               )}
 
-              {runtime.status === "ready" && activeFacet === "genre" && (
+              {runtime.status === "ready" && chapter.id === "dna" && (
                 <GenrePicker
                   runtime={runtime.value.bootstrap}
                   searchIndex={runtime.value.searchIndex}
@@ -276,99 +345,207 @@ export function App() {
                 />
               )}
 
-              {runtime.status === "ready" && activeFacet !== "genre" && (
-                <div className="runtime-state">
-                  <Text as="p" tone="muted" size="sm">
-                    This facet is structurally live but its production controls are not implemented in this slice.
-                    No placeholder option vocabulary is fabricated.
-                  </Text>
+              {runtime.status === "ready" && chapter.id !== "dna" && (
+                <div className="placeholder-fields">
+                  {chapter.facets.map((facet) => (
+                    <section key={facet} className="field-card">
+                      <div className="field-label">
+                        <span>{FACET_LABELS[facet]}</span>
+                        <span className="badge">MusicSpec</span>
+                      </div>
+                      <div className="placeholder-value">
+                        <strong>{facetSummary(facet)}</strong>
+                        <p>
+                          Produktionscontrol folgt im nächsten Slice. Hier werden
+                          bewusst keine Demo-Werte als echte Daten ausgegeben.
+                        </p>
+                      </div>
+                    </section>
+                  ))}
                 </div>
               )}
-            </Stack>
-          </Surface>
-        </section>
 
-        <aside className="preview-panel" aria-label="Live prompt preview">
-          <div className="preview-top">
-            <div>
-              <Text as="small" tone="accent" size="xs">
-                LIVE OUTPUT
-              </Text>
-              <h2>Prompt</h2>
-            </div>
-            <div
-              className="budget-pill"
-              data-valid={compilation?.budget.valid || undefined}
-              aria-label="Prompt budget"
-            >
-              <span>{compilation?.budget.used ?? 0}</span>
-              <span>/ {compilation?.budget.max ?? 1000}</span>
-            </div>
-          </div>
+              <div className="stage-footer">
+                <p>
+                  {chapter.id === "dna"
+                    ? "Foundation ist Pflicht. Fusion und Accent bleiben optional."
+                    : "Easy und Advanced werden denselben MusicSpec-Zustand bearbeiten."}
+                </p>
+                <button
+                  type="button"
+                  className="btn primary"
+                  disabled={chapter.id === "dna" && spec === null}
+                  onClick={() => chooseChapter(nextChapter.id)}
+                >
+                  {chapter.id === "finish" ? "Fertig" : nextChapter.label}
+                  <Icon name="arrow" />
+                </button>
+              </div>
+            </section>
+          </main>
 
-          <Surface elevation="raised" className="prompt-empty">
-            {compilation?.styleText ? (
-              <Stack gap="4">
-                <pre className="prompt-output">{compilation.styleText}</pre>
-                {compilation.diagnostics.length > 0 && (
-                  <div className="prompt-diagnostics">
-                    {compilation.diagnostics.map((diagnostic, index) => (
-                      <Text
-                        key={diagnostic.code + String(index)}
-                        as="small"
-                        tone={diagnostic.severity === "error" ? "accent" : "muted"}
-                        size="xs"
-                      >
-                        {diagnostic.message}
-                      </Text>
-                    ))}
-                  </div>
-                )}
-              </Stack>
-            ) : (
-              <Stack gap="3">
-                <div className="prompt-cursor" aria-hidden="true" />
-                <Text as="p" tone="muted" size="sm">
-                  Choose a Foundation genre to create the first valid MusicSpec.
-                  Rendered prompt text remains output only.
-                </Text>
-              </Stack>
-            )}
-          </Surface>
-
-          <div className="preview-footer">
-            <Text as="small" tone="muted" size="xs">
-              {compilation?.excludeText
-                ? "Exclude: " + compilation.excludeText
-                : "Exclude is a separate output channel."}
-            </Text>
-            <Button
-              size="sm"
-              disabled={!compilation?.styleText}
-              onClick={copyPrompt}
-            >
-              {copyState === "copied"
-                ? "Copied"
-                : copyState === "error"
-                  ? "Copy failed"
-                  : "Copy"}
-            </Button>
-          </div>
-        </aside>
-      </main>
-
-      <nav className="mobile-chapter-dock" aria-label="Studio chapters mobile">
-        {STUDIO_CHAPTERS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            data-active={item.id === chapter.id || undefined}
-            onClick={() => chooseChapter(item.id)}
+          <aside
+            className={
+              mobilePreviewOpen
+                ? previewPulse
+                  ? "preview mobile-open changed"
+                  : "preview mobile-open"
+                : previewPulse
+                  ? "preview changed"
+                  : "preview"
+            }
+            aria-label="Dein Live-Prompt"
           >
-            {item.shortLabel}
-          </button>
-        ))}
-      </nav>
+            <div className="preview-top">
+              <span className="eyebrow">Dein Sound, in Worten.</span>
+              <span className="live">
+                <i className="dot" /> LIVE PROMPT
+              </span>
+            </div>
+
+            <div className="cover">
+              <div className="eyebrow">V&apos;GINE / SOUND STUDY 001</div>
+              <h2>
+                {coverLineOne}
+                <br />
+                {coverLineTwo}
+              </h2>
+              <div className="cover-code">
+                {selectedGenreLabels.length
+                  ? selectedGenreLabels.slice(0, 3).join(" × ").toUpperCase()
+                  : "FOUNDATION × FUSION × ACCENT"}
+              </div>
+              <div className="record" aria-hidden="true" />
+              <div className="cover-barcode" aria-hidden="true" />
+            </div>
+
+            <div className="preview-tabs">
+              <button
+                type="button"
+                className={outputTab === "style" ? "preview-tab active" : "preview-tab"}
+                aria-pressed={outputTab === "style"}
+                onClick={() => setOutputTab("style")}
+              >
+                Style
+                <span className="n">{compilation?.sections.length ?? 0}</span>
+              </button>
+              <button
+                type="button"
+                className={outputTab === "exclude" ? "preview-tab active" : "preview-tab"}
+                aria-pressed={outputTab === "exclude"}
+                onClick={() => setOutputTab("exclude")}
+              >
+                Exclude
+                <span className="n">{compilation?.excludeText ? 1 : 0}</span>
+              </button>
+            </div>
+
+            <div className="prompt-area">
+              {outputTab === "style" ? (
+                compilation?.sections.length ? (
+                  compilation.sections.map((section) => (
+                    <div className="prompt-line changed-line" key={section.sectionKey}>
+                      <span className="bracket">[</span>
+                      <span className="prompt-key">{section.label}</span>
+                      <span className="bracket">: </span>
+                      <span className="prompt-value">{section.content}</span>
+                      <span className="bracket">]</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="preview-empty">
+                    <Icon name="spark" />
+                    <p>
+                      Wähle eine Foundation. Jede Änderung landet direkt hier —
+                      aus dem echten MusicSpec, nicht aus Demo-State.
+                    </p>
+                  </div>
+                )
+              ) : compilation?.excludeText ? (
+                <p className="exclude-text">{compilation.excludeText}</p>
+              ) : (
+                <div className="preview-empty">
+                  <p>Noch keine Ausschlüsse gesetzt.</p>
+                </div>
+              )}
+
+              {compilation?.diagnostics.map((diagnostic, index) => (
+                <div
+                  key={diagnostic.code + String(index)}
+                  className={"diagnostic " + diagnostic.severity}
+                >
+                  {diagnostic.message}
+                </div>
+              ))}
+            </div>
+
+            <div className="preview-footer">
+              <div className="budget-row">
+                <span>Suno Style</span>
+                <b>
+                  {budgetUsed} / {budgetMax}
+                </b>
+              </div>
+              <div className="budget-track">
+                <i style={{ width: budgetPercent + "%" }} />
+              </div>
+              <button
+                type="button"
+                className="btn acid"
+                disabled={
+                  outputTab === "style"
+                    ? !compilation?.styleText
+                    : !compilation?.excludeText
+                }
+                onClick={copyPrompt}
+              >
+                <Icon name="copy" />
+                {copyState === "copied"
+                  ? "Kopiert"
+                  : outputTab === "style"
+                    ? "Style kopieren"
+                    : "Exclude kopieren"}
+                <span className="copy-shortcut">Ctrl / ⌘ ↵</span>
+              </button>
+              <div className="preview-note">
+                Deine Auswahl wird deterministisch in den Prompt übersetzt.
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <footer className="bottom-note">
+          <span>GRAPH1KS / V&apos;GINE — PRODUCTION STUDIO</span>
+          <span>Runtime Pack · MusicSpec v1 · Compiler v1</span>
+        </footer>
+      </div>
+
+      <div className="mobile-dock">
+        <button
+          type="button"
+          className="btn mobile-preview-button"
+          onClick={() => setMobilePreviewOpen((current) => !current)}
+        >
+          <span>
+            {mobilePreviewOpen ? "Zurück zum Studio" : "Live-Prompt"}
+            <small>
+              {mobilePreviewOpen
+                ? "Deine Auswahl bleibt erhalten"
+                : budgetUsed + " / " + budgetMax + " Zeichen"}
+            </small>
+          </span>
+          <Icon name={mobilePreviewOpen ? "back" : "arrow"} />
+        </button>
+        <button
+          type="button"
+          className="btn acid"
+          disabled={!compilation?.styleText}
+          onClick={copyPrompt}
+        >
+          <Icon name="copy" />
+          Kopieren
+        </button>
+      </div>
     </div>
   );
 }
