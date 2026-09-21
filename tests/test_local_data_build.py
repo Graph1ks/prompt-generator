@@ -447,10 +447,10 @@ class LocalDataBuildTests(unittest.TestCase):
                 report["invariants"]["all_source_output_text_preserved"]
             )
             self.assertTrue(
-                (out / "reports" / "01-build.stdout.txt").is_file()
+                (out / "logs" / "database-01-build.stdout.txt").is_file()
             )
             self.assertTrue(
-                (out / "reports" / "03-knowledge-mining.stdout.txt").is_file()
+                (out / "logs" / "database-03-knowledge-mining.stdout.txt").is_file()
             )
 
     def test_renderer_profile_carries_source_derived_character_budget(self):
