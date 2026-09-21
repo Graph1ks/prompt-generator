@@ -19,6 +19,8 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Added resumable v2 local build state, staged work artifacts, source/build fingerprinting, read-only plan/status commands, safe pause/resume, stale-checkpoint rejection, and loss-safe promotion.
 - Added bundled report-driven genre curation: automatic backup, full JSON/CSV review export, decision-bundle freshness/target validation, transactional apply, automatic knowledge recompile/validation, rollback on failure, receipts, and refreshed reports.
 - Added bundled instrument/lexicon mining reports with curation-aware filtering, instrument segment/head-token evidence, section-aware term/phrase evidence, source examples, full CSV exports, automatic local curation backup, and concise terminal output.
+- Added reviewed knowledge decision bundles and transactional knowledge apply/recompile/validate/rollback tooling for instrument families, canonical instruments, aliases, dictionary concepts, definitions, and context definitions.
+- Strengthened knowledge-mining reports with semantic curation fingerprints and phrase-noise suppression for instrument-list adjacency, Key/Mode literals, connector boundaries, and common grammar scaffolding.
 
 ### Changed
 
