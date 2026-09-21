@@ -1,247 +1,1281 @@
 #!/usr/bin/env python3
-"""Build local-only Prompt V'gine corpus/knowledge DBs from factory files."""
+"""Resumable, loss-safe local Prompt V'gine data build pipeline.
+
+The promoted corpus/knowledge DBs are disposable compiled artifacts.
+curation.sqlite is durable local authoring state and is never replaced here.
+"""
 from __future__ import annotations
-import argparse, collections, datetime as dt, gzip, hashlib, json, re, sqlite3, unicodedata
+
+import argparse
+import datetime as dt
+import hashlib
+import json
+import os
+import shutil
+import signal
+import sqlite3
+import sys
+import time
 from pathlib import Path
 
-VAULT_SCHEMA="graph1ks-prompt-control-deck-v1"; GENRE_SCHEMA="graph1ks-genre-map-v2"; RULES="corpus-extract-v1"
-SECTION_MAP={
- "Genre":("genre","Genre","canonical"),"Era":("era","Era","canonical"),"BPM":("bpm","BPM","canonical"),
- "BPM/Meter":("bpm_meter","BPM/Meter","compound"),"Meter":("meter","Meter","canonical"),
- "Meter/Groove":("meter_groove","Meter/Groove","compound"),"Key/Mode":("key_mode","Key/Mode","canonical"),
- "Groove":("groove","Groove","canonical"),"Melody":("melody","Melody","canonical"),
- "Harmony":("harmony","Harmony","canonical"),"Drums":("drums","Drums","canonical"),"Bass":("bass","Bass","canonical"),
- "Low End":("low_end","Low End","legacy"),"Instruments":("instruments","Instruments","canonical"),
- "Exciters":("exciters","Exciters","canonical"),"Texture":("texture","Texture","canonical"),"Vocal":("vocal","Vocal","canonical"),
- "Emotion":("emotion","Emotion","legacy"),"Density":("density","Density","legacy"),"Dynamics":("dynamics","Dynamics","canonical"),
- "Space/Mix":("space_mix","Space/Mix","canonical"),"Mix":("space_mix","Space/Mix","alias"),
- "Production":("production","Production","canonical"),"Structure":("structure","Structure","canonical")}
-OUTPUT_SECTIONS=[("genre","Genre",10),("era","Era",20),("bpm","BPM",30),("key_mode","Key/Mode",40),("groove","Groove",50),
- ("melody","Melody",60),("harmony","Harmony",70),("drums","Drums",80),("bass","Bass",90),("instruments","Instruments",100),
- ("exciters","Exciters",110),("texture","Texture",120),("vocal","Vocal",130),("dynamics","Dynamics",140),("space_mix","Space/Mix",150),
- ("production","Production",160),("structure","Structure",170)]
-SECTION_RE=re.compile(r"^\[([^:\]]+):\s*(.*?)\]$"); TOKEN_RE=re.compile(r"[^\W_]+(?:[-'][^\W_]+)*",re.UNICODE); NEG_RE=re.compile(r"\s*,\s*")
+from local_data_v1_core import (
+    GENRE_SCHEMA,
+    OUTPUT_SECTIONS,
+    RULES,
+    SECTION_MAP,
+    VAULT_SCHEMA,
+    apply_curation,
+    build_knowledge,
+    clauses,
+    init_curation,
+    load,
+    lookup,
+    meta,
+    norm,
+    sections,
+    seed_review_queue,
+    sha,
+    sid,
+    space,
+    tokens,
+)
 
-def now(): return dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00","Z")
-def load(p):
- with (gzip.open(p,"rt",encoding="utf-8") if p.suffix==".gz" else p.open(encoding="utf-8")) as f:return json.load(f)
-def sha(p):
- h=hashlib.sha256()
- with p.open("rb") as f:
-  for b in iter(lambda:f.read(1048576),b""):h.update(b)
- return h.hexdigest()
-def space(s): return " ".join((s or "").strip().split())
-def norm(s): return space(unicodedata.normalize("NFKC",s or "")).casefold()
-def lookup(s):
- s=unicodedata.normalize("NFKD",s or ""); s="".join(c for c in s if not unicodedata.combining(c)).casefold().replace("&"," and ")
- return " ".join(re.sub(r"[^a-z0-9]+"," ",s).split())
-def slug(s): return re.sub(r"\s+","-",lookup(s)).strip("-") or "unnamed"
-def sid(prefix,s): return f"{prefix}:{slug(s)}:{hashlib.sha1(s.encode()).hexdigest()[:12]}"
-def sections(text):
- out=[]
- for i,line in enumerate((x.strip() for x in (text or "").splitlines() if x.strip()),1):
-  m=SECTION_RE.match(line)
-  if not m: raise ValueError(f"Malformed structured prompt line: {line!r}")
-  label=space(m.group(1)); content=space(m.group(2)); key,outlabel,status=SECTION_MAP.get(label,(f"unknown:{slug(label)}",label,"unknown"))
-  out.append((i,label,key,outlabel,status,content,norm(content),line))
- return out
-def clauses(text):
- out=[]; start=0; i=1
- for m in re.finditer(r"[,;]",text):
-  raw=text[start:m.start()].strip()
-  if raw:
-   rs=text.find(raw,start,m.start()+1); out.append((i,raw,norm(raw),m.group(0),rs,rs+len(raw))); i+=1
-  start=m.end()
- raw=text[start:].strip()
- if raw:
-  rs=text.find(raw,start); out.append((i,raw,norm(raw),None,rs,rs+len(raw)))
- return out
-def tokens(text): return [(i,m.group(),norm(m.group()),m.start(),m.end()) for i,m in enumerate(TOKEN_RE.finditer(text),1)]
-def meta(c,d): c.executemany("INSERT OR REPLACE INTO build_meta(key,value) VALUES (?,?)",[(k,str(v)) for k,v in d.items()])
-def schema(c,p): c.executescript(p.read_text(encoding="utf-8")); c.execute("PRAGMA synchronous=OFF"); c.execute("PRAGMA temp_store=MEMORY")
+BUILD_REVISION = "promptvgine-local-data-build-v2-resumable-1"
+WORK_DIR_NAME = ".build-v2"
+STAGES = [
+    ("corpus_init", 10),
+    ("ingest_tracks", 20),
+    ("aggregate_stats", 30),
+    ("phrases_2", 40),
+    ("phrases_3", 50),
+    ("phrases_4", 60),
+    ("phrases_5", 70),
+    ("fts", 80),
+    ("crosswalk_profile", 90),
+    ("knowledge_compile", 100),
+    ("curation_overlay", 110),
+    ("validate", 120),
+    ("report", 130),
+    ("promote", 140),
+]
+CORPUS_STAGE_NAMES = {name for name, ordinal in STAGES if ordinal <= 90}
+KNOWLEDGE_STAGE_NAMES = {name for name, ordinal in STAGES if 100 <= ordinal <= 130}
+CURATION_HASH_TABLES = [
+    "entry_patch",
+    "term_variant_patch",
+    "definition_patch",
+    "context_definition_patch",
+    "relation_patch",
+    "genre_crosswalk_decision",
+    "instrument_family_patch",
+    "instrument_patch",
+    "instrument_alias_patch",
+    "parameter_patch",
+    "parameter_option_patch",
+    "statement_patch",
+    "statement_concept_patch",
+    "statement_option_patch",
+]
 
-def build_corpus(c,v,g,vp,gp,vsha,gsha,deep=False):
- cur=c.cursor(); stamp=now(); meta(c,{"schema_version":"corpus-v1","rules":RULES,"vault_sha256":vsha,"genre_map_sha256":gsha,"built_at":stamp})
- cur.execute("INSERT INTO source_file(kind,basename,sha256,schema_name,schema_version,source_timestamp,imported_at) VALUES (?,?,?,?,?,?,?)",("prompt_vault",vp.name,vsha,v["schema"],v.get("version"),v.get("exported_at"),stamp)); vsid=cur.lastrowid
- cur.execute("INSERT INTO source_file(kind,basename,sha256,schema_name,schema_version,source_timestamp,imported_at) VALUES (?,?,?,?,?,?,?)",("genre_map",gp.name,gsha,g["schema"],str(g.get("taxonomy_version")),g.get("generated_at"),stamp))
- cur.executemany("INSERT INTO section_label_map(raw_label,canonical_key,canonical_output_label,mapping_status) VALUES (?,?,?,?)",[(k,*val) for k,val in SECTION_MAP.items()])
- majors={label:sid("major",label) for label in g["major_genres"]}
- cur.executemany("INSERT INTO major_genre_raw(major_key,label,source_ordinal) VALUES (?,?,?)",[(majors[x],x,i) for i,x in enumerate(g["major_genres"],1)])
- genres={}; gnorm={}
- for i,item in enumerate(g["genres"],1):
-  label=space(item["genre"]); gid=sid("genre",label); genres[label]=gid; gnorm.setdefault(lookup(label),gid)
-  cur.execute("INSERT INTO genre_raw(genre_key,label,label_norm,source_ordinal,track_count_declared) VALUES (?,?,?,?,?)",(gid,label,lookup(label),i,int(item.get("track_count") or 0)))
-  cur.executemany("INSERT INTO genre_major_raw(genre_key,major_key,ordinal) VALUES (?,?,?)",[(gid,majors[m],j) for j,m in enumerate(item.get("major_genres",[]),1)])
- tok=collections.Counter(); tok_tracks=collections.Counter(); gtok=collections.Counter(); gtok_tracks=collections.Counter(); phr=collections.Counter(); phr_tracks=collections.Counter(); phr_first={}; vals=collections.Counter(); val_tracks=collections.Counter(); val_example={}; seqs=collections.Counter(); neg=collections.Counter(); neg_tracks=collections.defaultdict(set); neg_raw={}; neg_occ=[]; vg=collections.Counter(); section_count=token_count=0
- for pos,t in enumerate(v["tracks"],1):
-  tid=str(t.get("id") if t.get("id") is not None else pos); genre=space(str(t.get("genre") or "")); vg[genre]+=1
-  cur.execute("INSERT INTO track(track_id,source_file_id,source_ordinal,title,genre_raw,bpm,emotion_raw,style_raw,year,key_raw,reference_artist,reference_song,structured_prompt,negative_prompt,instrumental_arrangement,used,favorite) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(tid,vsid,pos,t.get("title"),genre,t.get("bpm"),t.get("emotion"),t.get("style"),t.get("year"),t.get("key"),t.get("reference_artist"),t.get("reference_song"),t.get("structured_prompt") or "",t.get("negative_prompt"),t.get("instrumental_arrangement"),int(bool(t.get("used"))),int(bool(t.get("favorite")))))
-  ss=sections(t.get("structured_prompt") or ""); seqs[tuple(x[1] for x in ss)]+=1; seen_tok=set(); seen_gtok=set(); seen_phr=set(); seen_vals=set()
-  for ordinal,label,key,outlabel,status,raw,rawnorm,line in ss:
-   section_count+=1; cur.execute("INSERT INTO prompt_section(track_id,ordinal,raw_label,canonical_key,canonical_output_label,content_raw,content_norm,source_line_raw) VALUES (?,?,?,?,?,?,?,?)",(tid,ordinal,label,key,outlabel,raw,rawnorm,line)); secid=cur.lastrowid
-   vkey=(key,rawnorm); vals[vkey]+=1; val_tracks[vkey]+=int(vkey not in seen_vals); seen_vals.add(vkey); val_example.setdefault(vkey,raw)
-   cls=clauses(raw); cur.executemany("INSERT INTO prompt_clause(section_id,ordinal,content_raw,content_norm,delimiter_after,start_char,end_char) VALUES (?,?,?,?,?,?,?)",[(secid,*x) for x in cls])
-   ts=tokens(raw); token_count+=len(ts); tnorm=[x[2] for x in ts]
-   for oi,tr,tn,a,b in ts:
-    k=(tn,key); tok[k]+=1; seen_tok.add(k); gk=(lookup(genre),key,tn); gtok[gk]+=1; seen_gtok.add(gk)
-    if deep: cur.execute("INSERT INTO token_occurrence(section_id,ordinal_section,token_raw,token_norm,start_char,end_char) VALUES (?,?,?,?,?,?)",(secid,oi,tr,tn,a,b))
-   for n in range(2,min(5,len(tnorm))+1):
-    for i in range(len(tnorm)-n+1):
-     p=" ".join(tnorm[i:i+n]); pk=(key,n,p); phr[pk]+=1; seen_phr.add(pk); phr_first.setdefault(pk,secid)
-  for k in seen_tok: tok_tracks[k]+=1
-  for k in seen_gtok: gtok_tracks[k]+=1
-  for k in seen_phr: phr_tracks[k]+=1
-  for i,item in enumerate((space(x) for x in NEG_RE.split(space(str(t.get("negative_prompt") or ""))) if space(x)),1):
-   n=norm(item); neg[n]+=1; neg_tracks[n].add(tid); neg_raw.setdefault(n,item); neg_occ.append((tid,i,item,n))
- c.executemany("INSERT INTO token_section_stat(token_norm,canonical_key,occurrence_count,track_count) VALUES (?,?,?,?)",[(a,b,n,tok_tracks[(a,b)]) for (a,b),n in tok.items()])
- c.executemany("INSERT INTO genre_section_token_stat(vault_genre_norm,canonical_key,token_norm,occurrence_count,track_count) VALUES (?,?,?,?,?)",[(a,b,d,n,gtok_tracks[(a,b,d)]) for (a,b,d),n in gtok.items()])
- c.executemany("INSERT INTO section_value_stat(canonical_key,content_norm,content_raw_example,occurrence_count,track_count) VALUES (?,?,?,?,?)",[(a,b,val_example[(a,b)],n,val_tracks[(a,b)]) for (a,b),n in vals.items()])
- c.executemany("INSERT INTO phrase_candidate(canonical_key,n,phrase_norm,occurrence_count,track_count,first_section_id) VALUES (?,?,?,?,?,?)",[(a,n,p,count,phr_tracks[(a,n,p)],phr_first[(a,n,p)]) for (a,n,p),count in phr.items() if count>=3])
- negids={}
- for n,count in neg.items():
-  cur.execute("INSERT INTO negative_item(item_raw_example,item_norm) VALUES (?,?)",(neg_raw[n],n)); negids[n]=cur.lastrowid; cur.execute("INSERT INTO negative_item_stat(negative_item_id,occurrence_count,track_count) VALUES (?,?,?)",(cur.lastrowid,count,len(neg_tracks[n])))
- c.executemany("INSERT INTO track_negative_item(track_id,negative_item_id,ordinal,item_raw) VALUES (?,?,?,?)",[(tid,negids[n],i,raw) for tid,i,raw,n in neg_occ])
- c.execute("INSERT INTO prompt_section_fts(section_id,track_id,canonical_key,raw_label,content) SELECT id,track_id,canonical_key,raw_label,content_raw FROM prompt_section")
- for seq,count in seqs.items():
-  js=json.dumps(list(seq),ensure_ascii=False); cur.execute("INSERT INTO section_sequence_stat(sequence_key,sequence_json,track_count) VALUES (?,?,?)",(hashlib.sha1(js.encode()).hexdigest(),js,count))
- exact={r[0]:r[1] for r in cur.execute("SELECT label,genre_key FROM genre_raw")}; bynorm={}
- for a,b in cur.execute("SELECT label_norm,genre_key FROM genre_raw"): bynorm.setdefault(a,b)
- x=collections.Counter()
- for label,count in vg.items():
-  ln=lookup(label); status="exact" if label in exact else "normalized" if ln in bynorm else "unmatched"; match=exact.get(label) or bynorm.get(ln); x[status]+=1
-  cur.execute("INSERT INTO genre_crosswalk_candidate(vault_genre_raw,vault_genre_norm,vault_track_count,match_status,matched_genre_key) VALUES (?,?,?,?,?)",(label,ln,count,status,match))
- raw_labels={x[1] for t in v["tracks"] for x in sections(t.get("structured_prompt") or "")}
- track_match=collections.Counter()
- for label,count in vg.items():
-  row=cur.execute("SELECT match_status FROM genre_crosswalk_candidate WHERE vault_genre_raw=?",(label,)).fetchone()
-  if row: track_match[row[0]]+=count
- prof={"track_count":len(v["tracks"]),"section_count":section_count,"token_count":token_count,"raw_section_label_count":len(raw_labels),"section_sequence_variant_count":len(seqs),"negative_item_occurrence_count":sum(neg.values()),"negative_unique_item_count":len(neg),"major_genre_count":len(g["major_genres"]),"taxonomy_genre_count":len(g["genres"]),"vault_genre_label_count":len(vg),"genre_crosswalk_exact_labels":x["exact"],"genre_crosswalk_normalized_labels":x["normalized"],"genre_crosswalk_unmatched_labels":x["unmatched"],"genre_crosswalk_exact_tracks":track_match["exact"],"genre_crosswalk_normalized_tracks":track_match["normalized"],"genre_crosswalk_unmatched_tracks":track_match["unmatched"],"deep_token_index":deep}
- c.executemany("INSERT INTO corpus_profile(metric_key,metric_value) VALUES (?,?)",[(k,json.dumps(v)) for k,v in prof.items()]); c.commit(); return prof
-
-def build_knowledge(c,g,corpus,gsha):
- stamp=now(); meta(c,{"schema_version":"knowledge-v1","rules":RULES,"taxonomy":g.get("taxonomy"),"taxonomy_version":g.get("taxonomy_version"),"genre_map_sha256":gsha,"built_at":stamp,"curation_state":"bootstrap-candidates"}); cur=c.cursor(); prov="genre-map-factory"
- cur.execute("INSERT INTO provenance(provenance_key,source_kind,source_ref,source_version,source_hash,extraction_rule_version,notes) VALUES (?,?,?,?,?,?,?)",(prov,"factory","GRAPH1KS_GENRE_MAP_FACTORY.json",str(g.get("taxonomy_version")),gsha,RULES,"Full source file remains local-only."))
- for key,label,order in OUTPUT_SECTIONS: cur.execute("INSERT INTO prompt_section_definition(section_key,output_label,output_order,optional,easy_visible,advanced_visible) VALUES (?,?,?,?,?,?)",(key,label,order,1,1,1))
- cur.execute("INSERT INTO renderer_profile(id,label,version,active,notes) VALUES (?,?,?,?,?)",("suno-structured-v1","Suno structured prompt",1,1,"[Header: content] lines; Exclude is separate comma-list output."))
- cur.executemany("INSERT INTO renderer_section(renderer_profile_id,section_key,output_order,emit_when_empty) VALUES (?,?,?,0)",[("suno-structured-v1",k,o) for k,_,o in OUTPUT_SECTIONS])
- mids={}
- for i,label in enumerate(g["major_genres"],1):
-  mid=sid("major",label); eid=sid("knowledge:genre",f"major::{label}"); mids[label]=mid
-  cur.execute("INSERT INTO knowledge_entry(id,entry_type,canonical_label,canonical_slug,status,difficulty,created_from,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?)",(eid,"major_genre",label,f"major-{slug(label)}","approved","beginner","genre-map",stamp,stamp))
-  cur.execute("INSERT INTO term_variant(entry_id,surface,surface_norm,locale,match_kind,match_priority,is_primary) VALUES (?,?,?,?,?,?,1)",(eid,label,norm(label),"en","phrase",200))
-  cur.execute("INSERT INTO major_genre(id,label,source_ordinal,knowledge_entry_id) VALUES (?,?,?,?)",(mid,label,i,eid))
- gids={}
- for item in g["genres"]:
-  label=space(item["genre"]); gid=sid("genre",label); eid=sid("knowledge:genre",label); gids[label]=gid
-  cur.execute("INSERT INTO knowledge_entry(id,entry_type,canonical_label,canonical_slug,status,difficulty,created_from,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?)",(eid,"genre",label,f"genre-{slug(label)}","approved","beginner","genre-map",stamp,stamp))
-  cur.execute("INSERT INTO term_variant(entry_id,surface,surface_norm,locale,match_kind,match_priority,is_primary) VALUES (?,?,?,?,?,?,1)",(eid,label,norm(label),"en","phrase",300))
-  cur.execute("INSERT INTO genre(id,label,label_norm,status,knowledge_entry_id,provenance_key) VALUES (?,?,?,?,?,?)",(gid,label,lookup(label),"approved",eid,prov))
-  cur.executemany("INSERT INTO genre_major(genre_id,major_genre_id,ordinal) VALUES (?,?,?)",[(gid,mids[m],i) for i,m in enumerate(item.get("major_genres",[]),1)])
- raw_to_label={k:l for k,l in corpus.execute("SELECT genre_key,label FROM genre_raw")}; aliases=0
- for surface,n,status,gk in corpus.execute("SELECT vault_genre_raw,vault_genre_norm,match_status,matched_genre_key FROM genre_crosswalk_candidate WHERE match_status IN ('exact','normalized')"):
-  label=raw_to_label.get(gk)
-  if label:
-   cur.execute("INSERT OR IGNORE INTO genre_alias(alias_norm,alias_surface,genre_id,alias_kind,status,provenance_key) VALUES (?,?,?,?,?,?)",(n,surface,gids[label],status,"approved",prov)); aliases+=cur.rowcount
- c.commit(); return {"major_genres":len(mids),"genres":len(gids),"approved_genre_aliases":aliases,"renderer_sections":len(OUTPUT_SECTIONS)}
+STOP_REQUESTED = False
 
 
-def init_curation(path,schema_dir):
- c=sqlite3.connect(path); c.execute("PRAGMA foreign_keys=ON"); c.executescript((schema_dir/"curation-v1.sql").read_text(encoding="utf-8")); c.execute("INSERT OR REPLACE INTO curation_meta(key,value) VALUES (?,?)",("last_opened_at",now())); c.commit(); return c
+class PauseRequested(RuntimeError):
+    pass
 
-def seed_review_queue(curation,corpus,vault_sha):
- added=0
- for raw,n,count in corpus.execute("SELECT vault_genre_raw,vault_genre_norm,vault_track_count FROM genre_crosswalk_candidate WHERE match_status='unmatched' ORDER BY vault_track_count DESC,vault_genre_raw"):
-  key="genre-crosswalk:"+hashlib.sha1(n.encode()).hexdigest()[:16]; evidence=json.dumps({"vault_track_count":count,"vault_sha256":vault_sha},ensure_ascii=False,sort_keys=True)
-  cur=curation.execute("INSERT OR IGNORE INTO candidate_review(candidate_key,candidate_type,section_key,surface,normalized_surface,evidence_json) VALUES (?,?,?,?,?,?)",(key,"genre_crosswalk","genre",raw,n,evidence)); added+=cur.rowcount
- curation.commit(); return {"genre_crosswalk_candidates_added":added}
 
-def apply_curation(k,c):
- cur=k.cursor(); counts=collections.Counter()
- cur.execute("INSERT OR IGNORE INTO provenance(provenance_key,source_kind,source_ref,notes) VALUES ('local-curation','curation','curation.sqlite','Durable local authoring state; never committed.')")
- def has(table,col,value): return cur.execute(f"SELECT 1 FROM {table} WHERE {col}=?",(value,)).fetchone() is not None
- for eid,etype,label,eslug,status,difficulty,updated in c.execute("SELECT entry_id,entry_type,canonical_label,canonical_slug,status,difficulty,updated_at FROM entry_patch ORDER BY entry_id"):
-  if status=="deprecated": cur.execute("UPDATE knowledge_entry SET status='deprecated',updated_at=? WHERE id=?",(updated,eid)); counts["entries_deprecated"]+=cur.rowcount; continue
-  if has("knowledge_entry","id",eid): cur.execute("UPDATE knowledge_entry SET entry_type=?,canonical_label=?,canonical_slug=?,status=?,difficulty=?,created_from='curated',updated_at=? WHERE id=?",(etype,label,eslug,status,difficulty,updated,eid))
-  else: cur.execute("INSERT INTO knowledge_entry(id,entry_type,canonical_label,canonical_slug,status,difficulty,created_from,created_at,updated_at) VALUES (?,?,?,?,?,?,'curated',?,?)",(eid,etype,label,eslug,status,difficulty,updated,updated))
-  counts["entries_applied"]+=1
- for eid,surface,snorm,locale,mkind,priority,primary,status in c.execute("SELECT entry_id,surface,surface_norm,locale,match_kind,match_priority,is_primary,status FROM term_variant_patch ORDER BY id"):
-  if not has("knowledge_entry","id",eid): counts["term_variants_skipped_missing_entry"]+=1; continue
-  if status=="deprecated": cur.execute("DELETE FROM term_variant WHERE entry_id=? AND locale=? AND surface_norm=?",(eid,locale,snorm)); continue
-  cur.execute("INSERT INTO term_variant(entry_id,surface,surface_norm,locale,match_kind,match_priority,is_primary) VALUES (?,?,?,?,?,?,?) ON CONFLICT(entry_id,locale,surface_norm) DO UPDATE SET surface=excluded.surface,match_kind=excluded.match_kind,match_priority=excluded.match_priority,is_primary=excluded.is_primary",(eid,surface,snorm,locale,mkind,priority,primary)); counts["term_variants_applied"]+=1
- for row in c.execute("SELECT entry_id,locale,definition_kind,text,status,revision FROM definition_patch ORDER BY id"):
-  if not has("knowledge_entry","id",row[0]): counts["definitions_skipped_missing_entry"]+=1; continue
-  cur.execute("INSERT INTO definition(entry_id,locale,definition_kind,text,status,revision) VALUES (?,?,?,?,?,?) ON CONFLICT(entry_id,locale,definition_kind,revision) DO UPDATE SET text=excluded.text,status=excluded.status",row); counts["definitions_applied"]+=1
- for row in c.execute("SELECT entry_id,locale,context_type,context_key,text,status,revision FROM context_definition_patch ORDER BY id"):
-  if not has("knowledge_entry","id",row[0]): counts["context_definitions_skipped_missing_entry"]+=1; continue
-  cur.execute("INSERT INTO context_definition(entry_id,locale,context_type,context_key,text,status,revision) VALUES (?,?,?,?,?,?,?) ON CONFLICT(entry_id,locale,context_type,context_key,revision) DO UPDATE SET text=excluded.text,status=excluded.status",row); counts["context_definitions_applied"]+=1
- for source,rtype,target,strength,status in c.execute("SELECT source_entry_id,relation_type,target_entry_id,strength,status FROM relation_patch ORDER BY id"):
-  if not has("knowledge_entry","id",source) or not has("knowledge_entry","id",target): counts["relations_skipped_missing_entry"]+=1; continue
-  cur.execute("INSERT INTO knowledge_relation(source_entry_id,relation_type,target_entry_id,strength,status,provenance_key) VALUES (?,?,?,?,?,'local-curation') ON CONFLICT(source_entry_id,relation_type,target_entry_id) DO UPDATE SET strength=excluded.strength,status=excluded.status,provenance_key=excluded.provenance_key",(source,rtype,target,strength,status)); counts["relations_applied"]+=1
- for surface,snorm,target,role,kind,ordinal,status in c.execute("SELECT source_surface,source_norm,target_genre_id,target_role_hint,decision_kind,ordinal,status FROM genre_crosswalk_decision ORDER BY source_norm,ordinal"):
-  if kind in ("ignore","defer") or status=="deprecated": continue
-  if target and not has("genre","id",target): counts["genre_mappings_skipped_missing_target"]+=1; continue
-  cur.execute("INSERT INTO genre_source_mapping(source_norm,source_surface,mapping_kind,target_genre_id,target_role_hint,ordinal,status,provenance_key) VALUES (?,?,?,?,?,?,?,'local-curation') ON CONFLICT(source_norm,ordinal) DO UPDATE SET source_surface=excluded.source_surface,mapping_kind=excluded.mapping_kind,target_genre_id=excluded.target_genre_id,target_role_hint=excluded.target_role_hint,status=excluded.status,provenance_key=excluded.provenance_key",(snorm,surface,kind,target,role,ordinal,status))
-  if kind=="alias" and target: cur.execute("INSERT INTO genre_alias(alias_norm,alias_surface,genre_id,alias_kind,status,provenance_key) VALUES (?,?,?,'manual',?,'local-curation') ON CONFLICT(alias_norm) DO UPDATE SET alias_surface=excluded.alias_surface,genre_id=excluded.genre_id,alias_kind='manual',status=excluded.status,provenance_key='local-curation'",(snorm,surface,target,status))
-  counts["genre_mappings_applied"]+=1
- for fid,label,eid,status in c.execute("SELECT id,label,knowledge_entry_id,status FROM instrument_family_patch ORDER BY id"):
-  if status=="deprecated": cur.execute("DELETE FROM instrument_family WHERE id=?",(fid,)); continue
-  if status=="candidate": continue
-  if eid and not has("knowledge_entry","id",eid): eid=None
-  cur.execute("INSERT INTO instrument_family(id,label,knowledge_entry_id) VALUES (?,?,?) ON CONFLICT(id) DO UPDATE SET label=excluded.label,knowledge_entry_id=excluded.knowledge_entry_id",(fid,label,eid)); counts["instrument_families_applied"]+=1
- for iid,label,ln,fid,eid,status in c.execute("SELECT id,label,label_norm,family_id,knowledge_entry_id,status FROM instrument_patch ORDER BY id"):
-  if status=="deprecated": cur.execute("UPDATE instrument SET status='deprecated' WHERE id=?",(iid,)); continue
-  if fid and not has("instrument_family","id",fid): fid=None
-  if eid and not has("knowledge_entry","id",eid): eid=None
-  cur.execute("INSERT INTO instrument(id,label,label_norm,family_id,status,knowledge_entry_id,provenance_key) VALUES (?,?,?,?,?,?,'local-curation') ON CONFLICT(id) DO UPDATE SET label=excluded.label,label_norm=excluded.label_norm,family_id=excluded.family_id,status=excluded.status,knowledge_entry_id=excluded.knowledge_entry_id,provenance_key='local-curation'",(iid,label,ln,fid,status,eid)); counts["instruments_applied"]+=1
- for _,iid,surface,snorm,status in c.execute("SELECT id,instrument_id,alias_surface,alias_norm,status FROM instrument_alias_patch ORDER BY id"):
-  if not has("instrument","id",iid): counts["instrument_aliases_skipped_missing_instrument"]+=1; continue
-  if status=="deprecated": cur.execute("DELETE FROM instrument_alias WHERE alias_norm=?",(snorm,)); continue
-  cur.execute("INSERT INTO instrument_alias(alias_norm,alias_surface,instrument_id,status) VALUES (?,?,?,?) ON CONFLICT(alias_norm) DO UPDATE SET alias_surface=excluded.alias_surface,instrument_id=excluded.instrument_id,status=excluded.status",(snorm,surface,iid,status)); counts["instrument_aliases_applied"]+=1
- for row in c.execute("SELECT id,section_key,label,canonical_slug,value_type,easy_visible,advanced_visible,allow_custom_text,knowledge_entry_id,sort_order,status FROM parameter_patch ORDER BY id"):
-  pid,section,label,pslug,vtype,easy,adv,custom,eid,sort_order,status=row
-  if status=="deprecated": cur.execute("DELETE FROM parameter WHERE id=?",(pid,)); continue
-  if status=="candidate": continue
-  if not has("prompt_section_definition","section_key",section): counts["parameters_skipped_missing_section"]+=1; continue
-  if eid and not has("knowledge_entry","id",eid): eid=None
-  cur.execute("INSERT INTO parameter(id,section_key,label,canonical_slug,value_type,easy_visible,advanced_visible,allow_custom_text,knowledge_entry_id,sort_order) VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET section_key=excluded.section_key,label=excluded.label,canonical_slug=excluded.canonical_slug,value_type=excluded.value_type,easy_visible=excluded.easy_visible,advanced_visible=excluded.advanced_visible,allow_custom_text=excluded.allow_custom_text,knowledge_entry_id=excluded.knowledge_entry_id,sort_order=excluded.sort_order",(pid,section,label,pslug,vtype,easy,adv,custom,eid,sort_order)); counts["parameters_applied"]+=1
- for row in c.execute("SELECT id,parameter_id,label,canonical_slug,output_fragment,knowledge_entry_id,easy_visible,advanced_visible,sort_order,status FROM parameter_option_patch ORDER BY id"):
-  oid,pid,label,oslug,fragment,eid,easy,adv,sort_order,status=row
-  if status=="deprecated": cur.execute("DELETE FROM parameter_option WHERE id=?",(oid,)); continue
-  if not has("parameter","id",pid): counts["parameter_options_skipped_missing_parameter"]+=1; continue
-  if eid and not has("knowledge_entry","id",eid): eid=None
-  cur.execute("INSERT INTO parameter_option(id,parameter_id,label,canonical_slug,output_fragment,status,easy_visible,advanced_visible,knowledge_entry_id,sort_order) VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET parameter_id=excluded.parameter_id,label=excluded.label,canonical_slug=excluded.canonical_slug,output_fragment=excluded.output_fragment,status=excluded.status,easy_visible=excluded.easy_visible,advanced_visible=excluded.advanced_visible,knowledge_entry_id=excluded.knowledge_entry_id,sort_order=excluded.sort_order",(oid,pid,label,oslug,fragment,status,easy,adv,eid,sort_order)); counts["parameter_options_applied"]+=1
- for stid,section,label,out,mode,kind,status in c.execute("SELECT id,section_key,label,output_text,mode_scope,statement_kind,status FROM statement_patch ORDER BY id"):
-  if status=="deprecated": cur.execute("DELETE FROM statement WHERE id=?",(stid,)); continue
-  if not has("prompt_section_definition","section_key",section): counts["statements_skipped_missing_section"]+=1; continue
-  cur.execute("INSERT INTO statement(id,section_key,label,output_text,status,mode_scope,statement_kind,provenance_key) VALUES (?,?,?,?,?,?,?,'local-curation') ON CONFLICT(id) DO UPDATE SET section_key=excluded.section_key,label=excluded.label,output_text=excluded.output_text,status=excluded.status,mode_scope=excluded.mode_scope,statement_kind=excluded.statement_kind,provenance_key='local-curation'",(stid,section,label,out,status,mode,kind)); counts["statements_applied"]+=1
- for stid,eid,role,ordinal in c.execute("SELECT statement_id,entry_id,role,ordinal FROM statement_concept_patch ORDER BY statement_id,ordinal"):
-  if has("statement","id",stid) and has("knowledge_entry","id",eid): cur.execute("INSERT OR REPLACE INTO statement_concept(statement_id,entry_id,role,ordinal) VALUES (?,?,?,?)",(stid,eid,role,ordinal)); counts["statement_concepts_applied"]+=1
- for stid,oid,ordinal in c.execute("SELECT statement_id,option_id,ordinal FROM statement_option_patch ORDER BY statement_id,ordinal"):
-  if has("statement","id",stid) and has("parameter_option","id",oid): cur.execute("INSERT OR REPLACE INTO statement_option(statement_id,option_id,ordinal) VALUES (?,?,?)",(stid,oid,ordinal)); counts["statement_options_applied"]+=1
- cur.execute("DELETE FROM knowledge_search")
- cur.execute("""INSERT INTO knowledge_search(entry_id,label,terms,definition)
- SELECT e.id,e.canonical_label,
- COALESCE((SELECT group_concat(tv.surface,' ') FROM term_variant tv WHERE tv.entry_id=e.id),''),
- trim(COALESCE((SELECT group_concat(d.text,' ') FROM definition d WHERE d.entry_id=e.id AND d.status='approved'),'') || ' ' || COALESCE((SELECT group_concat(cd.text,' ') FROM context_definition cd WHERE cd.entry_id=e.id AND cd.status='approved'),''))
- FROM knowledge_entry e WHERE e.status<>'deprecated'""")
- meta(k,{"curation_compiled_at":now(),"curation_schema":"curation-v1"}); k.commit(); return dict(counts)
+def utc_now() -> str:
+    return dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z")
 
-def main():
- ap=argparse.ArgumentParser(); ap.add_argument("--vault",required=True,type=Path); ap.add_argument("--genre-map",required=True,type=Path); ap.add_argument("--out-dir",required=True,type=Path); ap.add_argument("--schema-dir",type=Path,default=Path(__file__).resolve().parents[2]/"schema"); ap.add_argument("--force",action="store_true",help="replace generated corpus/knowledge DBs; never deletes curation.sqlite"); ap.add_argument("--deep-token-index",action="store_true"); a=ap.parse_args()
- v=load(a.vault); g=load(a.genre_map)
- if v.get("schema")!=VAULT_SCHEMA or g.get("schema")!=GENRE_SCHEMA: raise SystemExit("Unsupported source schema; update importer explicitly.")
- a.out_dir.mkdir(parents=True,exist_ok=True); cp=a.out_dir/"corpus.sqlite"; kp=a.out_dir/"knowledge.sqlite"; xp=a.out_dir/"curation.sqlite"
- for p in (cp,kp):
-  if p.exists():
-   if not a.force: raise SystemExit(f"Generated output exists: {p}; use --force. curation.sqlite is preserved.")
-   p.unlink()
- vc=sqlite3.connect(cp); kc=sqlite3.connect(kp); xc=init_curation(xp,a.schema_dir)
- try:
-  schema(vc,a.schema_dir/"corpus-v1.sql"); schema(kc,a.schema_dir/"knowledge-v1.sql"); vs=sha(a.vault); gs=sha(a.genre_map)
-  cprof=build_corpus(vc,v,g,a.vault,a.genre_map,vs,gs,a.deep_token_index); kprof=build_knowledge(kc,g,vc,gs)
-  qprof=seed_review_queue(xc,vc,vs); oprof=apply_curation(kc,xc); xprof={**qprof,**oprof}; kprof["curation_overlay"]=oprof
-  if vc.execute("PRAGMA integrity_check").fetchone()[0]!="ok" or kc.execute("PRAGMA integrity_check").fetchone()[0]!="ok" or xc.execute("PRAGMA integrity_check").fetchone()[0]!="ok": raise SystemExit("SQLite integrity check failed")
-  report={"generated_at":now(),"corpus":cprof,"knowledge":kprof,"curation":xprof}; rp=a.out_dir/"reports"/"corpus-profile.json"; rp.parent.mkdir(parents=True,exist_ok=True); rp.write_text(json.dumps(report,indent=2,ensure_ascii=False),encoding="utf-8")
- finally: vc.close(); kc.close(); xc.close()
- print(json.dumps({"status":"ok","corpus_db":str(cp),"knowledge_db":str(kp),"curation_db":str(xp),"report":str(rp),"corpus":cprof,"knowledge":kprof,"curation":xprof},indent=2,ensure_ascii=False)); return 0
-if __name__=="__main__": raise SystemExit(main())
+
+def parse_json(value):
+    if value is None:
+        return None
+    try:
+        return json.loads(value)
+    except Exception:
+        return value
+
+
+def print_json(value) -> None:
+    print(json.dumps(value, indent=2, ensure_ascii=False))
+
+
+def fmt_duration(seconds: float) -> str:
+    seconds = max(0, int(round(seconds)))
+    if seconds >= 3600:
+        return f"{seconds // 3600}h {(seconds % 3600) // 60}m"
+    if seconds >= 60:
+        return f"{seconds // 60}m {seconds % 60}s"
+    return f"{seconds}s"
+
+
+def progress_line(stage: str, current: int, total: int | None, started: float, start_count: int = 0, batch_seconds: float | None = None, extra: list[str] | None = None) -> None:
+    elapsed = max(0.001, time.perf_counter() - started)
+    delta = max(0, current - start_count)
+    rate = delta / elapsed
+    pieces = [f"[{stage}]"]
+    if total is not None:
+        pct = (current * 100 / total) if total else 100.0
+        pieces.append(f"{current:,} / {total:,} ({pct:.1f}%)")
+    else:
+        pieces.append(f"{current:,}")
+    if rate > 0:
+        pieces.append(f"{rate:,.0f}/s")
+    if batch_seconds is not None:
+        pieces.append(f"batch {batch_seconds:.2f}s")
+    if total is not None and rate > 0 and current < total:
+        pieces.append(f"ETA ~{fmt_duration((total-current)/rate)}")
+    if extra:
+        pieces.extend(extra)
+    print(" · ".join(pieces), file=sys.stderr, flush=True)
+
+
+def install_signal_handlers() -> None:
+    def handler(signum, frame):
+        global STOP_REQUESTED
+        if not STOP_REQUESTED:
+            STOP_REQUESTED = True
+            print(
+                "\n[build] stop requested; finishing/rolling back the current safe unit before pausing...",
+                file=sys.stderr,
+                flush=True,
+            )
+    signal.signal(signal.SIGINT, handler)
+    if hasattr(signal, "SIGTERM"):
+        signal.signal(signal.SIGTERM, handler)
+
+
+def open_state(work_dir: Path, schema_dir: Path) -> sqlite3.Connection:
+    work_dir.mkdir(parents=True, exist_ok=True)
+    path = work_dir / "state.sqlite"
+    conn = sqlite3.connect(path)
+    conn.row_factory = sqlite3.Row
+    conn.executescript((schema_dir / "build-state-v1.sql").read_text(encoding="utf-8"))
+    for name, ordinal in STAGES:
+        conn.execute(
+            """INSERT OR IGNORE INTO build_stage(name,ordinal,status,processed,updated_at)
+               VALUES (?,?, 'pending',0,?)""",
+            (name, ordinal, utc_now()),
+        )
+    conn.commit()
+    return conn
+
+
+def state_meta(conn: sqlite3.Connection, key: str) -> str | None:
+    row = conn.execute("SELECT value FROM build_meta WHERE key=?", (key,)).fetchone()
+    return row[0] if row else None
+
+
+def set_state_meta(conn: sqlite3.Connection, values: dict) -> None:
+    conn.executemany(
+        """INSERT INTO build_meta(key,value) VALUES (?,?)
+           ON CONFLICT(key) DO UPDATE SET value=excluded.value""",
+        [(str(k), str(v)) for k, v in values.items()],
+    )
+    conn.commit()
+
+
+def event(conn: sqlite3.Connection, level: str, message: str, stage: str | None = None, detail=None) -> None:
+    conn.execute(
+        "INSERT INTO build_event(ts,level,stage,message,detail_json) VALUES (?,?,?,?,?)",
+        (utc_now(), level, stage, message, json.dumps(detail, ensure_ascii=False, sort_keys=True) if detail is not None else None),
+    )
+    conn.commit()
+
+
+def stage_row(conn: sqlite3.Connection, name: str):
+    return conn.execute("SELECT * FROM build_stage WHERE name=?", (name,)).fetchone()
+
+
+def stage_start(conn: sqlite3.Connection, name: str, total: int | None = None) -> None:
+    row = stage_row(conn, name)
+    conn.execute(
+        """UPDATE build_stage
+           SET status='running', total=COALESCE(?,total),
+               started_at=COALESCE(started_at,?), updated_at=?, completed_at=NULL
+           WHERE name=?""",
+        (total, utc_now(), utc_now(), name),
+    )
+    conn.commit()
+    event(conn, "info", "stage started", name, {"processed": row["processed"] if row else 0, "total": total})
+
+
+def stage_progress(conn: sqlite3.Connection, name: str, processed: int, total: int | None = None, detail=None) -> None:
+    conn.execute(
+        """UPDATE build_stage SET status='running',processed=?,total=COALESCE(?,total),
+           updated_at=?,detail_json=COALESCE(?,detail_json) WHERE name=?""",
+        (
+            processed,
+            total,
+            utc_now(),
+            json.dumps(detail, ensure_ascii=False, sort_keys=True) if detail is not None else None,
+            name,
+        ),
+    )
+    conn.commit()
+
+
+def stage_complete(conn: sqlite3.Connection, name: str, processed: int | None = None, total: int | None = None, detail=None, elapsed: float | None = None) -> None:
+    row = stage_row(conn, name)
+    final_processed = processed if processed is not None else (row["processed"] if row else 0)
+    final_total = total if total is not None else (row["total"] if row else None)
+    prior_elapsed = float(row["elapsed_seconds"] or 0) if row else 0.0
+    conn.execute(
+        """UPDATE build_stage SET status='complete',processed=?,total=?,updated_at=?,completed_at=?,
+           elapsed_seconds=?,detail_json=COALESCE(?,detail_json) WHERE name=?""",
+        (
+            final_processed,
+            final_total,
+            utc_now(),
+            utc_now(),
+            prior_elapsed + float(elapsed or 0),
+            json.dumps(detail, ensure_ascii=False, sort_keys=True) if detail is not None else None,
+            name,
+        ),
+    )
+    conn.commit()
+    event(conn, "info", "stage complete", name, detail)
+
+
+def stage_pause(conn: sqlite3.Connection, name: str, message: str) -> None:
+    conn.execute(
+        "UPDATE build_stage SET status='paused',updated_at=?,detail_json=? WHERE name=?",
+        (utc_now(), json.dumps({"message": message}, ensure_ascii=False), name),
+    )
+    conn.commit()
+    event(conn, "warning", message, name)
+
+
+def stage_error(conn: sqlite3.Connection, name: str, error: Exception) -> None:
+    conn.execute(
+        "UPDATE build_stage SET status='error',updated_at=?,detail_json=? WHERE name=?",
+        (utc_now(), json.dumps({"error": str(error)}, ensure_ascii=False), name),
+    )
+    conn.commit()
+    event(conn, "error", str(error), name)
+
+
+def mark_stages_complete(conn: sqlite3.Connection, names: set[str], detail: dict) -> None:
+    for name in names:
+        row = stage_row(conn, name)
+        if row and row["status"] != "complete":
+            stage_complete(conn, name, processed=row["total"] or row["processed"], total=row["total"], detail=detail)
+
+
+def reset_stages_from(conn: sqlite3.Connection, ordinal: int) -> None:
+    conn.execute(
+        """UPDATE build_stage SET status='pending',processed=0,total=NULL,started_at=NULL,
+           completed_at=NULL,elapsed_seconds=0,detail_json=NULL,updated_at=?
+           WHERE ordinal>=?""",
+        (utc_now(), ordinal),
+    )
+    conn.commit()
+
+
+def bind_state(conn: sqlite3.Connection, vault_sha: str, genre_sha: str) -> None:
+    expected = {
+        "build_revision": BUILD_REVISION,
+        "vault_sha256": vault_sha,
+        "genre_map_sha256": genre_sha,
+    }
+    existing = {k: state_meta(conn, k) for k in expected}
+    if not any(existing.values()):
+        set_state_meta(conn, {**expected, "created_at": utc_now(), "status": "in_progress"})
+        return
+    mismatches = {k: {"checkpoint": existing[k], "current": v} for k, v in expected.items() if existing[k] != v}
+    if mismatches:
+        raise SystemExit(
+            "Existing resumable work is bound to different source/build fingerprints. "
+            "Run --status to inspect it. Use --reset-work only if you intentionally want to discard the incomplete checkpoint.\n"
+            + json.dumps(mismatches, indent=2)
+        )
+
+
+def curation_fingerprint(conn: sqlite3.Connection) -> str:
+    h = hashlib.sha256()
+    for table in CURATION_HASH_TABLES:
+        columns = [row[1] for row in conn.execute(f"PRAGMA table_info({table})")]
+        if not columns:
+            continue
+        quoted = ",".join(f'"{c}"' for c in columns)
+        order = ",".join(str(i + 1) for i in range(len(columns)))
+        h.update(f"[{table}]".encode("utf-8"))
+        for row in conn.execute(f"SELECT {quoted} FROM {table} ORDER BY {order}"):
+            h.update(json.dumps(list(row), ensure_ascii=False, separators=(",", ":"), default=str).encode("utf-8"))
+            h.update(b"\n")
+    return h.hexdigest()
+
+
+def read_db_meta(path: Path) -> dict:
+    if not path.is_file():
+        return {}
+    try:
+        conn = sqlite3.connect(f"file:{path.resolve()}?mode=ro", uri=True)
+        try:
+            return {k: v for k, v in conn.execute("SELECT key,value FROM build_meta")}
+        finally:
+            conn.close()
+    except Exception:
+        return {}
+
+
+def promoted_corpus_matches(path: Path, vault_sha: str, genre_sha: str) -> bool:
+    m = read_db_meta(path)
+    return m.get("vault_sha256") == vault_sha and m.get("genre_map_sha256") == genre_sha
+
+
+def promoted_knowledge_matches(path: Path, vault_sha: str, genre_sha: str, curation_sha: str) -> bool:
+    m = read_db_meta(path)
+    return (
+        m.get("vault_sha256") == vault_sha
+        and m.get("genre_map_sha256") == genre_sha
+        and m.get("curation_fingerprint") == curation_sha
+        and m.get("build_revision") == BUILD_REVISION
+    )
+
+
+def preflight(vault_path: Path, genre_path: Path) -> dict:
+    if not vault_path.is_file():
+        raise SystemExit(f"Vault source not found: {vault_path}")
+    if not genre_path.is_file():
+        raise SystemExit(f"Genre map source not found: {genre_path}")
+    print("[preflight] reading source metadata...", file=sys.stderr, flush=True)
+    vault = load(vault_path)
+    genre_map = load(genre_path)
+    if vault.get("schema") != VAULT_SCHEMA:
+        raise SystemExit(f"Unsupported Vault schema: {vault.get('schema')!r}")
+    if genre_map.get("schema") != GENRE_SCHEMA:
+        raise SystemExit(f"Unsupported genre-map schema: {genre_map.get('schema')!r}")
+    print("[preflight] hashing source files...", file=sys.stderr, flush=True)
+    vault_sha = sha(vault_path)
+    genre_sha = sha(genre_path)
+    return {
+        "vault": vault,
+        "genre_map": genre_map,
+        "vault_sha": vault_sha,
+        "genre_sha": genre_sha,
+        "vault_bytes": vault_path.stat().st_size,
+        "genre_bytes": genre_path.stat().st_size,
+        "track_count": len(vault.get("tracks") or []),
+        "genre_count": len(genre_map.get("genres") or []),
+        "major_count": len(genre_map.get("major_genres") or []),
+    }
+
+
+def show_plan(info: dict, out_dir: Path) -> None:
+    promoted_corpus = out_dir / "corpus.sqlite"
+    promoted_knowledge = out_dir / "knowledge.sqlite"
+    work_dir = out_dir / WORK_DIR_NAME
+    print_json({
+        "mode": "plan",
+        "read_only": True,
+        "build_revision": BUILD_REVISION,
+        "sources": {
+            "vault": {
+                "bytes": info["vault_bytes"],
+                "sha256": info["vault_sha"],
+                "tracks": info["track_count"],
+                "schema": info["vault"].get("schema"),
+                "version": info["vault"].get("version"),
+            },
+            "genre_map": {
+                "bytes": info["genre_bytes"],
+                "sha256": info["genre_sha"],
+                "genres": info["genre_count"],
+                "major_genres": info["major_count"],
+                "schema": info["genre_map"].get("schema"),
+                "taxonomy_version": info["genre_map"].get("taxonomy_version"),
+            },
+        },
+        "output": str(out_dir),
+        "promoted": {
+            "corpus_exists": promoted_corpus.exists(),
+            "knowledge_exists": promoted_knowledge.exists(),
+            "curation_exists": (out_dir / "curation.sqlite").exists(),
+            "corpus_matches_sources": promoted_corpus_matches(promoted_corpus, info["vault_sha"], info["genre_sha"]),
+        },
+        "checkpoint_exists": (work_dir / "state.sqlite").exists(),
+        "safety": {
+            "promoted_artifacts_replaced_before_validation": False,
+            "curation_replaced": False,
+            "ordinary_rerun_resumes": True,
+        },
+    })
+
+
+def show_status(out_dir: Path) -> None:
+    work_dir = out_dir / WORK_DIR_NAME
+    state_path = work_dir / "state.sqlite"
+    result = {
+        "output": str(out_dir),
+        "promoted": {
+            "corpus": read_db_meta(out_dir / "corpus.sqlite"),
+            "knowledge": read_db_meta(out_dir / "knowledge.sqlite"),
+            "curation_exists": (out_dir / "curation.sqlite").exists(),
+        },
+        "checkpoint": None,
+    }
+    if state_path.is_file():
+        conn = sqlite3.connect(state_path)
+        conn.row_factory = sqlite3.Row
+        try:
+            result["checkpoint"] = {
+                "meta": {k: v for k, v in conn.execute("SELECT key,value FROM build_meta ORDER BY key")},
+                "stages": [dict(row) for row in conn.execute("SELECT * FROM build_stage ORDER BY ordinal")],
+                "recent_events": [dict(row) for row in conn.execute("SELECT * FROM build_event ORDER BY id DESC LIMIT 15")],
+            }
+        finally:
+            conn.close()
+    print_json(result)
+
+
+def reset_work(out_dir: Path) -> None:
+    work_dir = out_dir / WORK_DIR_NAME
+    if work_dir.exists():
+        shutil.rmtree(work_dir)
+        print(f"[reset] removed incomplete/checkpoint work only: {work_dir}")
+    else:
+        print(f"[reset] no work checkpoint exists: {work_dir}")
+    print("[reset] promoted corpus/knowledge and durable curation were not touched.")
+
+
+def open_work_corpus(path: Path) -> sqlite3.Connection:
+    conn = sqlite3.connect(path)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys=ON")
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA synchronous=NORMAL")
+    conn.execute("PRAGMA temp_store=MEMORY")
+    conn.set_progress_handler(lambda: 1 if STOP_REQUESTED else 0, 20000)
+    return conn
+
+
+def init_corpus_stage(state: sqlite3.Connection, work_corpus: Path, schema_dir: Path, info: dict, vault_path: Path, genre_path: Path) -> None:
+    if stage_row(state, "corpus_init")["status"] == "complete":
+        return
+    started = time.perf_counter()
+    stage_start(state, "corpus_init", 1)
+    try:
+        if work_corpus.exists():
+            work_corpus.unlink()
+        for suffix in ("-wal", "-shm"):
+            Path(str(work_corpus) + suffix).unlink(missing_ok=True)
+        conn = open_work_corpus(work_corpus)
+        try:
+            conn.executescript((schema_dir / "corpus-v2.sql").read_text(encoding="utf-8"))
+            meta(conn, {
+                "schema_version": "corpus-v2",
+                "rules": RULES,
+                "build_revision": BUILD_REVISION,
+                "vault_sha256": info["vault_sha"],
+                "genre_map_sha256": info["genre_sha"],
+                "built_at": utc_now(),
+            })
+            stamp = utc_now()
+            cur = conn.cursor()
+            cur.execute(
+                """INSERT INTO source_file(kind,basename,sha256,schema_name,schema_version,source_timestamp,imported_at)
+                   VALUES (?,?,?,?,?,?,?)""",
+                (
+                    "prompt_vault", vault_path.name, info["vault_sha"], info["vault"]["schema"],
+                    info["vault"].get("version"), info["vault"].get("exported_at"), stamp,
+                ),
+            )
+            cur.execute(
+                """INSERT INTO source_file(kind,basename,sha256,schema_name,schema_version,source_timestamp,imported_at)
+                   VALUES (?,?,?,?,?,?,?)""",
+                (
+                    "genre_map", genre_path.name, info["genre_sha"], info["genre_map"]["schema"],
+                    str(info["genre_map"].get("taxonomy_version")), info["genre_map"].get("generated_at"), stamp,
+                ),
+            )
+            cur.executemany(
+                "INSERT INTO section_label_map(raw_label,canonical_key,canonical_output_label,mapping_status) VALUES (?,?,?,?)",
+                [(label, *mapping) for label, mapping in SECTION_MAP.items()],
+            )
+            majors = {label: sid("major", label) for label in info["genre_map"]["major_genres"]}
+            cur.executemany(
+                "INSERT INTO major_genre_raw(major_key,label,source_ordinal) VALUES (?,?,?)",
+                [(majors[label], label, i) for i, label in enumerate(info["genre_map"]["major_genres"], 1)],
+            )
+            for i, item in enumerate(info["genre_map"]["genres"], 1):
+                label = space(item["genre"])
+                gid = sid("genre", label)
+                cur.execute(
+                    "INSERT INTO genre_raw(genre_key,label,label_norm,source_ordinal,track_count_declared) VALUES (?,?,?,?,?)",
+                    (gid, label, lookup(label), i, int(item.get("track_count") or 0)),
+                )
+                cur.executemany(
+                    "INSERT INTO genre_major_raw(genre_key,major_key,ordinal) VALUES (?,?,?)",
+                    [(gid, majors[m], j) for j, m in enumerate(item.get("major_genres", []), 1)],
+                )
+            conn.commit()
+        finally:
+            conn.close()
+        elapsed = time.perf_counter() - started
+        stage_complete(state, "corpus_init", 1, 1, {"schema": "corpus-v2"}, elapsed)
+        progress_line("corpus:init", 1, 1, started, extra=["done"])
+    except Exception as exc:
+        stage_error(state, "corpus_init", exc)
+        raise
+
+
+def insert_track_batch(conn: sqlite3.Connection, tracks_batch: list, start_ordinal: int, vault_source_id: int) -> None:
+    cur = conn.cursor()
+    cur.execute("BEGIN")
+    try:
+        for offset, track in enumerate(tracks_batch):
+            source_ordinal = start_ordinal + offset
+            track_id = str(track.get("id") if track.get("id") is not None else source_ordinal)
+            genre_raw = space(str(track.get("genre") or ""))
+            genre_norm = lookup(genre_raw)
+            cur.execute(
+                """INSERT INTO track(
+                     track_id,source_file_id,source_ordinal,title,genre_raw,genre_norm,bpm,emotion_raw,style_raw,year,
+                     key_raw,reference_artist,reference_song,structured_prompt,negative_prompt,instrumental_arrangement,used,favorite
+                   ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                (
+                    track_id, vault_source_id, source_ordinal, track.get("title"), genre_raw, genre_norm,
+                    track.get("bpm"), track.get("emotion"), track.get("style"), track.get("year"), track.get("key"),
+                    track.get("reference_artist"), track.get("reference_song"), track.get("structured_prompt") or "",
+                    track.get("negative_prompt"), track.get("instrumental_arrangement"),
+                    int(bool(track.get("used"))), int(bool(track.get("favorite"))),
+                ),
+            )
+            parsed_sections = sections(track.get("structured_prompt") or "")
+            sequence_json = json.dumps([row[1] for row in parsed_sections], ensure_ascii=False)
+            sequence_key = hashlib.sha1(sequence_json.encode("utf-8")).hexdigest()
+            cur.execute(
+                """INSERT INTO section_sequence_stat(sequence_key,sequence_json,track_count) VALUES (?,?,1)
+                   ON CONFLICT(sequence_key) DO UPDATE SET track_count=track_count+1""",
+                (sequence_key, sequence_json),
+            )
+            for ordinal, raw_label, canonical_key, output_label, mapping_status, raw, raw_norm, source_line in parsed_sections:
+                cur.execute(
+                    """INSERT INTO prompt_section(
+                         track_id,ordinal,raw_label,canonical_key,canonical_output_label,
+                         content_raw,content_norm,source_line_raw
+                       ) VALUES (?,?,?,?,?,?,?,?)""",
+                    (track_id, ordinal, raw_label, canonical_key, output_label, raw, raw_norm, source_line),
+                )
+                section_id = cur.lastrowid
+                clause_rows = clauses(raw)
+                cur.executemany(
+                    """INSERT INTO prompt_clause(
+                         section_id,ordinal,content_raw,content_norm,delimiter_after,start_char,end_char
+                       ) VALUES (?,?,?,?,?,?,?)""",
+                    [(section_id, *row) for row in clause_rows],
+                )
+                token_rows = tokens(raw)
+                cur.executemany(
+                    """INSERT INTO token_occurrence(
+                         section_id,clause_id,ordinal_section,ordinal_clause,token_raw,token_norm,start_char,end_char
+                       ) VALUES (?,NULL,?,NULL,?,?,?,?)""",
+                    [(section_id, oi, token_raw, token_norm, start, end) for oi, token_raw, token_norm, start, end in token_rows],
+                )
+            raw_negative = space(str(track.get("negative_prompt") or ""))
+            if raw_negative:
+                items = [space(part) for part in raw_negative.split(",") if space(part)]
+                for ordinal, item in enumerate(items, 1):
+                    item_norm = norm(item)
+                    cur.execute(
+                        "INSERT OR IGNORE INTO negative_item(item_raw_example,item_norm) VALUES (?,?)",
+                        (item, item_norm),
+                    )
+                    negative_id = cur.execute(
+                        "SELECT id FROM negative_item WHERE item_norm=?", (item_norm,)
+                    ).fetchone()[0]
+                    cur.execute(
+                        """INSERT INTO track_negative_item(track_id,negative_item_id,ordinal,item_raw)
+                           VALUES (?,?,?,?)""",
+                        (track_id, negative_id, ordinal, item),
+                    )
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+
+
+def ingest_tracks_stage(state: sqlite3.Connection, work_corpus: Path, vault_tracks: list, batch_size: int, test_stop_after_batches: int | None) -> None:
+    row = stage_row(state, "ingest_tracks")
+    if row["status"] == "complete":
+        return
+    total = len(vault_tracks)
+    processed = int(row["processed"] or 0)
+    stage_start(state, "ingest_tracks", total)
+    started = time.perf_counter()
+    start_count = processed
+    batch_number = 0
+    conn = open_work_corpus(work_corpus)
+    try:
+        source_id = conn.execute("SELECT id FROM source_file WHERE kind='prompt_vault' ORDER BY id LIMIT 1").fetchone()[0]
+        while processed < total:
+            if STOP_REQUESTED:
+                raise PauseRequested("stop requested before next batch")
+            end = min(total, processed + batch_size)
+            batch_started = time.perf_counter()
+            insert_track_batch(conn, vault_tracks[processed:end], processed + 1, source_id)
+            processed = end
+            batch_number += 1
+            batch_elapsed = time.perf_counter() - batch_started
+            stage_progress(state, "ingest_tracks", processed, total, {"batch_size": end - (processed - (end - (processed - end))) if False else min(batch_size, total - (processed - min(batch_size, processed))), "last_batch_seconds": batch_elapsed})
+            progress_line(
+                "corpus:tracks",
+                processed,
+                total,
+                started,
+                start_count,
+                batch_elapsed,
+                [
+                    f"sections {conn.execute('SELECT COUNT(*) FROM prompt_section').fetchone()[0]:,}",
+                    f"tokens {conn.execute('SELECT COUNT(*) FROM token_occurrence').fetchone()[0]:,}",
+                ],
+            )
+            if test_stop_after_batches and batch_number >= test_stop_after_batches:
+                raise PauseRequested("test stop after committed batch")
+            if STOP_REQUESTED:
+                raise PauseRequested("stop requested after committed batch")
+        elapsed = time.perf_counter() - started
+        stage_complete(state, "ingest_tracks", total, total, {"batch_size": batch_size}, elapsed)
+    except PauseRequested as exc:
+        stage_pause(state, "ingest_tracks", str(exc))
+        raise
+    except Exception as exc:
+        stage_error(state, "ingest_tracks", exc)
+        raise
+    finally:
+        conn.close()
+
+
+def sql_stage(state: sqlite3.Connection, name: str, work_corpus: Path, statements: list[str], detail=None) -> None:
+    row = stage_row(state, name)
+    if row["status"] == "complete":
+        return
+    stage_start(state, name, len(statements))
+    started = time.perf_counter()
+    conn = open_work_corpus(work_corpus)
+    try:
+        conn.execute("BEGIN")
+        for i, statement in enumerate(statements, 1):
+            conn.execute(statement)
+            stage_progress(state, name, i, len(statements))
+            progress_line(name, i, len(statements), started)
+        conn.commit()
+        elapsed = time.perf_counter() - started
+        stage_complete(state, name, len(statements), len(statements), detail, elapsed)
+    except sqlite3.OperationalError as exc:
+        conn.rollback()
+        if STOP_REQUESTED and "interrupt" in str(exc).lower():
+            stage_pause(state, name, "SQLite stage interrupted safely; rerun resumes from this stage")
+            raise PauseRequested(str(exc))
+        stage_error(state, name, exc)
+        raise
+    except Exception as exc:
+        conn.rollback()
+        stage_error(state, name, exc)
+        raise
+    finally:
+        conn.close()
+
+
+def aggregate_stats_stage(state: sqlite3.Connection, work_corpus: Path) -> None:
+    statements = [
+        "DELETE FROM token_section_stat",
+        """INSERT INTO token_section_stat(token_norm,canonical_key,occurrence_count,track_count)
+           SELECT t.token_norm,s.canonical_key,COUNT(*),COUNT(DISTINCT s.track_id)
+           FROM token_occurrence t JOIN prompt_section s ON s.id=t.section_id
+           GROUP BY t.token_norm,s.canonical_key""",
+        "DELETE FROM genre_section_token_stat",
+        """INSERT INTO genre_section_token_stat(vault_genre_norm,canonical_key,token_norm,occurrence_count,track_count)
+           SELECT tr.genre_norm,s.canonical_key,t.token_norm,COUNT(*),COUNT(DISTINCT tr.track_id)
+           FROM token_occurrence t
+           JOIN prompt_section s ON s.id=t.section_id
+           JOIN track tr ON tr.track_id=s.track_id
+           GROUP BY tr.genre_norm,s.canonical_key,t.token_norm""",
+        "DELETE FROM section_value_stat",
+        """INSERT INTO section_value_stat(canonical_key,content_norm,content_raw_example,occurrence_count,track_count)
+           SELECT canonical_key,content_norm,MIN(content_raw),COUNT(*),COUNT(DISTINCT track_id)
+           FROM prompt_section GROUP BY canonical_key,content_norm""",
+        "DELETE FROM negative_item_stat",
+        """INSERT INTO negative_item_stat(negative_item_id,occurrence_count,track_count)
+           SELECT negative_item_id,COUNT(*),COUNT(DISTINCT track_id)
+           FROM track_negative_item GROUP BY negative_item_id""",
+    ]
+    sql_stage(state, "aggregate_stats", work_corpus, statements, {"kind": "SQL aggregate"})
+
+
+def phrase_sql(n: int) -> str:
+    aliases = [f"t{i}" for i in range(1, n + 1)]
+    joins = []
+    for i in range(2, n + 1):
+        joins.append(
+            f"JOIN token_occurrence t{i} ON t{i}.section_id=t1.section_id AND t{i}.ordinal_section=t1.ordinal_section+{i-1}"
+        )
+    expr = " || ' ' || ".join(f"{a}.token_norm" for a in aliases)
+    return f"""INSERT INTO phrase_candidate(canonical_key,n,phrase_norm,occurrence_count,track_count,first_section_id)
+      SELECT s.canonical_key,{n},{expr},COUNT(*),COUNT(DISTINCT s.track_id),MIN(s.id)
+      FROM token_occurrence t1
+      {' '.join(joins)}
+      JOIN prompt_section s ON s.id=t1.section_id
+      GROUP BY s.canonical_key,{expr}
+      HAVING COUNT(*)>=3"""
+
+
+def phrase_stage(state: sqlite3.Connection, work_corpus: Path, n: int) -> None:
+    sql_stage(
+        state,
+        f"phrases_{n}",
+        work_corpus,
+        [f"DELETE FROM phrase_candidate WHERE n={n}", phrase_sql(n)],
+        {"n": n, "minimum_occurrences": 3},
+    )
+
+
+def fts_stage(state: sqlite3.Connection, work_corpus: Path) -> None:
+    sql_stage(
+        state,
+        "fts",
+        work_corpus,
+        [
+            "DELETE FROM prompt_section_fts",
+            """INSERT INTO prompt_section_fts(section_id,track_id,canonical_key,raw_label,content)
+               SELECT id,track_id,canonical_key,raw_label,content_raw FROM prompt_section""",
+        ],
+        {"kind": "FTS5"},
+    )
+
+
+def corpus_profile(conn: sqlite3.Connection) -> dict:
+    raw = {row[0]: parse_json(row[1]) for row in conn.execute("SELECT metric_key,metric_value FROM corpus_profile")}
+    return raw
+
+
+def crosswalk_profile_stage(state: sqlite3.Connection, work_corpus: Path, info: dict) -> dict:
+    row = stage_row(state, "crosswalk_profile")
+    if row["status"] == "complete":
+        conn = sqlite3.connect(work_corpus)
+        try:
+            return corpus_profile(conn)
+        finally:
+            conn.close()
+    stage_start(state, "crosswalk_profile", 1)
+    started = time.perf_counter()
+    conn = open_work_corpus(work_corpus)
+    try:
+        conn.execute("BEGIN")
+        conn.execute("DELETE FROM genre_crosswalk_candidate")
+        exact = {label: gid for label, gid in conn.execute("SELECT label,genre_key FROM genre_raw")}
+        normalized = {}
+        for label_norm, gid in conn.execute("SELECT label_norm,genre_key FROM genre_raw ORDER BY source_ordinal"):
+            normalized.setdefault(label_norm, gid)
+        rows = conn.execute(
+            "SELECT genre_raw,genre_norm,COUNT(*) FROM track GROUP BY genre_raw,genre_norm ORDER BY COUNT(*) DESC,genre_raw"
+        ).fetchall()
+        for genre_raw, genre_norm, count in rows:
+            status = "exact" if genre_raw in exact else "normalized" if genre_norm in normalized else "unmatched"
+            matched = exact.get(genre_raw) or normalized.get(genre_norm)
+            conn.execute(
+                """INSERT INTO genre_crosswalk_candidate(
+                     vault_genre_raw,vault_genre_norm,vault_track_count,match_status,matched_genre_key
+                   ) VALUES (?,?,?,?,?)""",
+                (genre_raw, genre_norm, count, status, matched),
+            )
+        counts = {row[0]: int(row[1]) for row in conn.execute(
+            "SELECT match_status,COUNT(*) FROM genre_crosswalk_candidate GROUP BY match_status"
+        )}
+        track_counts = {row[0]: int(row[1]) for row in conn.execute(
+            "SELECT match_status,SUM(vault_track_count) FROM genre_crosswalk_candidate GROUP BY match_status"
+        )}
+        profile = {
+            "track_count": conn.execute("SELECT COUNT(*) FROM track").fetchone()[0],
+            "section_count": conn.execute("SELECT COUNT(*) FROM prompt_section").fetchone()[0],
+            "token_count": conn.execute("SELECT COUNT(*) FROM token_occurrence").fetchone()[0],
+            "raw_section_label_count": conn.execute("SELECT COUNT(DISTINCT raw_label) FROM prompt_section").fetchone()[0],
+            "section_sequence_variant_count": conn.execute("SELECT COUNT(*) FROM section_sequence_stat").fetchone()[0],
+            "negative_item_occurrence_count": conn.execute("SELECT COUNT(*) FROM track_negative_item").fetchone()[0],
+            "negative_unique_item_count": conn.execute("SELECT COUNT(*) FROM negative_item").fetchone()[0],
+            "major_genre_count": conn.execute("SELECT COUNT(*) FROM major_genre_raw").fetchone()[0],
+            "taxonomy_genre_count": conn.execute("SELECT COUNT(*) FROM genre_raw").fetchone()[0],
+            "vault_genre_label_count": len(rows),
+            "genre_crosswalk_exact_labels": counts.get("exact", 0),
+            "genre_crosswalk_normalized_labels": counts.get("normalized", 0),
+            "genre_crosswalk_unmatched_labels": counts.get("unmatched", 0),
+            "genre_crosswalk_exact_tracks": track_counts.get("exact", 0),
+            "genre_crosswalk_normalized_tracks": track_counts.get("normalized", 0),
+            "genre_crosswalk_unmatched_tracks": track_counts.get("unmatched", 0),
+            "token_occurrence_index": True,
+            "build_revision": BUILD_REVISION,
+        }
+        conn.execute("DELETE FROM corpus_profile")
+        conn.executemany(
+            "INSERT INTO corpus_profile(metric_key,metric_value) VALUES (?,?)",
+            [(key, json.dumps(value, ensure_ascii=False)) for key, value in profile.items()],
+        )
+        meta(conn, {"completed_at": utc_now(), "schema_version": "corpus-v2"})
+        conn.commit()
+        elapsed = time.perf_counter() - started
+        stage_complete(state, "crosswalk_profile", 1, 1, profile, elapsed)
+        progress_line("corpus:profile", 1, 1, started, extra=[f"tracks {profile['track_count']:,}", f"tokens {profile['token_count']:,}"])
+        return profile
+    except Exception as exc:
+        conn.rollback()
+        stage_error(state, "crosswalk_profile", exc)
+        raise
+    finally:
+        conn.close()
+
+
+def ensure_corpus(
+    state: sqlite3.Connection,
+    work_corpus: Path,
+    promoted_corpus: Path,
+    schema_dir: Path,
+    info: dict,
+    vault_path: Path,
+    genre_path: Path,
+    batch_size: int,
+    test_stop_after_batches: int | None,
+    rebuild_corpus: bool,
+) -> tuple[Path, bool]:
+    if (
+        not rebuild_corpus
+        and not work_corpus.exists()
+        and promoted_corpus_matches(promoted_corpus, info["vault_sha"], info["genre_sha"])
+        and not any(stage_row(state, name)["status"] in ("running", "paused", "error") for name in CORPUS_STAGE_NAMES)
+    ):
+        mark_stages_complete(state, CORPUS_STAGE_NAMES, {"adopted_promoted": True, "path": str(promoted_corpus)})
+        print("[corpus] existing promoted corpus matches source fingerprints; adopting without rebuild.", file=sys.stderr)
+        return promoted_corpus, False
+
+    init_corpus_stage(state, work_corpus, schema_dir, info, vault_path, genre_path)
+    ingest_tracks_stage(state, work_corpus, info["vault"]["tracks"], batch_size, test_stop_after_batches)
+    aggregate_stats_stage(state, work_corpus)
+    for n in range(2, 6):
+        phrase_stage(state, work_corpus, n)
+    fts_stage(state, work_corpus)
+    crosswalk_profile_stage(state, work_corpus, info)
+    return work_corpus, True
+
+
+def compile_knowledge(
+    state: sqlite3.Connection,
+    work_knowledge: Path,
+    schema_dir: Path,
+    info: dict,
+    corpus_path: Path,
+    curation: sqlite3.Connection,
+    curation_sha: str,
+) -> tuple[dict, dict]:
+    row = stage_row(state, "knowledge_compile")
+    bootstrap_profile = {}
+    if row["status"] != "complete":
+        stage_start(state, "knowledge_compile", 1)
+        started = time.perf_counter()
+        try:
+            work_knowledge.unlink(missing_ok=True)
+            for suffix in ("-wal", "-shm"):
+                Path(str(work_knowledge) + suffix).unlink(missing_ok=True)
+            kc = sqlite3.connect(work_knowledge)
+            corpus = sqlite3.connect(corpus_path)
+            try:
+                kc.execute("PRAGMA foreign_keys=ON")
+                kc.executescript((schema_dir / "knowledge-v1.sql").read_text(encoding="utf-8"))
+                bootstrap_profile = build_knowledge(kc, info["genre_map"], corpus, info["genre_sha"])
+                meta(kc, {
+                    "vault_sha256": info["vault_sha"],
+                    "genre_map_sha256": info["genre_sha"],
+                    "build_revision": BUILD_REVISION,
+                    "curation_fingerprint": curation_sha,
+                })
+                kc.commit()
+            finally:
+                corpus.close()
+                kc.close()
+            elapsed = time.perf_counter() - started
+            stage_complete(state, "knowledge_compile", 1, 1, bootstrap_profile, elapsed)
+            progress_line("knowledge:bootstrap", 1, 1, started, extra=[f"genres {bootstrap_profile.get('genres', 0):,}"])
+        except Exception as exc:
+            stage_error(state, "knowledge_compile", exc)
+            raise
+    else:
+        bootstrap_profile = parse_json(row["detail_json"]) or {}
+
+    overlay_row = stage_row(state, "curation_overlay")
+    overlay_profile = {}
+    if overlay_row["status"] != "complete":
+        stage_start(state, "curation_overlay", 1)
+        started = time.perf_counter()
+        corpus = sqlite3.connect(corpus_path)
+        kc = sqlite3.connect(work_knowledge)
+        try:
+            queue_profile = seed_review_queue(curation, corpus, info["vault_sha"])
+            overlay_profile = apply_curation(kc, curation)
+            overlay_profile = {**queue_profile, **overlay_profile}
+            meta(kc, {
+                "vault_sha256": info["vault_sha"],
+                "genre_map_sha256": info["genre_sha"],
+                "build_revision": BUILD_REVISION,
+                "curation_fingerprint": curation_sha,
+                "compiled_at": utc_now(),
+            })
+            kc.commit()
+        finally:
+            corpus.close()
+            kc.close()
+        elapsed = time.perf_counter() - started
+        stage_complete(state, "curation_overlay", 1, 1, overlay_profile, elapsed)
+        progress_line("knowledge:curation", 1, 1, started, extra=[f"queue +{overlay_profile.get('genre_crosswalk_candidates_added', 0)}"])
+    else:
+        overlay_profile = parse_json(overlay_row["detail_json"]) or {}
+    return bootstrap_profile, overlay_profile
+
+
+def validate_stage(state: sqlite3.Connection, corpus_path: Path, knowledge_path: Path, curation_path: Path) -> None:
+    if stage_row(state, "validate")["status"] == "complete":
+        return
+    stage_start(state, "validate", 3)
+    started = time.perf_counter()
+    checks = []
+    for label, path in (("corpus", corpus_path), ("knowledge", knowledge_path), ("curation", curation_path)):
+        conn = sqlite3.connect(path)
+        try:
+            result = conn.execute("PRAGMA integrity_check").fetchone()[0]
+        finally:
+            conn.close()
+        if result != "ok":
+            exc = RuntimeError(f"{label} integrity_check failed: {result}")
+            stage_error(state, "validate", exc)
+            raise exc
+        checks.append(label)
+        stage_progress(state, "validate", len(checks), 3)
+        progress_line("validate", len(checks), 3, started, extra=[label])
+    corpus = sqlite3.connect(corpus_path)
+    knowledge = sqlite3.connect(knowledge_path)
+    try:
+        corpus_genres = corpus.execute("SELECT COUNT(*) FROM genre_raw").fetchone()[0]
+        knowledge_genres = knowledge.execute("SELECT COUNT(*) FROM genre").fetchone()[0]
+        if corpus_genres != knowledge_genres:
+            raise RuntimeError(f"genre count mismatch: corpus={corpus_genres} knowledge={knowledge_genres}")
+        if knowledge.execute("SELECT COUNT(*) FROM prompt_section_definition WHERE lower(output_label)='exclude'").fetchone()[0]:
+            raise RuntimeError("Exclude must not be a structured prompt section")
+    except Exception as exc:
+        stage_error(state, "validate", exc)
+        raise
+    finally:
+        corpus.close()
+        knowledge.close()
+    stage_complete(state, "validate", 3, 3, {"integrity": checks, "invariants": "ok"}, time.perf_counter() - started)
+
+
+def collect_knowledge_profile(path: Path) -> dict:
+    conn = sqlite3.connect(path)
+    try:
+        return {
+            "major_genres": conn.execute("SELECT COUNT(*) FROM major_genre").fetchone()[0],
+            "genres": conn.execute("SELECT COUNT(*) FROM genre").fetchone()[0],
+            "approved_genre_aliases": conn.execute("SELECT COUNT(*) FROM genre_alias WHERE status='approved'").fetchone()[0],
+            "knowledge_entries": conn.execute("SELECT COUNT(*) FROM knowledge_entry").fetchone()[0],
+            "approved_definitions": conn.execute("SELECT COUNT(*) FROM definition WHERE status='approved'").fetchone()[0],
+            "renderer_sections": conn.execute("SELECT COUNT(*) FROM renderer_section WHERE renderer_profile_id='suno-structured-v1'").fetchone()[0],
+        }
+    finally:
+        conn.close()
+
+
+def report_stage(state: sqlite3.Connection, corpus_path: Path, knowledge_path: Path, curation_sha: str, work_report: Path, info: dict) -> dict:
+    row = stage_row(state, "report")
+    if row["status"] == "complete" and work_report.is_file():
+        return json.loads(work_report.read_text(encoding="utf-8"))
+    stage_start(state, "report", 1)
+    started = time.perf_counter()
+    corpus = sqlite3.connect(corpus_path)
+    try:
+        cprof = corpus_profile(corpus)
+    finally:
+        corpus.close()
+    kprof = collect_knowledge_profile(knowledge_path)
+    stage_snapshot = []
+    for r in state.execute("SELECT name,ordinal,status,processed,total,elapsed_seconds,detail_json FROM build_stage ORDER BY ordinal"):
+        d = dict(r)
+        d["detail"] = parse_json(d.pop("detail_json"))
+        stage_snapshot.append(d)
+    report = {
+        "schema": "promptvgine-local-data-build-report-v2",
+        "status": "validated_ready_to_promote",
+        "generated_at": utc_now(),
+        "build_revision": BUILD_REVISION,
+        "source": {
+            "vault_sha256": info["vault_sha"],
+            "genre_map_sha256": info["genre_sha"],
+            "vault_schema": info["vault"].get("schema"),
+            "vault_version": info["vault"].get("version"),
+            "genre_schema": info["genre_map"].get("schema"),
+            "taxonomy_version": info["genre_map"].get("taxonomy_version"),
+        },
+        "curation_fingerprint": curation_sha,
+        "corpus": cprof,
+        "knowledge": kprof,
+        "stages": stage_snapshot,
+        "safety": {
+            "curation_replaced": False,
+            "promotion_after_integrity_checks": True,
+            "source_fingerprints_bound": True,
+        },
+    }
+    work_report.parent.mkdir(parents=True, exist_ok=True)
+    temp = work_report.with_suffix(".tmp")
+    temp.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    os.replace(temp, work_report)
+    stage_complete(state, "report", 1, 1, {"report": str(work_report)}, time.perf_counter() - started)
+    return report
+
+
+def checkpoint_and_close(path: Path) -> None:
+    if not path.is_file():
+        return
+    conn = sqlite3.connect(path)
+    try:
+        conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    finally:
+        conn.close()
+
+
+def promote_files(
+    state: sqlite3.Connection,
+    work_corpus: Path,
+    corpus_was_built: bool,
+    work_knowledge: Path,
+    promoted_corpus: Path,
+    promoted_knowledge: Path,
+    work_report: Path,
+    final_report: Path,
+) -> None:
+    if stage_row(state, "promote")["status"] == "complete":
+        return
+    stage_start(state, "promote", 1)
+    started = time.perf_counter()
+    checkpoint_and_close(work_corpus)
+    checkpoint_and_close(work_knowledge)
+    final_report.parent.mkdir(parents=True, exist_ok=True)
+    promotions = []
+    if corpus_was_built:
+        promotions.append((work_corpus, promoted_corpus, promoted_corpus.with_name("corpus.previous.sqlite")))
+    promotions.append((work_knowledge, promoted_knowledge, promoted_knowledge.with_name("knowledge.previous.sqlite")))
+    moved_old = []
+    moved_new = []
+    try:
+        for work, target, previous in promotions:
+            if not work.is_file():
+                raise RuntimeError(f"work artifact missing before promotion: {work}")
+            if target.exists():
+                os.replace(target, previous)
+                moved_old.append((target, previous))
+        for work, target, previous in promotions:
+            os.replace(work, target)
+            moved_new.append((work, target))
+        temp_report = final_report.with_suffix(".tmp")
+        shutil.copy2(work_report, temp_report)
+        os.replace(temp_report, final_report)
+    except Exception:
+        for work, target in reversed(moved_new):
+            if target.exists():
+                os.replace(target, work)
+        for target, previous in reversed(moved_old):
+            if previous.exists():
+                os.replace(previous, target)
+        raise
+    stage_complete(
+        state,
+        "promote",
+        1,
+        1,
+        {
+            "corpus_promoted": corpus_was_built,
+            "knowledge_promoted": True,
+            "previous_artifacts_retained": True,
+        },
+        time.perf_counter() - started,
+    )
+    set_state_meta(state, {"status": "complete", "completed_at": utc_now()})
+    print("[promote] validated artifacts promoted; previous promoted DB(s) retained as *.previous.sqlite.", file=sys.stderr)
+
+
+def run_build(args) -> int:
+    install_signal_handlers()
+    info = preflight(args.vault.resolve(), args.genre_map.resolve())
+    out_dir = args.out_dir.resolve()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    schema_dir = args.schema_dir.resolve()
+    work_dir = out_dir / WORK_DIR_NAME
+    state = open_state(work_dir, schema_dir)
+    try:
+        bind_state(state, info["vault_sha"], info["genre_sha"])
+        curation_path = out_dir / "curation.sqlite"
+        curation = init_curation(curation_path, schema_dir)
+        try:
+            current_curation_sha = curation_fingerprint(curation)
+            previous_curation_sha = state_meta(state, "curation_fingerprint")
+            promoted_corpus = out_dir / "corpus.sqlite"
+            promoted_knowledge = out_dir / "knowledge.sqlite"
+            work_corpus = work_dir / "corpus.building.sqlite"
+            work_knowledge = work_dir / "knowledge.building.sqlite"
+            work_report = work_dir / "build-report.json"
+            final_report = out_dir / "reports" / "corpus-profile.json"
+
+            if previous_curation_sha and previous_curation_sha != current_curation_sha:
+                print("[curation] durable curation changed; keeping corpus and rebuilding compiled knowledge only.", file=sys.stderr)
+                reset_stages_from(state, 100)
+                work_knowledge.unlink(missing_ok=True)
+                work_report.unlink(missing_ok=True)
+            set_state_meta(state, {"curation_fingerprint": current_curation_sha, "status": "in_progress"})
+
+            if (
+                not args.rebuild_corpus
+                and promoted_corpus_matches(promoted_corpus, info["vault_sha"], info["genre_sha"])
+                and promoted_knowledge_matches(promoted_knowledge, info["vault_sha"], info["genre_sha"], current_curation_sha)
+                and not work_corpus.exists()
+                and not work_knowledge.exists()
+            ):
+                mark_stages_complete(state, CORPUS_STAGE_NAMES | KNOWLEDGE_STAGE_NAMES | {"promote"}, {"adopted_promoted": True, "already_current": True})
+                set_state_meta(state, {"status": "complete", "completed_at": utc_now()})
+                print_json({
+                    "status": "ok",
+                    "message": "promoted local data is already current",
+                    "corpus_db": str(promoted_corpus),
+                    "knowledge_db": str(promoted_knowledge),
+                    "curation_db": str(curation_path),
+                })
+                return 0
+
+            corpus_path, corpus_was_built = ensure_corpus(
+                state,
+                work_corpus,
+                promoted_corpus,
+                schema_dir,
+                info,
+                args.vault.resolve(),
+                args.genre_map.resolve(),
+                args.batch_size,
+                args.test_stop_after_batches,
+                args.rebuild_corpus,
+            )
+
+            # If a prior complete run moved the work corpus away, use the promoted corpus.
+            if not corpus_path.exists() and promoted_corpus_matches(promoted_corpus, info["vault_sha"], info["genre_sha"]):
+                corpus_path = promoted_corpus
+                corpus_was_built = False
+
+            knowledge_needs_build = not promoted_knowledge_matches(
+                promoted_knowledge, info["vault_sha"], info["genre_sha"], current_curation_sha
+            )
+            if stage_row(state, "knowledge_compile")["status"] == "complete" and not work_knowledge.exists() and knowledge_needs_build:
+                reset_stages_from(state, 100)
+
+            if knowledge_needs_build or work_knowledge.exists() or stage_row(state, "knowledge_compile")["status"] != "complete":
+                bootstrap, overlay = compile_knowledge(
+                    state, work_knowledge, schema_dir, info, corpus_path, curation, current_curation_sha
+                )
+                knowledge_path = work_knowledge
+            else:
+                mark_stages_complete(state, {"knowledge_compile", "curation_overlay"}, {"adopted_promoted": True})
+                knowledge_path = promoted_knowledge
+
+            if not knowledge_path.exists() and promoted_knowledge.exists():
+                knowledge_path = promoted_knowledge
+
+            validate_stage(state, corpus_path, knowledge_path, curation_path)
+            report = report_stage(state, corpus_path, knowledge_path, current_curation_sha, work_report, info)
+
+            knowledge_is_work = knowledge_path == work_knowledge and work_knowledge.exists()
+            if knowledge_is_work:
+                promote_files(
+                    state,
+                    work_corpus,
+                    corpus_was_built,
+                    work_knowledge,
+                    promoted_corpus,
+                    promoted_knowledge,
+                    work_report,
+                    final_report,
+                )
+            else:
+                mark_stages_complete(state, {"promote"}, {"adopted_promoted": True})
+                set_state_meta(state, {"status": "complete", "completed_at": utc_now()})
+
+            print_json({
+                "status": "ok",
+                "build_revision": BUILD_REVISION,
+                "corpus_db": str(promoted_corpus),
+                "knowledge_db": str(promoted_knowledge),
+                "curation_db": str(curation_path),
+                "report": str(final_report if final_report.exists() else work_report),
+                "corpus": report.get("corpus"),
+                "knowledge": report.get("knowledge"),
+                "resume_checkpoint": str(work_dir / "state.sqlite"),
+            })
+            return 0
+        finally:
+            curation.close()
+    except PauseRequested as exc:
+        set_state_meta(state, {"status": "paused", "paused_at": utc_now()})
+        print(f"[build] PAUSED safely: {exc}", file=sys.stderr)
+        print(f"[build] rerun the same command to resume. Status: --out-dir \"{args.out_dir}\" --status", file=sys.stderr)
+        return 75
+    except KeyboardInterrupt:
+        set_state_meta(state, {"status": "paused", "paused_at": utc_now()})
+        print("[build] PAUSED safely after KeyboardInterrupt; rerun the same command to resume.", file=sys.stderr)
+        return 130
+    except Exception as exc:
+        set_state_meta(state, {"status": "error", "last_error": str(exc), "error_at": utc_now()})
+        print(f"[build] ERROR: {exc}", file=sys.stderr)
+        raise
+    finally:
+        state.close()
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Build/resume local Prompt V'gine corpus + compiled knowledge without risking durable curation."
+    )
+    parser.add_argument("--vault", type=Path)
+    parser.add_argument("--genre-map", type=Path)
+    parser.add_argument("--out-dir", required=True, type=Path)
+    parser.add_argument("--schema-dir", type=Path, default=Path(__file__).resolve().parents[2] / "schema")
+    parser.add_argument("--plan", action="store_true", help="read-only source/output preflight")
+    parser.add_argument("--status", action="store_true", help="inspect current promoted artifacts and resumable checkpoint")
+    parser.add_argument("--reset-work", action="store_true", help="delete only incomplete/checkpoint work; never promoted DBs or curation")
+    parser.add_argument("--rebuild-corpus", action="store_true", help="build a fresh work corpus even when promoted corpus matches")
+    parser.add_argument("--batch-size", type=int, default=250)
+    parser.add_argument("--force", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--deep-token-index", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--test-stop-after-batches", type=int, help=argparse.SUPPRESS)
+    return parser
+
+
+def main() -> int:
+    args = build_parser().parse_args()
+    if args.force:
+        raise SystemExit(
+            "--force is intentionally retired. Normal reruns resume safely. "
+            "Use --reset-work only to discard incomplete checkpoint work; it never deletes promoted DBs or curation."
+        )
+    if args.batch_size < 1:
+        raise SystemExit("--batch-size must be >= 1")
+    if args.status:
+        show_status(args.out_dir.resolve())
+        return 0
+    if args.reset_work:
+        reset_work(args.out_dir.resolve())
+        return 0
+    if not args.vault or not args.genre_map:
+        raise SystemExit("--vault and --genre-map are required for --plan or build/resume")
+    info = preflight(args.vault.resolve(), args.genre_map.resolve())
+    if args.plan:
+        show_plan(info, args.out_dir.resolve())
+        return 0
+    return run_build(args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
