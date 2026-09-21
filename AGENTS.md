@@ -229,7 +229,7 @@ Hard requirements:
 
 For genuinely small one-shot scripts where checkpointing would add more complexity than the whole job, keep the implementation simple. Large-data workflows must not silently opt out of resumability.
 
-## 10. QA strategy
+## 9. QA strategy
 
 Use risk-based QA.
 
@@ -249,7 +249,7 @@ A bug fix should normally include a regression test when practical.
 
 For destructive persistent-data changes, verify a recovery path appropriate to the project: backup/restore, rollback, reversible migration, or a documented reason why recovery is unnecessary. Do not add enterprise-grade recovery machinery to projects that do not persist user data.
 
-## 9. Performance
+## 10. Performance
 
 Do not optimize blindly.
 
