@@ -1,40 +1,165 @@
 # Engineering Decisions
 
-Use this file for decisions that would be expensive to rediscover or reverse. Do not record trivial implementation choices.
+Use this file for durable decisions that would be expensive to rediscover or reverse.
 
 ---
 
-## ADR-001 — <title>
+## ADR-001 — Generated data is local-only
 
-**Status:** proposed / accepted / superseded  
-**Date:** YYYY-MM-DD
+**Status:** accepted  
+**Date:** 2026-09-21
 
 ### Context
 
-What problem or constraint requires a decision?
+The prompt Vault and genre taxonomy are large build inputs and the product will create derived corpus/knowledge/runtime databases. The owner explicitly does not want the database stored or run from GitHub.
 
 ### Decision
 
-What are we doing?
+GitHub stores only schemas, build/mining code, small synthetic fixtures, validation, and documentation. Raw factories, generated SQLite databases, reports, indexes, and compiled runtime data remain local and are ignored by Git.
 
 ### Why
 
-Why is this the best fit for the project's actual scope?
-
-### Alternatives considered
-
-Only include credible alternatives.
-
-### Cost / licensing impact
-
-Does the decision add any external cost, licensing obligation, redistribution restriction, or lock-in?
-
-### Security / privacy impact
-
-Does it change trust boundaries, stored/transmitted data, secrets, or public artifacts?
+Keeps generated data out of source control, avoids repository bloat, preserves data-policy flexibility, and makes source→database transformation reproducible rather than treating a binary DB as source.
 
 ### Consequences
 
-What becomes easier, harder, or intentionally unsupported?
+A local build step is required before corpus/knowledge work. CI can use synthetic fixtures without the real database.
 
 ---
+
+## ADR-002 — Split evidence corpus from curated knowledge
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Context
+
+The 10k source prompts are valuable evidence but most rich section sentences are unique and unsuitable as direct runtime options.
+
+### Decision
+
+Use two local databases:
+
+- `corpus.sqlite` for lossless source evidence, parsing, search, word/phrase usage, negative items, and taxonomy crosswalk research;
+- `knowledge.sqlite` for canonical genres, aliases, dictionary entries, definitions, parameters/options, Easy statements, traits, renderer metadata, and provenance.
+
+Runtime bundles are compiled from approved knowledge rather than shipping the evidence corpus.
+
+### Why
+
+Separates “what the source said” from “what the product knows/teaches.” Prevents frequency or one-off wording from becoming accidental product truth.
+
+### Consequences
+
+Curation is explicit. Rebuilds can replace corpus evidence without rewriting stable approved knowledge identities.
+
+---
+
+## ADR-003 — MusicSpec is source of truth; Suno text is rendered output
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+Easy mode, Advanced mode, quality checks, genre routing, dictionary context, and prompt rendering operate on a shared semantic MusicSpec. The generated Suno string is a renderer output, not application state.
+
+### Consequences
+
+Future output formats/model versions can use new renderer profiles without discarding the semantic editor or knowledge data.
+
+---
+
+## ADR-004 — Easy and Advanced are views of the same state
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+Easy mode uses curated words/combination statements. Advanced exposes the atomic parameters/options plus custom text and explicit routing. Mode switching does not create a second prompt or erase state.
+
+### Consequences
+
+Statements should link to concepts/options where possible so Easy selections can be expanded/explained in Advanced.
+
+---
+
+## ADR-005 — Inline knowledge dictionary is a core product subsystem
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+Genres, subgenres, instruments, descriptors, production terms, rhythm/harmony/mix vocabulary, and generated prompt terms can be highlighted inline and explained in plain language. Definitions have global and context-specific layers; current-project interpretation is derived from MusicSpec.
+
+### Interaction consequence
+
+Desktop hover/focus may preview; click can pin/expand. Mobile uses tap/popover/bottom-sheet. Hover is never required. Knowledge markers use a subtle inline affordance rather than an `ⓘ` icon after every term.
+
+---
+
+## ADR-006 — Genre influence is 1–3 ordered roles, not percentages
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+A project can have Foundation, Fusion, and Accent genre influences. Genres can be drag-swapped between roles. The product does not expose default numeric influence percentages because the prompt target expresses language rather than meaningful numeric mixing weights.
+
+The taxonomy is many-to-many: a subgenre is one entity even when tagged with multiple Major Genres.
+
+---
+
+## ADR-007 — Structured source-style prompt + separate Exclude
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+The v1 style renderer emits bracketed source-style lines in canonical order, for example:
+
+```text
+[Genre: ...]
+[Era: ...]
+[BPM: ...]
+[Key/Mode: ...]
+[Groove: ...]
+```
+
+Only non-empty sections are emitted. Exclude is a separate copy target consisting of a comma-separated list with no brackets and no `[Exclude: ...]` line.
+
+### Consequences
+
+Editing a facet can map directly to visible output sections and diff-highlight exactly what changed.
+
+---
+
+## ADR-008 — Large/explainable option sets use pickers, not native dropdowns
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+Genres, instruments, descriptors, Advanced values, and other explanation-heavy choices use search/browse pickers or sheets. Each option can expose its own definition. Mobile uses tap-first sheets; desktop may use anchored/centered dialogs.
+
+### Why
+
+The product will contain thousands of options and must explain them. Native dropdowns scale poorly for search, rich descriptions, touch, and semantic grouping.
+
+---
+
+## ADR-009 — Constraints advise; they do not censor the option space
+
+**Status:** accepted  
+**Date:** 2026-09-21
+
+### Decision
+
+Constraint logic is surfaced primarily as quality checks/relations. It can warn about competing melodic owners, low-end collisions, or contradictory mix instructions, but it does not silently remove creative content or forbid genre combinations.
+
+Deliberate overrides remain possible and visible.
