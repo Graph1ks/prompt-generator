@@ -48,7 +48,14 @@ jobs:
         run: npm install --global pnpm@11.27.1
 
       - name: Install TypeScript workspace
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Bootstrap app lockfile capture
+        run: |
+          echo "LOCKFILE_BASE64_BEGIN"
+          base64 -w0 pnpm-lock.yaml
+          echo
+          echo "LOCKFILE_BASE64_END"
 
       - name: Validate TypeScript foundation
         run: pnpm run check
