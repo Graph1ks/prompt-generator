@@ -58,6 +58,8 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
             },
             "curation_fingerprint": "c" * 64,
             "unique_segment_count": 4,
+            "fully_semantic_unique": 2,
+            "fully_identity_decomposed_unique": 1,
         }
         decomposition_path = knowledge / "instrument-decomposition-v1.json"
         decomposition_path.write_text(json.dumps(decomposition, indent=2), encoding="utf-8")
@@ -190,6 +192,66 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
             self.assertEqual(template["review_id"], "synthetic-review")
             self.assertEqual(set(template["report_sha256"]), {"completion_plan"})
             self.assertEqual(len(template["report_sha256"]["completion_plan"]), 64)
+
+    def test_prepare_accepts_semantic_progress_after_foundation_acceptance(self):
+        with tempfile.TemporaryDirectory() as td:
+            out, _, _ = self.write_fixture(Path(td))
+            csv_path = (
+                out / "reports" / "knowledge" / "instrument-decomposition-full-v1.csv"
+            )
+            with csv_path.open("r", newline="", encoding="utf-8-sig") as f:
+                rows = list(csv.DictReader(f))
+                fieldnames = list(rows[0].keys())
+            rows[3]["coverage"] = "1.0"
+            rows[3]["fully_semantic"] = "True"
+            rows[3]["concept_ids"] = "concept:glass|concept:cloud"
+            rows[3]["residual_tokens"] = ""
+            with csv_path.open("w", newline="", encoding="utf-8-sig") as f:
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(rows)
+
+            decomposition_path = (
+                out / "reports" / "knowledge" / "instrument-decomposition-v1.json"
+            )
+            decomposition = json.loads(decomposition_path.read_text(encoding="utf-8"))
+            decomposition["fully_semantic_unique"] = 3
+            decomposition_path.write_text(
+                json.dumps(decomposition, indent=2), encoding="utf-8"
+            )
+
+            result = self.run_prepare(out)
+            self.assertEqual(
+                result.returncode,
+                0,
+                msg=f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}",
+            )
+            plan = json.loads(
+                (
+                    out
+                    / "reports"
+                    / "knowledge-completion"
+                    / "knowledge-completion-plan-v1.json"
+                ).read_text(encoding="utf-8")
+            )
+            self.assertEqual(plan["counts"]["fully_semantic_expressions"], 3)
+            self.assertEqual(plan["counts"]["semantic_residual_expressions"], 1)
+            self.assertEqual(
+                plan["counts"]["decomposition_states_source"],
+                "acceptance_baseline",
+            )
+            self.assertEqual(
+                plan["counts"]["semantic_progress_since_acceptance"],
+                {
+                    "acceptance_fully_semantic_expressions": 2,
+                    "acceptance_semantic_residual_expressions": 2,
+                    "fully_semantic_delta": 1,
+                    "semantic_residual_delta": -1,
+                },
+            )
+            self.assertTrue(
+                plan["contract"]["semantic_coverage_may_advance_after_acceptance"]
+            )
 
     def test_completion_plan_is_a_supported_v2_review_binding(self):
         with tempfile.TemporaryDirectory() as td:
