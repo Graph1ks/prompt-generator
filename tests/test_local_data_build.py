@@ -10,6 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILDER = ROOT / "scripts" / "data" / "build_local_data.py"
+V1_BUILDER = ROOT / "scripts" / "data" / "local_data_v1_core.py"
 
 VAULT = {
     "schema": "graph1ks-prompt-control-deck-v1",
@@ -238,6 +239,94 @@ class LocalDataBuildTests(unittest.TestCase):
                 )
             finally:
                 curation.close()
+
+
+    def test_existing_v1_build_is_adopted_without_data_loss(self):
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            vault, genres = self.write_sources(tmp)
+            out = tmp / "out"
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(V1_BUILDER),
+                    "--vault",
+                    str(vault),
+                    "--genre-map",
+                    str(genres),
+                    "--out-dir",
+                    str(out),
+                    "--force",
+                ],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            old_corpus_hash = __import__("hashlib").sha256((out / "corpus.sqlite").read_bytes()).hexdigest()
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(BUILDER),
+                    "--vault",
+                    str(vault),
+                    "--genre-map",
+                    str(genres),
+                    "--out-dir",
+                    str(out),
+                    "--batch-size",
+                    "1",
+                ],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            self.assertIn('"status": "ok"', result.stdout)
+            new_corpus_hash = __import__("hashlib").sha256((out / "corpus.sqlite").read_bytes()).hexdigest()
+            self.assertEqual(old_corpus_hash, new_corpus_hash)
+            self.assertTrue((out / "knowledge.previous.sqlite").exists())
+            self.assertFalse((out / "corpus.previous.sqlite").exists())
+            c = sqlite3.connect(out / "corpus.sqlite")
+            k = sqlite3.connect(out / "knowledge.sqlite")
+            try:
+                self.assertEqual(c.execute("select count(*) from track").fetchone()[0], 2)
+                self.assertEqual(
+                    k.execute("select value from build_meta where key='build_revision'").fetchone()[0],
+                    "promptvgine-local-data-build-v2-resumable-1",
+                )
+            finally:
+                c.close()
+                k.close()
+
+    def test_rebuild_retains_previous_promoted_corpus(self):
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            out, _ = self.run_builder(tmp)
+            old_bytes = (out / "corpus.sqlite").read_bytes()
+            vault, genres = self.write_sources(tmp)
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(BUILDER),
+                    "--vault",
+                    str(vault),
+                    "--genre-map",
+                    str(genres),
+                    "--out-dir",
+                    str(out),
+                    "--batch-size",
+                    "1",
+                    "--rebuild-corpus",
+                ],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            self.assertIn('"status": "ok"', result.stdout)
+            self.assertTrue((out / "corpus.previous.sqlite").exists())
+            self.assertEqual((out / "corpus.previous.sqlite").read_bytes(), old_bytes)
 
     def test_plan_is_read_only(self):
         with tempfile.TemporaryDirectory() as td:
