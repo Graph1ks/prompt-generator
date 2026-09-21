@@ -615,11 +615,13 @@ def ingest_tracks_stage(state: sqlite3.Connection, work_corpus: Path, vault_trac
                 raise PauseRequested("stop requested before next batch")
             end = min(total, processed + batch_size)
             batch_started = time.perf_counter()
-            insert_track_batch(conn, vault_tracks[processed:end], processed + 1, source_id)
+            batch = vault_tracks[processed:end]
+            batch_count = len(batch)
+            insert_track_batch(conn, batch, processed + 1, source_id)
             processed = end
             batch_number += 1
             batch_elapsed = time.perf_counter() - batch_started
-            stage_progress(state, "ingest_tracks", processed, total, {"batch_size": end - (processed - (end - (processed - end))) if False else min(batch_size, total - (processed - min(batch_size, processed))), "last_batch_seconds": batch_elapsed})
+            stage_progress(state, "ingest_tracks", processed, total, {"batch_size": batch_count, "last_batch_seconds": batch_elapsed})
             progress_line(
                 "corpus:tracks",
                 processed,
