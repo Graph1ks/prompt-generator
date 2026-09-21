@@ -186,6 +186,32 @@ class KnowledgeMiningSessionTests(unittest.TestCase):
         self.assertEqual(result["instrument_ids"], ["instrument:baritone-saxophone"])
         self.assertEqual(result["residual_tokens"], ["warm"])
         self.assertFalse(result["fully_semantic"])
+
+    def test_decomposition_ignores_only_explicit_grammar_scaffolding(self):
+        instrument = {
+            "kind": "instrument",
+            "id": "instrument:piano",
+            "label": "Piano",
+            "role": "identity",
+        }
+        concept = lambda eid, label: {
+            "kind": "concept",
+            "id": eid,
+            "label": label,
+            "role": "arrangement_role",
+        }
+        result = decompose_surface(
+            "piano used as primary harmonic support",
+            {("piano",): instrument},
+            {
+                ("primary",): concept("concept:primary", "Primary"),
+                ("harmonic",): concept("concept:harmonic", "Harmonic"),
+                ("support",): concept("concept:support", "Support"),
+            },
+        )
+        self.assertEqual(result["residual_tokens"], [])
+        self.assertTrue(result["fully_semantic"])
+
     def setup_local(self, tmp: Path):
         vault = tmp / "vault.json.gz"
         genres = tmp / "genres.json"
