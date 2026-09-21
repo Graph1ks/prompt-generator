@@ -178,6 +178,98 @@ def infer_coordinated_shared_head_identities(
             for idx in range(start, end):
                 covered[idx] = True
 
+def infer_hyphen_compound_semantics(
+    toks: list[str],
+    covered: list[bool],
+    matches: list[dict],
+    instrument_phrases: dict[tuple[str, ...], dict],
+    concept_phrases: dict[tuple[str, ...], dict],
+) -> None:
+    """Decompose unresolved hyphen compounds without inventing identities.
+
+    Exact de-hyphenated reviewed phrases win first. Otherwise every component
+    must be fully explainable by reviewed concepts or identities and at most
+    one canonical instrument identity may be produced.
+    """
+    lexicons = (instrument_phrases, concept_phrases)
+
+    for token_index, token in enumerate(toks):
+        if covered[token_index] or "-" not in token:
+            continue
+        parts = tuple(part for part in token.split("-") if part)
+        if len(parts) < 2:
+            continue
+
+        direct = None
+        for lexicon in lexicons:
+            if parts in lexicon:
+                direct = lexicon[parts]
+                break
+        if direct:
+            matches.append(
+                {
+                    **direct,
+                    "surface": token,
+                    "start": token_index,
+                    "end": token_index + 1,
+                    "inference": "hyphen_reconstructed_phrase",
+                }
+            )
+            covered[token_index] = True
+            continue
+
+        local_matches: list[dict] = []
+        local_covered = [False] * len(parts)
+        max_len = max(
+            [1]
+            + [
+                max((len(key) for key in lexicon), default=1)
+                for lexicon in lexicons
+            ]
+        )
+        for span_len in range(max_len, 0, -1):
+            for start in range(0, len(parts) - span_len + 1):
+                end = start + span_len
+                if any(local_covered[start:end]):
+                    continue
+                key = parts[start:end]
+                found = None
+                for lexicon in lexicons:
+                    if key in lexicon:
+                        found = lexicon[key]
+                        break
+                if not found:
+                    continue
+                local_matches.append(
+                    {
+                        **found,
+                        "surface": " ".join(parts[start:end]),
+                        "start": token_index,
+                        "end": token_index + 1,
+                        "component_start": start,
+                        "component_end": end,
+                        "inference": "hyphen_component",
+                    }
+                )
+                for idx in range(start, end):
+                    local_covered[idx] = True
+
+        unexplained = [
+            part
+            for idx, part in enumerate(parts)
+            if not local_covered[idx] and part not in DECOMPOSITION_SYNTAX
+        ]
+        instrument_ids = {
+            match["id"]
+            for match in local_matches
+            if match.get("kind") == "instrument"
+        }
+        if unexplained or not local_matches or len(instrument_ids) > 1:
+            continue
+
+        matches.extend(local_matches)
+        covered[token_index] = True
+
 def decompose_surface(
     surface: str,
     instrument_phrases: dict[tuple[str, ...], dict],
@@ -222,6 +314,13 @@ def decompose_surface(
         covered,
         matches,
         instrument_phrases,
+    )
+    infer_hyphen_compound_semantics(
+        toks,
+        covered,
+        matches,
+        instrument_phrases,
+        concept_phrases,
     )
 
     residual = [
