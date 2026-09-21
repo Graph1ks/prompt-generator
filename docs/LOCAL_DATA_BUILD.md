@@ -84,13 +84,16 @@ Local outputs:
 .local-data\\current\\reports\\knowledge-completion\\knowledge-completion-plan-v1.json
 .local-data\\current\\reports\\knowledge-completion\\residual-token-groups-v1.csv
 .local-data\\current\\reports\\knowledge-completion\\batches\\instrument-semantic-review-batch-###-v1.json
+.local-data\\current\\reports\\knowledge-completion\\knowledge-curation-decisions-v2.template.json
 ```
 
 The batches contain exact source expression wording plus current resolved instrument/concept IDs, residual tokens, coverage, occurrence/track evidence, and deterministic **review priority**. Frequency affects review order only; it never auto-approves semantics.
 
 Crucially, this phase does not modify `curation.sqlite` and does not alter product availability. Every source-backed Instruments expression remains a first-class selectable/renderable database entity whether it is fully decomposed, partial, or unresolved. Canonical identity and semantic concepts remain additive metadata underneath the expression.
 
-Use reviewed batch evidence to author scoped `knowledge-curation-decisions-v2` bundles, apply them through `knowledge_curation_session.py`, then regenerate the completion plan for the next coherent batch.
+The plan records a SHA-256 for every generated batch. The generated v2 decision-bundle template is itself bound to the exact completion-plan SHA through `report_sha256.completion_plan`, so reviewed semantic decisions cannot silently drift to another completion snapshot.
+
+Use the generated template as the starting point for reviewed additive decisions, apply it through `knowledge_curation_session.py`, then regenerate the completion plan for the next coherent batch.
 
 
 ### 3. Status

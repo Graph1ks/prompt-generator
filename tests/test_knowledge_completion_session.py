@@ -8,6 +8,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 COMPLETION = ROOT / "scripts" / "data" / "knowledge_completion_session.py"
+sys.path.insert(0, str(ROOT / "scripts" / "data"))
+
+from knowledge_curation_session import load_review_state
+from knowledge_mining_session import sha256_file
 
 
 class KnowledgeCompletionSessionTests(unittest.TestCase):
@@ -168,6 +172,9 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
 
             batches = sorted((reports / "batches").glob("*.json"))
             self.assertEqual(len(batches), 2)
+            self.assertEqual(len(plan["reports"]["review_batches"]), 2)
+            for item in plan["reports"]["review_batches"]:
+                self.assertEqual(len(item["sha256"]), 64)
             surfaces = []
             for path in batches:
                 batch = json.loads(path.read_text(encoding="utf-8"))
@@ -177,6 +184,31 @@ class KnowledgeCompletionSessionTests(unittest.TestCase):
                 surfaces.append(batch["rows"][0]["surface"])
             self.assertCountEqual(surfaces, ["muted silver trumpet", "glass cloud"])
             self.assertTrue((reports / "residual-token-groups-v1.csv").is_file())
+            template_path = reports / "knowledge-curation-decisions-v2.template.json"
+            template = json.loads(template_path.read_text(encoding="utf-8"))
+            self.assertEqual(template["schema"], "promptvgine-knowledge-curation-decisions-v2")
+            self.assertEqual(template["review_id"], "synthetic-review")
+            self.assertEqual(set(template["report_sha256"]), {"completion_plan"})
+            self.assertEqual(len(template["report_sha256"]["completion_plan"]), 64)
+
+    def test_completion_plan_is_a_supported_v2_review_binding(self):
+        with tempfile.TemporaryDirectory() as td:
+            out, _, _ = self.write_fixture(Path(td))
+            result = self.run_prepare(out)
+            self.assertEqual(result.returncode, 0, msg=result.stderr)
+            plan_path = (
+                out
+                / "reports"
+                / "knowledge-completion"
+                / "knowledge-completion-plan-v1.json"
+            )
+            state = load_review_state(
+                out,
+                {"completion_plan": sha256_file(plan_path)},
+            )
+            self.assertEqual(state["review_id"], "synthetic-review")
+            self.assertEqual(state["curation_fingerprint"], "c" * 64)
+            self.assertIn("completion_plan", state["reports"])
 
     def test_prepare_fails_closed_when_acceptance_is_not_ok(self):
         with tempfile.TemporaryDirectory() as td:

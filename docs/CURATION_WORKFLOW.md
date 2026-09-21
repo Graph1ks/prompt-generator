@@ -130,7 +130,7 @@ Reviewed instrument/lexicon knowledge is applied through a decision bundle rathe
 py scripts\data\knowledge_curation_session.py apply --out-dir ".local-data\current" --bundle ".local-data\current\reports\knowledge\knowledge-curation-decisions-v1.json" --vault ".local-data\source\GRAPH1KS_PUBLIC_VAULT_FACTORY.json.gz" --genre-map ".local-data\source\GRAPH1KS_GENRE_MAP_FACTORY.json"
 ```
 
-The apply bundle is backed up, transactional, fingerprint/hash-bound to the reviewed evidence, automatically recompiled/validated, and rollback-safe.
+The apply bundle is backed up, transactional, fingerprint/hash-bound to the reviewed evidence, automatically recompiled/validated, and rollback-safe. After database-foundation acceptance, `knowledge_completion_session.py prepare` writes SHA-addressed residual review batches plus `knowledge-curation-decisions-v2.template.json`; that template binds `report_sha256.completion_plan` to the exact completion plan, and the apply path verifies this artifact before any durable mutation.
 
 Important decomposition rule: every source Instruments-list segment is a **first-class selectable instrument expression**. The complete wording is preserved because words such as clean, distorted, muted, warm, layered, lead, rhythm, programmed, electronic, staccato, restrained, etc. describe how the instrument/layer is played, voiced, processed, or arranged.
 

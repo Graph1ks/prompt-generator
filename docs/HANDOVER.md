@@ -238,9 +238,10 @@ Primary local outputs:
 .local-data\\current\\reports\\knowledge-completion\\knowledge-completion-plan-v1.json
 .local-data\\current\\reports\\knowledge-completion\\residual-token-groups-v1.csv
 .local-data\\current\\reports\\knowledge-completion\\batches\\instrument-semantic-review-batch-###-v1.json
+.local-data\\current\\reports\\knowledge-completion\\knowledge-curation-decisions-v2.template.json
 ```
 
-These batches are evidence/review inputs for additive v2 ontology/concept curation. They are **not** a product-filter list and are never a replacement for the complete selectable expression catalog.
+These batches are evidence/review inputs for additive v2 ontology/concept curation. They are **not** a product-filter list and are never a replacement for the complete selectable expression catalog. The completion plan stores each batch SHA-256, and the generated v2 decision template binds to the exact plan hash via `report_sha256.completion_plan`; the existing apply path verifies that binding before durable mutation.
 
 ## Query/debug tools
 

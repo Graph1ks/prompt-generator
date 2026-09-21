@@ -3,20 +3,50 @@
   "$id": "https://graph1ks.local/schemas/knowledge-curation-decisions-v2.schema.json",
   "title": "Graph1ks Prompt V'gine Knowledge Curation Decisions v2",
   "type": "object",
-  "required": ["schema","bundle_id","review_id","source","report_sha256"],
+  "required": [
+    "schema",
+    "bundle_id",
+    "review_id",
+    "source",
+    "report_sha256"
+  ],
   "additionalProperties": false,
   "properties": {
-    "schema": { "const": "promptvgine-knowledge-curation-decisions-v2" },
-    "bundle_id": { "type": "string", "minLength": 1 },
-    "review_id": { "type": "string", "minLength": 1 },
-    "curation_fingerprint": { "type": ["string","null"] },
+    "schema": {
+      "const": "promptvgine-knowledge-curation-decisions-v2"
+    },
+    "bundle_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "review_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "curation_fingerprint": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "source": {
       "type": "object",
-      "required": ["prompt_vault_sha256","genre_map_sha256"],
+      "required": [
+        "prompt_vault_sha256",
+        "genre_map_sha256"
+      ],
       "additionalProperties": false,
       "properties": {
-        "prompt_vault_sha256": { "type": "string", "minLength": 64, "maxLength": 64 },
-        "genre_map_sha256": { "type": "string", "minLength": 64, "maxLength": 64 }
+        "prompt_vault_sha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "genre_map_sha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64
+        }
       }
     },
     "report_sha256": {
@@ -24,157 +54,499 @@
       "minProperties": 1,
       "additionalProperties": false,
       "properties": {
-        "instrument": { "type": "string", "minLength": 64, "maxLength": 64 },
-        "lexicon": { "type": "string", "minLength": 64, "maxLength": 64 }
+        "instrument": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "lexicon": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "completion_plan": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64
+        }
       }
     },
-    "instrument_families": { "type": "array", "items": { "$ref": "#/$defs/family" }, "default": [] },
-    "instruments": { "type": "array", "items": { "$ref": "#/$defs/instrument" }, "default": [] },
-    "instrument_aliases": { "type": "array", "items": { "$ref": "#/$defs/instrumentAlias" }, "default": [] },
-    "instrument_traits": { "type": "array", "items": { "$ref": "#/$defs/instrumentTrait" }, "default": [] },
-    "concepts": { "type": "array", "items": { "$ref": "#/$defs/entry" }, "default": [] },
-    "parameters": { "type": "array", "items": { "$ref": "#/$defs/parameter" }, "default": [] },
-    "parameter_options": { "type": "array", "items": { "$ref": "#/$defs/parameterOption" }, "default": [] }
+    "instrument_families": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/family"
+      },
+      "default": []
+    },
+    "instruments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/instrument"
+      },
+      "default": []
+    },
+    "instrument_aliases": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/instrumentAlias"
+      },
+      "default": []
+    },
+    "instrument_traits": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/instrumentTrait"
+      },
+      "default": []
+    },
+    "concepts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entry"
+      },
+      "default": []
+    },
+    "parameters": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/parameter"
+      },
+      "default": []
+    },
+    "parameter_options": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/parameterOption"
+      },
+      "default": []
+    }
   },
   "$defs": {
-    "status": { "enum": ["reviewed","approved"] },
+    "status": {
+      "enum": [
+        "reviewed",
+        "approved"
+      ]
+    },
     "family": {
       "type": "object",
-      "required": ["id","label","status"],
+      "required": [
+        "id",
+        "label",
+        "status"
+      ],
       "additionalProperties": false,
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "label": { "type": "string", "minLength": 1 },
-        "status": { "$ref": "#/$defs/status" }
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        }
       }
     },
     "variant": {
       "type": "object",
-      "required": ["surface","match_kind"],
+      "required": [
+        "surface",
+        "match_kind"
+      ],
       "additionalProperties": false,
       "properties": {
-        "surface": { "type": "string", "minLength": 1 },
-        "match_kind": { "enum": ["exact","word","phrase","prefix","manual"] },
-        "match_priority": { "type": "integer", "minimum": 1, "maximum": 1000 },
-        "is_primary": { "type": "boolean" }
+        "surface": {
+          "type": "string",
+          "minLength": 1
+        },
+        "match_kind": {
+          "enum": [
+            "exact",
+            "word",
+            "phrase",
+            "prefix",
+            "manual"
+          ]
+        },
+        "match_priority": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "is_primary": {
+          "type": "boolean"
+        }
       }
     },
     "definition": {
       "type": "object",
-      "required": ["kind","text","status"],
+      "required": [
+        "kind",
+        "text",
+        "status"
+      ],
       "additionalProperties": false,
       "properties": {
-        "kind": { "enum": ["one_liner","plain","why_it_matters","hear_it_as","misconception","expert_note"] },
-        "text": { "type": "string", "minLength": 1 },
-        "status": { "$ref": "#/$defs/status" }
+        "kind": {
+          "enum": [
+            "one_liner",
+            "plain",
+            "why_it_matters",
+            "hear_it_as",
+            "misconception",
+            "expert_note"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        }
       }
     },
     "context": {
       "type": "object",
-      "required": ["context_type","context_key","text","status"],
+      "required": [
+        "context_type",
+        "context_key",
+        "text",
+        "status"
+      ],
       "additionalProperties": false,
       "properties": {
-        "context_type": { "enum": ["section","parameter","option","genre","instrument","role","global"] },
-        "context_key": { "type": "string", "minLength": 1 },
-        "text": { "type": "string", "minLength": 1 },
-        "status": { "$ref": "#/$defs/status" }
+        "context_type": {
+          "enum": [
+            "section",
+            "parameter",
+            "option",
+            "genre",
+            "instrument",
+            "role",
+            "global"
+          ]
+        },
+        "context_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        }
       }
     },
-    "evidence": { "type": ["object","array","string","number","boolean","null"] },
+    "evidence": {
+      "type": [
+        "object",
+        "array",
+        "string",
+        "number",
+        "boolean",
+        "null"
+      ]
+    },
     "entry": {
       "type": "object",
-      "required": ["entry_id","entry_type","canonical_label","canonical_slug","status","difficulty","variants","definitions","contexts"],
+      "required": [
+        "entry_id",
+        "entry_type",
+        "canonical_label",
+        "canonical_slug",
+        "status",
+        "difficulty",
+        "variants",
+        "definitions",
+        "contexts"
+      ],
       "additionalProperties": false,
       "properties": {
-        "entry_id": { "type": "string", "minLength": 1 },
-        "entry_type": { "type": "string", "minLength": 1 },
-        "canonical_label": { "type": "string", "minLength": 1 },
-        "canonical_slug": { "type": "string", "minLength": 1 },
-        "status": { "$ref": "#/$defs/status" },
-        "difficulty": { "enum": ["beginner","intermediate","advanced"] },
-        "variants": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/variant" } },
-        "definitions": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/definition" } },
-        "contexts": { "type": "array", "items": { "$ref": "#/$defs/context" } },
-        "evidence": { "$ref": "#/$defs/evidence" }
+        "entry_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entry_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "canonical_label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "canonical_slug": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "difficulty": {
+          "enum": [
+            "beginner",
+            "intermediate",
+            "advanced"
+          ]
+        },
+        "variants": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/variant"
+          }
+        },
+        "definitions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/definition"
+          }
+        },
+        "contexts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/context"
+          }
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        }
       }
     },
     "nestedAlias": {
       "type": "object",
-      "required": ["surface"],
+      "required": [
+        "surface"
+      ],
       "additionalProperties": false,
-      "properties": { "surface": { "type": "string", "minLength": 1 } }
+      "properties": {
+        "surface": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     },
     "instrument": {
       "type": "object",
-      "required": ["id","label","label_norm","family_id","status","entry","aliases"],
+      "required": [
+        "id",
+        "label",
+        "label_norm",
+        "family_id",
+        "status",
+        "entry",
+        "aliases"
+      ],
       "additionalProperties": false,
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "label": { "type": "string", "minLength": 1 },
-        "label_norm": { "type": "string", "minLength": 1 },
-        "family_id": { "type": "string", "minLength": 1 },
-        "status": { "$ref": "#/$defs/status" },
-        "entry": { "$ref": "#/$defs/entry" },
-        "aliases": { "type": "array", "items": { "$ref": "#/$defs/nestedAlias" } },
-        "evidence": { "$ref": "#/$defs/evidence" }
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label_norm": {
+          "type": "string",
+          "minLength": 1
+        },
+        "family_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "entry": {
+          "$ref": "#/$defs/entry"
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nestedAlias"
+          }
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        }
       }
     },
     "instrumentAlias": {
       "type": "object",
-      "required": ["instrument_id","surface"],
+      "required": [
+        "instrument_id",
+        "surface"
+      ],
       "additionalProperties": false,
       "properties": {
-        "instrument_id": { "type": "string", "minLength": 1 },
-        "surface": { "type": "string", "minLength": 1 },
-        "status": { "$ref": "#/$defs/status" }
+        "instrument_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "surface": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        }
       }
     },
     "instrumentTrait": {
       "type": "object",
-      "required": ["instrument_id","entry_id","trait_type"],
+      "required": [
+        "instrument_id",
+        "entry_id",
+        "trait_type"
+      ],
       "additionalProperties": false,
       "properties": {
-        "instrument_id": { "type": "string", "minLength": 1 },
-        "entry_id": { "type": "string", "minLength": 1 },
-        "trait_type": { "type": "string", "minLength": 1 },
-        "confidence": { "type": ["number","null"], "minimum": 0, "maximum": 1 },
-        "status": { "$ref": "#/$defs/status" },
-        "evidence": { "$ref": "#/$defs/evidence" }
+        "instrument_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entry_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trait_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        }
       }
     },
     "parameter": {
       "type": "object",
-      "required": ["id","section_key","label","canonical_slug","value_type","status"],
+      "required": [
+        "id",
+        "section_key",
+        "label",
+        "canonical_slug",
+        "value_type",
+        "status"
+      ],
       "additionalProperties": false,
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "section_key": { "type": "string", "minLength": 1 },
-        "label": { "type": "string", "minLength": 1 },
-        "canonical_slug": { "type": "string", "minLength": 1 },
-        "value_type": { "enum": ["enum","multi","number","text","boolean","relation"] },
-        "easy_visible": { "type": "boolean" },
-        "advanced_visible": { "type": "boolean" },
-        "allow_custom_text": { "type": "boolean" },
-        "knowledge_entry_id": { "type": ["string","null"] },
-        "sort_order": { "type": "integer" },
-        "status": { "$ref": "#/$defs/status" }
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "section_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "canonical_slug": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value_type": {
+          "enum": [
+            "enum",
+            "multi",
+            "number",
+            "text",
+            "boolean",
+            "relation"
+          ]
+        },
+        "easy_visible": {
+          "type": "boolean"
+        },
+        "advanced_visible": {
+          "type": "boolean"
+        },
+        "allow_custom_text": {
+          "type": "boolean"
+        },
+        "knowledge_entry_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sort_order": {
+          "type": "integer"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        }
       }
     },
     "parameterOption": {
       "type": "object",
-      "required": ["id","parameter_id","label","canonical_slug","output_fragment","status"],
+      "required": [
+        "id",
+        "parameter_id",
+        "label",
+        "canonical_slug",
+        "output_fragment",
+        "status"
+      ],
       "additionalProperties": false,
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "parameter_id": { "type": "string", "minLength": 1 },
-        "label": { "type": "string", "minLength": 1 },
-        "canonical_slug": { "type": "string", "minLength": 1 },
-        "output_fragment": { "type": "string", "minLength": 1 },
-        "knowledge_entry_id": { "type": ["string","null"] },
-        "easy_visible": { "type": "boolean" },
-        "advanced_visible": { "type": "boolean" },
-        "sort_order": { "type": "integer" },
-        "status": { "$ref": "#/$defs/status" }
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parameter_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "canonical_slug": {
+          "type": "string",
+          "minLength": 1
+        },
+        "output_fragment": {
+          "type": "string",
+          "minLength": 1
+        },
+        "knowledge_entry_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "easy_visible": {
+          "type": "boolean"
+        },
+        "advanced_visible": {
+          "type": "boolean"
+        },
+        "sort_order": {
+          "type": "integer"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        }
       }
     }
   }
