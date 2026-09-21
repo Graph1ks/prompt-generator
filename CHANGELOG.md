@@ -8,7 +8,7 @@ This file records meaningful product, behavior, compatibility, security, data, a
 
 - Initialized **Graph1ks Prompt V'gine** product and UX foundation.
 - Added MusicSpec v1 semantic state contract and JSON Schema.
-- Added the Suno structured-v1 prompt renderer contract with a separate comma-delimited Exclude output.
+- Added the Suno structured-v1 prompt renderer contract with a separate comma-delimited Exclude output and a hard 1,000-character style-prompt ceiling.
 - Added local-only SQLite schemas for disposable corpus evidence, durable curation state, and compiled knowledge.
 - Added deterministic local Factory ingest/mining and knowledge compilation tooling.
 - Added corpus and curation inspection CLIs, local integrity validation, curation backup, and Factory snapshot diff tools.
@@ -34,7 +34,7 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Added conservative coordinated shared-head instrument decomposition: phrases such as `tenor and baritone saxophones` can reuse a reviewed shared head only when all inferred instrument phrases already exist in the canonical/alias lexicon; unknown combinations remain residual.
 - Added explicit decomposition grammar scaffolding for `as`, `in`, and `used` so sentence structure does not masquerade as missing instrument semantics.
 - Added guarded hyphen-compound decomposition: exact reviewed de-hyphenated phrases are reused, while component-level inference requires complete reviewed coverage and refuses compounds that would imply multiple instrument identities.\n- Hardened instrument-expression tokenization for Unicode names, apostrophes, and dotted acronyms, and expanded the explicit grammar/count scaffolding set used only by semantic decomposition.
-- Build revision advanced to `promptvgine-local-data-build-v2-resumable-2-instrument-expressions`; completed older checkpoints can advance knowledge stages without rebuilding a matching promoted corpus.
+- Added Factory-derived renderer budgeting: source preflight/validation rejects structured prompts above 1,000 characters, compiled renderer profiles carry the global hard limit, and renderer sections carry P90 soft targets/sample counts without inventing missing Vocal evidence.\n- Build revision advanced to `promptvgine-local-data-build-v2-resumable-3-prompt-budget`; completed older checkpoints can advance knowledge stages without rebuilding a matching promoted corpus.
 
 ### Changed
 

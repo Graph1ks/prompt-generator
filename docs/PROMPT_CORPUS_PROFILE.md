@@ -21,7 +21,72 @@
 
 All structured prompt lines in the inspected snapshot matched the `[Header: content]` grammar; no malformed lines were observed in the baseline pass.
 
-## 2. Section coverage and uniqueness
+## 2. Style-prompt character budget
+
+The current Factory snapshot treats **1,000 characters as a hard ceiling for
+`structured_prompt`**. Across all 10,043 tracks:
+
+| Metric | Characters |
+|---|---:|
+| Minimum | 411 |
+| Median | 716 |
+| P75 | 811 |
+| P90 | 898 |
+| P95 | 936 |
+| P99 | 982 |
+| Maximum | **1,000** |
+| Prompts above 1,000 | **0** |
+| Prompts exactly 1,000 | 4 |
+
+96.6% of source prompts are at or below 950 characters, 99.4% are at or below
+990, and every observed 1,000-character prompt still ends on a complete
+`[Header: content]` section rather than a mid-string truncation.
+
+A prompt contains a median of 12 structured sections (range 9–13). Full-line
+lengths, including `[Header: ...]`, show the source's practical per-section
+writing budget:
+
+| Section | Rows | Median | P90 | P95 | Max | Typical comma/semicolon chunks |
+|---|---:|---:|---:|---:|---:|---:|
+| Genre | 10,043 | 39 | 56 | 63 | 121 | 2 |
+| Era | 9,226 | 29 | 49 | 62 | 141 | 1 |
+| BPM | 10,040 | 10 | 10 | 10 | 76 | 1 |
+| Key/Mode | 10,043 | 19 | 25 | 25 | 85 | 1 |
+| Groove | 9,016 | 81 | 106 | 112 | 148 | 1 |
+| Melody | 10,043 | 90 | 110 | 116 | 152 | 1 |
+| Harmony | 9,956 | 74 | 97 | 103 | 139 | 1 |
+| Drums | 9,362 | 75 | 94 | 100 | 136 | 3 |
+| Bass | 10,036 | 70 | 89 | 95 | 125 | 1 |
+| Instruments | 9,882 | 84 | 107 | 114 | 176 | 5 |
+| Texture | 2,915 | 66 | 88 | 95 | 121 | 1 |
+| Dynamics | 747 | 69 | 87 | 93 | 115 | 1 |
+| Space/Mix | 9,761* | 87 | 107 | 113 | 170 | 3 |
+| Production | 4,459 | 95 | 120 | 126 | 165 | 2 |
+
+The common 12-section layout's independent P90 line budgets plus newline
+separators total approximately **981 characters**, which closely matches the
+1,000-character source ceiling. These P90 values are therefore stored as
+**soft renderer targets**, not hard per-section truncation limits.
+
+`Exciters` (20 rows, P90 80) and `Structure` (16 rows, P90 96) are retained
+as weak source evidence only. The current Factory has **no structured Vocal
+section evidence**, so no source-derived Vocal soft budget is invented.
+
+The separate `negative_prompt` has a median length of 127 characters
+(maximum 240). `instrumental_arrangement` is a different, much longer field
+(median 2,254; range 1,800–3,299) and is not evidence that the structured style
+prompt may exceed 1,000 characters.
+
+### Renderer consequence
+
+The renderer must budget semantics **before** final serialization. It may
+compact or omit lower-priority derived/redundant material, but it must never
+produce a style prompt above 1,000 characters and must never solve overflow by
+blindly slicing the final string at character 1,000. Explicit/locked user text
+must not be silently discarded; if protected content cannot fit, the UI/compiler
+must surface a budget diagnostic.
+
+## 3. Section coverage and uniqueness
 
 | Canonical section | Rows | Unique values | Repeated-value share |
 |---|---:|---:|---:|
@@ -56,7 +121,7 @@ BPM, Key/Mode and much of Era are naturally parameter-like. Melody, Harmony, Gro
 
 Those sections should be mined into concepts, phrase patterns, parameters, and curated combinations while retaining the original source sentence as evidence.
 
-## 3. Raw section-label variants
+## 4. Raw section-label variants
 
 Observed raw labels:
 
@@ -86,7 +151,7 @@ Observed raw labels:
 
 The evidence DB preserves these labels. Product rendering uses a versioned canonical subset and does not silently erase legacy information.
 
-## 4. Strong lexical domains already visible
+## 5. Strong lexical domains already visible
 
 Examples of high-frequency section vocabulary from the actual corpus:
 
@@ -120,7 +185,7 @@ Examples of high-frequency section vocabulary from the actual corpus:
 
 These are *candidate vocabulary families*, not automatically approved glossary entries.
 
-## 5. Example term distribution: why context matters
+## 6. Example term distribution: why context matters
 
 The corpus already shows that the same word belongs to different contexts.
 
@@ -139,7 +204,7 @@ The corpus already shows that the same word belongs to different contexts.
 
 This directly supports the knowledge-layer design: a global definition is not enough; the product needs section/context explanations.
 
-## 6. Repeated phrase evidence
+## 7. Repeated phrase evidence
 
 High-frequency phrases demonstrate useful building blocks but also show why raw n-grams require curation.
 
@@ -152,7 +217,7 @@ Examples:
 
 Other high-frequency n-grams such as `carries a`, `pulse with`, or `and snare` are grammatical scaffolding, not useful concepts. Candidate mining must score/filter and then curate rather than promoting frequency directly into UI options.
 
-## 7. Negative / Exclude corpus
+## 8. Negative / Exclude corpus
 
 Every Vault track in the analyzed snapshot has a negative prompt. The data is already naturally comma-delimited and aligns with the product decision to keep Exclude separate from the structured prompt.
 
@@ -173,7 +238,7 @@ Very common exclusions include:
 
 This corpus can seed candidate exclude entries, but variants/synonyms should be normalized into concepts before product exposure.
 
-## 8. Genre taxonomy/crosswalk baseline
+## 9. Genre taxonomy/crosswalk baseline
 
 Taxonomy:
 
@@ -197,7 +262,7 @@ Examples among unresolved labels include `Synth-Pop`, `R&B/Soul`, `New Wave`, `P
 
 Do **not** silently collapse these labels. Some are spelling aliases, some are composites, some may expose genuine taxonomy gaps, and some should map to multiple influences rather than one genre ID.
 
-## 9. Important gaps in the current corpus
+## 10. Important gaps in the current corpus
 
 The structured prompts are strong for core instrumental/production facets, but coverage is not uniform:
 
@@ -209,7 +274,7 @@ The structured prompts are strong for core instrumental/production facets, but c
 
 Therefore future Vocal/Exciter/Structure vocabularies must not be fabricated merely by stretching sparse evidence. They need separate curated/source enrichment.
 
-## 10. v1 extraction conclusion
+## 11. v1 extraction conclusion
 
 The source corpus is best treated as **evidence for a semantic model**, not as the runtime option list.
 

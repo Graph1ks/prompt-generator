@@ -306,7 +306,7 @@ class LocalDataBuildTests(unittest.TestCase):
                 self.assertEqual(c.execute("select count(*) from track").fetchone()[0], 2)
                 self.assertEqual(
                     k.execute("select value from build_meta where key='build_revision'").fetchone()[0],
-                    "promptvgine-local-data-build-v2-resumable-2-instrument-expressions",
+                    "promptvgine-local-data-build-v2-resumable-3-prompt-budget",
                 )
             finally:
                 c.close()
@@ -386,7 +386,7 @@ class LocalDataBuildTests(unittest.TestCase):
                     state.execute(
                         "select value from build_meta where key='build_revision'"
                     ).fetchone()[0],
-                    "promptvgine-local-data-build-v2-resumable-2-instrument-expressions",
+                    "promptvgine-local-data-build-v2-resumable-3-prompt-budget",
                 )
             finally:
                 state.close()
@@ -452,6 +452,42 @@ class LocalDataBuildTests(unittest.TestCase):
             self.assertTrue(
                 (out / "reports" / "database" / "03-knowledge-mining.stdout.txt").is_file()
             )
+
+    def test_renderer_profile_carries_source_derived_character_budget(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            out, result = self.run_builder(root)
+            self.assertEqual(result.returncode, 0, msg=result.stderr)
+            knowledge = sqlite3.connect(out / "knowledge.sqlite")
+            try:
+                profile = knowledge.execute(
+                    "SELECT max_characters,overflow_policy FROM renderer_profile "
+                    "WHERE id='suno-structured-v1'"
+                ).fetchone()
+                self.assertEqual(profile, (1000, "semantic-budget"))
+                sections = {
+                    key: (soft, samples)
+                    for key, soft, samples in knowledge.execute(
+                        "SELECT section_key,soft_max_characters,source_sample_count "
+                        "FROM renderer_section WHERE renderer_profile_id='suno-structured-v1'"
+                    )
+                }
+                self.assertEqual(sections["melody"], (110, 10043))
+                self.assertEqual(sections["instruments"], (107, 9882))
+                self.assertEqual(sections["production"], (120, 4459))
+                self.assertEqual(sections["vocal"], (None, 0))
+            finally:
+                knowledge.close()
+
+    def test_source_prompt_over_1000_characters_fails_preflight(self):
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            changed = copy.deepcopy(VAULT)
+            changed["tracks"][0]["structured_prompt"] = "[Genre: " + ("x" * 992) + "]"
+            self.assertGreater(len(changed["tracks"][0]["structured_prompt"]), 1000)
+            _, result = self.run_builder(tmp, vault_data=changed, check=False)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("1000-character limit", result.stderr)
 
     def test_plan_is_read_only(self):
         with tempfile.TemporaryDirectory() as td:

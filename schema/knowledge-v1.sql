@@ -349,6 +349,9 @@ CREATE TABLE IF NOT EXISTS renderer_profile (
   label TEXT NOT NULL,
   version INTEGER NOT NULL,
   active INTEGER NOT NULL DEFAULT 0 CHECK (active IN (0,1)),
+  max_characters INTEGER NOT NULL CHECK (max_characters > 0),
+  overflow_policy TEXT NOT NULL DEFAULT 'semantic-budget'
+    CHECK (overflow_policy IN ('semantic-budget','reject')),
   notes TEXT
 );
 
@@ -358,6 +361,8 @@ CREATE TABLE IF NOT EXISTS renderer_section (
   output_label_override TEXT,
   output_order INTEGER NOT NULL,
   emit_when_empty INTEGER NOT NULL DEFAULT 0 CHECK (emit_when_empty IN (0,1)),
+  soft_max_characters INTEGER CHECK (soft_max_characters IS NULL OR soft_max_characters > 0),
+  source_sample_count INTEGER CHECK (source_sample_count IS NULL OR source_sample_count >= 0),
   PRIMARY KEY(renderer_profile_id, section_key)
 );
 
@@ -386,3 +391,7 @@ VALUES (1, 'knowledge-v1', strftime('%Y-%m-%dT%H:%M:%fZ','now'));
 
 INSERT OR IGNORE INTO schema_migrations(version, name, applied_at)
 VALUES (2, 'instrument-expression-layer', strftime('%Y-%m-%dT%H:%M:%fZ','now'));
+
+
+INSERT OR IGNORE INTO schema_migrations(version, name, applied_at)
+VALUES (3, 'renderer-character-budget', strftime('%Y-%m-%dT%H:%M:%fZ','now'));
