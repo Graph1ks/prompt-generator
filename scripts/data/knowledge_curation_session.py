@@ -798,7 +798,8 @@ def apply_command(args) -> int:
             json.dumps(receipt, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
         )
         print(
-            f"[knowledge-curation] FAILED safely · status {receipt['status']} · receipt: {receipt_path}"
+            f"[knowledge-curation] FAILED safely · status {receipt['status']}"
+            f" · error {receipt['error']} · receipt: {receipt_path}"
         )
         return 1
 
