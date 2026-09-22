@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-22  
-**Current milestone:** **Studio UX stabilization through guarded final Style editing** — Database V1/Product Knowledge/project library remain closed/implemented; current branch adds an inline final-output guard before manual Style override; next: owner-local interaction smoke, then targeted visual/motion refinement
+**Current milestone:** **Studio UX stabilization through guarded final Style editing** — Database V1/Product Knowledge/project library remain closed/implemented; Studio now guards the first manual Style transition as an explicit final-output override; next: owner-local interaction smoke, then targeted visual/motion refinement
 
 ## Completion verdict
 
