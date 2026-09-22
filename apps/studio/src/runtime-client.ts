@@ -65,7 +65,10 @@ export async function loadStudioRuntime(): Promise<StudioRuntime> {
         reader,
         bootstrap.manifest,
         hashOptions,
-      );
+      ).catch((error: unknown) => {
+        instrumentLibraryPromise = null;
+        throw error;
+      });
       return instrumentLibraryPromise;
     },
     loadEditor() {
@@ -73,7 +76,10 @@ export async function loadStudioRuntime(): Promise<StudioRuntime> {
         reader,
         bootstrap.manifest,
         hashOptions,
-      );
+      ).catch((error: unknown) => {
+        editorPromise = null;
+        throw error;
+      });
       return editorPromise;
     },
     loadKnowledge() {
@@ -81,7 +87,10 @@ export async function loadStudioRuntime(): Promise<StudioRuntime> {
         reader,
         bootstrap.manifest,
         hashOptions,
-      );
+      ).catch((error: unknown) => {
+        knowledgePromise = null;
+        throw error;
+      });
       return knowledgePromise;
     },
   };
