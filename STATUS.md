@@ -254,6 +254,14 @@ Proceed in this order:
 - Active parameter cards get a restrained state accent and a parameter-scoped clear action, so expert users can inspect and reset one parameter without hunting through the full facet state rail.
 - Custom Advanced wording remains full-width below the parameter grid. No controls were moved into dropdowns, drawers or popups.
 
+## Genre picker focus + selected-pool management
+
+- Genre role pickers now restore keyboard focus to the originating role control after Escape, explicit close, selection or role clear; role triggers expose `aria-expanded` / `aria-controls`.
+- Opening a Genre picker on fine-pointer desktop still focuses/selects its search field, while Escape cleanly exits the picker rather than leaving keyboard focus stranded in hidden content.
+- Instruments and Exclude now group their current selections into explicit selected pools with per-item removal plus a visible pool-scoped Clear All action.
+- Clear All uses the existing MusicSpec reset contract: clearing Instruments removes only the Instruments facet; clearing Exclude removes only Exclude state.
+- Mobile selected chips and pool clear actions keep practical touch targets.
+
 ## Explain click-through + real slash-search shortcuts
 
 - Knowledge-linked selectable labels no longer steal the primary click/tap. Hover/focus previews Explain; clicking the label selects/toggles the actual Easy/Advanced/Genre/Instrument/Exclude control.
