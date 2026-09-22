@@ -100,7 +100,9 @@ function isChapterId(
 
 
 function createLocalProjectId(): string {
-  return "project:" + globalThis.crypto.randomUUID();
+  const uuid = globalThis.crypto?.randomUUID?.();
+  if (uuid) return "project:" + uuid;
+  return "project:" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
 }
 
 function safeProjectFileName(title: string | null, fallback: string): string {
@@ -858,11 +860,11 @@ export function App() {
           <button
             type="button"
             className="icon-btn"
-            aria-label={t("app.newPrompt")}
-            title={t("app.newPrompt")}
+            aria-label={t("project.new")}
+            title={t("project.new")}
             onClick={startNewPrompt}
           >
-            <Icon name="reset" />
+            <Icon name="plus" />
           </button>
           <button
             type="button"
