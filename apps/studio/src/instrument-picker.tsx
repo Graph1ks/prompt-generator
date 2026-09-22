@@ -437,6 +437,7 @@ export function InstrumentPicker({
                   loadKnowledge={runtime.loadKnowledge}
                   contextType="instrument_expression"
                   contextKey={expression.id}
+                  onActivate={() => toggleExpression(expression)}
                 />
               </span>
               <small>{familyLabelsForExpression(expression)}</small>
