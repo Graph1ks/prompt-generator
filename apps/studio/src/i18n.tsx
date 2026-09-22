@@ -1,15 +1,19 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
 
+import { userDataStorage } from "./user-data-storage.js";
+
 export const SUPPORTED_LOCALES = ["de", "en"] as const;
 export type AppLocale = (typeof SUPPORTED_LOCALES)[number];
 
-const LOCALE_STORAGE_KEY = "vgine.locale";
+const LEGACY_LOCALE_STORAGE_KEY = "vgine.locale";
+const LOCALE_PREFERENCE_KEY = "preference:locale";
 
 const en = {
   "app.soundStudio": "Your personal sound studio",
@@ -445,7 +449,7 @@ function isLocale(value: string | null | undefined): value is AppLocale {
 }
 
 function browserLocale(): AppLocale {
-  const stored = globalThis.localStorage?.getItem(LOCALE_STORAGE_KEY);
+  const stored = globalThis.localStorage?.getItem(LEGACY_LOCALE_STORAGE_KEY);
   if (isLocale(stored)) return stored;
   const language = globalThis.navigator?.language?.toLowerCase() ?? "en";
   return language.startsWith("de") ? "de" : "en";
@@ -476,14 +480,48 @@ const I18nContext = createContext<I18nContextValue | null>(null);
 export function I18nProvider({ children }: { readonly children: ReactNode }) {
   const [locale, setLocaleState] = useState<AppLocale>(browserLocale);
 
+  useEffect(() => {
+    let live = true;
+    const legacy = globalThis.localStorage?.getItem(
+      LEGACY_LOCALE_STORAGE_KEY,
+    );
+
+    void userDataStorage
+      .get<unknown>(LOCALE_PREFERENCE_KEY)
+      .then(async (stored) => {
+        if (!live) return;
+        const next = isLocale(
+          typeof stored === "string" ? stored : undefined,
+        )
+          ? stored
+          : isLocale(legacy)
+            ? legacy
+            : browserLocale();
+        setLocaleState(next);
+        if (!isLocale(typeof stored === "string" ? stored : undefined)) {
+          await userDataStorage.set(LOCALE_PREFERENCE_KEY, next);
+        }
+        try {
+          globalThis.localStorage?.removeItem(LEGACY_LOCALE_STORAGE_KEY);
+        } catch {
+          // Legacy cleanup is best effort only.
+        }
+      })
+      .catch(() => {
+        // Browser locale remains the current-session fallback.
+      });
+
+    return () => {
+      live = false;
+    };
+  }, []);
+
   const value = useMemo<I18nContextValue>(() => {
     const setLocale = (next: AppLocale) => {
       setLocaleState(next);
-      try {
-        globalThis.localStorage?.setItem(LOCALE_STORAGE_KEY, next);
-      } catch {
-        // Locale persistence is a preference enhancement.
-      }
+      void userDataStorage.set(LOCALE_PREFERENCE_KEY, next).catch(() => {
+        // Locale remains usable for the current session.
+      });
     };
     const t: Translate = (key, values) =>
       formatMessage(CATALOGS[locale][key], values);
