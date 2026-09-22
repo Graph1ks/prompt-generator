@@ -370,10 +370,6 @@ export function InstrumentPicker({
             count: matchingExpressions.length.toLocaleString(locale),
           })}
         </span>
-        <span className="favorite-hint">
-          <Icon name="star" />
-          {t("instrument.favoriteHint")}
-        </span>
       </div>
 
       <div
