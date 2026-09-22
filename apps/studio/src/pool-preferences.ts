@@ -1,6 +1,9 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "vgine.pool-preferences.v1";
+import { userDataStorage } from "./user-data-storage.js";
+
+const LEGACY_STORAGE_KEY = "vgine.pool-preferences.v1";
+const USER_DATA_PREFIX = "pool-preferences:";
 
 interface PoolItemPreference {
   readonly favorite: boolean;
@@ -13,27 +16,40 @@ interface StoredPoolPreferences {
   readonly pools: Readonly<Record<string, Readonly<Record<string, PoolItemPreference>>>>;
 }
 
-const EMPTY_STORE: StoredPoolPreferences = { version: 1, pools: {} };
-
-function readStore(): StoredPoolPreferences {
+function legacyPool(poolId: string): Readonly<Record<string, PoolItemPreference>> {
   try {
-    const raw = globalThis.localStorage?.getItem(STORAGE_KEY);
-    if (!raw) return EMPTY_STORE;
+    const raw = globalThis.localStorage?.getItem(LEGACY_STORAGE_KEY);
+    if (!raw) return {};
     const parsed = JSON.parse(raw) as Partial<StoredPoolPreferences>;
-    if (parsed.version !== 1 || typeof parsed.pools !== "object" || parsed.pools === null) {
-      return EMPTY_STORE;
+    if (parsed.version !== 1 || typeof parsed.pools !== "object" || !parsed.pools) {
+      return {};
     }
-    return parsed as StoredPoolPreferences;
+    return parsed.pools[poolId] ?? {};
   } catch {
-    return EMPTY_STORE;
+    return {};
   }
 }
 
-function writeStore(store: StoredPoolPreferences): void {
+function removeLegacyPool(poolId: string): void {
   try {
-    globalThis.localStorage?.setItem(STORAGE_KEY, JSON.stringify(store));
+    const raw = globalThis.localStorage?.getItem(LEGACY_STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw) as Partial<StoredPoolPreferences>;
+    if (parsed.version !== 1 || typeof parsed.pools !== "object" || !parsed.pools) {
+      return;
+    }
+    const pools = { ...parsed.pools };
+    delete pools[poolId];
+    if (Object.keys(pools).length === 0) {
+      globalThis.localStorage?.removeItem(LEGACY_STORAGE_KEY);
+    } else {
+      globalThis.localStorage?.setItem(
+        LEGACY_STORAGE_KEY,
+        JSON.stringify({ version: 1, pools }),
+      );
+    }
   } catch {
-    // Preferences are an enhancement. Storage failure must never block editing.
+    // Migration cleanup must never block editing.
   }
 }
 
@@ -42,13 +58,44 @@ export interface PoolPreferences {
   readonly usageCount: (id: string) => number;
   readonly setFavorite: (id: string, favorite: boolean) => void;
   readonly recordUse: (id: string) => void;
-  readonly sortFavoriteFirst: <T>(items: readonly T[], idOf: (item: T) => string) => T[];
+  readonly sortFavoriteFirst: <T>(
+    items: readonly T[],
+    idOf: (item: T) => string,
+  ) => T[];
 }
 
 export function usePoolPreferences(poolId: string): PoolPreferences {
+  const storageKey = USER_DATA_PREFIX + poolId;
   const [items, setItems] = useState<Readonly<Record<string, PoolItemPreference>>>(
-    () => readStore().pools[poolId] ?? {},
+    {},
   );
+
+  useEffect(() => {
+    let live = true;
+    void userDataStorage
+      .get<Readonly<Record<string, PoolItemPreference>>>(storageKey)
+      .then(async (stored) => {
+        if (!live) return;
+        if (stored) {
+          setItems(stored);
+          return;
+        }
+
+        const migrated = legacyPool(poolId);
+        if (Object.keys(migrated).length > 0) {
+          setItems(migrated);
+          await userDataStorage.set(storageKey, migrated);
+          removeLegacyPool(poolId);
+        }
+      })
+      .catch(() => {
+        // Favorites are an enhancement; storage failure must not block editing.
+      });
+
+    return () => {
+      live = false;
+    };
+  }, [poolId, storageKey]);
 
   const mutate = useCallback(
     (id: string, update: (current: PoolItemPreference) => PoolItemPreference) => {
@@ -56,18 +103,13 @@ export function usePoolPreferences(poolId: string): PoolPreferences {
         const current =
           currentItems[id] ?? { favorite: false, useCount: 0, lastUsedAt: 0 };
         const nextItems = { ...currentItems, [id]: update(current) };
-        const store = readStore();
-        writeStore({
-          version: 1,
-          pools: {
-            ...store.pools,
-            [poolId]: nextItems,
-          },
+        void userDataStorage.set(storageKey, nextItems).catch(() => {
+          // Keep the current editing session functional even if persistence fails.
         });
         return nextItems;
       });
     },
-    [poolId],
+    [storageKey],
   );
 
   const isFavorite = useCallback(
@@ -111,7 +153,8 @@ export function usePoolPreferences(poolId: string): PoolPreferences {
           if (aFavorite && bFavorite) {
             const useDiff = (bPref?.useCount ?? 0) - (aPref?.useCount ?? 0);
             if (useDiff !== 0) return useDiff;
-            const recentDiff = (bPref?.lastUsedAt ?? 0) - (aPref?.lastUsedAt ?? 0);
+            const recentDiff =
+              (bPref?.lastUsedAt ?? 0) - (aPref?.lastUsedAt ?? 0);
             if (recentDiff !== 0) return recentDiff;
           }
           return a.sourceIndex - b.sourceIndex;
@@ -122,7 +165,13 @@ export function usePoolPreferences(poolId: string): PoolPreferences {
   );
 
   return useMemo(
-    () => ({ isFavorite, usageCount, setFavorite, recordUse, sortFavoriteFirst }),
+    () => ({
+      isFavorite,
+      usageCount,
+      setFavorite,
+      recordUse,
+      sortFavoriteFirst,
+    }),
     [isFavorite, recordUse, setFavorite, sortFavoriteFirst, usageCount],
   );
 }
