@@ -223,6 +223,7 @@ export function App() {
   const projectCreatedAtRef = useRef(new Date().toISOString());
   const saveRevisionRef = useRef(0);
   const autosaveTimerRef = useRef<number | null>(null);
+  const previewRef = useRef<HTMLElement | null>(null);
 
   const chapter =
     STUDIO_CHAPTERS.find((candidate) => candidate.id === chapterId) ??
@@ -955,6 +956,28 @@ export function App() {
     void createNewProject();
   }
 
+  function reviewPrompt() {
+    if (!effectiveStyleText && compilation?.excludeText) {
+      setOutputTab("exclude");
+    } else {
+      setOutputTab("style");
+    }
+
+    if (window.matchMedia("(max-width: 760px)").matches) {
+      setMobilePreviewOpen(true);
+    }
+
+    window.requestAnimationFrame(() => {
+      const preview = previewRef.current;
+      if (!preview) return;
+      preview.focus({ preventScroll: true });
+      preview.dataset.reviewFocus = "true";
+      window.setTimeout(() => {
+        delete preview.dataset.reviewFocus;
+      }, 900);
+    });
+  }
+
   function togglePromptUnlock() {
     if (!promptUnlocked && manualStyleText === null) {
       setManualStyleText(compiledStyleText);
@@ -1437,7 +1460,11 @@ export function App() {
                       ? "btn warning-next"
                       : "btn primary"
                   }
-                  onClick={() => requestChapter(nextChapter.id)}
+                  onClick={() =>
+                    chapter.id === "finish"
+                      ? reviewPrompt()
+                      : requestChapter(nextChapter.id)
+                  }
                 >
                   {chapter.id === "dna" && genreSkipAcknowledged && !hasGenre ? (
                     <>
@@ -1446,7 +1473,9 @@ export function App() {
                     </>
                   ) : (
                     <>
-                      {chapter.id === "finish" ? t("footer.done") : chapterLabel(nextChapter.id)}
+                      {chapter.id === "finish"
+                        ? t("footer.reviewPrompt")
+                        : chapterLabel(nextChapter.id)}
                       <Icon name="arrow" />
                     </>
                   )}
@@ -1456,6 +1485,8 @@ export function App() {
           </main>
 
           <aside
+            ref={previewRef}
+            tabIndex={-1}
             className={
               mobilePreviewOpen
                 ? previewPulse
