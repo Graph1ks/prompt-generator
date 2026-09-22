@@ -125,6 +125,26 @@ function isStudioSourceTarget(value: string): value is StudioSourceTarget {
   );
 }
 
+function chapterActiveItemCount(
+  spec: MusicSpec,
+  chapter: (typeof STUDIO_CHAPTERS)[number],
+): number {
+  let count = chapter.facets.reduce((total, facet) => {
+    if (facet === "genre") {
+      return total + spec.genre_influences.length;
+    }
+    const state = spec.facets[facet];
+    return (
+      total +
+      (state?.selections.length ?? 0) +
+      (state?.custom_text?.trim() ? 1 : 0)
+    );
+  }, 0);
+
+  if (chapter.id === "finish") count += spec.exclude.length;
+  return count;
+}
+
 
 function createLocalProjectId(): string {
   const uuid = globalThis.crypto?.randomUUID?.();
@@ -1056,25 +1076,37 @@ export function App() {
             <nav className="steps" aria-label={t("app.soundStudio")}>
               {STUDIO_CHAPTERS.map((item, index) => {
                 const active = item.id === chapter.id;
-                const currentIndex = STUDIO_CHAPTERS.findIndex(
-                  (candidate) => candidate.id === chapter.id,
-                );
+                const activeItems = chapterActiveItemCount(spec, item);
+                const label = chapterLabel(item.id);
                 return (
                   <button
                     key={item.id}
                     type="button"
-                    className={
-                      active
-                        ? "step active"
-                        : index < currentIndex
-                          ? "step done"
-                          : "step"
-                    }
+                    className={[
+                      "step",
+                      active ? "active" : "",
+                      activeItems > 0 ? "filled" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
                     aria-current={active ? "step" : undefined}
+                    aria-label={
+                      activeItems > 0
+                        ? t("chapter.navWithCount", {
+                            chapter: label,
+                            count: activeItems,
+                          })
+                        : label
+                    }
                     onClick={() => requestChapter(item.id)}
                   >
                     <span className="num">0{index + 1}</span>
-                    {chapterLabel(item.id)}
+                    <span className="step-label">{label}</span>
+                    {activeItems > 0 && (
+                      <span className="step-count" aria-hidden="true">
+                        {activeItems}
+                      </span>
+                    )}
                   </button>
                 );
               })}
