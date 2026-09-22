@@ -97,7 +97,7 @@ The default pattern is therefore:
 - browse by semantic category;
 - each result has a short explanation;
 - recent and favorite items are quick-access views;
-- selected values remain visible in the editor;
+- selected values remain visible in the editor and can be removed directly from that visible state; specialized high-cardinality pools also expose a scoped clear-all action;
 - no giant `<select>` menus.
 
 On narrow/mobile screens this becomes a bottom sheet or full-height selection sheet. On desktop it may be an anchored dialog or centered modal depending on content volume.
