@@ -217,6 +217,14 @@ Proceed in this order:
 - Copy availability is derived from the active Style/Exclude tab, so Exclude can be copied even when Style is empty and all header/preview/mobile copy controls share one validity rule.
 - `Ctrl / ⌘ + Enter` follows that same active-output rule and is suppressed while project/manual-copy overlays are open.
 
+## Desktop facet density + parameter scan state
+
+- Wide desktop ordinary facets now use available horizontal space instead of stretching every Advanced parameter into a full-width vertical row.
+- At wide desktop widths, Advanced parameter groups form a two-column scan grid and Easy statement cards expand to three columns; narrower desktop/tablet/mobile layouts retain the simpler single/two-column compositions.
+- Every Advanced parameter header now shows its active value(s) directly beside the parameter identity, with compact summarization for multi-select values.
+- Active parameter cards get a restrained state accent and a parameter-scoped clear action, so expert users can inspect and reset one parameter without hunting through the full facet state rail.
+- Custom Advanced wording remains full-width below the parameter grid. No controls were moved into dropdowns, drawers or popups.
+
 ## Explain click-through + real slash-search shortcuts
 
 - Knowledge-linked selectable labels no longer steal the primary click/tap. Hover/focus previews Explain; clicking the label selects/toggles the actual Easy/Advanced/Genre/Instrument/Exclude control.

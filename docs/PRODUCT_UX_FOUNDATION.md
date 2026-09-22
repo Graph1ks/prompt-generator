@@ -22,7 +22,7 @@ The internal product model must remain richer than the exported prompt. Suno is 
 6. **Mobile is a first-class interaction model.** Anything necessary must work by tap. Hover is enhancement, never a requirement.
 7. **Teach in place.** Music terminology is explained where it appears, including inside generated prompt text.
 8. **The output is inspectable.** The user must see exactly which structured prompt section a change affects.
-9. **Readable before dense.** Avoid micro-fonts and gratuitous dashboard chrome. Dense expert functionality is allowed, but hierarchy and touch/readability win.
+9. **Readable before dense.** Avoid micro-fonts and gratuitous dashboard chrome. Dense expert functionality is allowed, but hierarchy and touch/readability win. Wide desktop layouts should spend horizontal space to reduce unnecessary vertical travel; density must be responsive rather than achieved by hiding controls.
 10. **Motion communicates state.** Animation is used for reorder, replacement, navigation, picker transitions, and causality—not decorative perpetual motion.
 
 ## 3. Easy and Advanced modes
