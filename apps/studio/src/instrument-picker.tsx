@@ -219,23 +219,25 @@ export function InstrumentPicker({
     runtime.searchIndex,
   ]);
 
-  const favoriteCount = useMemo(() => {
-    if (!data) return 0;
-    return data.expressions.expressions.reduce(
-      (count, expression) =>
-        count + (preferences.isFavorite(expression.id) ? 1 : 0),
-      0,
-    );
-  }, [data, preferences]);
+  const favoriteCount = useMemo(
+    () =>
+      matchingExpressions.reduce(
+        (count, expression) =>
+          count + (preferences.isFavorite(expression.id) ? 1 : 0),
+        0,
+      ),
+    [matchingExpressions, preferences],
+  );
 
-  const recentCount = useMemo(() => {
-    if (!data) return 0;
-    return data.expressions.expressions.reduce(
-      (count, expression) =>
-        count + (preferences.lastUsedAt(expression.id) > 0 ? 1 : 0),
-      0,
-    );
-  }, [data, preferences]);
+  const recentCount = useMemo(
+    () =>
+      matchingExpressions.reduce(
+        (count, expression) =>
+          count + (preferences.lastUsedAt(expression.id) > 0 ? 1 : 0),
+        0,
+      ),
+    [matchingExpressions, preferences],
+  );
 
   const poolExpressions = useMemo(() => {
     if (quickView === "favorites") {
