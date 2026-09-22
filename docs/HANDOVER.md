@@ -361,6 +361,14 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Counts are calculated after the active search/category/family filter. Recent ordering is `lastUsedAt` descending.
 - All view keeps existing favorite-first ordering; Show All and chunked rendering consume the quick-view-filtered result set.
 
+## Large-pool keyboard navigation carry-forward
+
+- Genre, Instruments and Exclude use the shared `usePoolKeyboardNavigation` helper over their visible result buttons.
+- `ArrowDown` from search enters the result grid; arrows navigate spatially by rendered card geometry; `Home` / `End` jump to boundaries; `Escape` restores search focus/selection.
+- Pool result buttons expose `data-pool-result`; do not reimplement picker-specific roving-tabindex state.
+- Enter/Space keep primary selection behavior. `Shift+F` is the keyboard alternative for the existing hold-to-favorite gesture and uses the same local favorite persistence.
+- Focus styling belongs to the whole HoldFavoriteOption card even though the actual accessible button is the internal hit area.
+
 ## Large-pool control reachability carry-forward
 
 - Genre, Instruments and Exclude wrap search/filter/meta controls in a desktop sticky control stack.
