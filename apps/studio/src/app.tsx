@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { compileMusicSpec, countCharacters } from "@vgine/compiler";
 import {
+  FACET_KEYS,
   createMusicSpec,
   resetMusicSpec,
   resetMusicSpecFacets,
@@ -44,6 +45,8 @@ const FACET_MODE_PREFERENCE_KEY = "preference:facet-modes";
 const ACTIVE_PROJECT_POINTER_KEY = "project:active-id";
 const projectStorage = createIndexedDbProjectStorage();
 const PROJECT_AUTOSAVE_DELAY_MS = 320;
+const SPEC_HISTORY_LIMIT = 80;
+const SPEC_HISTORY_COALESCE_MS = 650;
 
 type RuntimeState =
   | { readonly status: "loading" }
@@ -143,6 +146,62 @@ function facetActiveItemCount(spec: MusicSpec, facet: FacetKey): number {
   );
 }
 
+function specHistoryGroup(current: MusicSpec, next: MusicSpec): string | null {
+  if (
+    current.genre_influences !== next.genre_influences ||
+    current.exclude !== next.exclude
+  ) {
+    return null;
+  }
+
+  const changedFacets = FACET_KEYS.filter(
+    (facet) => current.facets[facet] !== next.facets[facet],
+  );
+  if (changedFacets.length !== 1) return null;
+
+  const facet = changedFacets[0];
+  const before = current.facets[facet];
+  const after = next.facets[facet];
+  if (!before || !after) return null;
+
+  if (
+    before.custom_text !== after.custom_text &&
+    before.selections === after.selections
+  ) {
+    return "facet:" + facet + ":custom";
+  }
+
+  if (before.custom_text !== after.custom_text) return null;
+
+  const beforeById = new Map(
+    before.selections
+      .filter((selection) => Boolean(selection.id))
+      .map((selection) => [selection.id as string, selection] as const),
+  );
+  const afterById = new Map(
+    after.selections
+      .filter((selection) => Boolean(selection.id))
+      .map((selection) => [selection.id as string, selection] as const),
+  );
+  const changedIds = new Set<string>();
+
+  for (const id of new Set([...beforeById.keys(), ...afterById.keys()])) {
+    const previous = beforeById.get(id);
+    const upcoming = afterById.get(id);
+    if (
+      previous?.value !== upcoming?.value ||
+      previous?.kind !== upcoming?.kind ||
+      previous?.origin !== upcoming?.origin ||
+      previous?.locked !== upcoming?.locked
+    ) {
+      changedIds.add(id);
+    }
+  }
+
+  if (changedIds.size !== 1) return null;
+  return "facet:" + facet + ":selection:" + [...changedIds][0];
+}
+
 function chapterActiveItemCount(
   spec: MusicSpec,
   chapter: (typeof STUDIO_CHAPTERS)[number],
@@ -197,6 +256,15 @@ export function App() {
   const [activeGenreRole, setActiveGenreRole] =
     useState<GenreInfluenceRole>("foundation");
   const [spec, setSpec] = useState<MusicSpec>(() => createMusicSpec());
+  const undoSpecRef = useRef<MusicSpec[]>([]);
+  const redoSpecRef = useRef<MusicSpec[]>([]);
+  const lastSpecCommitRef = useRef<{ group: string | null; at: number } | null>(
+    null,
+  );
+  const [specHistoryState, setSpecHistoryState] = useState({
+    undo: 0,
+    redo: 0,
+  });
   const [runtime, setRuntime] = useState<RuntimeState>({ status: "loading" });
   const [copyState, setCopyState] = useState<"idle" | "copied">("idle");
   const [copyFallbackText, setCopyFallbackText] = useState<string | null>(null);
@@ -713,8 +781,74 @@ export function App() {
     };
   }, [chapter, mobilePreviewOpen, runtime.status]);
 
+  function syncSpecHistoryState() {
+    setSpecHistoryState({
+      undo: undoSpecRef.current.length,
+      redo: redoSpecRef.current.length,
+    });
+  }
+
+  function clearSpecHistory() {
+    undoSpecRef.current = [];
+    redoSpecRef.current = [];
+    lastSpecCommitRef.current = null;
+    syncSpecHistoryState();
+  }
+
+  function commitSpec(next: MusicSpec) {
+    if (next === spec) return;
+
+    const now = performance.now();
+    const group = specHistoryGroup(spec, next);
+    const last = lastSpecCommitRef.current;
+    const canCoalesce =
+      group !== null &&
+      last?.group === group &&
+      now - last.at <= SPEC_HISTORY_COALESCE_MS &&
+      undoSpecRef.current.length > 0;
+
+    if (!canCoalesce) {
+      undoSpecRef.current = [
+        ...undoSpecRef.current.slice(-(SPEC_HISTORY_LIMIT - 1)),
+        spec,
+      ];
+    }
+    redoSpecRef.current = [];
+    lastSpecCommitRef.current = { group, at: now };
+    setSpec(next);
+    syncSpecHistoryState();
+  }
+
+  function undoSpec() {
+    const previous = undoSpecRef.current.at(-1);
+    if (!previous) return;
+
+    undoSpecRef.current = undoSpecRef.current.slice(0, -1);
+    redoSpecRef.current = [
+      ...redoSpecRef.current.slice(-(SPEC_HISTORY_LIMIT - 1)),
+      spec,
+    ];
+    lastSpecCommitRef.current = null;
+    setSpec(previous);
+    syncSpecHistoryState();
+  }
+
+  function redoSpec() {
+    const next = redoSpecRef.current.at(-1);
+    if (!next) return;
+
+    redoSpecRef.current = redoSpecRef.current.slice(0, -1);
+    undoSpecRef.current = [
+      ...undoSpecRef.current.slice(-(SPEC_HISTORY_LIMIT - 1)),
+      spec,
+    ];
+    lastSpecCommitRef.current = null;
+    setSpec(next);
+    syncSpecHistoryState();
+  }
+
   function resetCurrentChapter() {
-    setSpec(
+    commitSpec(
       resetMusicSpecFacets(spec, chapter.facets, {
         clearExclude: chapter.id === "finish",
       }),
@@ -722,6 +856,7 @@ export function App() {
   }
 
   function applyProject(project: ProjectDocument) {
+    clearSpecHistory();
     setCurrentProjectId(project.id);
     setProjectTitle(project.title);
     setSpec(project.music_spec);
@@ -1033,6 +1168,40 @@ export function App() {
     projectLibraryOpen,
   ]);
 
+
+  useEffect(() => {
+    function onHistoryKeyDown(event: KeyboardEvent) {
+      if (
+        projectLibraryOpen ||
+        copyFallbackText !== null ||
+        isTextEntryTarget(event.target) ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      const command = event.ctrlKey || event.metaKey;
+      if (!command) return;
+
+      const key = event.key.toLowerCase();
+      const redo =
+        (key === "z" && event.shiftKey) ||
+        (key === "y" && event.ctrlKey && !event.metaKey && !event.shiftKey);
+      const undo = key === "z" && !event.shiftKey;
+
+      if (redo && redoSpecRef.current.length > 0) {
+        event.preventDefault();
+        redoSpec();
+      } else if (undo && undoSpecRef.current.length > 0) {
+        event.preventDefault();
+        undoSpec();
+      }
+    }
+
+    window.addEventListener("keydown", onHistoryKeyDown);
+    return () => window.removeEventListener("keydown", onHistoryKeyDown);
+  }, [copyFallbackText, projectLibraryOpen, spec]);
+
   const runtimeLabel =
     runtime.status === "ready"
       ? t("app.runtimeReady", {
@@ -1118,6 +1287,30 @@ export function App() {
           >
             {runtime.status === "ready" ? projectSaveLabel : runtimeLabel}
           </span>
+          <div className="history-actions" role="group" aria-label={t("history.label")}>
+            <button
+              type="button"
+              className="icon-btn"
+              disabled={specHistoryState.undo === 0}
+              aria-label={t("history.undo")}
+              aria-keyshortcuts="Control+Z Meta+Z"
+              title={t("history.undoTitle")}
+              onClick={undoSpec}
+            >
+              <Icon name="undo" />
+            </button>
+            <button
+              type="button"
+              className="icon-btn"
+              disabled={specHistoryState.redo === 0}
+              aria-label={t("history.redo")}
+              aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
+              title={t("history.redoTitle")}
+              onClick={redoSpec}
+            >
+              <Icon name="redo" />
+            </button>
+          </div>
           <button
             type="button"
             className="icon-btn new-project-action"
@@ -1406,7 +1599,7 @@ export function App() {
                         spec={spec}
                         activeRole={activeGenreRole}
                         onRoleChange={setActiveGenreRole}
-                        onSpecChange={setSpec}
+                        onSpecChange={commitSpec}
                         assistOn={assistOn}
                         loadKnowledge={runtime.value.loadKnowledge}
                       />
@@ -1415,7 +1608,7 @@ export function App() {
                         key={facet}
                         runtime={runtime.value}
                         spec={spec}
-                        onSpecChange={setSpec}
+                        onSpecChange={commitSpec}
                         assistOn={assistOn}
                       />
                     ) : (
@@ -1425,7 +1618,7 @@ export function App() {
                         label={facetLabel(facet)}
                         runtime={runtime.value}
                         spec={spec}
-                        onSpecChange={setSpec}
+                        onSpecChange={commitSpec}
                         assistOn={assistOn}
                         mode={facetModes[facet] ?? globalEditorMode}
                         onModeChange={(next) =>
@@ -1438,7 +1631,7 @@ export function App() {
                     <ExcludePicker
                       runtime={runtime.value}
                       spec={spec}
-                      onSpecChange={setSpec}
+                      onSpecChange={commitSpec}
                       assistOn={assistOn}
                     />
                   )}
