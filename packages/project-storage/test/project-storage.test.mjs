@@ -31,7 +31,7 @@ test("creates and parses a v1 project document", () => {
   assert.equal(project.music_spec.facets.groove.selections.length, 1);
   assert.equal(project.output.manual_style_override, "[Genre: Boom Bap]");
   assert.equal(project.workspace.active_chapter, "pulse");
-  assert.equal(parseProjectDocument(project), project);
+  assert.deepEqual(parseProjectDocument(project), project);
 });
 
 test("rejects unsupported project schemas and invalid MusicSpec state", () => {
