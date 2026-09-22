@@ -299,7 +299,11 @@ export function GenrePicker({
 
   return (
     <>
-      <div className="genre-slots" aria-label={t("genre.influencesAria")}>
+      <div
+        className="genre-slots"
+        data-facet="genre"
+        aria-label={t("genre.influencesAria")}
+      >
         {(["foundation", "fusion", "accent"] as const).map((role, index) => {
           const selectedId = genreIdForRole(spec, role);
           const option = selectedId ? optionById.get(selectedId) : undefined;
