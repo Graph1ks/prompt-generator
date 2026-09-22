@@ -10,6 +10,8 @@ import {
 } from "@vgine/music-spec";
 import { isVgineTheme, type VgineTheme } from "@vgine/ui";
 
+import { ExcludePicker } from "./exclude-picker.js";
+import { FacetEditor } from "./facet-editor.js";
 import { GenrePicker } from "./genre-picker.js";
 import { InstrumentPicker } from "./instrument-picker.js";
 import { Icon } from "./icons.js";
@@ -194,21 +196,6 @@ export function App() {
   function resetManualPrompt() {
     setManualStyleText(null);
     setPromptUnlocked(false);
-  }
-
-  function facetSummary(facet: FacetKey): string {
-    if (facet === "genre") {
-      return selectedGenreLabels.length
-        ? selectedGenreLabels.join(" · ")
-        : t("placeholder.notSelected");
-    }
-    const state = spec?.facets[facet];
-    if (!state) return t("placeholder.notSet");
-    const count = state.selections.length + (state.custom_text?.trim() ? 1 : 0);
-    if (count === 0) return t("placeholder.notSet");
-    return t(count === 1 ? "placeholder.selection" : "placeholder.selections", {
-      count,
-    });
   }
 
   async function copyPrompt() {
@@ -453,18 +440,23 @@ export function App() {
                         spec={spec}
                         onSpecChange={setSpec}
                       />
-                    ) : (
-                      <section key={facet} className="field-card">
-                        <div className="field-label">
-                          <span>{facetLabel(facet)}</span>
-                          <span className="badge">MusicSpec</span>
-                        </div>
-                        <div className="placeholder-value">
-                          <strong>{facetSummary(facet)}</strong>
-                          <p>{t("placeholder.future")}</p>
-                        </div>
-                      </section>
+                    ) : facet === "genre" ? null : (
+                      <FacetEditor
+                        key={facet}
+                        facet={facet}
+                        label={facetLabel(facet)}
+                        runtime={runtime.value}
+                        spec={spec}
+                        onSpecChange={setSpec}
+                      />
                     ),
+                  )}
+                  {chapter.id === "finish" && (
+                    <ExcludePicker
+                      runtime={runtime.value}
+                      spec={spec}
+                      onSpecChange={setSpec}
+                    />
                   )}
                 </div>
               )}

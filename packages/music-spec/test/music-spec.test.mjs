@@ -9,8 +9,12 @@ import {
   resetMusicSpec,
   resetMusicSpecFacets,
   setFacetSelection,
+  setFacetCustomText,
   removeFacetSelection,
   hasFacetSelection,
+  setExcludeItem,
+  removeExcludeItem,
+  hasExcludeItem,
   setGenreInfluence,
   validateMusicSpec,
 } from "../dist/index.js";
@@ -161,5 +165,51 @@ test("adds, replaces and removes stable facet selections", () => {
     "instrument-expression:warm-rhodes",
   );
   assert.equal(spec.facets.instruments.selections.length, 0);
+  assert.equal(validateMusicSpec(spec).valid, true);
+});
+
+
+test("sets and clears facet custom text without disturbing selections", () => {
+  let spec = createMusicSpec();
+  spec = setFacetSelection(spec, "texture", {
+    id: "statement:texture:test",
+    kind: "statement",
+    value: "grainy analog texture",
+    origin: "user",
+    locked: false,
+  });
+  spec = setFacetCustomText(spec, "texture", "subtle tape flutter");
+  assert.equal(spec.facets.texture.custom_text, "subtle tape flutter");
+  assert.equal(spec.facets.texture.selections.length, 1);
+
+  spec = setFacetCustomText(spec, "texture", null);
+  assert.equal(spec.facets.texture.custom_text, null);
+  assert.equal(spec.facets.texture.selections.length, 1);
+  assert.equal(validateMusicSpec(spec).valid, true);
+});
+
+
+test("adds and removes stable Exclude items independently from facet state", () => {
+  let spec = createMusicSpec();
+  spec = setExcludeItem(spec, {
+    id: "exclude:glossy-pop-synths",
+    text: "bright glossy pop synths",
+    origin: "user",
+    locked: false,
+  });
+  assert.equal(hasExcludeItem(spec, "exclude:glossy-pop-synths"), true);
+  assert.equal(spec.exclude.length, 1);
+
+  spec = setExcludeItem(spec, {
+    id: "exclude:glossy-pop-synths",
+    text: "bright glossy pop synths",
+    origin: "user",
+    locked: true,
+  });
+  assert.equal(spec.exclude.length, 1);
+  assert.equal(spec.exclude[0].locked, true);
+
+  spec = removeExcludeItem(spec, "exclude:glossy-pop-synths");
+  assert.equal(spec.exclude.length, 0);
   assert.equal(validateMusicSpec(spec).valid, true);
 });

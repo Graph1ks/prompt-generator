@@ -2,8 +2,10 @@ import {
   buildCompilerKnowledge,
   loadRuntimeBootstrap,
   loadRuntimeInstrumentLibrary,
+  loadRuntimeEditor,
   type RuntimeBootstrap,
   type RuntimeInstrumentLibrary,
+  type RuntimeEditorPayload,
   type RuntimeCompilerKnowledge,
   type RuntimePackReader,
 } from "@vgine/runtime-data";
@@ -14,6 +16,7 @@ export interface StudioRuntime {
   readonly compilerKnowledge: RuntimeCompilerKnowledge;
   readonly searchIndex: SearchIndex;
   readonly loadInstrumentLibrary: () => Promise<RuntimeInstrumentLibrary>;
+  readonly loadEditor: () => Promise<RuntimeEditorPayload>;
 }
 
 function createBrowserReader(): RuntimePackReader {
@@ -47,6 +50,7 @@ export async function loadStudioRuntime(): Promise<StudioRuntime> {
   const reader = createBrowserReader();
   const bootstrap = await loadRuntimeBootstrap(reader, hashOptions);
   let instrumentLibraryPromise: Promise<RuntimeInstrumentLibrary> | null = null;
+  let editorPromise: Promise<RuntimeEditorPayload> | null = null;
 
   return {
     bootstrap,
@@ -59,6 +63,14 @@ export async function loadStudioRuntime(): Promise<StudioRuntime> {
         hashOptions,
       );
       return instrumentLibraryPromise;
+    },
+    loadEditor() {
+      editorPromise ??= loadRuntimeEditor(
+        reader,
+        bootstrap.manifest,
+        hashOptions,
+      );
+      return editorPromise;
     },
   };
 }

@@ -212,7 +212,7 @@ If a proposed implementation requires changing a Database V1 invariant, call tha
 
 - MusicSpec v1 now accepts zero to three genre influences. Existing v1 documents remain valid.
 - Sound DNA can be skipped after one per-prompt warning confirmation.
-- Large pools have reusable user favorites with 1.5 s add / 2 s remove hold gestures and usage-based ranking.
+- Large pools have reusable user favorites with 0.8 s add / 1.0 s remove hold gestures, synchronized progress feedback and usage-based ranking.
 - Explicit Show All replaces repeated 12-item paging; expanded Genre lists include a floating return-to-top action and collapse after selection.
 - Page reset clears only the current chapter's state; new prompt reset clears the complete prompt session but not user favorites.
 - The final Style output may be manually overridden. The override never mutates MusicSpec; restoring the original returns to the current deterministic compiler result.
@@ -237,3 +237,13 @@ If a proposed implementation requires changing a Database V1 invariant, call tha
 - Instrument selections use `kind: option`, `id: <instrument_expression id>`, `value: <preserved output_text>`, `origin: user`.
 - Palette has production search, family filters, selected chips, favorites/usage ordering, explicit Show All, automatic scroll chunking and segment-scoped return-to-start behavior.
 - Database V1 semantics/identity curation remain closed. Do not collapse or rewrite source expressions in application code.
+
+## Production generic facet editor carry-forward
+
+- Studio Runtime now lazy-loads/caches `editor.json` with manifest hash/count validation.
+- Pulse/Palette/Finish ordinary facets use one generic FacetEditor instead of placeholder/demo state.
+- Easy statements honor `mode_scope`; Advanced parameter options honor schema `value_type` cardinality and can add facet custom text.
+- Runtime statement `source_frequency` is nullable and must stay nullable.
+- Finish has a separate Runtime-backed Exclude picker writing only to `MusicSpec.exclude[]`.
+- Favorite add/remove timings are 0.8 s / 1.0 s. Add progress uses theme semantic success green and an animated checkmark.
+- Expanded-pool return controls are left-edge, viewport/segment scoped.

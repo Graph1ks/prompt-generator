@@ -304,14 +304,15 @@ The UI must never end at an unexplained `clipboard unavailable` dead-end.
 
 Large selectable pools such as Genres and Instruments use the same preference contract:
 
-- long-press with mouse or touch for approximately 1.5 seconds to favorite;
-- long-press an existing favorite for approximately 2 seconds to remove it;
-- hold progress is visible and does not accidentally activate the underlying option;
+- long-press with mouse or touch for approximately 0.8 seconds to favorite;
+- long-press an existing favorite for approximately 1.0 second to remove it;
+- hold progress is visible and does not accidentally activate the underlying option; adding uses theme-semantic success green and draws a completion checkmark, removing uses explicit red square/X feedback;
 - favorites are shown first and ordered by actual use count, then recency;
 - favorites are user preference state, not MusicSpec/project semantics;
 - compact result views use an explicit **Show all** action rather than repeated fixed-size paging;
 - expanded long lists provide an obvious return-to-top control and collapse back to compact after selection;
-- the return-to-top control appears only after the user has scrolled down inside that expanded segment, disappears again at the segment start, above the segment, and after the viewport has passed the segment.
+- the return-to-top control appears only after the user has scrolled down inside that expanded segment, disappears again at the segment start, above the segment, and after the viewport has passed the segment;
+- floating return-to-start controls prefer the free **left** viewport edge so they do not collide with the persistent Live Prompt/preview side.
 
 ## 16. Genre-free continuation
 
@@ -340,3 +341,21 @@ The application UI is multilingual; renderer/prompt language is a separate contr
 - genre/instrument canonical labels are domain data and are not silently translated unless a future knowledge layer supplies explicit localized display labels.
 
 Localization includes accessibility labels, warnings, picker guidance and user-facing diagnostics, not just headings.
+
+## 19. Runtime-backed facet editing
+
+Pulse, Palette and Finish use one shared Runtime-backed facet editor rather than bespoke local demo state.
+
+- `editor.json` is lazy-loaded and validated against the Runtime Pack manifest;
+- Easy mode renders reviewed/approved statements whose `mode_scope` permits Easy;
+- Advanced mode renders reviewed/approved parameter options grouped by their parameter;
+- parameter `value_type` comes from the canonical schema: `enum`, `multi`, `number`, `text`, `boolean`, `relation`;
+- `multi` permits multiple active options; option-bearing non-`multi` parameters are exclusive within that parameter;
+- Advanced custom wording is stored in the facet's MusicSpec `custom_text` and remains English renderer material;
+- empty Runtime sections stay honestly empty rather than receiving invented demo values.
+
+Instruments remain a specialized high-cardinality facet because source expressions carry identity/family/semantic links and require the dedicated 6,035-expression picker.
+
+## 20. Finish / Exclude editing
+
+Finish exposes the Runtime `exclude` catalog as a separate selectable pool. Selected entries write only to `MusicSpec.exclude[]` and compile to the separate comma-delimited Exclude output. They must never produce a bracketed Style section.

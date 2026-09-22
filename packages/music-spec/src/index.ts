@@ -467,3 +467,59 @@ export function hasFacetSelection(
     ) ?? false
   );
 }
+
+
+export function setFacetCustomText(
+  spec: MusicSpec,
+  facetKey: FacetKey,
+  customText: string | null,
+): MusicSpec {
+  const current = spec.facets[facetKey] ?? {
+    locked: false,
+    selections: [],
+    custom_text: null,
+  };
+  return {
+    ...spec,
+    facets: {
+      ...spec.facets,
+      [facetKey]: {
+        ...current,
+        custom_text: customText,
+      },
+    },
+  };
+}
+
+
+export function setExcludeItem(
+  spec: MusicSpec,
+  item: ExcludeItem,
+): MusicSpec {
+  const next = item.id
+    ? [...spec.exclude.filter((entry) => entry.id !== item.id), item]
+    : [
+        ...spec.exclude.filter(
+          (entry) => !(entry.id == null && entry.text === item.text),
+        ),
+        item,
+      ];
+  return { ...spec, exclude: next };
+}
+
+export function removeExcludeItem(
+  spec: MusicSpec,
+  itemId: string,
+): MusicSpec {
+  return {
+    ...spec,
+    exclude: spec.exclude.filter((entry) => entry.id !== itemId),
+  };
+}
+
+export function hasExcludeItem(
+  spec: MusicSpec,
+  itemId: string,
+): boolean {
+  return spec.exclude.some((entry) => entry.id === itemId);
+}
