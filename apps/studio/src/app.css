@@ -1147,8 +1147,8 @@
     background: var(--studio-dark);
     border-radius: 21px;
     color: #edf0e7;
-    position: relative;
-    inset-block-start: 0;
+    position: sticky;
+    inset-block-start: var(--preview-sticky-top, 98px);
     overflow: hidden;
     box-shadow: var(--studio-shadow);
   }
@@ -1364,6 +1364,22 @@
     cursor: pointer;
   }
 
+  .prompt-line-source[data-active="true"],
+  .exclude-source[data-active="true"] {
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--studio-acid) 14%, transparent),
+        transparent 72%
+      );
+    box-shadow: inset 2px 0 0 color-mix(in srgb, var(--studio-acid) 76%, transparent);
+  }
+
+  .prompt-line-source[data-active="true"] .prompt-key,
+  .exclude-source[data-active="true"] {
+    color: color-mix(in srgb, var(--studio-acid) 72%, #edf0e7);
+  }
+
   .prompt-line-source:hover,
   .prompt-line-source:focus-visible,
   .exclude-source:hover,
@@ -1409,17 +1425,20 @@
     opacity: 1;
   }
 
-  .preview.changed .changed-line {
-    animation: prompt-flash 1.3s var(--vg-motion-ease-emphasized);
+  .prompt-line-source[data-changed="true"],
+  .exclude-source[data-changed="true"] {
+    animation: prompt-section-flash 1.05s var(--vg-motion-ease-emphasized);
   }
 
-  @keyframes prompt-flash {
+  @keyframes prompt-section-flash {
     0%,
-    35% {
-      background: color-mix(in srgb, var(--studio-acid) 18%, transparent);
+    34% {
+      background: color-mix(in srgb, var(--studio-acid) 22%, transparent);
+      box-shadow: inset 2px 0 0 var(--studio-acid);
     }
     100% {
       background: transparent;
+      box-shadow: inset 2px 0 0 transparent;
     }
   }
 
