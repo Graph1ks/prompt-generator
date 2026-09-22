@@ -338,6 +338,13 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - `Ctrl/⌘+Z`, `Ctrl/⌘+Shift+Z` and `Ctrl+Y` are ignored in text-entry targets so native field undo still works.
 - Applying another project clears both stacks, so history never crosses project identity.
 
+## Pool quick-view carry-forward
+
+- Genre, Instruments and Exclude expose All / Favorites / Recent quick views in the same control stack as search/filtering.
+- Favorites and usage timestamps come from the existing `usePoolPreferences` local user-data contract; no project state is involved.
+- Counts are calculated after the active search/category/family filter. Recent ordering is `lastUsedAt` descending.
+- All view keeps existing favorite-first ordering; Show All and chunked rendering consume the quick-view-filtered result set.
+
 ## Large-pool control reachability carry-forward
 
 - Genre, Instruments and Exclude wrap search/filter/meta controls in a desktop sticky control stack.
