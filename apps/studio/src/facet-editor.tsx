@@ -171,39 +171,52 @@ export function FacetEditor({
 
   const currentSelections = useMemo(
     () =>
-      (facetState?.selections ?? []).map((selection) => {
-        const statement = statementById.get(selection.id);
+      (facetState?.selections ?? []).map((selection, index) => {
+        const selectionId = selection.id ?? null;
+        const statement = selectionId
+          ? statementById.get(selectionId)
+          : undefined;
         if (statement) {
           return {
-            id: selection.id,
+            key: selectionId,
+            selectionId,
+            index,
             label: statement.label,
             detail: statement.output_text,
           };
         }
 
-        const option = optionById.get(selection.id);
+        const option = selectionId ? optionById.get(selectionId) : undefined;
         if (option) {
           return {
-            id: selection.id,
+            key: selectionId,
+            selectionId,
+            index,
             label: option.label,
             detail: option.output_fragment,
           };
         }
 
-        const numberParameter = numberParameterByValueId.get(selection.id);
+        const numberParameter = selectionId
+          ? numberParameterByValueId.get(selectionId)
+          : undefined;
         if (numberParameter) {
           const unit = numberParameter.ui?.unit
             ? " " + numberParameter.ui.unit
             : "";
           return {
-            id: selection.id,
+            key: selectionId,
+            selectionId,
+            index,
             label: selection.value + unit,
             detail: numberParameter.label,
           };
         }
 
         return {
-          id: selection.id,
+          key: selectionId ?? "selection:" + index + ":" + selection.value,
+          selectionId,
+          index,
           label: selection.value,
           detail: selection.value,
         };
@@ -368,8 +381,24 @@ export function FacetEditor({
     );
   }
 
-  function removeCurrentSelection(id: string) {
-    onSpecChange(removeFacetSelection(spec, facet, id));
+  function removeCurrentSelection(
+    selectionId: string | null,
+    selectionIndex: number,
+  ) {
+    if (selectionId) {
+      onSpecChange(removeFacetSelection(spec, facet, selectionId));
+      return;
+    }
+
+    const current = spec.facets[facet];
+    if (!current) return;
+    onSpecChange(
+      replaceFacetState(
+        spec,
+        current.selections.filter((_, index) => index !== selectionIndex),
+        current.custom_text,
+      ),
+    );
   }
 
   function clearCurrentCustomText() {
@@ -498,14 +527,16 @@ export function FacetEditor({
           <div className="facet-current-items">
             {currentSelections.map((selection) => (
               <button
-                key={selection.id}
+                key={selection.key}
                 type="button"
                 className="facet-current-chip"
                 title={selection.detail}
                 aria-label={t("facetEditor.removeCurrent", {
                   label: selection.label,
                 })}
-                onClick={() => removeCurrentSelection(selection.id)}
+                onClick={() =>
+                  removeCurrentSelection(selection.selectionId, selection.index)
+                }
               >
                 <span>{selection.label}</span>
                 <Icon name="close" />
