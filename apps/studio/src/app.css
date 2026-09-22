@@ -3163,3 +3163,22 @@
     }
   }
 }
+
+
+@layer studio {
+  .save-status[data-state="loading"]::before,
+  .save-status[data-state="saving"]::before {
+    background: var(--studio-acid);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--studio-acid) 18%, transparent);
+  }
+
+  .save-status[data-state="restored"]::before,
+  .save-status[data-state="saved"]::before {
+    background: var(--vg-color-success);
+  }
+
+  .save-status[data-state="error"]::before,
+  .save-status[data-state="unavailable"]::before {
+    background: var(--vg-color-danger);
+  }
+}
