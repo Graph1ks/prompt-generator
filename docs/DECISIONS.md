@@ -952,4 +952,17 @@ The deterministic locked Live Prompt and the themed manual Style editor represen
 - Exclude remains a separate output block and may retain a larger touch target.
 - This rule changes presentation only; compiler serialization/copy output remain plain text and unchanged.
 
+## ADR-054 — Manual Style editing is a guarded final-output escape hatch
 
+**Status:** accepted
+
+The global manual Style editor exists for deliberate final output corrections, not as a parallel semantic authoring mode.
+
+- The first unlock from deterministic Style opens an inline guard; opening that guard alone does not create or persist a manual override.
+- Confirming the guard snapshots the current compiler Style into the explicit manual output override. MusicSpec and the deterministic compiler continue underneath, but subsequent Studio edits do not alter the visible/copyable manual Style.
+- If the user is still building the sound, custom wording belongs in the matching facet's **Advanced → Custom wording** field so it remains part of MusicSpec, recompiles normally, participates in project history, and retains prompt-to-source navigation.
+- Arbitrary manual Style text is never reverse-parsed or string-guessed into a facet.
+- Restoring the original discards the manual override and immediately reconnects the visible Style to the current deterministic compiler result.
+- A persisted/existing manual override may be locked and reopened without repeating the first-transition guard; the warning is a mode-boundary acknowledgement, not recurring friction.
+
+The guard stays inline in the Live Prompt and does not move central editing into a modal, dropdown, or hidden surface.
