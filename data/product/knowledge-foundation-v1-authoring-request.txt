@@ -1,0 +1,3638 @@
+PROMPT V'GINE — PRODUCT KNOWLEDGE FOUNDATION V1 — AUTHORING REQUEST
+==================================================================
+
+PURPOSE
+Replace the current generated/meta Product Knowledge copy with a real user-facing music-production dictionary.
+The explanations must teach what each musical term, value, phrase, production characteristic, or undesirable condition actually means.
+Do NOT explain how the UI works and do NOT describe an item as a preset, option, control, or prompt fragment.
+
+AUTHORING RULES
+1. Write one concise expert explanation in English and one natural German equivalent for every entry below.
+2. EN and DE should each be one short paragraph, normally 25–70 words. Prefer clarity over hitting a word count.
+3. Start with what the term/phrase IS. Then explain what it sounds/feels like or what it changes in music/production when useful.
+4. Never use meta copy such as: 'this preset', 'this option', 'this control', 'sets X to', 'renders as', 'adds to Exclude', 'packages a musical direction', 'Product Editor', or prompt-syntax explanations.
+5. Do not merely restate the label. Define jargon in plain language and avoid circular definitions.
+6. Historical/era entries: describe broad period-typical recording, arrangement, instrumentation, media, dynamics, stereo, effects, and mix tendencies where relevant. Treat them as tendencies, not rules; do not imply every record from a decade sounds the same.
+7. BPM entries: explain the tempo feel/range meaning. Mention half-time/double-time perception only where useful; do not equate BPM mechanically with emotional intensity.
+8. Key/mode entries: explain the tonal structure or modal character. Avoid simplistic claims such as 'major = happy' or 'minor = sad' as universal rules.
+9. Groove/rhythm entries: explain timing, subdivision, accent placement, pocket, swing, syncopation, or feel in audible terms.
+10. Production/mix entries: use accurate engineering language, but make it understandable. Distinguish cause from audible result when they are not one-to-one.
+11. Sonic adjectives and compound phrases: unpack the meaningful components and explain the combined audible result.
+12. Easy statements: explain the WHOLE phrase as a musical direction; do not call it a preset. If it combines several concepts, briefly unpack them.
+13. Exclude entries: define the undesirable sonic/arrangement condition itself and why it can be problematic when excessive; do not explain that the UI excludes it.
+14. Avoid artist names, song titles, brand/equipment endorsements, marketing language, and fake precision.
+15. If a term is context-dependent or ambiguous, say so briefly rather than inventing certainty.
+16. Preserve the exact ID. Do not invent, merge, split, rename, or omit entries.
+
+RETURN FORMAT — STRICT
+Return plain UTF-8 text only. No Markdown table, no commentary before/after, no code fence.
+Return all entries in the same order using exactly this 4-line block:
+
+ID: <exact id>
+EN: <single-paragraph English explanation>
+DE: <single-paragraph German explanation>
+---
+
+The metadata below is AUTHORING CONTEXT only. PROMPT_FRAGMENT shows what the editor currently emits; it is NOT a definition and must not be copied as the explanation.
+
+ENTRY COUNT: 400
+
+[001/400]
+ID: product:knowledge:parameter:era:period
+TYPE: parameter
+SECTION: era
+PARENT: -
+TERM: Era / Period
+SOURCE_ID: product:parameter:era:period
+PROMPT_FRAGMENT: -
+
+[002/400]
+ID: product:knowledge:parameter:bpm:tempo
+TYPE: parameter
+SECTION: bpm
+PARENT: -
+TERM: Tempo
+SOURCE_ID: product:parameter:bpm:tempo
+PROMPT_FRAGMENT: -
+
+[003/400]
+ID: product:knowledge:parameter:key_mode:tonality
+TYPE: parameter
+SECTION: key_mode
+PARENT: -
+TERM: Key / Mode
+SOURCE_ID: product:parameter:key_mode:tonality
+PROMPT_FRAGMENT: -
+
+[004/400]
+ID: product:knowledge:parameter:groove:pocket
+TYPE: parameter
+SECTION: groove
+PARENT: -
+TERM: Pocket
+SOURCE_ID: product:parameter:groove:pocket
+PROMPT_FRAGMENT: -
+
+[005/400]
+ID: product:knowledge:parameter:groove:swing
+TYPE: parameter
+SECTION: groove
+PARENT: -
+TERM: Swing
+SOURCE_ID: product:parameter:groove:swing
+PROMPT_FRAGMENT: -
+
+[006/400]
+ID: product:knowledge:parameter:groove:syncopation
+TYPE: parameter
+SECTION: groove
+PARENT: -
+TERM: Syncopation
+SOURCE_ID: product:parameter:groove:syncopation
+PROMPT_FRAGMENT: -
+
+[007/400]
+ID: product:knowledge:parameter:groove:subdivision
+TYPE: parameter
+SECTION: groove
+PARENT: -
+TERM: Subdivision / Feel
+SOURCE_ID: product:parameter:groove:subdivision
+PROMPT_FRAGMENT: -
+
+[008/400]
+ID: product:knowledge:parameter:melody:shape
+TYPE: parameter
+SECTION: melody
+PARENT: -
+TERM: Contour / Shape
+SOURCE_ID: product:parameter:melody:shape
+PROMPT_FRAGMENT: -
+
+[009/400]
+ID: product:knowledge:parameter:melody:density
+TYPE: parameter
+SECTION: melody
+PARENT: -
+TERM: Density
+SOURCE_ID: product:parameter:melody:density
+PROMPT_FRAGMENT: -
+
+[010/400]
+ID: product:knowledge:parameter:melody:role
+TYPE: parameter
+SECTION: melody
+PARENT: -
+TERM: Behavior
+SOURCE_ID: product:parameter:melody:role
+PROMPT_FRAGMENT: -
+
+[011/400]
+ID: product:knowledge:parameter:melody:register
+TYPE: parameter
+SECTION: melody
+PARENT: -
+TERM: Register
+SOURCE_ID: product:parameter:melody:register
+PROMPT_FRAGMENT: -
+
+[012/400]
+ID: product:knowledge:parameter:harmony:color
+TYPE: parameter
+SECTION: harmony
+PARENT: -
+TERM: Tonal Color
+SOURCE_ID: product:parameter:harmony:color
+PROMPT_FRAGMENT: -
+
+[013/400]
+ID: product:knowledge:parameter:harmony:motion
+TYPE: parameter
+SECTION: harmony
+PARENT: -
+TERM: Harmonic Motion
+SOURCE_ID: product:parameter:harmony:motion
+PROMPT_FRAGMENT: -
+
+[014/400]
+ID: product:knowledge:parameter:harmony:voicing
+TYPE: parameter
+SECTION: harmony
+PARENT: -
+TERM: Voicing / Density
+SOURCE_ID: product:parameter:harmony:voicing
+PROMPT_FRAGMENT: -
+
+[015/400]
+ID: product:knowledge:parameter:drums:kit
+TYPE: parameter
+SECTION: drums
+PARENT: -
+TERM: Kit
+SOURCE_ID: product:parameter:drums:kit
+PROMPT_FRAGMENT: -
+
+[016/400]
+ID: product:knowledge:parameter:drums:snare
+TYPE: parameter
+SECTION: drums
+PARENT: -
+TERM: Snare
+SOURCE_ID: product:parameter:drums:snare
+PROMPT_FRAGMENT: -
+
+[017/400]
+ID: product:knowledge:parameter:drums:hats
+TYPE: parameter
+SECTION: drums
+PARENT: -
+TERM: Hats / Cymbals
+SOURCE_ID: product:parameter:drums:hats
+PROMPT_FRAGMENT: -
+
+[018/400]
+ID: product:knowledge:parameter:drums:fills
+TYPE: parameter
+SECTION: drums
+PARENT: -
+TERM: Fills
+SOURCE_ID: product:parameter:drums:fills
+PROMPT_FRAGMENT: -
+
+[019/400]
+ID: product:knowledge:parameter:drums:impact
+TYPE: parameter
+SECTION: drums
+PARENT: -
+TERM: Impact
+SOURCE_ID: product:parameter:drums:impact
+PROMPT_FRAGMENT: -
+
+[020/400]
+ID: product:knowledge:parameter:bass:source
+TYPE: parameter
+SECTION: bass
+PARENT: -
+TERM: Bass Source
+SOURCE_ID: product:parameter:bass:source
+PROMPT_FRAGMENT: -
+
+[021/400]
+ID: product:knowledge:parameter:bass:motion
+TYPE: parameter
+SECTION: bass
+PARENT: -
+TERM: Movement
+SOURCE_ID: product:parameter:bass:motion
+PROMPT_FRAGMENT: -
+
+[022/400]
+ID: product:knowledge:parameter:bass:length
+TYPE: parameter
+SECTION: bass
+PARENT: -
+TERM: Note Length
+SOURCE_ID: product:parameter:bass:length
+PROMPT_FRAGMENT: -
+
+[023/400]
+ID: product:knowledge:parameter:bass:kick_relation
+TYPE: parameter
+SECTION: bass
+PARENT: -
+TERM: Kick Relationship
+SOURCE_ID: product:parameter:bass:kick_relation
+PROMPT_FRAGMENT: -
+
+[024/400]
+ID: product:knowledge:parameter:exciters:type
+TYPE: parameter
+SECTION: exciters
+PARENT: -
+TERM: Exciter Type
+SOURCE_ID: product:parameter:exciters:type
+PROMPT_FRAGMENT: -
+
+[025/400]
+ID: product:knowledge:parameter:exciters:density
+TYPE: parameter
+SECTION: exciters
+PARENT: -
+TERM: Density
+SOURCE_ID: product:parameter:exciters:density
+PROMPT_FRAGMENT: -
+
+[026/400]
+ID: product:knowledge:parameter:exciters:placement
+TYPE: parameter
+SECTION: exciters
+PARENT: -
+TERM: Placement
+SOURCE_ID: product:parameter:exciters:placement
+PROMPT_FRAGMENT: -
+
+[027/400]
+ID: product:knowledge:parameter:texture:character
+TYPE: parameter
+SECTION: texture
+PARENT: -
+TERM: Character
+SOURCE_ID: product:parameter:texture:character
+PROMPT_FRAGMENT: -
+
+[028/400]
+ID: product:knowledge:parameter:texture:density
+TYPE: parameter
+SECTION: texture
+PARENT: -
+TERM: Layer Density
+SOURCE_ID: product:parameter:texture:density
+PROMPT_FRAGMENT: -
+
+[029/400]
+ID: product:knowledge:parameter:texture:movement
+TYPE: parameter
+SECTION: texture
+PARENT: -
+TERM: Movement
+SOURCE_ID: product:parameter:texture:movement
+PROMPT_FRAGMENT: -
+
+[030/400]
+ID: product:knowledge:parameter:vocal:presence
+TYPE: parameter
+SECTION: vocal
+PARENT: -
+TERM: Vocal Presence
+SOURCE_ID: product:parameter:vocal:presence
+PROMPT_FRAGMENT: -
+
+[031/400]
+ID: product:knowledge:parameter:vocal:delivery
+TYPE: parameter
+SECTION: vocal
+PARENT: -
+TERM: Delivery
+SOURCE_ID: product:parameter:vocal:delivery
+PROMPT_FRAGMENT: -
+
+[032/400]
+ID: product:knowledge:parameter:vocal:arrangement
+TYPE: parameter
+SECTION: vocal
+PARENT: -
+TERM: Arrangement
+SOURCE_ID: product:parameter:vocal:arrangement
+PROMPT_FRAGMENT: -
+
+[033/400]
+ID: product:knowledge:parameter:vocal:processing
+TYPE: parameter
+SECTION: vocal
+PARENT: -
+TERM: Processing / Space
+SOURCE_ID: product:parameter:vocal:processing
+PROMPT_FRAGMENT: -
+
+[034/400]
+ID: product:knowledge:parameter:dynamics:range
+TYPE: parameter
+SECTION: dynamics
+PARENT: -
+TERM: Dynamic Range
+SOURCE_ID: product:parameter:dynamics:range
+PROMPT_FRAGMENT: -
+
+[035/400]
+ID: product:knowledge:parameter:dynamics:arc
+TYPE: parameter
+SECTION: dynamics
+PARENT: -
+TERM: Energy Arc
+SOURCE_ID: product:parameter:dynamics:arc
+PROMPT_FRAGMENT: -
+
+[036/400]
+ID: product:knowledge:parameter:dynamics:accents
+TYPE: parameter
+SECTION: dynamics
+PARENT: -
+TERM: Accents
+SOURCE_ID: product:parameter:dynamics:accents
+PROMPT_FRAGMENT: -
+
+[037/400]
+ID: product:knowledge:parameter:space_mix:width
+TYPE: parameter
+SECTION: space_mix
+PARENT: -
+TERM: Stereo Width
+SOURCE_ID: product:parameter:space_mix:width
+PROMPT_FRAGMENT: -
+
+[038/400]
+ID: product:knowledge:parameter:space_mix:depth
+TYPE: parameter
+SECTION: space_mix
+PARENT: -
+TERM: Depth
+SOURCE_ID: product:parameter:space_mix:depth
+PROMPT_FRAGMENT: -
+
+[039/400]
+ID: product:knowledge:parameter:space_mix:low_end
+TYPE: parameter
+SECTION: space_mix
+PARENT: -
+TERM: Low End
+SOURCE_ID: product:parameter:space_mix:low_end
+PROMPT_FRAGMENT: -
+
+[040/400]
+ID: product:knowledge:parameter:space_mix:focus
+TYPE: parameter
+SECTION: space_mix
+PARENT: -
+TERM: Focus
+SOURCE_ID: product:parameter:space_mix:focus
+PROMPT_FRAGMENT: -
+
+[041/400]
+ID: product:knowledge:parameter:space_mix:reverb
+TYPE: parameter
+SECTION: space_mix
+PARENT: -
+TERM: Reverb
+SOURCE_ID: product:parameter:space_mix:reverb
+PROMPT_FRAGMENT: -
+
+[042/400]
+ID: product:knowledge:parameter:production:aesthetic
+TYPE: parameter
+SECTION: production
+PARENT: -
+TERM: Production Aesthetic
+SOURCE_ID: product:parameter:production:aesthetic
+PROMPT_FRAGMENT: -
+
+[043/400]
+ID: product:knowledge:parameter:production:transients
+TYPE: parameter
+SECTION: production
+PARENT: -
+TERM: Transients
+SOURCE_ID: product:parameter:production:transients
+PROMPT_FRAGMENT: -
+
+[044/400]
+ID: product:knowledge:parameter:production:saturation
+TYPE: parameter
+SECTION: production
+PARENT: -
+TERM: Saturation
+SOURCE_ID: product:parameter:production:saturation
+PROMPT_FRAGMENT: -
+
+[045/400]
+ID: product:knowledge:parameter:production:fidelity
+TYPE: parameter
+SECTION: production
+PARENT: -
+TERM: Fidelity
+SOURCE_ID: product:parameter:production:fidelity
+PROMPT_FRAGMENT: -
+
+[046/400]
+ID: product:knowledge:parameter:structure:form
+TYPE: parameter
+SECTION: structure
+PARENT: -
+TERM: Form
+SOURCE_ID: product:parameter:structure:form
+PROMPT_FRAGMENT: -
+
+[047/400]
+ID: product:knowledge:parameter:structure:intro
+TYPE: parameter
+SECTION: structure
+PARENT: -
+TERM: Intro
+SOURCE_ID: product:parameter:structure:intro
+PROMPT_FRAGMENT: -
+
+[048/400]
+ID: product:knowledge:parameter:structure:transitions
+TYPE: parameter
+SECTION: structure
+PARENT: -
+TERM: Transitions
+SOURCE_ID: product:parameter:structure:transitions
+PROMPT_FRAGMENT: -
+
+[049/400]
+ID: product:knowledge:parameter:structure:outro
+TYPE: parameter
+SECTION: structure
+PARENT: -
+TERM: Outro
+SOURCE_ID: product:parameter:structure:outro
+PROMPT_FRAGMENT: -
+
+[050/400]
+ID: product:knowledge:option:era:period:1950s
+TYPE: parameter_option
+SECTION: era
+PARENT: Era / Period
+TERM: 1950s
+SOURCE_ID: product:option:era:period:1950s
+PROMPT_FRAGMENT: 1950s studio production
+
+[051/400]
+ID: product:knowledge:option:era:period:1960s
+TYPE: parameter_option
+SECTION: era
+PARENT: Era / Period
+TERM: 1960s
+SOURCE_ID: product:option:era:period:1960s
+PROMPT_FRAGMENT: 1960s studio production
+
+[052/400]
+ID: product:knowledge:option:era:period:1970s
+TYPE: parameter_option
+SECTION: era
+PARENT: Era / Period
+TERM: 1970s
+SOURCE_ID: product:option:era:period:1970s
+PROMPT_FRAGMENT: 1970s studio production
+
+[053/400]
+ID: product:knowledge:option:era:period:1980s
+TYPE: parameter_option
+SECTION: era
+PARENT: Era / Period
+TERM: 1980s
+SOURCE_ID: product:option:era:period:1980s
+PROMPT_FRAGMENT: 1980s studio production
+
+[054/400]
+ID: product:knowledge:option:era:period:1990s
+TYPE: parameter_option
+SECTION: era
+PARENT: Era / Period
+TERM: 1990s
+SOURCE_ID: product:option:era:period:1990s
+PROMPT_FRAGMENT: 1990s studio production
+
+[055/400]
+ID: product:knowledge:option:era:period:2000s
+TYPE: parameter_option
+SECTION: era
+PARENT: Era / Period
+TERM: 2000s
+SOURCE_ID: product:option:era:period:2000s
+PROMPT_FRAGMENT: 2000s studio production
+
+[056/400]
+ID: product:knowledge:option:era:period:2010s
+TYPE: parameter_option
+SECTION: era
+PARENT: Era / Period
+TERM: 2010s
+SOURCE_ID: product:option:era:period:2010s
+PROMPT_FRAGMENT: 2010s studio production
+
+[057/400]
+ID: product:knowledge:option:era:period:2020s
+TYPE: parameter_option
+SECTION: era
+PARENT: Era / Period
+TERM: 2020s
+SOURCE_ID: product:option:era:period:2020s
+PROMPT_FRAGMENT: 2020s studio production
+
+[058/400]
+ID: product:knowledge:option:era:period:contemporary
+TYPE: parameter_option
+SECTION: era
+PARENT: Era / Period
+TERM: Contemporary
+SOURCE_ID: product:option:era:period:contemporary
+PROMPT_FRAGMENT: contemporary studio production
+
+[059/400]
+ID: product:knowledge:option:bpm:tempo:72
+TYPE: parameter_option
+SECTION: bpm
+PARENT: Tempo
+TERM: 72 BPM
+SOURCE_ID: product:option:bpm:tempo:72
+PROMPT_FRAGMENT: 72
+
+[060/400]
+ID: product:knowledge:option:bpm:tempo:84
+TYPE: parameter_option
+SECTION: bpm
+PARENT: Tempo
+TERM: 84 BPM
+SOURCE_ID: product:option:bpm:tempo:84
+PROMPT_FRAGMENT: 84
+
+[061/400]
+ID: product:knowledge:option:bpm:tempo:96
+TYPE: parameter_option
+SECTION: bpm
+PARENT: Tempo
+TERM: 96 BPM
+SOURCE_ID: product:option:bpm:tempo:96
+PROMPT_FRAGMENT: 96
+
+[062/400]
+ID: product:knowledge:option:bpm:tempo:100
+TYPE: parameter_option
+SECTION: bpm
+PARENT: Tempo
+TERM: 100 BPM
+SOURCE_ID: product:option:bpm:tempo:100
+PROMPT_FRAGMENT: 100
+
+[063/400]
+ID: product:knowledge:option:bpm:tempo:110
+TYPE: parameter_option
+SECTION: bpm
+PARENT: Tempo
+TERM: 110 BPM
+SOURCE_ID: product:option:bpm:tempo:110
+PROMPT_FRAGMENT: 110
+
+[064/400]
+ID: product:knowledge:option:bpm:tempo:120
+TYPE: parameter_option
+SECTION: bpm
+PARENT: Tempo
+TERM: 120 BPM
+SOURCE_ID: product:option:bpm:tempo:120
+PROMPT_FRAGMENT: 120
+
+[065/400]
+ID: product:knowledge:option:bpm:tempo:128
+TYPE: parameter_option
+SECTION: bpm
+PARENT: Tempo
+TERM: 128 BPM
+SOURCE_ID: product:option:bpm:tempo:128
+PROMPT_FRAGMENT: 128
+
+[066/400]
+ID: product:knowledge:option:bpm:tempo:140
+TYPE: parameter_option
+SECTION: bpm
+PARENT: Tempo
+TERM: 140 BPM
+SOURCE_ID: product:option:bpm:tempo:140
+PROMPT_FRAGMENT: 140
+
+[067/400]
+ID: product:knowledge:option:key_mode:tonality:c-major
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: C major
+SOURCE_ID: product:option:key_mode:tonality:c-major
+PROMPT_FRAGMENT: C major
+
+[068/400]
+ID: product:knowledge:option:key_mode:tonality:g-major
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: G major
+SOURCE_ID: product:option:key_mode:tonality:g-major
+PROMPT_FRAGMENT: G major
+
+[069/400]
+ID: product:knowledge:option:key_mode:tonality:d-major
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: D major
+SOURCE_ID: product:option:key_mode:tonality:d-major
+PROMPT_FRAGMENT: D major
+
+[070/400]
+ID: product:knowledge:option:key_mode:tonality:a-major
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: A major
+SOURCE_ID: product:option:key_mode:tonality:a-major
+PROMPT_FRAGMENT: A major
+
+[071/400]
+ID: product:knowledge:option:key_mode:tonality:e-major
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: E major
+SOURCE_ID: product:option:key_mode:tonality:e-major
+PROMPT_FRAGMENT: E major
+
+[072/400]
+ID: product:knowledge:option:key_mode:tonality:f-major
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: F major
+SOURCE_ID: product:option:key_mode:tonality:f-major
+PROMPT_FRAGMENT: F major
+
+[073/400]
+ID: product:knowledge:option:key_mode:tonality:bb-major
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: B-flat major
+SOURCE_ID: product:option:key_mode:tonality:bb-major
+PROMPT_FRAGMENT: B-flat major
+
+[074/400]
+ID: product:knowledge:option:key_mode:tonality:eb-major
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: E-flat major
+SOURCE_ID: product:option:key_mode:tonality:eb-major
+PROMPT_FRAGMENT: E-flat major
+
+[075/400]
+ID: product:knowledge:option:key_mode:tonality:db-major
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: D-flat major
+SOURCE_ID: product:option:key_mode:tonality:db-major
+PROMPT_FRAGMENT: D-flat major
+
+[076/400]
+ID: product:knowledge:option:key_mode:tonality:ab-major
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: A-flat major
+SOURCE_ID: product:option:key_mode:tonality:ab-major
+PROMPT_FRAGMENT: A-flat major
+
+[077/400]
+ID: product:knowledge:option:key_mode:tonality:b-major
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: B major
+SOURCE_ID: product:option:key_mode:tonality:b-major
+PROMPT_FRAGMENT: B major
+
+[078/400]
+ID: product:knowledge:option:key_mode:tonality:fs-major
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: F-sharp major
+SOURCE_ID: product:option:key_mode:tonality:fs-major
+PROMPT_FRAGMENT: F-sharp major
+
+[079/400]
+ID: product:knowledge:option:key_mode:tonality:a-minor
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: A minor
+SOURCE_ID: product:option:key_mode:tonality:a-minor
+PROMPT_FRAGMENT: A minor
+
+[080/400]
+ID: product:knowledge:option:key_mode:tonality:e-minor
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: E minor
+SOURCE_ID: product:option:key_mode:tonality:e-minor
+PROMPT_FRAGMENT: E minor
+
+[081/400]
+ID: product:knowledge:option:key_mode:tonality:b-minor
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: B minor
+SOURCE_ID: product:option:key_mode:tonality:b-minor
+PROMPT_FRAGMENT: B minor
+
+[082/400]
+ID: product:knowledge:option:key_mode:tonality:d-minor
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: D minor
+SOURCE_ID: product:option:key_mode:tonality:d-minor
+PROMPT_FRAGMENT: D minor
+
+[083/400]
+ID: product:knowledge:option:key_mode:tonality:g-minor
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: G minor
+SOURCE_ID: product:option:key_mode:tonality:g-minor
+PROMPT_FRAGMENT: G minor
+
+[084/400]
+ID: product:knowledge:option:key_mode:tonality:c-minor
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: C minor
+SOURCE_ID: product:option:key_mode:tonality:c-minor
+PROMPT_FRAGMENT: C minor
+
+[085/400]
+ID: product:knowledge:option:key_mode:tonality:f-minor
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: F minor
+SOURCE_ID: product:option:key_mode:tonality:f-minor
+PROMPT_FRAGMENT: F minor
+
+[086/400]
+ID: product:knowledge:option:key_mode:tonality:fs-minor
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: F-sharp minor
+SOURCE_ID: product:option:key_mode:tonality:fs-minor
+PROMPT_FRAGMENT: F-sharp minor
+
+[087/400]
+ID: product:knowledge:option:key_mode:tonality:cs-minor
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: C-sharp minor
+SOURCE_ID: product:option:key_mode:tonality:cs-minor
+PROMPT_FRAGMENT: C-sharp minor
+
+[088/400]
+ID: product:knowledge:option:key_mode:tonality:bb-minor
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: B-flat minor
+SOURCE_ID: product:option:key_mode:tonality:bb-minor
+PROMPT_FRAGMENT: B-flat minor
+
+[089/400]
+ID: product:knowledge:option:key_mode:tonality:dorian
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: Dorian
+SOURCE_ID: product:option:key_mode:tonality:dorian
+PROMPT_FRAGMENT: Dorian modal color
+
+[090/400]
+ID: product:knowledge:option:key_mode:tonality:mixolydian
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: Mixolydian
+SOURCE_ID: product:option:key_mode:tonality:mixolydian
+PROMPT_FRAGMENT: Mixolydian modal color
+
+[091/400]
+ID: product:knowledge:option:key_mode:tonality:phrygian
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: Phrygian
+SOURCE_ID: product:option:key_mode:tonality:phrygian
+PROMPT_FRAGMENT: Phrygian modal color
+
+[092/400]
+ID: product:knowledge:option:key_mode:tonality:lydian
+TYPE: parameter_option
+SECTION: key_mode
+PARENT: Key / Mode
+TERM: Lydian
+SOURCE_ID: product:option:key_mode:tonality:lydian
+PROMPT_FRAGMENT: Lydian modal color
+
+[093/400]
+ID: product:knowledge:option:groove:pocket:straight
+TYPE: parameter_option
+SECTION: groove
+PARENT: Pocket
+TERM: Straight
+SOURCE_ID: product:option:groove:pocket:straight
+PROMPT_FRAGMENT: straight pocket
+
+[094/400]
+ID: product:knowledge:option:groove:pocket:laid-back
+TYPE: parameter_option
+SECTION: groove
+PARENT: Pocket
+TERM: Laid-back
+SOURCE_ID: product:option:groove:pocket:laid-back
+PROMPT_FRAGMENT: laid-back pocket
+
+[095/400]
+ID: product:knowledge:option:groove:pocket:driving
+TYPE: parameter_option
+SECTION: groove
+PARENT: Pocket
+TERM: Driving
+SOURCE_ID: product:option:groove:pocket:driving
+PROMPT_FRAGMENT: driving pocket
+
+[096/400]
+ID: product:knowledge:option:groove:pocket:tight
+TYPE: parameter_option
+SECTION: groove
+PARENT: Pocket
+TERM: Tight
+SOURCE_ID: product:option:groove:pocket:tight
+PROMPT_FRAGMENT: tight pocket
+
+[097/400]
+ID: product:knowledge:option:groove:pocket:loose
+TYPE: parameter_option
+SECTION: groove
+PARENT: Pocket
+TERM: Loose
+SOURCE_ID: product:option:groove:pocket:loose
+PROMPT_FRAGMENT: loose pocket
+
+[098/400]
+ID: product:knowledge:option:groove:pocket:behind
+TYPE: parameter_option
+SECTION: groove
+PARENT: Pocket
+TERM: Behind the beat
+SOURCE_ID: product:option:groove:pocket:behind
+PROMPT_FRAGMENT: behind-the-beat pocket
+
+[099/400]
+ID: product:knowledge:option:groove:swing:straight
+TYPE: parameter_option
+SECTION: groove
+PARENT: Swing
+TERM: No swing
+SOURCE_ID: product:option:groove:swing:straight
+PROMPT_FRAGMENT: straight subdivisions
+
+[100/400]
+ID: product:knowledge:option:groove:swing:subtle
+TYPE: parameter_option
+SECTION: groove
+PARENT: Swing
+TERM: Subtle
+SOURCE_ID: product:option:groove:swing:subtle
+PROMPT_FRAGMENT: subtle swing
+
+[101/400]
+ID: product:knowledge:option:groove:swing:medium
+TYPE: parameter_option
+SECTION: groove
+PARENT: Swing
+TERM: Medium
+SOURCE_ID: product:option:groove:swing:medium
+PROMPT_FRAGMENT: medium swing
+
+[102/400]
+ID: product:knowledge:option:groove:swing:hard
+TYPE: parameter_option
+SECTION: groove
+PARENT: Swing
+TERM: Hard / Shuffle
+SOURCE_ID: product:option:groove:swing:hard
+PROMPT_FRAGMENT: hard swing / shuffle
+
+[103/400]
+ID: product:knowledge:option:groove:syncopation:minimal
+TYPE: parameter_option
+SECTION: groove
+PARENT: Syncopation
+TERM: Minimal
+SOURCE_ID: product:option:groove:syncopation:minimal
+PROMPT_FRAGMENT: minimal syncopation
+
+[104/400]
+ID: product:knowledge:option:groove:syncopation:light
+TYPE: parameter_option
+SECTION: groove
+PARENT: Syncopation
+TERM: Light
+SOURCE_ID: product:option:groove:syncopation:light
+PROMPT_FRAGMENT: light syncopation
+
+[105/400]
+ID: product:knowledge:option:groove:syncopation:syncopated
+TYPE: parameter_option
+SECTION: groove
+PARENT: Syncopation
+TERM: Syncopated
+SOURCE_ID: product:option:groove:syncopation:syncopated
+PROMPT_FRAGMENT: syncopated accents
+
+[106/400]
+ID: product:knowledge:option:groove:syncopation:heavy
+TYPE: parameter_option
+SECTION: groove
+PARENT: Syncopation
+TERM: Heavy
+SOURCE_ID: product:option:groove:syncopation:heavy
+PROMPT_FRAGMENT: heavy syncopation
+
+[107/400]
+ID: product:knowledge:option:groove:subdivision:eighth
+TYPE: parameter_option
+SECTION: groove
+PARENT: Subdivision / Feel
+TERM: 8th-note
+SOURCE_ID: product:option:groove:subdivision:eighth
+PROMPT_FRAGMENT: eighth-note pulse
+
+[108/400]
+ID: product:knowledge:option:groove:subdivision:sixteenth
+TYPE: parameter_option
+SECTION: groove
+PARENT: Subdivision / Feel
+TERM: 16th-note
+SOURCE_ID: product:option:groove:subdivision:sixteenth
+PROMPT_FRAGMENT: sixteenth-note pulse
+
+[109/400]
+ID: product:knowledge:option:groove:subdivision:triplet
+TYPE: parameter_option
+SECTION: groove
+PARENT: Subdivision / Feel
+TERM: Triplet
+SOURCE_ID: product:option:groove:subdivision:triplet
+PROMPT_FRAGMENT: triplet subdivision
+
+[110/400]
+ID: product:knowledge:option:groove:subdivision:half-time
+TYPE: parameter_option
+SECTION: groove
+PARENT: Subdivision / Feel
+TERM: Half-time
+SOURCE_ID: product:option:groove:subdivision:half-time
+PROMPT_FRAGMENT: half-time feel
+
+[111/400]
+ID: product:knowledge:option:groove:subdivision:double-time
+TYPE: parameter_option
+SECTION: groove
+PARENT: Subdivision / Feel
+TERM: Double-time
+SOURCE_ID: product:option:groove:subdivision:double-time
+PROMPT_FRAGMENT: double-time feel
+
+[112/400]
+ID: product:knowledge:option:melody:shape:rising
+TYPE: parameter_option
+SECTION: melody
+PARENT: Contour / Shape
+TERM: Rising
+SOURCE_ID: product:option:melody:shape:rising
+PROMPT_FRAGMENT: rising melodic phrase
+
+[113/400]
+ID: product:knowledge:option:melody:shape:descending
+TYPE: parameter_option
+SECTION: melody
+PARENT: Contour / Shape
+TERM: Descending
+SOURCE_ID: product:option:melody:shape:descending
+PROMPT_FRAGMENT: descending melodic phrase
+
+[114/400]
+ID: product:knowledge:option:melody:shape:arching
+TYPE: parameter_option
+SECTION: melody
+PARENT: Contour / Shape
+TERM: Arching
+SOURCE_ID: product:option:melody:shape:arching
+PROMPT_FRAGMENT: arching melodic contour
+
+[115/400]
+ID: product:knowledge:option:melody:shape:repeated
+TYPE: parameter_option
+SECTION: melody
+PARENT: Contour / Shape
+TERM: Repeated motif
+SOURCE_ID: product:option:melody:shape:repeated
+PROMPT_FRAGMENT: repeated short motif
+
+[116/400]
+ID: product:knowledge:option:melody:shape:cell
+TYPE: parameter_option
+SECTION: melody
+PARENT: Contour / Shape
+TERM: Narrow cell
+SOURCE_ID: product:option:melody:shape:cell
+PROMPT_FRAGMENT: compact repeating melodic cell
+
+[117/400]
+ID: product:knowledge:option:melody:density:sparse
+TYPE: parameter_option
+SECTION: melody
+PARENT: Density
+TERM: Sparse
+SOURCE_ID: product:option:melody:density:sparse
+PROMPT_FRAGMENT: sparse melodic activity
+
+[118/400]
+ID: product:knowledge:option:melody:density:restrained
+TYPE: parameter_option
+SECTION: melody
+PARENT: Density
+TERM: Restrained
+SOURCE_ID: product:option:melody:density:restrained
+PROMPT_FRAGMENT: restrained melodic density
+
+[119/400]
+ID: product:knowledge:option:melody:density:moderate
+TYPE: parameter_option
+SECTION: melody
+PARENT: Density
+TERM: Moderate
+SOURCE_ID: product:option:melody:density:moderate
+PROMPT_FRAGMENT: moderate melodic density
+
+[120/400]
+ID: product:knowledge:option:melody:density:active
+TYPE: parameter_option
+SECTION: melody
+PARENT: Density
+TERM: Active
+SOURCE_ID: product:option:melody:density:active
+PROMPT_FRAGMENT: active melodic movement
+
+[121/400]
+ID: product:knowledge:option:melody:role:hook
+TYPE: parameter_option
+SECTION: melody
+PARENT: Behavior
+TERM: Hook-led
+SOURCE_ID: product:option:melody:role:hook
+PROMPT_FRAGMENT: hook-led melody
+
+[122/400]
+ID: product:knowledge:option:melody:role:riff
+TYPE: parameter_option
+SECTION: melody
+PARENT: Behavior
+TERM: Riff-led
+SOURCE_ID: product:option:melody:role:riff
+PROMPT_FRAGMENT: riff-led melody
+
+[123/400]
+ID: product:knowledge:option:melody:role:call-response
+TYPE: parameter_option
+SECTION: melody
+PARENT: Behavior
+TERM: Call & response
+SOURCE_ID: product:option:melody:role:call-response
+PROMPT_FRAGMENT: call-and-response phrases
+
+[124/400]
+ID: product:knowledge:option:melody:role:counterline
+TYPE: parameter_option
+SECTION: melody
+PARENT: Behavior
+TERM: Counterline
+SOURCE_ID: product:option:melody:role:counterline
+PROMPT_FRAGMENT: supporting counterline
+
+[125/400]
+ID: product:knowledge:option:melody:role:motif
+TYPE: parameter_option
+SECTION: melody
+PARENT: Behavior
+TERM: Motif-led
+SOURCE_ID: product:option:melody:role:motif
+PROMPT_FRAGMENT: short motif-led melody
+
+[126/400]
+ID: product:knowledge:option:melody:register:low
+TYPE: parameter_option
+SECTION: melody
+PARENT: Register
+TERM: Low
+SOURCE_ID: product:option:melody:register:low
+PROMPT_FRAGMENT: low-register melody
+
+[127/400]
+ID: product:knowledge:option:melody:register:mid
+TYPE: parameter_option
+SECTION: melody
+PARENT: Register
+TERM: Mid
+SOURCE_ID: product:option:melody:register:mid
+PROMPT_FRAGMENT: mid-register melody
+
+[128/400]
+ID: product:knowledge:option:melody:register:high
+TYPE: parameter_option
+SECTION: melody
+PARENT: Register
+TERM: High
+SOURCE_ID: product:option:melody:register:high
+PROMPT_FRAGMENT: high-register melody
+
+[129/400]
+ID: product:knowledge:option:melody:register:wide
+TYPE: parameter_option
+SECTION: melody
+PARENT: Register
+TERM: Wide
+SOURCE_ID: product:option:melody:register:wide
+PROMPT_FRAGMENT: wide-register melodic range
+
+[130/400]
+ID: product:knowledge:option:harmony:color:major
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Tonal Color
+TERM: Bright Major
+SOURCE_ID: product:option:harmony:color:major
+PROMPT_FRAGMENT: bright major-key harmony
+
+[131/400]
+ID: product:knowledge:option:harmony:color:minor
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Tonal Color
+TERM: Dark Minor
+SOURCE_ID: product:option:harmony:color:minor
+PROMPT_FRAGMENT: dark minor-key harmony
+
+[132/400]
+ID: product:knowledge:option:harmony:color:modal
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Tonal Color
+TERM: Modal
+SOURCE_ID: product:option:harmony:color:modal
+PROMPT_FRAGMENT: modal harmonic color
+
+[133/400]
+ID: product:knowledge:option:harmony:color:dominant
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Tonal Color
+TERM: Dominant / Blues
+SOURCE_ID: product:option:harmony:color:dominant
+PROMPT_FRAGMENT: dominant-heavy blues harmony
+
+[134/400]
+ID: product:knowledge:option:harmony:color:suspended
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Tonal Color
+TERM: Suspended
+SOURCE_ID: product:option:harmony:color:suspended
+PROMPT_FRAGMENT: suspended harmonic color
+
+[135/400]
+ID: product:knowledge:option:harmony:color:chromatic
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Tonal Color
+TERM: Chromatic
+SOURCE_ID: product:option:harmony:color:chromatic
+PROMPT_FRAGMENT: chromatic tension
+
+[136/400]
+ID: product:knowledge:option:harmony:motion:static
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Harmonic Motion
+TERM: Static Vamp
+SOURCE_ID: product:option:harmony:motion:static
+PROMPT_FRAGMENT: static harmonic vamp
+
+[137/400]
+ID: product:knowledge:option:harmony:motion:slow
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Harmonic Motion
+TERM: Slow
+SOURCE_ID: product:option:harmony:motion:slow
+PROMPT_FRAGMENT: slow harmonic movement
+
+[138/400]
+ID: product:knowledge:option:harmony:motion:moderate
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Harmonic Motion
+TERM: Moderate
+SOURCE_ID: product:option:harmony:motion:moderate
+PROMPT_FRAGMENT: moderate chord movement
+
+[139/400]
+ID: product:knowledge:option:harmony:motion:fast
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Harmonic Motion
+TERM: Fast
+SOURCE_ID: product:option:harmony:motion:fast
+PROMPT_FRAGMENT: fast harmonic changes
+
+[140/400]
+ID: product:knowledge:option:harmony:motion:loop
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Harmonic Motion
+TERM: Looped Cycle
+SOURCE_ID: product:option:harmony:motion:loop
+PROMPT_FRAGMENT: looped harmonic cycle
+
+[141/400]
+ID: product:knowledge:option:harmony:voicing:open
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Voicing / Density
+TERM: Open
+SOURCE_ID: product:option:harmony:voicing:open
+PROMPT_FRAGMENT: open voicings
+
+[142/400]
+ID: product:knowledge:option:harmony:voicing:close
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Voicing / Density
+TERM: Close
+SOURCE_ID: product:option:harmony:voicing:close
+PROMPT_FRAGMENT: close voicings
+
+[143/400]
+ID: product:knowledge:option:harmony:voicing:sparse
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Voicing / Density
+TERM: Sparse
+SOURCE_ID: product:option:harmony:voicing:sparse
+PROMPT_FRAGMENT: sparse chord voicings
+
+[144/400]
+ID: product:knowledge:option:harmony:voicing:dense
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Voicing / Density
+TERM: Dense
+SOURCE_ID: product:option:harmony:voicing:dense
+PROMPT_FRAGMENT: dense chord voicings
+
+[145/400]
+ID: product:knowledge:option:harmony:voicing:extended
+TYPE: parameter_option
+SECTION: harmony
+PARENT: Voicing / Density
+TERM: Extended
+SOURCE_ID: product:option:harmony:voicing:extended
+PROMPT_FRAGMENT: extended-color voicings
+
+[146/400]
+ID: product:knowledge:option:drums:kit:acoustic
+TYPE: parameter_option
+SECTION: drums
+PARENT: Kit
+TERM: Acoustic
+SOURCE_ID: product:option:drums:kit:acoustic
+PROMPT_FRAGMENT: acoustic kit
+
+[147/400]
+ID: product:knowledge:option:drums:kit:electronic
+TYPE: parameter_option
+SECTION: drums
+PARENT: Kit
+TERM: Electronic
+SOURCE_ID: product:option:drums:kit:electronic
+PROMPT_FRAGMENT: electronic drums
+
+[148/400]
+ID: product:knowledge:option:drums:kit:hybrid
+TYPE: parameter_option
+SECTION: drums
+PARENT: Kit
+TERM: Hybrid
+SOURCE_ID: product:option:drums:kit:hybrid
+PROMPT_FRAGMENT: hybrid acoustic/electronic drums
+
+[149/400]
+ID: product:knowledge:option:drums:kit:percussion
+TYPE: parameter_option
+SECTION: drums
+PARENT: Kit
+TERM: Percussion-led
+SOURCE_ID: product:option:drums:kit:percussion
+PROMPT_FRAGMENT: percussion-led drum pattern
+
+[150/400]
+ID: product:knowledge:option:drums:snare:dry
+TYPE: parameter_option
+SECTION: drums
+PARENT: Snare
+TERM: Dry
+SOURCE_ID: product:option:drums:snare:dry
+PROMPT_FRAGMENT: dry snare
+
+[151/400]
+ID: product:knowledge:option:drums:snare:crisp
+TYPE: parameter_option
+SECTION: drums
+PARENT: Snare
+TERM: Crisp
+SOURCE_ID: product:option:drums:snare:crisp
+PROMPT_FRAGMENT: crisp snare
+
+[152/400]
+ID: product:knowledge:option:drums:snare:soft
+TYPE: parameter_option
+SECTION: drums
+PARENT: Snare
+TERM: Soft
+SOURCE_ID: product:option:drums:snare:soft
+PROMPT_FRAGMENT: soft snare
+
+[153/400]
+ID: product:knowledge:option:drums:snare:hard
+TYPE: parameter_option
+SECTION: drums
+PARENT: Snare
+TERM: Hard
+SOURCE_ID: product:option:drums:snare:hard
+PROMPT_FRAGMENT: hard snare
+
+[154/400]
+ID: product:knowledge:option:drums:snare:side-stick
+TYPE: parameter_option
+SECTION: drums
+PARENT: Snare
+TERM: Side-stick
+SOURCE_ID: product:option:drums:snare:side-stick
+PROMPT_FRAGMENT: side-stick / rim-click
+
+[155/400]
+ID: product:knowledge:option:drums:hats:tight
+TYPE: parameter_option
+SECTION: drums
+PARENT: Hats / Cymbals
+TERM: Tight
+SOURCE_ID: product:option:drums:hats:tight
+PROMPT_FRAGMENT: tight closed hats
+
+[156/400]
+ID: product:knowledge:option:drums:hats:open
+TYPE: parameter_option
+SECTION: drums
+PARENT: Hats / Cymbals
+TERM: Open
+SOURCE_ID: product:option:drums:hats:open
+PROMPT_FRAGMENT: open bright hats
+
+[157/400]
+ID: product:knowledge:option:drums:hats:sparse
+TYPE: parameter_option
+SECTION: drums
+PARENT: Hats / Cymbals
+TERM: Sparse
+SOURCE_ID: product:option:drums:hats:sparse
+PROMPT_FRAGMENT: sparse hats
+
+[158/400]
+ID: product:knowledge:option:drums:hats:busy
+TYPE: parameter_option
+SECTION: drums
+PARENT: Hats / Cymbals
+TERM: Busy
+SOURCE_ID: product:option:drums:hats:busy
+PROMPT_FRAGMENT: busy hat subdivision
+
+[159/400]
+ID: product:knowledge:option:drums:hats:cymbal-light
+TYPE: parameter_option
+SECTION: drums
+PARENT: Hats / Cymbals
+TERM: Light Cymbals
+SOURCE_ID: product:option:drums:hats:cymbal-light
+PROMPT_FRAGMENT: light cymbal accents
+
+[160/400]
+ID: product:knowledge:option:drums:fills:restrained
+TYPE: parameter_option
+SECTION: drums
+PARENT: Fills
+TERM: Restrained
+SOURCE_ID: product:option:drums:fills:restrained
+PROMPT_FRAGMENT: restrained fills
+
+[161/400]
+ID: product:knowledge:option:drums:fills:sparse
+TYPE: parameter_option
+SECTION: drums
+PARENT: Fills
+TERM: Sparse
+SOURCE_ID: product:option:drums:fills:sparse
+PROMPT_FRAGMENT: sparse fills
+
+[162/400]
+ID: product:knowledge:option:drums:fills:active
+TYPE: parameter_option
+SECTION: drums
+PARENT: Fills
+TERM: Active
+SOURCE_ID: product:option:drums:fills:active
+PROMPT_FRAGMENT: active fills
+
+[163/400]
+ID: product:knowledge:option:drums:fills:explosive
+TYPE: parameter_option
+SECTION: drums
+PARENT: Fills
+TERM: Explosive
+SOURCE_ID: product:option:drums:fills:explosive
+PROMPT_FRAGMENT: explosive fills
+
+[164/400]
+ID: product:knowledge:option:drums:impact:soft
+TYPE: parameter_option
+SECTION: drums
+PARENT: Impact
+TERM: Soft / Rounded
+SOURCE_ID: product:option:drums:impact:soft
+PROMPT_FRAGMENT: soft rounded drum impact
+
+[165/400]
+ID: product:knowledge:option:drums:impact:tight
+TYPE: parameter_option
+SECTION: drums
+PARENT: Impact
+TERM: Tight / Punchy
+SOURCE_ID: product:option:drums:impact:tight
+PROMPT_FRAGMENT: tight punchy drums
+
+[166/400]
+ID: product:knowledge:option:drums:impact:hard
+TYPE: parameter_option
+SECTION: drums
+PARENT: Impact
+TERM: Hard / Aggressive
+SOURCE_ID: product:option:drums:impact:hard
+PROMPT_FRAGMENT: hard aggressive drum impact
+
+[167/400]
+ID: product:knowledge:option:bass:source:electric
+TYPE: parameter_option
+SECTION: bass
+PARENT: Bass Source
+TERM: Electric Bass
+SOURCE_ID: product:option:bass:source:electric
+PROMPT_FRAGMENT: electric bass
+
+[168/400]
+ID: product:knowledge:option:bass:source:synth
+TYPE: parameter_option
+SECTION: bass
+PARENT: Bass Source
+TERM: Synth Bass
+SOURCE_ID: product:option:bass:source:synth
+PROMPT_FRAGMENT: synth bass
+
+[169/400]
+ID: product:knowledge:option:bass:source:upright
+TYPE: parameter_option
+SECTION: bass
+PARENT: Bass Source
+TERM: Upright Bass
+SOURCE_ID: product:option:bass:source:upright
+PROMPT_FRAGMENT: upright bass
+
+[170/400]
+ID: product:knowledge:option:bass:source:sub
+TYPE: parameter_option
+SECTION: bass
+PARENT: Bass Source
+TERM: Sub Bass
+SOURCE_ID: product:option:bass:source:sub
+PROMPT_FRAGMENT: sub bass
+
+[171/400]
+ID: product:knowledge:option:bass:source:808
+TYPE: parameter_option
+SECTION: bass
+PARENT: Bass Source
+TERM: 808
+SOURCE_ID: product:option:bass:source:808
+PROMPT_FRAGMENT: 808 bass
+
+[172/400]
+ID: product:knowledge:option:bass:motion:roots
+TYPE: parameter_option
+SECTION: bass
+PARENT: Movement
+TERM: Root-led
+SOURCE_ID: product:option:bass:motion:roots
+PROMPT_FRAGMENT: root-led bass movement
+
+[173/400]
+ID: product:knowledge:option:bass:motion:walking
+TYPE: parameter_option
+SECTION: bass
+PARENT: Movement
+TERM: Walking
+SOURCE_ID: product:option:bass:motion:walking
+PROMPT_FRAGMENT: walking bass
+
+[174/400]
+ID: product:knowledge:option:bass:motion:syncopated
+TYPE: parameter_option
+SECTION: bass
+PARENT: Movement
+TERM: Syncopated
+SOURCE_ID: product:option:bass:motion:syncopated
+PROMPT_FRAGMENT: syncopated bass movement
+
+[175/400]
+ID: product:knowledge:option:bass:motion:melodic
+TYPE: parameter_option
+SECTION: bass
+PARENT: Movement
+TERM: Melodic
+SOURCE_ID: product:option:bass:motion:melodic
+PROMPT_FRAGMENT: melodic bass movement
+
+[176/400]
+ID: product:knowledge:option:bass:motion:pedal
+TYPE: parameter_option
+SECTION: bass
+PARENT: Movement
+TERM: Pedal / Held
+SOURCE_ID: product:option:bass:motion:pedal
+PROMPT_FRAGMENT: pedal-tone bass movement
+
+[177/400]
+ID: product:knowledge:option:bass:length:short
+TYPE: parameter_option
+SECTION: bass
+PARENT: Note Length
+TERM: Short / Punchy
+SOURCE_ID: product:option:bass:length:short
+PROMPT_FRAGMENT: short punchy bass notes
+
+[178/400]
+ID: product:knowledge:option:bass:length:medium
+TYPE: parameter_option
+SECTION: bass
+PARENT: Note Length
+TERM: Medium
+SOURCE_ID: product:option:bass:length:medium
+PROMPT_FRAGMENT: medium-length bass notes
+
+[179/400]
+ID: product:knowledge:option:bass:length:long
+TYPE: parameter_option
+SECTION: bass
+PARENT: Note Length
+TERM: Long / Sustained
+SOURCE_ID: product:option:bass:length:long
+PROMPT_FRAGMENT: long sustained bass notes
+
+[180/400]
+ID: product:knowledge:option:bass:kick_relation:locked
+TYPE: parameter_option
+SECTION: bass
+PARENT: Kick Relationship
+TERM: Locked to Kick
+SOURCE_ID: product:option:bass:kick_relation:locked
+PROMPT_FRAGMENT: locked to the kick
+
+[181/400]
+ID: product:knowledge:option:bass:kick_relation:counter
+TYPE: parameter_option
+SECTION: bass
+PARENT: Kick Relationship
+TERM: Counter-rhythmic
+SOURCE_ID: product:option:bass:kick_relation:counter
+PROMPT_FRAGMENT: counter-rhythmic to the kick
+
+[182/400]
+ID: product:knowledge:option:bass:kick_relation:space
+TYPE: parameter_option
+SECTION: bass
+PARENT: Kick Relationship
+TERM: Leaves Space
+SOURCE_ID: product:option:bass:kick_relation:space
+PROMPT_FRAGMENT: leaves space around the kick
+
+[183/400]
+ID: product:knowledge:option:bass:kick_relation:independent
+TYPE: parameter_option
+SECTION: bass
+PARENT: Kick Relationship
+TERM: Independent
+SOURCE_ID: product:option:bass:kick_relation:independent
+PROMPT_FRAGMENT: independent from the kick pattern
+
+[184/400]
+ID: product:knowledge:option:exciters:type:tambourine
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Exciter Type
+TERM: Tambourine
+SOURCE_ID: product:option:exciters:type:tambourine
+PROMPT_FRAGMENT: tambourine accents
+
+[185/400]
+ID: product:knowledge:option:exciters:type:shaker
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Exciter Type
+TERM: Shaker
+SOURCE_ID: product:option:exciters:type:shaker
+PROMPT_FRAGMENT: shaker subdivision
+
+[186/400]
+ID: product:knowledge:option:exciters:type:hand-percussion
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Exciter Type
+TERM: Hand Percussion
+SOURCE_ID: product:option:exciters:type:hand-percussion
+PROMPT_FRAGMENT: hand percussion
+
+[187/400]
+ID: product:knowledge:option:exciters:type:claps
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Exciter Type
+TERM: Claps
+SOURCE_ID: product:option:exciters:type:claps
+PROMPT_FRAGMENT: handclap accents
+
+[188/400]
+ID: product:knowledge:option:exciters:type:woodblock
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Exciter Type
+TERM: Woodblock / Triangle
+SOURCE_ID: product:option:exciters:type:woodblock
+PROMPT_FRAGMENT: woodblock / triangle accents
+
+[189/400]
+ID: product:knowledge:option:exciters:type:sweeps
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Exciter Type
+TERM: Noise Sweeps
+SOURCE_ID: product:option:exciters:type:sweeps
+PROMPT_FRAGMENT: short noise sweeps
+
+[190/400]
+ID: product:knowledge:option:exciters:type:stabs
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Exciter Type
+TERM: Stabs
+SOURCE_ID: product:option:exciters:type:stabs
+PROMPT_FRAGMENT: short accent stabs
+
+[191/400]
+ID: product:knowledge:option:exciters:density:sparse
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Density
+TERM: Sparse
+SOURCE_ID: product:option:exciters:density:sparse
+PROMPT_FRAGMENT: sparse exciters
+
+[192/400]
+ID: product:knowledge:option:exciters:density:occasional
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Density
+TERM: Occasional
+SOURCE_ID: product:option:exciters:density:occasional
+PROMPT_FRAGMENT: occasional exciters
+
+[193/400]
+ID: product:knowledge:option:exciters:density:regular
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Density
+TERM: Regular
+SOURCE_ID: product:option:exciters:density:regular
+PROMPT_FRAGMENT: regular exciter accents
+
+[194/400]
+ID: product:knowledge:option:exciters:density:busy
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Density
+TERM: Busy
+SOURCE_ID: product:option:exciters:density:busy
+PROMPT_FRAGMENT: busy exciter layer
+
+[195/400]
+ID: product:knowledge:option:exciters:placement:backbeat
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Placement
+TERM: Backbeat
+SOURCE_ID: product:option:exciters:placement:backbeat
+PROMPT_FRAGMENT: on selected backbeats
+
+[196/400]
+ID: product:knowledge:option:exciters:placement:offbeat
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Placement
+TERM: Offbeats
+SOURCE_ID: product:option:exciters:placement:offbeat
+PROMPT_FRAGMENT: on offbeats
+
+[197/400]
+ID: product:knowledge:option:exciters:placement:subdivision
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Placement
+TERM: Subdivision
+SOURCE_ID: product:option:exciters:placement:subdivision
+PROMPT_FRAGMENT: on subdivision accents
+
+[198/400]
+ID: product:knowledge:option:exciters:placement:transition
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Placement
+TERM: Transitions
+SOURCE_ID: product:option:exciters:placement:transition
+PROMPT_FRAGMENT: at transitions
+
+[199/400]
+ID: product:knowledge:option:exciters:placement:ending
+TYPE: parameter_option
+SECTION: exciters
+PARENT: Placement
+TERM: Phrase Endings
+SOURCE_ID: product:option:exciters:placement:ending
+PROMPT_FRAGMENT: at phrase endings
+
+[200/400]
+ID: product:knowledge:option:texture:character:warm
+TYPE: parameter_option
+SECTION: texture
+PARENT: Character
+TERM: Warm
+SOURCE_ID: product:option:texture:character:warm
+PROMPT_FRAGMENT: warm texture
+
+[201/400]
+ID: product:knowledge:option:texture:character:clean
+TYPE: parameter_option
+SECTION: texture
+PARENT: Character
+TERM: Clean
+SOURCE_ID: product:option:texture:character:clean
+PROMPT_FRAGMENT: clean texture
+
+[202/400]
+ID: product:knowledge:option:texture:character:dry
+TYPE: parameter_option
+SECTION: texture
+PARENT: Character
+TERM: Dry
+SOURCE_ID: product:option:texture:character:dry
+PROMPT_FRAGMENT: dry texture
+
+[203/400]
+ID: product:knowledge:option:texture:character:polished
+TYPE: parameter_option
+SECTION: texture
+PARENT: Character
+TERM: Polished
+SOURCE_ID: product:option:texture:character:polished
+PROMPT_FRAGMENT: polished surface
+
+[204/400]
+ID: product:knowledge:option:texture:character:filtered
+TYPE: parameter_option
+SECTION: texture
+PARENT: Character
+TERM: Filtered
+SOURCE_ID: product:option:texture:character:filtered
+PROMPT_FRAGMENT: filtered texture
+
+[205/400]
+ID: product:knowledge:option:texture:character:grainy
+TYPE: parameter_option
+SECTION: texture
+PARENT: Character
+TERM: Grainy
+SOURCE_ID: product:option:texture:character:grainy
+PROMPT_FRAGMENT: grainy texture
+
+[206/400]
+ID: product:knowledge:option:texture:character:airy
+TYPE: parameter_option
+SECTION: texture
+PARENT: Character
+TERM: Airy
+SOURCE_ID: product:option:texture:character:airy
+PROMPT_FRAGMENT: airy ambience
+
+[207/400]
+ID: product:knowledge:option:texture:character:saturated
+TYPE: parameter_option
+SECTION: texture
+PARENT: Character
+TERM: Saturated
+SOURCE_ID: product:option:texture:character:saturated
+PROMPT_FRAGMENT: saturated texture
+
+[208/400]
+ID: product:knowledge:option:texture:character:dusty
+TYPE: parameter_option
+SECTION: texture
+PARENT: Character
+TERM: Dusty
+SOURCE_ID: product:option:texture:character:dusty
+PROMPT_FRAGMENT: dusty texture
+
+[209/400]
+ID: product:knowledge:option:texture:character:bright
+TYPE: parameter_option
+SECTION: texture
+PARENT: Character
+TERM: Bright
+SOURCE_ID: product:option:texture:character:bright
+PROMPT_FRAGMENT: bright texture
+
+[210/400]
+ID: product:knowledge:option:texture:density:sparse
+TYPE: parameter_option
+SECTION: texture
+PARENT: Layer Density
+TERM: Sparse
+SOURCE_ID: product:option:texture:density:sparse
+PROMPT_FRAGMENT: sparse texture
+
+[211/400]
+ID: product:knowledge:option:texture:density:restrained
+TYPE: parameter_option
+SECTION: texture
+PARENT: Layer Density
+TERM: Restrained
+SOURCE_ID: product:option:texture:density:restrained
+PROMPT_FRAGMENT: restrained texture
+
+[212/400]
+ID: product:knowledge:option:texture:density:layered
+TYPE: parameter_option
+SECTION: texture
+PARENT: Layer Density
+TERM: Layered
+SOURCE_ID: product:option:texture:density:layered
+PROMPT_FRAGMENT: layered texture
+
+[213/400]
+ID: product:knowledge:option:texture:density:dense
+TYPE: parameter_option
+SECTION: texture
+PARENT: Layer Density
+TERM: Dense
+SOURCE_ID: product:option:texture:density:dense
+PROMPT_FRAGMENT: dense texture
+
+[214/400]
+ID: product:knowledge:option:texture:movement:static
+TYPE: parameter_option
+SECTION: texture
+PARENT: Movement
+TERM: Static
+SOURCE_ID: product:option:texture:movement:static
+PROMPT_FRAGMENT: static texture
+
+[215/400]
+ID: product:knowledge:option:texture:movement:subtle
+TYPE: parameter_option
+SECTION: texture
+PARENT: Movement
+TERM: Subtle
+SOURCE_ID: product:option:texture:movement:subtle
+PROMPT_FRAGMENT: subtle textural movement
+
+[216/400]
+ID: product:knowledge:option:texture:movement:pulsing
+TYPE: parameter_option
+SECTION: texture
+PARENT: Movement
+TERM: Pulsing
+SOURCE_ID: product:option:texture:movement:pulsing
+PROMPT_FRAGMENT: pulsing texture
+
+[217/400]
+ID: product:knowledge:option:texture:movement:evolving
+TYPE: parameter_option
+SECTION: texture
+PARENT: Movement
+TERM: Evolving
+SOURCE_ID: product:option:texture:movement:evolving
+PROMPT_FRAGMENT: evolving texture
+
+[218/400]
+ID: product:knowledge:option:vocal:presence:instrumental
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Vocal Presence
+TERM: Instrumental
+SOURCE_ID: product:option:vocal:presence:instrumental
+PROMPT_FRAGMENT: instrumental / no lead vocal
+
+[219/400]
+ID: product:knowledge:option:vocal:presence:lead
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Vocal Presence
+TERM: Lead Vocal
+SOURCE_ID: product:option:vocal:presence:lead
+PROMPT_FRAGMENT: lead vocal
+
+[220/400]
+ID: product:knowledge:option:vocal:presence:duet
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Vocal Presence
+TERM: Duet
+SOURCE_ID: product:option:vocal:presence:duet
+PROMPT_FRAGMENT: duet vocals
+
+[221/400]
+ID: product:knowledge:option:vocal:presence:group
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Vocal Presence
+TERM: Group / Choir
+SOURCE_ID: product:option:vocal:presence:group
+PROMPT_FRAGMENT: group / choir vocals
+
+[222/400]
+ID: product:knowledge:option:vocal:presence:spoken
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Vocal Presence
+TERM: Spoken / Rap
+SOURCE_ID: product:option:vocal:presence:spoken
+PROMPT_FRAGMENT: spoken / rap vocal
+
+[223/400]
+ID: product:knowledge:option:vocal:delivery:intimate
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Delivery
+TERM: Intimate
+SOURCE_ID: product:option:vocal:delivery:intimate
+PROMPT_FRAGMENT: intimate vocal delivery
+
+[224/400]
+ID: product:knowledge:option:vocal:delivery:breathy
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Delivery
+TERM: Breathy
+SOURCE_ID: product:option:vocal:delivery:breathy
+PROMPT_FRAGMENT: breathy vocal delivery
+
+[225/400]
+ID: product:knowledge:option:vocal:delivery:smooth
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Delivery
+TERM: Smooth
+SOURCE_ID: product:option:vocal:delivery:smooth
+PROMPT_FRAGMENT: smooth vocal delivery
+
+[226/400]
+ID: product:knowledge:option:vocal:delivery:gritty
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Delivery
+TERM: Gritty
+SOURCE_ID: product:option:vocal:delivery:gritty
+PROMPT_FRAGMENT: gritty vocal delivery
+
+[227/400]
+ID: product:knowledge:option:vocal:delivery:powerful
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Delivery
+TERM: Powerful
+SOURCE_ID: product:option:vocal:delivery:powerful
+PROMPT_FRAGMENT: powerful vocal delivery
+
+[228/400]
+ID: product:knowledge:option:vocal:delivery:restrained
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Delivery
+TERM: Restrained
+SOURCE_ID: product:option:vocal:delivery:restrained
+PROMPT_FRAGMENT: restrained vocal delivery
+
+[229/400]
+ID: product:knowledge:option:vocal:arrangement:single
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Arrangement
+TERM: Single Lead
+SOURCE_ID: product:option:vocal:arrangement:single
+PROMPT_FRAGMENT: single lead vocal
+
+[230/400]
+ID: product:knowledge:option:vocal:arrangement:double
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Arrangement
+TERM: Doubles
+SOURCE_ID: product:option:vocal:arrangement:double
+PROMPT_FRAGMENT: vocal doubles
+
+[231/400]
+ID: product:knowledge:option:vocal:arrangement:harmony
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Arrangement
+TERM: Harmonies
+SOURCE_ID: product:option:vocal:arrangement:harmony
+PROMPT_FRAGMENT: stacked vocal harmonies
+
+[232/400]
+ID: product:knowledge:option:vocal:arrangement:call-response
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Arrangement
+TERM: Call & Response
+SOURCE_ID: product:option:vocal:arrangement:call-response
+PROMPT_FRAGMENT: vocal call-and-response
+
+[233/400]
+ID: product:knowledge:option:vocal:arrangement:adlibs
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Arrangement
+TERM: Ad-libs
+SOURCE_ID: product:option:vocal:arrangement:adlibs
+PROMPT_FRAGMENT: vocal ad-libs
+
+[234/400]
+ID: product:knowledge:option:vocal:processing:dry
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Processing / Space
+TERM: Dry / Close
+SOURCE_ID: product:option:vocal:processing:dry
+PROMPT_FRAGMENT: dry close vocal
+
+[235/400]
+ID: product:knowledge:option:vocal:processing:light-reverb
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Processing / Space
+TERM: Light Reverb
+SOURCE_ID: product:option:vocal:processing:light-reverb
+PROMPT_FRAGMENT: light vocal reverb
+
+[236/400]
+ID: product:knowledge:option:vocal:processing:wide
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Processing / Space
+TERM: Wide / Doubled
+SOURCE_ID: product:option:vocal:processing:wide
+PROMPT_FRAGMENT: wide doubled vocal
+
+[237/400]
+ID: product:knowledge:option:vocal:processing:saturated
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Processing / Space
+TERM: Saturated
+SOURCE_ID: product:option:vocal:processing:saturated
+PROMPT_FRAGMENT: saturated vocal
+
+[238/400]
+ID: product:knowledge:option:vocal:processing:filtered
+TYPE: parameter_option
+SECTION: vocal
+PARENT: Processing / Space
+TERM: Filtered
+SOURCE_ID: product:option:vocal:processing:filtered
+PROMPT_FRAGMENT: filtered vocal
+
+[239/400]
+ID: product:knowledge:option:dynamics:range:steady
+TYPE: parameter_option
+SECTION: dynamics
+PARENT: Dynamic Range
+TERM: Steady / Compressed
+SOURCE_ID: product:option:dynamics:range:steady
+PROMPT_FRAGMENT: steady controlled dynamics
+
+[240/400]
+ID: product:knowledge:option:dynamics:range:restrained
+TYPE: parameter_option
+SECTION: dynamics
+PARENT: Dynamic Range
+TERM: Restrained
+SOURCE_ID: product:option:dynamics:range:restrained
+PROMPT_FRAGMENT: restrained dynamic range
+
+[241/400]
+ID: product:knowledge:option:dynamics:range:moderate
+TYPE: parameter_option
+SECTION: dynamics
+PARENT: Dynamic Range
+TERM: Moderate
+SOURCE_ID: product:option:dynamics:range:moderate
+PROMPT_FRAGMENT: moderate dynamic contrast
+
+[242/400]
+ID: product:knowledge:option:dynamics:range:broad
+TYPE: parameter_option
+SECTION: dynamics
+PARENT: Dynamic Range
+TERM: Broad
+SOURCE_ID: product:option:dynamics:range:broad
+PROMPT_FRAGMENT: broad dynamic range
+
+[243/400]
+ID: product:knowledge:option:dynamics:range:extreme
+TYPE: parameter_option
+SECTION: dynamics
+PARENT: Dynamic Range
+TERM: Extreme
+SOURCE_ID: product:option:dynamics:range:extreme
+PROMPT_FRAGMENT: extreme dynamic contrast
+
+[244/400]
+ID: product:knowledge:option:dynamics:arc:consistent
+TYPE: parameter_option
+SECTION: dynamics
+PARENT: Energy Arc
+TERM: Consistent
+SOURCE_ID: product:option:dynamics:arc:consistent
+PROMPT_FRAGMENT: consistent energy
+
+[245/400]
+ID: product:knowledge:option:dynamics:arc:build
+TYPE: parameter_option
+SECTION: dynamics
+PARENT: Energy Arc
+TERM: Gradual Build
+SOURCE_ID: product:option:dynamics:arc:build
+PROMPT_FRAGMENT: gradual dynamic build
+
+[246/400]
+ID: product:knowledge:option:dynamics:arc:sectional
+TYPE: parameter_option
+SECTION: dynamics
+PARENT: Energy Arc
+TERM: Sectional Contrast
+SOURCE_ID: product:option:dynamics:arc:sectional
+PROMPT_FRAGMENT: controlled sectional contrast
+
+[247/400]
+ID: product:knowledge:option:dynamics:arc:drop
+TYPE: parameter_option
+SECTION: dynamics
+PARENT: Energy Arc
+TERM: Drop & Rebuild
+SOURCE_ID: product:option:dynamics:arc:drop
+PROMPT_FRAGMENT: dynamic drop and rebuild
+
+[248/400]
+ID: product:knowledge:option:dynamics:arc:peak
+TYPE: parameter_option
+SECTION: dynamics
+PARENT: Energy Arc
+TERM: Final Peak
+SOURCE_ID: product:option:dynamics:arc:peak
+PROMPT_FRAGMENT: final dynamic peak
+
+[249/400]
+ID: product:knowledge:option:dynamics:accents:subtle
+TYPE: parameter_option
+SECTION: dynamics
+PARENT: Accents
+TERM: Subtle
+SOURCE_ID: product:option:dynamics:accents:subtle
+PROMPT_FRAGMENT: subtle dynamic accents
+
+[250/400]
+ID: product:knowledge:option:dynamics:accents:sectional
+TYPE: parameter_option
+SECTION: dynamics
+PARENT: Accents
+TERM: Sectional
+SOURCE_ID: product:option:dynamics:accents:sectional
+PROMPT_FRAGMENT: sectional dynamic accents
+
+[251/400]
+ID: product:knowledge:option:dynamics:accents:strong
+TYPE: parameter_option
+SECTION: dynamics
+PARENT: Accents
+TERM: Strong
+SOURCE_ID: product:option:dynamics:accents:strong
+PROMPT_FRAGMENT: strong dynamic accents
+
+[252/400]
+ID: product:knowledge:option:space_mix:width:mono
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Stereo Width
+TERM: Mono / Narrow
+SOURCE_ID: product:option:space_mix:width:mono
+PROMPT_FRAGMENT: narrow mono-era image
+
+[253/400]
+ID: product:knowledge:option:space_mix:width:centered
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Stereo Width
+TERM: Centered
+SOURCE_ID: product:option:space_mix:width:centered
+PROMPT_FRAGMENT: centered stereo image
+
+[254/400]
+ID: product:knowledge:option:space_mix:width:balanced
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Stereo Width
+TERM: Balanced
+SOURCE_ID: product:option:space_mix:width:balanced
+PROMPT_FRAGMENT: balanced stereo width
+
+[255/400]
+ID: product:knowledge:option:space_mix:width:wide
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Stereo Width
+TERM: Wide
+SOURCE_ID: product:option:space_mix:width:wide
+PROMPT_FRAGMENT: wide stereo image
+
+[256/400]
+ID: product:knowledge:option:space_mix:depth:dry
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Depth
+TERM: Dry / Close
+SOURCE_ID: product:option:space_mix:depth:dry
+PROMPT_FRAGMENT: dry close depth
+
+[257/400]
+ID: product:knowledge:option:space_mix:depth:shallow
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Depth
+TERM: Shallow
+SOURCE_ID: product:option:space_mix:depth:shallow
+PROMPT_FRAGMENT: shallow room depth
+
+[258/400]
+ID: product:knowledge:option:space_mix:depth:moderate
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Depth
+TERM: Moderate
+SOURCE_ID: product:option:space_mix:depth:moderate
+PROMPT_FRAGMENT: controlled moderate depth
+
+[259/400]
+ID: product:knowledge:option:space_mix:depth:deep
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Depth
+TERM: Deep / Spacious
+SOURCE_ID: product:option:space_mix:depth:deep
+PROMPT_FRAGMENT: deep spacious mix depth
+
+[260/400]
+ID: product:knowledge:option:space_mix:low_end:tight
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Low End
+TERM: Tight / Centered
+SOURCE_ID: product:option:space_mix:low_end:tight
+PROMPT_FRAGMENT: tight centered low end
+
+[261/400]
+ID: product:knowledge:option:space_mix:low_end:warm
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Low End
+TERM: Warm / Round
+SOURCE_ID: product:option:space_mix:low_end:warm
+PROMPT_FRAGMENT: warm rounded low end
+
+[262/400]
+ID: product:knowledge:option:space_mix:low_end:sub
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Low End
+TERM: Sub-heavy
+SOURCE_ID: product:option:space_mix:low_end:sub
+PROMPT_FRAGMENT: sub-heavy low end
+
+[263/400]
+ID: product:knowledge:option:space_mix:low_end:restrained
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Low End
+TERM: Restrained
+SOURCE_ID: product:option:space_mix:low_end:restrained
+PROMPT_FRAGMENT: restrained low end
+
+[264/400]
+ID: product:knowledge:option:space_mix:focus:rhythm
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Focus
+TERM: Forward Rhythm
+SOURCE_ID: product:option:space_mix:focus:rhythm
+PROMPT_FRAGMENT: forward rhythm section
+
+[265/400]
+ID: product:knowledge:option:space_mix:focus:vocal
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Focus
+TERM: Forward Vocal
+SOURCE_ID: product:option:space_mix:focus:vocal
+PROMPT_FRAGMENT: forward vocal
+
+[266/400]
+ID: product:knowledge:option:space_mix:focus:bass
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Focus
+TERM: Centered Bass
+SOURCE_ID: product:option:space_mix:focus:bass
+PROMPT_FRAGMENT: centered bass
+
+[267/400]
+ID: product:knowledge:option:space_mix:focus:upper
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Focus
+TERM: Wide Upper Layers
+SOURCE_ID: product:option:space_mix:focus:upper
+PROMPT_FRAGMENT: wide upper layers
+
+[268/400]
+ID: product:knowledge:option:space_mix:focus:mids
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Focus
+TERM: Clear Mids
+SOURCE_ID: product:option:space_mix:focus:mids
+PROMPT_FRAGMENT: clear controlled mids
+
+[269/400]
+ID: product:knowledge:option:space_mix:reverb:dry
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Reverb
+TERM: Dry
+SOURCE_ID: product:option:space_mix:reverb:dry
+PROMPT_FRAGMENT: dry reflections
+
+[270/400]
+ID: product:knowledge:option:space_mix:reverb:room
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Reverb
+TERM: Short Room
+SOURCE_ID: product:option:space_mix:reverb:room
+PROMPT_FRAGMENT: short room reflections
+
+[271/400]
+ID: product:knowledge:option:space_mix:reverb:plate
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Reverb
+TERM: Plate
+SOURCE_ID: product:option:space_mix:reverb:plate
+PROMPT_FRAGMENT: plate reverb
+
+[272/400]
+ID: product:knowledge:option:space_mix:reverb:hall
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Reverb
+TERM: Hall
+SOURCE_ID: product:option:space_mix:reverb:hall
+PROMPT_FRAGMENT: hall reverb
+
+[273/400]
+ID: product:knowledge:option:space_mix:reverb:ambient
+TYPE: parameter_option
+SECTION: space_mix
+PARENT: Reverb
+TERM: Washed / Ambient
+SOURCE_ID: product:option:space_mix:reverb:ambient
+PROMPT_FRAGMENT: washed ambient reverb
+
+[274/400]
+ID: product:knowledge:option:production:aesthetic:raw
+TYPE: parameter_option
+SECTION: production
+PARENT: Production Aesthetic
+TERM: Raw / Live
+SOURCE_ID: product:option:production:aesthetic:raw
+PROMPT_FRAGMENT: raw live production
+
+[275/400]
+ID: product:knowledge:option:production:aesthetic:vintage
+TYPE: parameter_option
+SECTION: production
+PARENT: Production Aesthetic
+TERM: Vintage / Analog
+SOURCE_ID: product:option:production:aesthetic:vintage
+PROMPT_FRAGMENT: vintage analog production
+
+[276/400]
+ID: product:knowledge:option:production:aesthetic:clean
+TYPE: parameter_option
+SECTION: production
+PARENT: Production Aesthetic
+TERM: Clean Studio
+SOURCE_ID: product:option:production:aesthetic:clean
+PROMPT_FRAGMENT: clean studio production
+
+[277/400]
+ID: product:knowledge:option:production:aesthetic:polished
+TYPE: parameter_option
+SECTION: production
+PARENT: Production Aesthetic
+TERM: Polished Modern
+SOURCE_ID: product:option:production:aesthetic:polished
+PROMPT_FRAGMENT: polished modern production
+
+[278/400]
+ID: product:knowledge:option:production:aesthetic:lofi
+TYPE: parameter_option
+SECTION: production
+PARENT: Production Aesthetic
+TERM: Lo-fi / Textured
+SOURCE_ID: product:option:production:aesthetic:lofi
+PROMPT_FRAGMENT: lo-fi textured production
+
+[279/400]
+ID: product:knowledge:option:production:aesthetic:aggressive
+TYPE: parameter_option
+SECTION: production
+PARENT: Production Aesthetic
+TERM: Aggressive / Punchy
+SOURCE_ID: product:option:production:aesthetic:aggressive
+PROMPT_FRAGMENT: aggressive punchy production
+
+[280/400]
+ID: product:knowledge:option:production:transients:soft
+TYPE: parameter_option
+SECTION: production
+PARENT: Transients
+TERM: Soft
+SOURCE_ID: product:option:production:transients:soft
+PROMPT_FRAGMENT: soft transients
+
+[281/400]
+ID: product:knowledge:option:production:transients:controlled
+TYPE: parameter_option
+SECTION: production
+PARENT: Transients
+TERM: Controlled
+SOURCE_ID: product:option:production:transients:controlled
+PROMPT_FRAGMENT: controlled transients
+
+[282/400]
+ID: product:knowledge:option:production:transients:crisp
+TYPE: parameter_option
+SECTION: production
+PARENT: Transients
+TERM: Crisp
+SOURCE_ID: product:option:production:transients:crisp
+PROMPT_FRAGMENT: crisp transients
+
+[283/400]
+ID: product:knowledge:option:production:transients:hard
+TYPE: parameter_option
+SECTION: production
+PARENT: Transients
+TERM: Hard
+SOURCE_ID: product:option:production:transients:hard
+PROMPT_FRAGMENT: hard transients
+
+[284/400]
+ID: product:knowledge:option:production:saturation:clean
+TYPE: parameter_option
+SECTION: production
+PARENT: Saturation
+TERM: Clean
+SOURCE_ID: product:option:production:saturation:clean
+PROMPT_FRAGMENT: clean saturation profile
+
+[285/400]
+ID: product:knowledge:option:production:saturation:subtle
+TYPE: parameter_option
+SECTION: production
+PARENT: Saturation
+TERM: Subtle
+SOURCE_ID: product:option:production:saturation:subtle
+PROMPT_FRAGMENT: subtle saturation
+
+[286/400]
+ID: product:knowledge:option:production:saturation:tape
+TYPE: parameter_option
+SECTION: production
+PARENT: Saturation
+TERM: Warm Tape
+SOURCE_ID: product:option:production:saturation:tape
+PROMPT_FRAGMENT: warm tape-like saturation
+
+[287/400]
+ID: product:knowledge:option:production:saturation:driven
+TYPE: parameter_option
+SECTION: production
+PARENT: Saturation
+TERM: Driven
+SOURCE_ID: product:option:production:saturation:driven
+PROMPT_FRAGMENT: driven saturation
+
+[288/400]
+ID: product:knowledge:option:production:saturation:distorted
+TYPE: parameter_option
+SECTION: production
+PARENT: Saturation
+TERM: Distorted
+SOURCE_ID: product:option:production:saturation:distorted
+PROMPT_FRAGMENT: distorted production color
+
+[289/400]
+ID: product:knowledge:option:production:fidelity:mono-era
+TYPE: parameter_option
+SECTION: production
+PARENT: Fidelity
+TERM: Mono-era
+SOURCE_ID: product:option:production:fidelity:mono-era
+PROMPT_FRAGMENT: mono-era production
+
+[290/400]
+ID: product:knowledge:option:production:fidelity:vintage-hifi
+TYPE: parameter_option
+SECTION: production
+PARENT: Fidelity
+TERM: Vintage Hi-Fi
+SOURCE_ID: product:option:production:fidelity:vintage-hifi
+PROMPT_FRAGMENT: vintage hi-fi production
+
+[291/400]
+ID: product:knowledge:option:production:fidelity:modern-hifi
+TYPE: parameter_option
+SECTION: production
+PARENT: Fidelity
+TERM: Contemporary Hi-Fi
+SOURCE_ID: product:option:production:fidelity:modern-hifi
+PROMPT_FRAGMENT: contemporary hi-fi production
+
+[292/400]
+ID: product:knowledge:option:production:fidelity:degraded
+TYPE: parameter_option
+SECTION: production
+PARENT: Fidelity
+TERM: Degraded
+SOURCE_ID: product:option:production:fidelity:degraded
+PROMPT_FRAGMENT: intentionally degraded fidelity
+
+[293/400]
+ID: product:knowledge:option:structure:form:hook-led
+TYPE: parameter_option
+SECTION: structure
+PARENT: Form
+TERM: Hook-led
+SOURCE_ID: product:option:structure:form:hook-led
+PROMPT_FRAGMENT: short hook-led form
+
+[294/400]
+ID: product:knowledge:option:structure:form:verse-chorus
+TYPE: parameter_option
+SECTION: structure
+PARENT: Form
+TERM: Verse / Chorus
+SOURCE_ID: product:option:structure:form:verse-chorus
+PROMPT_FRAGMENT: verse-chorus song form
+
+[295/400]
+ID: product:knowledge:option:structure:form:aaba
+TYPE: parameter_option
+SECTION: structure
+PARENT: Form
+TERM: AABA
+SOURCE_ID: product:option:structure:form:aaba
+PROMPT_FRAGMENT: AABA song form
+
+[296/400]
+ID: product:knowledge:option:structure:form:cyclic
+TYPE: parameter_option
+SECTION: structure
+PARENT: Form
+TERM: Cyclic
+SOURCE_ID: product:option:structure:form:cyclic
+PROMPT_FRAGMENT: cyclic theme-based form
+
+[297/400]
+ID: product:knowledge:option:structure:form:through
+TYPE: parameter_option
+SECTION: structure
+PARENT: Form
+TERM: Through-composed
+SOURCE_ID: product:option:structure:form:through
+PROMPT_FRAGMENT: through-composed form
+
+[298/400]
+ID: product:knowledge:option:structure:form:extended
+TYPE: parameter_option
+SECTION: structure
+PARENT: Form
+TERM: Extended Instrumental
+SOURCE_ID: product:option:structure:form:extended
+PROMPT_FRAGMENT: extended instrumental form
+
+[299/400]
+ID: product:knowledge:option:structure:intro:cold
+TYPE: parameter_option
+SECTION: structure
+PARENT: Intro
+TERM: Cold Open
+SOURCE_ID: product:option:structure:intro:cold
+PROMPT_FRAGMENT: cold open
+
+[300/400]
+ID: product:knowledge:option:structure:intro:short
+TYPE: parameter_option
+SECTION: structure
+PARENT: Intro
+TERM: Short Intro
+SOURCE_ID: product:option:structure:intro:short
+PROMPT_FRAGMENT: short intro
+
+[301/400]
+ID: product:knowledge:option:structure:intro:gradual
+TYPE: parameter_option
+SECTION: structure
+PARENT: Intro
+TERM: Gradual Intro
+SOURCE_ID: product:option:structure:intro:gradual
+PROMPT_FRAGMENT: gradual opening
+
+[302/400]
+ID: product:knowledge:option:structure:intro:instrumental
+TYPE: parameter_option
+SECTION: structure
+PARENT: Intro
+TERM: Instrumental Intro
+SOURCE_ID: product:option:structure:intro:instrumental
+PROMPT_FRAGMENT: instrumental opening
+
+[303/400]
+ID: product:knowledge:option:structure:transitions:fills
+TYPE: parameter_option
+SECTION: structure
+PARENT: Transitions
+TERM: Fills
+SOURCE_ID: product:option:structure:transitions:fills
+PROMPT_FRAGMENT: transition fills
+
+[304/400]
+ID: product:knowledge:option:structure:transitions:breaks
+TYPE: parameter_option
+SECTION: structure
+PARENT: Transitions
+TERM: Breaks
+SOURCE_ID: product:option:structure:transitions:breaks
+PROMPT_FRAGMENT: short breaks
+
+[305/400]
+ID: product:knowledge:option:structure:transitions:risers
+TYPE: parameter_option
+SECTION: structure
+PARENT: Transitions
+TERM: Risers
+SOURCE_ID: product:option:structure:transitions:risers
+PROMPT_FRAGMENT: riser transitions
+
+[306/400]
+ID: product:knowledge:option:structure:transitions:drops
+TYPE: parameter_option
+SECTION: structure
+PARENT: Transitions
+TERM: Drops
+SOURCE_ID: product:option:structure:transitions:drops
+PROMPT_FRAGMENT: drop transitions
+
+[307/400]
+ID: product:knowledge:option:structure:transitions:turnarounds
+TYPE: parameter_option
+SECTION: structure
+PARENT: Transitions
+TERM: Turnarounds
+SOURCE_ID: product:option:structure:transitions:turnarounds
+PROMPT_FRAGMENT: turnaround transitions
+
+[308/400]
+ID: product:knowledge:option:structure:outro:hard-stop
+TYPE: parameter_option
+SECTION: structure
+PARENT: Outro
+TERM: Hard Stop
+SOURCE_ID: product:option:structure:outro:hard-stop
+PROMPT_FRAGMENT: hard stop
+
+[309/400]
+ID: product:knowledge:option:structure:outro:short
+TYPE: parameter_option
+SECTION: structure
+PARENT: Outro
+TERM: Short Outro
+SOURCE_ID: product:option:structure:outro:short
+PROMPT_FRAGMENT: short outro
+
+[310/400]
+ID: product:knowledge:option:structure:outro:fade
+TYPE: parameter_option
+SECTION: structure
+PARENT: Outro
+TERM: Fade
+SOURCE_ID: product:option:structure:outro:fade
+PROMPT_FRAGMENT: fade-out
+
+[311/400]
+ID: product:knowledge:option:structure:outro:extended
+TYPE: parameter_option
+SECTION: structure
+PARENT: Outro
+TERM: Extended Outro
+SOURCE_ID: product:option:structure:outro:extended
+PROMPT_FRAGMENT: extended outro
+
+[312/400]
+ID: product:knowledge:statement:era:60s-studio
+TYPE: statement
+SECTION: era
+PARENT: Easy statement
+TERM: 1960s studio
+SOURCE_ID: product:statement:era:60s-studio
+PROMPT_FRAGMENT: 1960s studio production
+
+[313/400]
+ID: product:knowledge:statement:era:70s-warm
+TYPE: statement
+SECTION: era
+PARENT: Easy statement
+TERM: 1970s warm studio
+SOURCE_ID: product:statement:era:70s-warm
+PROMPT_FRAGMENT: 1970s warm studio production
+
+[314/400]
+ID: product:knowledge:statement:era:80s-polished
+TYPE: statement
+SECTION: era
+PARENT: Easy statement
+TERM: 1980s polished
+SOURCE_ID: product:statement:era:80s-polished
+PROMPT_FRAGMENT: 1980s polished studio production
+
+[315/400]
+ID: product:knowledge:statement:era:90s-studio
+TYPE: statement
+SECTION: era
+PARENT: Easy statement
+TERM: 1990s studio
+SOURCE_ID: product:statement:era:90s-studio
+PROMPT_FRAGMENT: 1990s studio production
+
+[316/400]
+ID: product:knowledge:statement:era:modern-polished
+TYPE: statement
+SECTION: era
+PARENT: Easy statement
+TERM: Modern polished
+SOURCE_ID: product:statement:era:modern-polished
+PROMPT_FRAGMENT: contemporary polished studio production
+
+[317/400]
+ID: product:knowledge:statement:bpm:slow-72
+TYPE: statement
+SECTION: bpm
+PARENT: Easy statement
+TERM: Slow
+SOURCE_ID: product:statement:bpm:slow-72
+PROMPT_FRAGMENT: 72
+
+[318/400]
+ID: product:knowledge:statement:bpm:laid-back-84
+TYPE: statement
+SECTION: bpm
+PARENT: Easy statement
+TERM: Laid-back
+SOURCE_ID: product:statement:bpm:laid-back-84
+PROMPT_FRAGMENT: 84
+
+[319/400]
+ID: product:knowledge:statement:bpm:head-nod-96
+TYPE: statement
+SECTION: bpm
+PARENT: Easy statement
+TERM: Head-nod
+SOURCE_ID: product:statement:bpm:head-nod-96
+PROMPT_FRAGMENT: 96
+
+[320/400]
+ID: product:knowledge:statement:bpm:midtempo-110
+TYPE: statement
+SECTION: bpm
+PARENT: Easy statement
+TERM: Midtempo
+SOURCE_ID: product:statement:bpm:midtempo-110
+PROMPT_FRAGMENT: 110
+
+[321/400]
+ID: product:knowledge:statement:bpm:driving-120
+TYPE: statement
+SECTION: bpm
+PARENT: Easy statement
+TERM: Driving
+SOURCE_ID: product:statement:bpm:driving-120
+PROMPT_FRAGMENT: 120
+
+[322/400]
+ID: product:knowledge:statement:bpm:club-128
+TYPE: statement
+SECTION: bpm
+PARENT: Easy statement
+TERM: Club drive
+SOURCE_ID: product:statement:bpm:club-128
+PROMPT_FRAGMENT: 128
+
+[323/400]
+ID: product:knowledge:statement:key_mode:c-major
+TYPE: statement
+SECTION: key_mode
+PARENT: Easy statement
+TERM: C major
+SOURCE_ID: product:statement:key_mode:c-major
+PROMPT_FRAGMENT: C major
+
+[324/400]
+ID: product:knowledge:statement:key_mode:e-minor
+TYPE: statement
+SECTION: key_mode
+PARENT: Easy statement
+TERM: E minor
+SOURCE_ID: product:statement:key_mode:e-minor
+PROMPT_FRAGMENT: E minor
+
+[325/400]
+ID: product:knowledge:statement:key_mode:a-minor
+TYPE: statement
+SECTION: key_mode
+PARENT: Easy statement
+TERM: A minor
+SOURCE_ID: product:statement:key_mode:a-minor
+PROMPT_FRAGMENT: A minor
+
+[326/400]
+ID: product:knowledge:statement:key_mode:bb-major
+TYPE: statement
+SECTION: key_mode
+PARENT: Easy statement
+TERM: B-flat major
+SOURCE_ID: product:statement:key_mode:bb-major
+PROMPT_FRAGMENT: B-flat major
+
+[327/400]
+ID: product:knowledge:statement:key_mode:dorian
+TYPE: statement
+SECTION: key_mode
+PARENT: Easy statement
+TERM: Dorian color
+SOURCE_ID: product:statement:key_mode:dorian
+PROMPT_FRAGMENT: Dorian modal color
+
+[328/400]
+ID: product:knowledge:statement:key_mode:mixolydian
+TYPE: statement
+SECTION: key_mode
+PARENT: Easy statement
+TERM: Mixolydian color
+SOURCE_ID: product:statement:key_mode:mixolydian
+PROMPT_FRAGMENT: Mixolydian modal color
+
+[329/400]
+ID: product:knowledge:statement:groove:straight-backbeat
+TYPE: statement
+SECTION: groove
+PARENT: Easy statement
+TERM: Straight backbeat
+SOURCE_ID: product:statement:groove:straight-backbeat
+PROMPT_FRAGMENT: straight pocket, firm backbeat
+
+[330/400]
+ID: product:knowledge:statement:groove:laid-back-swing
+TYPE: statement
+SECTION: groove
+PARENT: Easy statement
+TERM: Laid-back swing
+SOURCE_ID: product:statement:groove:laid-back-swing
+PROMPT_FRAGMENT: laid-back swung pocket
+
+[331/400]
+ID: product:knowledge:statement:groove:syncopated-kick
+TYPE: statement
+SECTION: groove
+PARENT: Easy statement
+TERM: Syncopated pocket
+SOURCE_ID: product:statement:groove:syncopated-kick
+PROMPT_FRAGMENT: syncopated kick-led pocket
+
+[332/400]
+ID: product:knowledge:statement:groove:rock-drive
+TYPE: statement
+SECTION: groove
+PARENT: Easy statement
+TERM: Driving backbeat
+SOURCE_ID: product:statement:groove:rock-drive
+PROMPT_FRAGMENT: driving rock pulse, strong backbeat
+
+[333/400]
+ID: product:knowledge:statement:groove:half-time
+TYPE: statement
+SECTION: groove
+PARENT: Easy statement
+TERM: Heavy half-time
+SOURCE_ID: product:statement:groove:half-time
+PROMPT_FRAGMENT: heavy half-time pocket
+
+[334/400]
+ID: product:knowledge:statement:groove:four-floor
+TYPE: statement
+SECTION: groove
+PARENT: Easy statement
+TERM: Four-on-the-floor
+SOURCE_ID: product:statement:groove:four-floor
+PROMPT_FRAGMENT: steady four-on-the-floor drive
+
+[335/400]
+ID: product:knowledge:statement:melody:motif-hook
+TYPE: statement
+SECTION: melody
+PARENT: Easy statement
+TERM: Motif hook
+SOURCE_ID: product:statement:melody:motif-hook
+PROMPT_FRAGMENT: short motif-led hook
+
+[336/400]
+ID: product:knowledge:statement:melody:descending-hook
+TYPE: statement
+SECTION: melody
+PARENT: Easy statement
+TERM: Descending hook
+SOURCE_ID: product:statement:melody:descending-hook
+PROMPT_FRAGMENT: descending hook phrase
+
+[337/400]
+ID: product:knowledge:statement:melody:call-response
+TYPE: statement
+SECTION: melody
+PARENT: Easy statement
+TERM: Call & response
+SOURCE_ID: product:statement:melody:call-response
+PROMPT_FRAGMENT: call-and-response lead phrases
+
+[338/400]
+ID: product:knowledge:statement:melody:sparse-cell
+TYPE: statement
+SECTION: melody
+PARENT: Easy statement
+TERM: Sparse motif
+SOURCE_ID: product:statement:melody:sparse-cell
+PROMPT_FRAGMENT: restrained sparse melodic cell
+
+[339/400]
+ID: product:knowledge:statement:melody:rising-phrase
+TYPE: statement
+SECTION: melody
+PARENT: Easy statement
+TERM: Rising phrase
+SOURCE_ID: product:statement:melody:rising-phrase
+PROMPT_FRAGMENT: rising melodic phrase with a clear peak
+
+[340/400]
+ID: product:knowledge:statement:harmony:major-pop
+TYPE: statement
+SECTION: harmony
+PARENT: Easy statement
+TERM: Bright major
+SOURCE_ID: product:statement:harmony:major-pop
+PROMPT_FRAGMENT: bright major-key progression
+
+[341/400]
+ID: product:knowledge:statement:harmony:minor-loop
+TYPE: statement
+SECTION: harmony
+PARENT: Easy statement
+TERM: Dark minor loop
+SOURCE_ID: product:statement:harmony:minor-loop
+PROMPT_FRAGMENT: dark minor-key loop
+
+[342/400]
+ID: product:knowledge:statement:harmony:suspended
+TYPE: statement
+SECTION: harmony
+PARENT: Easy statement
+TERM: Suspended color
+SOURCE_ID: product:statement:harmony:suspended
+PROMPT_FRAGMENT: suspended harmony with gentle tension
+
+[343/400]
+ID: product:knowledge:statement:harmony:blues
+TYPE: statement
+SECTION: harmony
+PARENT: Easy statement
+TERM: Blues dominant
+SOURCE_ID: product:statement:harmony:blues
+PROMPT_FRAGMENT: dominant-heavy blues cycle
+
+[344/400]
+ID: product:knowledge:statement:harmony:modal-vamp
+TYPE: statement
+SECTION: harmony
+PARENT: Easy statement
+TERM: Modal vamp
+SOURCE_ID: product:statement:harmony:modal-vamp
+PROMPT_FRAGMENT: static vamp with modal color
+
+[345/400]
+ID: product:knowledge:statement:drums:acoustic-backbeat
+TYPE: statement
+SECTION: drums
+PARENT: Easy statement
+TERM: Acoustic backbeat
+SOURCE_ID: product:statement:drums:acoustic-backbeat
+PROMPT_FRAGMENT: acoustic kit, firm snare backbeat, restrained fills
+
+[346/400]
+ID: product:knowledge:statement:drums:dry-punchy
+TYPE: statement
+SECTION: drums
+PARENT: Easy statement
+TERM: Dry & punchy
+SOURCE_ID: product:statement:drums:dry-punchy
+PROMPT_FRAGMENT: dry punchy kick and snare, tight hats
+
+[347/400]
+ID: product:knowledge:statement:drums:crisp-restrained
+TYPE: statement
+SECTION: drums
+PARENT: Easy statement
+TERM: Crisp & restrained
+SOURCE_ID: product:statement:drums:crisp-restrained
+PROMPT_FRAGMENT: crisp snare, tight hats, restrained fills
+
+[348/400]
+ID: product:knowledge:statement:drums:electronic-tight
+TYPE: statement
+SECTION: drums
+PARENT: Easy statement
+TERM: Electronic tight
+SOURCE_ID: product:statement:drums:electronic-tight
+PROMPT_FRAGMENT: electronic kick and snare, tight hats
+
+[349/400]
+ID: product:knowledge:statement:drums:sparse-percussion
+TYPE: statement
+SECTION: drums
+PARENT: Easy statement
+TERM: Sparse percussion
+SOURCE_ID: product:statement:drums:sparse-percussion
+PROMPT_FRAGMENT: sparse percussion-led pattern
+
+[350/400]
+ID: product:knowledge:statement:bass:electric-roots
+TYPE: statement
+SECTION: bass
+PARENT: Easy statement
+TERM: Warm electric roots
+SOURCE_ID: product:statement:bass:electric-roots
+PROMPT_FRAGMENT: warm electric bass on roots
+
+[351/400]
+ID: product:knowledge:statement:bass:short-kick
+TYPE: statement
+SECTION: bass
+PARENT: Easy statement
+TERM: Short & locked
+SOURCE_ID: product:statement:bass:short-kick
+PROMPT_FRAGMENT: short punchy bass notes locked to kick
+
+[352/400]
+ID: product:knowledge:statement:bass:sync-synth
+TYPE: statement
+SECTION: bass
+PARENT: Easy statement
+TERM: Syncopated synth
+SOURCE_ID: product:statement:bass:sync-synth
+PROMPT_FRAGMENT: syncopated synth bass movement
+
+[353/400]
+ID: product:knowledge:statement:bass:sustained
+TYPE: statement
+SECTION: bass
+PARENT: Easy statement
+TERM: Sustained low end
+SOURCE_ID: product:statement:bass:sustained
+PROMPT_FRAGMENT: long sustained low-end bed
+
+[354/400]
+ID: product:knowledge:statement:bass:melodic
+TYPE: statement
+SECTION: bass
+PARENT: Easy statement
+TERM: Melodic movement
+SOURCE_ID: product:statement:bass:melodic
+PROMPT_FRAGMENT: melodic bass movement with occasional pickups
+
+[355/400]
+ID: product:knowledge:statement:exciters:tambourine
+TYPE: statement
+SECTION: exciters
+PARENT: Easy statement
+TERM: Tambourine accents
+SOURCE_ID: product:statement:exciters:tambourine
+PROMPT_FRAGMENT: tambourine accents on selected backbeats
+
+[356/400]
+ID: product:knowledge:statement:exciters:hand-perc
+TYPE: statement
+SECTION: exciters
+PARENT: Easy statement
+TERM: Sparse hand percussion
+SOURCE_ID: product:statement:exciters:hand-perc
+PROMPT_FRAGMENT: sparse hand percussion
+
+[357/400]
+ID: product:knowledge:statement:exciters:shaker
+TYPE: statement
+SECTION: exciters
+PARENT: Easy statement
+TERM: Shaker pulse
+SOURCE_ID: product:statement:exciters:shaker
+PROMPT_FRAGMENT: light shaker subdivision
+
+[358/400]
+ID: product:knowledge:statement:exciters:claps
+TYPE: statement
+SECTION: exciters
+PARENT: Easy statement
+TERM: Occasional claps
+SOURCE_ID: product:statement:exciters:claps
+PROMPT_FRAGMENT: occasional dry handclaps
+
+[359/400]
+ID: product:knowledge:statement:exciters:sweeps
+TYPE: statement
+SECTION: exciters
+PARENT: Easy statement
+TERM: Transition sweeps
+SOURCE_ID: product:statement:exciters:sweeps
+PROMPT_FRAGMENT: short noise sweeps at transitions
+
+[360/400]
+ID: product:knowledge:statement:texture:warm-analog
+TYPE: statement
+SECTION: texture
+PARENT: Easy statement
+TERM: Warm analog
+SOURCE_ID: product:statement:texture:warm-analog
+PROMPT_FRAGMENT: warm analog texture
+
+[361/400]
+ID: product:knowledge:statement:texture:clean-polished
+TYPE: statement
+SECTION: texture
+PARENT: Easy statement
+TERM: Clean polished
+SOURCE_ID: product:statement:texture:clean-polished
+PROMPT_FRAGMENT: clean polished surface
+
+[362/400]
+ID: product:knowledge:statement:texture:dry-intimate
+TYPE: statement
+SECTION: texture
+PARENT: Easy statement
+TERM: Dry intimate
+SOURCE_ID: product:statement:texture:dry-intimate
+PROMPT_FRAGMENT: dry intimate texture
+
+[363/400]
+ID: product:knowledge:statement:texture:filtered-grain
+TYPE: statement
+SECTION: texture
+PARENT: Easy statement
+TERM: Filtered grain
+SOURCE_ID: product:statement:texture:filtered-grain
+PROMPT_FRAGMENT: filtered grainy texture
+
+[364/400]
+ID: product:knowledge:statement:texture:airy
+TYPE: statement
+SECTION: texture
+PARENT: Easy statement
+TERM: Airy ambience
+SOURCE_ID: product:statement:texture:airy
+PROMPT_FRAGMENT: airy ambient layer
+
+[365/400]
+ID: product:knowledge:statement:vocal:instrumental
+TYPE: statement
+SECTION: vocal
+PARENT: Easy statement
+TERM: Instrumental
+SOURCE_ID: product:statement:vocal:instrumental
+PROMPT_FRAGMENT: instrumental / no lead vocal
+
+[366/400]
+ID: product:knowledge:statement:vocal:intimate
+TYPE: statement
+SECTION: vocal
+PARENT: Easy statement
+TERM: Intimate lead
+SOURCE_ID: product:statement:vocal:intimate
+PROMPT_FRAGMENT: intimate close lead vocal
+
+[367/400]
+ID: product:knowledge:statement:vocal:airy
+TYPE: statement
+SECTION: vocal
+PARENT: Easy statement
+TERM: Airy lead
+SOURCE_ID: product:statement:vocal:airy
+PROMPT_FRAGMENT: breathy airy lead vocal
+
+[368/400]
+ID: product:knowledge:statement:vocal:gritty
+TYPE: statement
+SECTION: vocal
+PARENT: Easy statement
+TERM: Gritty lead
+SOURCE_ID: product:statement:vocal:gritty
+PROMPT_FRAGMENT: gritty forward lead vocal
+
+[369/400]
+ID: product:knowledge:statement:vocal:layered
+TYPE: statement
+SECTION: vocal
+PARENT: Easy statement
+TERM: Layered harmonies
+SOURCE_ID: product:statement:vocal:layered
+PROMPT_FRAGMENT: lead vocal with stacked harmonies
+
+[370/400]
+ID: product:knowledge:statement:dynamics:restrained-build
+TYPE: statement
+SECTION: dynamics
+PARENT: Easy statement
+TERM: Restrained build
+SOURCE_ID: product:statement:dynamics:restrained-build
+PROMPT_FRAGMENT: restrained opening with gradual expansion
+
+[371/400]
+ID: product:knowledge:statement:dynamics:sectional
+TYPE: statement
+SECTION: dynamics
+PARENT: Easy statement
+TERM: Sectional contrast
+SOURCE_ID: product:statement:dynamics:sectional
+PROMPT_FRAGMENT: controlled sectional contrast
+
+[372/400]
+ID: product:knowledge:statement:dynamics:broad-arc
+TYPE: statement
+SECTION: dynamics
+PARENT: Easy statement
+TERM: Broad arc
+SOURCE_ID: product:statement:dynamics:broad-arc
+PROMPT_FRAGMENT: broad dynamic arc with clear peaks
+
+[373/400]
+ID: product:knowledge:statement:dynamics:steady
+TYPE: statement
+SECTION: dynamics
+PARENT: Easy statement
+TERM: Steady energy
+SOURCE_ID: product:statement:dynamics:steady
+PROMPT_FRAGMENT: steady controlled energy
+
+[374/400]
+ID: product:knowledge:statement:dynamics:final-peak
+TYPE: statement
+SECTION: dynamics
+PARENT: Easy statement
+TERM: Final peak
+SOURCE_ID: product:statement:dynamics:final-peak
+PROMPT_FRAGMENT: gradual build toward a final peak
+
+[375/400]
+ID: product:knowledge:statement:space_mix:dry-center
+TYPE: statement
+SECTION: space_mix
+PARENT: Easy statement
+TERM: Dry centered
+SOURCE_ID: product:statement:space_mix:dry-center
+PROMPT_FRAGMENT: dry center, controlled studio reflections
+
+[376/400]
+ID: product:knowledge:statement:space_mix:wide-low-center
+TYPE: statement
+SECTION: space_mix
+PARENT: Easy statement
+TERM: Wide / centered low end
+SOURCE_ID: product:statement:space_mix:wide-low-center
+PROMPT_FRAGMENT: wide upper layers, centered low end
+
+[377/400]
+ID: product:knowledge:statement:space_mix:forward-rhythm
+TYPE: statement
+SECTION: space_mix
+PARENT: Easy statement
+TERM: Forward rhythm section
+SOURCE_ID: product:statement:space_mix:forward-rhythm
+PROMPT_FRAGMENT: forward rhythm section with controlled depth
+
+[378/400]
+ID: product:knowledge:statement:space_mix:mono-era
+TYPE: statement
+SECTION: space_mix
+PARENT: Easy statement
+TERM: Mono-era dry
+SOURCE_ID: product:statement:space_mix:mono-era
+PROMPT_FRAGMENT: narrow mono-era image, dry center
+
+[379/400]
+ID: product:knowledge:statement:space_mix:spacious
+TYPE: statement
+SECTION: space_mix
+PARENT: Easy statement
+TERM: Spacious controlled
+SOURCE_ID: product:statement:space_mix:spacious
+PROMPT_FRAGMENT: wide stereo image with controlled spacious depth
+
+[380/400]
+ID: product:knowledge:statement:production:clean-polished
+TYPE: statement
+SECTION: production
+PARENT: Easy statement
+TERM: Clean polished
+SOURCE_ID: product:statement:production:clean-polished
+PROMPT_FRAGMENT: clean polished studio production
+
+[381/400]
+ID: product:knowledge:statement:production:raw-analog
+TYPE: statement
+SECTION: production
+PARENT: Easy statement
+TERM: Raw analog
+SOURCE_ID: product:statement:production:raw-analog
+PROMPT_FRAGMENT: raw vintage analog production
+
+[382/400]
+ID: product:knowledge:statement:production:controlled
+TYPE: statement
+SECTION: production
+PARENT: Easy statement
+TERM: Controlled punch
+SOURCE_ID: product:statement:production:controlled
+PROMPT_FRAGMENT: controlled transients, clear low end
+
+[383/400]
+ID: product:knowledge:statement:production:tape
+TYPE: statement
+SECTION: production
+PARENT: Easy statement
+TERM: Tape warmth
+SOURCE_ID: product:statement:production:tape
+PROMPT_FRAGMENT: warm tape-like saturation
+
+[384/400]
+ID: product:knowledge:statement:production:modern-punch
+TYPE: statement
+SECTION: production
+PARENT: Easy statement
+TERM: Modern punch
+SOURCE_ID: product:statement:production:modern-punch
+PROMPT_FRAGMENT: polished modern production with strong controlled transients
+
+[385/400]
+ID: product:knowledge:statement:production:lofi
+TYPE: statement
+SECTION: production
+PARENT: Easy statement
+TERM: Lo-fi texture
+SOURCE_ID: product:statement:production:lofi
+PROMPT_FRAGMENT: lo-fi textured production
+
+[386/400]
+ID: product:knowledge:statement:structure:hook-led
+TYPE: statement
+SECTION: structure
+PARENT: Easy statement
+TERM: Hook-led
+SOURCE_ID: product:statement:structure:hook-led
+PROMPT_FRAGMENT: short hook-led song form
+
+[387/400]
+ID: product:knowledge:statement:structure:verse-chorus
+TYPE: statement
+SECTION: structure
+PARENT: Easy statement
+TERM: Verse / chorus
+SOURCE_ID: product:statement:structure:verse-chorus
+PROMPT_FRAGMENT: verse-chorus form with short intro and outro
+
+[388/400]
+ID: product:knowledge:statement:structure:extended
+TYPE: statement
+SECTION: structure
+PARENT: Easy statement
+TERM: Extended development
+SOURCE_ID: product:statement:structure:extended
+PROMPT_FRAGMENT: extended instrumental development
+
+[389/400]
+ID: product:knowledge:statement:structure:build
+TYPE: statement
+SECTION: structure
+PARENT: Easy statement
+TERM: Build to peak
+SOURCE_ID: product:statement:structure:build
+PROMPT_FRAGMENT: gradual opening with a final peak
+
+[390/400]
+ID: product:knowledge:statement:structure:cyclic
+TYPE: statement
+SECTION: structure
+PARENT: Easy statement
+TERM: Cyclic form
+SOURCE_ID: product:statement:structure:cyclic
+PROMPT_FRAGMENT: cyclic theme-and-variation form
+
+[391/400]
+ID: product:knowledge:exclude:muddy-low-end
+TYPE: exclude
+SECTION: exclude
+PARENT: Exclude
+TERM: Muddy low end
+SOURCE_ID: product:exclude:muddy-low-end
+PROMPT_FRAGMENT: muddy low end
+
+[392/400]
+ID: product:knowledge:exclude:excessive-reverb
+TYPE: exclude
+SECTION: exclude
+PARENT: Exclude
+TERM: Excessive reverb
+SOURCE_ID: product:exclude:excessive-reverb
+PROMPT_FRAGMENT: excessive reverb
+
+[393/400]
+ID: product:knowledge:exclude:competing-leads
+TYPE: exclude
+SECTION: exclude
+PARENT: Exclude
+TERM: Competing lead instruments
+SOURCE_ID: product:exclude:competing-leads
+PROMPT_FRAGMENT: competing lead instruments
+
+[394/400]
+ID: product:knowledge:exclude:busy-fills
+TYPE: exclude
+SECTION: exclude
+PARENT: Exclude
+TERM: Busy fills
+SOURCE_ID: product:exclude:busy-fills
+PROMPT_FRAGMENT: overly busy fills
+
+[395/400]
+ID: product:knowledge:exclude:harsh-highs
+TYPE: exclude
+SECTION: exclude
+PARENT: Exclude
+TERM: Harsh high end
+SOURCE_ID: product:exclude:harsh-highs
+PROMPT_FRAGMENT: harsh brittle high end
+
+[396/400]
+ID: product:knowledge:exclude:overcompressed
+TYPE: exclude
+SECTION: exclude
+PARENT: Exclude
+TERM: Overcompression
+SOURCE_ID: product:exclude:overcompressed
+PROMPT_FRAGMENT: overcompressed mastering
+
+[397/400]
+ID: product:knowledge:exclude:constant-density
+TYPE: exclude
+SECTION: exclude
+PARENT: Exclude
+TERM: Constant maximum density
+SOURCE_ID: product:exclude:constant-density
+PROMPT_FRAGMENT: constant maximum density
+
+[398/400]
+ID: product:knowledge:exclude:glossy-pop-synths
+TYPE: exclude
+SECTION: exclude
+PARENT: Exclude
+TERM: Glossy pop synths
+SOURCE_ID: product:exclude:glossy-pop-synths
+PROMPT_FRAGMENT: bright glossy pop synths
+
+[399/400]
+ID: product:knowledge:exclude:generic-risers
+TYPE: exclude
+SECTION: exclude
+PARENT: Exclude
+TERM: Generic risers
+SOURCE_ID: product:exclude:generic-risers
+PROMPT_FRAGMENT: generic oversized risers
+
+[400/400]
+ID: product:knowledge:exclude:washed-drums
+TYPE: exclude
+SECTION: exclude
+PARENT: Exclude
+TERM: Washed-out drums
+SOURCE_ID: product:exclude:washed-drums
+PROMPT_FRAGMENT: cavernous washed-out drum reverb
