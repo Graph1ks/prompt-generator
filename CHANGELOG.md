@@ -79,6 +79,7 @@ This file records meaningful product, behavior, compatibility, security, data, a
 
 ### Changed
 
+- Deterministic Live Prompt Style sections now render as text-first compact rows rather than padded full-row buttons; reverse source navigation uses a separate gutter action that does not affect line wrapping or height.
 - Manual Style editing is now guarded as an explicit final-output override: the first unlock explains that later Studio/MusicSpec edits will no longer update the manual Style, points ongoing structured work to the matching Advanced custom wording field, and creates no override until the user confirms.
 - Runtime Pack export now merges, searches, fingerprints and validates the Product Knowledge Foundation independently from `knowledge.sqlite` and the Product Editor Foundation.
 
