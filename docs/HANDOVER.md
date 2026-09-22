@@ -1,7 +1,7 @@
 # Handover — Explain UX + authored Product Knowledge
 
 **Last updated:** 2026-09-22  
-**Handoff target:** owner-local Runtime/Explain + project-library acceptance, then remaining Studio ergonomics  
+**Handoff target:** owner-local Runtime/Explain/project-library acceptance plus ordinary-facet state-rail smoke, then remaining Studio ergonomics  
 **Milestone:** Database V1 remains closed; Explain is selection-time/portal-based; Product Knowledge v1 is fully authored; multi-project local library/naming/duplicate/import/export is implemented on ProjectStorage
 
 ## Read this first
@@ -261,6 +261,14 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Current first consumers: selected Genres, facet section labels, Advanced parameter headings and Instruments section heading.
 - Locale resolution is UI-locale -> English fallback; renderer language remains independent.
 - Favorite hold durations remain 0.8 s add / 1.0 s remove internally, but duration instructions are intentionally hidden from normal UI/hover copy.
+
+## Ordinary-facet ergonomics carry-forward
+
+- Ordinary FacetEditor cards now expose a compact current-state rail above the active Easy/Advanced controls.
+- The rail shows selected statements/options/numeric values plus custom wording using Runtime-backed labels, and supports direct per-item removal or facet-wide clear.
+- Easy/Advanced switching is still view-only; the rail is a view onto current MusicSpec state and does not mutate anything until the user removes/clears an item.
+- Mobile uses wrapped 44 px current-state chips rather than a nested horizontal scroller.
+- Explain remains available on mobile from the bottom dock even when the constrained top bar hides its desktop toggle.
 
 ## Project library v1 carry-forward
 
