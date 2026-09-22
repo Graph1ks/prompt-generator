@@ -262,6 +262,13 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Locale resolution is UI-locale -> English fallback; renderer language remains independent.
 - Favorite hold durations remain 0.8 s add / 1.0 s remove internally, but duration instructions are intentionally hidden from normal UI/hover copy.
 
+## Clipboard/copy carry-forward
+
+- Copy uses one active-output validity rule across the header, Live Prompt footer, mobile dock and `Ctrl / ⌘ + Enter`.
+- Clipboard writes now degrade from the modern API to legacy copy and finally to a manual-copy dialog/sheet with the clean plaintext preselected.
+- The final fallback is deliberate product UI, not an error state; it never injects explanation chrome into the copied text.
+- Keyboard copy is disabled while project/manual-copy overlays are active.
+
 ## Ordinary-facet ergonomics carry-forward
 
 - Ordinary FacetEditor cards now expose a compact current-state rail above the active Easy/Advanced controls.
