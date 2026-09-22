@@ -79,6 +79,7 @@ This file records meaningful product, behavior, compatibility, security, data, a
 
 ### Changed
 
+- Manual Style editing is now guarded as an explicit final-output override: the first unlock explains that later Studio/MusicSpec edits will no longer update the manual Style, points ongoing structured work to the matching Advanced custom wording field, and creates no override until the user confirms.
 - Runtime Pack export now merges, searches, fingerprints and validates the Product Knowledge Foundation independently from `knowledge.sqlite` and the Product Editor Foundation.
 
 - Easy and Advanced now behave as mutually exclusive authoring layers once a facet is edited, preventing contradictory mixed states.
