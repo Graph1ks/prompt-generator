@@ -12,6 +12,9 @@ import {
   setFacetCustomText,
   removeFacetSelection,
   hasFacetSelection,
+  setExcludeItem,
+  removeExcludeItem,
+  hasExcludeItem,
   setGenreInfluence,
   validateMusicSpec,
 } from "../dist/index.js";
@@ -182,5 +185,31 @@ test("sets and clears facet custom text without disturbing selections", () => {
   spec = setFacetCustomText(spec, "texture", null);
   assert.equal(spec.facets.texture.custom_text, null);
   assert.equal(spec.facets.texture.selections.length, 1);
+  assert.equal(validateMusicSpec(spec).valid, true);
+});
+
+
+test("adds and removes stable Exclude items independently from facet state", () => {
+  let spec = createMusicSpec();
+  spec = setExcludeItem(spec, {
+    id: "exclude:glossy-pop-synths",
+    text: "bright glossy pop synths",
+    origin: "user",
+    locked: false,
+  });
+  assert.equal(hasExcludeItem(spec, "exclude:glossy-pop-synths"), true);
+  assert.equal(spec.exclude.length, 1);
+
+  spec = setExcludeItem(spec, {
+    id: "exclude:glossy-pop-synths",
+    text: "bright glossy pop synths",
+    origin: "user",
+    locked: true,
+  });
+  assert.equal(spec.exclude.length, 1);
+  assert.equal(spec.exclude[0].locked, true);
+
+  spec = removeExcludeItem(spec, "exclude:glossy-pop-synths");
+  assert.equal(spec.exclude.length, 0);
   assert.equal(validateMusicSpec(spec).valid, true);
 });
