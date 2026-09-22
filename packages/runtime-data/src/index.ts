@@ -96,6 +96,68 @@ export interface RuntimeGenresPayload {
   readonly genres: readonly RuntimeGenre[];
 }
 
+export interface RuntimeInstrumentFamily {
+  readonly id: string;
+  readonly label: string;
+  readonly knowledge_entry_id: string | null;
+}
+
+export interface RuntimeInstrument {
+  readonly id: string;
+  readonly label: string;
+  readonly normalized: string;
+  readonly family_id: string | null;
+  readonly knowledge_entry_id: string | null;
+  readonly aliases: readonly string[];
+  readonly traits: readonly Readonly<Record<string, unknown>>[];
+}
+
+export interface RuntimeInstrumentsPayload {
+  readonly schema: "vgine-runtime-instruments-v1";
+  readonly families: readonly RuntimeInstrumentFamily[];
+  readonly instruments: readonly RuntimeInstrument[];
+}
+
+export interface RuntimeExpressionInstrumentLink {
+  readonly instrument_id: string;
+  readonly role: string;
+  readonly ordinal: number;
+}
+
+export interface RuntimeExpressionConceptLink {
+  readonly entry_id: string;
+  readonly role: string | null;
+  readonly ordinal: number;
+}
+
+export interface RuntimeInstrumentExpression {
+  readonly id: string;
+  readonly label: string;
+  readonly normalized: string;
+  readonly output_text: string;
+  readonly source_kind: string;
+  readonly status: string;
+  readonly selectable: boolean;
+  readonly base_instrument_id: string | null;
+  readonly occurrence_count: number;
+  readonly track_count: number;
+  readonly decomposition_state: string;
+  readonly semantic_coverage: number;
+  readonly residual_terms: readonly unknown[];
+  readonly instruments: readonly RuntimeExpressionInstrumentLink[];
+  readonly concepts: readonly RuntimeExpressionConceptLink[];
+}
+
+export interface RuntimeInstrumentExpressionsPayload {
+  readonly schema: "vgine-runtime-instrument-expressions-v1";
+  readonly expressions: readonly RuntimeInstrumentExpression[];
+}
+
+export interface RuntimeInstrumentLibrary {
+  readonly instruments: RuntimeInstrumentsPayload;
+  readonly expressions: RuntimeInstrumentExpressionsPayload;
+}
+
 export type RuntimeSearchKind = "genre" | "instrument_expression" | "knowledge";
 
 export interface RuntimeSearchDocument {
@@ -190,6 +252,13 @@ function asNullableString(value: unknown, path: string): string | null {
 
 function asBoolean(value: unknown, path: string): boolean {
   if (typeof value !== "boolean") fail("invalid_boolean", path, `${path} must be boolean`);
+  return value;
+}
+
+function asNumber(value: unknown, path: string): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    fail("invalid_number", path, `${path} must be a finite number`);
+  }
   return value;
 }
 
@@ -385,6 +454,100 @@ export function parseRuntimeGenres(value: unknown): RuntimeGenresPayload {
   return { schema: "vgine-runtime-genres-v1", genres };
 }
 
+export function parseRuntimeInstruments(value: unknown): RuntimeInstrumentsPayload {
+  const root = asRecord(value, "instruments");
+  assertSchema(root, "vgine-runtime-instruments-v1", "instruments");
+
+  const families = asArray(root.families, "instruments.families").map((entry, index) => {
+    const path = `instruments.families[${index}]`;
+    const row = asRecord(entry, path);
+    return {
+      id: asString(row.id, `${path}.id`),
+      label: asString(row.label, `${path}.label`),
+      knowledge_entry_id: asNullableString(row.knowledge_entry_id, `${path}.knowledge_entry_id`),
+    };
+  });
+
+  const instruments = asArray(root.instruments, "instruments.instruments").map((entry, index) => {
+    const path = `instruments.instruments[${index}]`;
+    const row = asRecord(entry, path);
+    return {
+      id: asString(row.id, `${path}.id`),
+      label: asString(row.label, `${path}.label`),
+      normalized: asString(row.normalized, `${path}.normalized`),
+      family_id: asNullableString(row.family_id, `${path}.family_id`),
+      knowledge_entry_id: asNullableString(row.knowledge_entry_id, `${path}.knowledge_entry_id`),
+      aliases: asStringArray(row.aliases, `${path}.aliases`),
+      traits: asArray(row.traits, `${path}.traits`).map((trait, traitIndex) =>
+        asRecord(trait, `${path}.traits[${traitIndex}]`),
+      ),
+    };
+  });
+
+  return { schema: "vgine-runtime-instruments-v1", families, instruments };
+}
+
+export function parseRuntimeInstrumentExpressions(
+  value: unknown,
+): RuntimeInstrumentExpressionsPayload {
+  const root = asRecord(value, "instrument-expressions");
+  assertSchema(
+    root,
+    "vgine-runtime-instrument-expressions-v1",
+    "instrument-expressions",
+  );
+
+  const expressions = asArray(
+    root.expressions,
+    "instrument-expressions.expressions",
+  ).map((entry, index) => {
+    const path = `instrument-expressions.expressions[${index}]`;
+    const row = asRecord(entry, path);
+    const instrumentLinks = asArray(row.instruments, `${path}.instruments`).map(
+      (linkEntry, linkIndex) => {
+        const linkPath = `${path}.instruments[${linkIndex}]`;
+        const link = asRecord(linkEntry, linkPath);
+        return {
+          instrument_id: asString(link.instrument_id, `${linkPath}.instrument_id`),
+          role: asString(link.role, `${linkPath}.role`),
+          ordinal: asInteger(link.ordinal, `${linkPath}.ordinal`),
+        };
+      },
+    );
+    const conceptLinks = asArray(row.concepts, `${path}.concepts`).map(
+      (linkEntry, linkIndex) => {
+        const linkPath = `${path}.concepts[${linkIndex}]`;
+        const link = asRecord(linkEntry, linkPath);
+        return {
+          entry_id: asString(link.entry_id, `${linkPath}.entry_id`),
+          role: asNullableString(link.role, `${linkPath}.role`),
+          ordinal: asInteger(link.ordinal, `${linkPath}.ordinal`),
+        };
+      },
+    );
+
+    return {
+      id: asString(row.id, `${path}.id`),
+      label: asString(row.label, `${path}.label`),
+      normalized: asString(row.normalized, `${path}.normalized`),
+      output_text: asString(row.output_text, `${path}.output_text`),
+      source_kind: asString(row.source_kind, `${path}.source_kind`),
+      status: asString(row.status, `${path}.status`),
+      selectable: asBoolean(row.selectable, `${path}.selectable`),
+      base_instrument_id: asNullableString(row.base_instrument_id, `${path}.base_instrument_id`),
+      occurrence_count: asInteger(row.occurrence_count, `${path}.occurrence_count`),
+      track_count: asInteger(row.track_count, `${path}.track_count`),
+      decomposition_state: asString(row.decomposition_state, `${path}.decomposition_state`),
+      semantic_coverage: asNumber(row.semantic_coverage, `${path}.semantic_coverage`),
+      residual_terms: asArray(row.residual_terms, `${path}.residual_terms`),
+      instruments: instrumentLinks,
+      concepts: conceptLinks,
+    };
+  });
+
+  return { schema: "vgine-runtime-instrument-expressions-v1", expressions };
+}
+
 export function parseRuntimeSearch(value: unknown): RuntimeSearchPayload {
   const root = asRecord(value, "search");
   assertSchema(root, "vgine-runtime-search-documents-v1", "search");
@@ -471,6 +634,45 @@ export async function loadRuntimeBootstrap(
   assertCount(manifest, "search.json", "documents", search.documents.length);
 
   return { manifest, core, genres, search };
+}
+
+export async function loadRuntimeInstrumentLibrary(
+  reader: RuntimePackReader,
+  manifest: RuntimeManifest,
+  options: LoadRuntimeBootstrapOptions = {},
+): Promise<RuntimeInstrumentLibrary> {
+  const [instrumentsText, expressionsText] = await Promise.all([
+    readAndVerify(reader, manifest, "instruments.json", options.sha256Hex),
+    readAndVerify(reader, manifest, "instrument-expressions.json", options.sha256Hex),
+  ]);
+
+  const instruments = parseRuntimeInstruments(
+    parseJson(instrumentsText, "instruments.json"),
+  );
+  const expressions = parseRuntimeInstrumentExpressions(
+    parseJson(expressionsText, "instrument-expressions.json"),
+  );
+
+  assertCount(
+    manifest,
+    "instruments.json",
+    "families",
+    instruments.families.length,
+  );
+  assertCount(
+    manifest,
+    "instruments.json",
+    "instruments",
+    instruments.instruments.length,
+  );
+  assertCount(
+    manifest,
+    "instrument-expressions.json",
+    "expressions",
+    expressions.expressions.length,
+  );
+
+  return { instruments, expressions };
 }
 
 export function buildCompilerKnowledge(bootstrap: RuntimeBootstrap): RuntimeCompilerKnowledge {
