@@ -2777,8 +2777,6 @@
   }
 
   .statement-card > span:first-child {
-    position: relative;
-    z-index: 3;
     font-size: 11px;
     font-weight: 750;
     line-height: 1.35;
