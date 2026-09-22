@@ -11,7 +11,6 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import type {
-  RuntimeContextDefinition,
   RuntimeDefinition,
   RuntimeKnowledgeEntry,
   RuntimeKnowledgePayload,
@@ -117,25 +116,6 @@ function bestDefinition(
   );
 }
 
-function bestContextDefinition(
-  definitions: readonly RuntimeContextDefinition[],
-  locale: string,
-  contextType?: string,
-  contextKey?: string,
-): RuntimeContextDefinition | null {
-  const candidates = definitions.filter((entry) => {
-    if (!contextType || !contextKey) return false;
-    return entry.context_type === contextType && entry.context_key === contextKey;
-  });
-  return (
-    [...candidates].sort(
-      (a, b) =>
-        localeRank(a.locale, locale) - localeRank(b.locale, locale) ||
-        b.revision - a.revision,
-    )[0] ?? null
-  );
-}
-
 export function KnowledgeTerm({
   entryId,
   label,
@@ -169,19 +149,6 @@ export function KnowledgeTerm({
     () => (entry ? bestDefinition(entry.definitions, locale) : null),
     [entry, locale],
   );
-  const contextDefinition = useMemo(
-    () =>
-      entry
-        ? bestContextDefinition(
-            entry.context_definitions,
-            locale,
-            contextType,
-            contextKey,
-          )
-        : null,
-    [contextKey, contextType, entry, locale],
-  );
-
   const related = useMemo(() => {
     if (state.status !== "ready" || !entry) return [];
     const byId = new Map(
@@ -398,6 +365,8 @@ export function KnowledgeTerm({
         aria-describedby={open ? cardId : undefined}
         aria-label={t("knowledge.toggle", { label })}
         data-pinned={pinned || undefined}
+        data-context-type={contextType}
+        data-context-key={contextKey}
         onPointerDown={(event) => event.stopPropagation()}
         onPointerEnter={(event) => {
           if (event.pointerType !== "touch") {
@@ -469,13 +438,6 @@ export function KnowledgeTerm({
                 <span className="knowledge-definition">
                   {definition?.text ?? t("knowledge.noDefinition")}
                 </span>
-
-                {contextDefinition && (
-                  <span className="knowledge-context">
-                    <small>{t("knowledge.context")}</small>
-                    <span>{contextDefinition.text}</span>
-                  </span>
-                )}
 
                 {related.length > 0 && (
                   <span className="knowledge-related">
