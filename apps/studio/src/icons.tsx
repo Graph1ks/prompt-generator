@@ -23,7 +23,9 @@ type IconName =
   | "download"
   | "upload"
   | "duplicate"
-  | "trash";
+  | "trash"
+  | "undo"
+  | "redo";
 
 const paths: Readonly<Record<IconName, ReactNode>> = {
   arrow: <><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></>,
@@ -49,6 +51,8 @@ const paths: Readonly<Record<IconName, ReactNode>> = {
   upload: <><path d="M12 15V3" /><path d="m7 8 5-5 5 5" /><path d="M4 20h16" /></>,
   duplicate: <><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" /><path d="M14 11v6M11 14h6" /></>,
   trash: <><path d="M4 7h16" /><path d="m9 3h6l1 4H8Z" /><path d="m6 7 1 14h10l1-14" /><path d="M10 11v6M14 11v6" /></>,
+  undo: <><path d="M9 7 4 12l5 5" /><path d="M5 12h8a6 6 0 0 1 6 6" /></>,
+  redo: <><path d="m15 7 5 5-5 5" /><path d="M19 12h-8a6 6 0 0 0-6 6" /></>,
 };
 
 export interface IconProps extends SVGProps<SVGSVGElement> {

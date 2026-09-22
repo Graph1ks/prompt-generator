@@ -202,6 +202,15 @@ Proceed in this order:
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
 
+## MusicSpec undo / redo
+
+- Studio now maintains a bounded in-memory undo/redo history for MusicSpec authoring changes without changing the persisted project schema.
+- Genre, Instrument, ordinary-facet, Exclude mutations and chapter-scoped resets pass through one history-aware commit path.
+- Desktop exposes Undo/Redo controls plus `Ctrl/⌘+Z`, `Ctrl/⌘+Shift+Z` and Windows-style `Ctrl+Y`.
+- History shortcuts do not intercept native text-entry undo inside search/custom/manual text fields and are suppressed while project/manual-copy overlays are active.
+- Repeated edits to the same stable selection ID (for example a dragged BPM value) and continuous custom-text typing coalesce briefly so one gesture does not create dozens of undo steps.
+- Project open/create/import/duplicate/switch clears session history; undo never crosses project boundaries. Autosave persists the resulting current MusicSpec normally, not the history stack.
+
 ## Sticky large-pool controls
 
 - Genre, Instruments and Exclude keep their search/filter/result-count controls reachable while long result sets scroll on desktop.

@@ -882,3 +882,18 @@ Explain is secondary assistance. When a Knowledge-linked term is also the visibl
 
 This refines ADR-005/ADR-045: inline explanation remains available before selection, but it cannot make the actual control harder to operate.
 
+## ADR-049 — Undo/redo is session-local MusicSpec history, not project data
+
+**Status:** accepted
+
+Studio authoring gets a bounded in-memory undo/redo history around MusicSpec mutations.
+
+- History is not serialized into `vgine-project-v1` and does not change `ProjectStorage`.
+- Opening, creating, importing, duplicating or switching projects clears both history stacks.
+- Autosave persists only the resulting current MusicSpec.
+- Direct text-entry fields keep native browser undo; global MusicSpec shortcuts ignore text inputs, textareas, selects and contenteditable targets.
+- Repeated changes to one stable selection ID and continuous facet custom-text edits may coalesce within a short interaction window, avoiding dozens of steps from range drags/typing.
+- Distinct semantic selections are not intentionally merged into one history step.
+
+This keeps recovery fast without creating hidden cross-project state or expanding the persistence contract.
+

@@ -330,6 +330,14 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - The facet-wide current-state rail remains the canonical overview; parameter summaries are a local scan aid derived from the same MusicSpec/Runtime IDs.
 - Custom Advanced wording remains full-width and nothing is hidden behind dropdown menus.
 
+## MusicSpec undo/redo carry-forward
+
+- MusicSpec editing has a bounded session-only undo/redo stack; the project document schema is unchanged and history itself is not persisted.
+- Child editors receive the history-aware commit function. Direct `setSpec` remains reserved for project restore/switch and history traversal.
+- Continuous edits to the same stable selection ID or custom-text field coalesce briefly; distinct option changes remain separate.
+- `Ctrl/⌘+Z`, `Ctrl/⌘+Shift+Z` and `Ctrl+Y` are ignored in text-entry targets so native field undo still works.
+- Applying another project clears both stacks, so history never crosses project identity.
+
 ## Large-pool control reachability carry-forward
 
 - Genre, Instruments and Exclude wrap search/filter/meta controls in a desktop sticky control stack.

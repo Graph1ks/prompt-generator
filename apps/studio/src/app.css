@@ -1636,6 +1636,10 @@
       display: none;
     }
 
+    .history-actions {
+      display: none;
+    }
+
     .genre-results {
       grid-template-columns: 1fr 1fr;
     }
@@ -2634,6 +2638,35 @@
     color: #ffffff;
     background: color-mix(in srgb, var(--studio-dark) 86%, #52604d);
     border-color: transparent;
+  }
+
+  .history-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px;
+    border: 1px solid var(--studio-line);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--studio-card) 78%, transparent);
+  }
+
+  .history-actions .icon-btn {
+    inline-size: 34px;
+    min-inline-size: 34px;
+    block-size: 34px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+  }
+
+  .history-actions .icon-btn:disabled {
+    opacity: 0.28;
+    cursor: default;
+  }
+
+  .history-actions .studio-icon {
+    inline-size: 15px;
+    block-size: 15px;
   }
 
   .language-switch {
