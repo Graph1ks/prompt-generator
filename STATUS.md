@@ -90,6 +90,14 @@ Expected result: acceptance remains `status: ok`; the compiled knowledge DB is s
 - `@vgine/ui` now includes the first reusable React primitives (`Surface`, `Button`, `IconButton`, `Text`, `Stack`, `Cluster`) styled only through V'gine semantic tokens.
 - Local operator outputs are standardized: flat `reports/`, separate `logs/`, durable `.local-data/backups/`; legacy nested report folders have a safe plan/apply migrator.
 
+## Text-first compact Live Prompt
+
+- Deterministic locked Style sections now render as plain compact text instead of full-row buttons.
+- Prompt→Source navigation remains available through a separate keyboard-focusable edit/source action positioned in the right prompt gutter; it does not reserve inline text width or add row padding/min-height.
+- Active facet indication uses a thin non-layout-affecting marker and key emphasis; mutation pulses remain section-scoped on the line container.
+- Mobile keeps the source action visible as a secondary compact affordance while the renderer text itself stays at zero control padding.
+- Exclude remains the intentionally larger separate output action.
+
 ## Guarded final Style editing
 
 - The first deterministic Style unlock now opens an inline guard instead of immediately creating a manual override.
@@ -113,7 +121,7 @@ Future enrichment does not reopen the V1 database milestone unless it changes sc
 Proceed in this order:
 
 1. owner-locally `git pull` + `pnpm dev`; no Runtime rebuild is required for the latest Studio-only slices;
-2. smoke the guarded first-unlock flow plus locked/unlocked prompt density, bottom-aware preview following, facet-scoped highlight/source-jump behavior, direct BPM >220, Explain click-through, Undo/Redo, project library operations and large-pool mouse/touch/keyboard flows;
+2. smoke the guarded first-unlock flow plus locked/unlocked prompt density, text-first Style rows/source-action gutter behavior, bottom-aware preview following, facet-scoped highlight/source-jump behavior, direct BPM >220, Explain click-through, Undo/Redo, project library operations and large-pool mouse/touch/keyboard flows;
 3. verify that cancelling the guard preserves deterministic Style, confirming creates the final override, later MusicSpec edits do not alter that manual Style, and Restore original reconnects to the current compiler result;
 4. fix only reproducible interaction/layout defects found in that smoke; keep Database V1, Genre crosswalk, Instruments semantic completion and authored Product Knowledge closed;
 5. after interaction acceptance, continue targeted visual refinement and restrained causal motion polish rather than broad decorative animation.

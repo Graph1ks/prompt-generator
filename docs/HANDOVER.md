@@ -348,7 +348,10 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Structured prompt highlighting is keyed to explicit MusicSpec facet IDs. The current authoring facet is highlighted persistently; recent mutations pulse only changed facet sections.
 - Focus/pointer activity inside a `data-facet` editor updates the active prompt section immediately; scrollspy remains the fallback as the user moves through a long chapter.
 - Undo/redo computes changed prompt targets from immutable MusicSpec facet/genre/exclude references. Do not revert to `.preview.changed .changed-line`, which flashes every section indiscriminately.
-- Active deterministic prompt lines expose `aria-current="location"`. Manual overrides stay intentionally non-semantic.
+- Deterministic Style text is no longer wrapped in a full-row button. The visible renderer line stays plain compact text with zero control padding; a separate absolutely positioned source-action button lives in the right prompt gutter and does not consume text width/height.
+- Active/changed causality state belongs to the prompt-line container. The source-action button carries the accessible label/current-location state and remains keyboard focusable.
+- Do not regress to a full-line button/overlay merely to make the text clickable; that couples source navigation hitbox geometry back into prompt density.
+- Manual overrides stay intentionally non-semantic.
 
 ## Guarded manual Style override carry-forward
 
@@ -490,7 +493,7 @@ pnpm dev
 
 3. Smoke the current Studio interaction baseline before adding new features:
    - first deterministic Style unlock shows the inline final-output guard without creating an override; cancel leaves Style compiler-driven; confirm creates the override; later Studio edits leave the manual Style unchanged; Restore original reconnects to the current compiler output;
-   - locked Style output is compact on mobile and visually matches unlocked themed Style density;
+   - locked Style output is compact on mobile and visually matches unlocked themed Style density; deterministic Style rows are plain text, not padded full-row buttons, and the separate source-jump icon does not change wrapping/line height;
    - Live Prompt has no inner vertical scrollbar and follows long desktop edits without hiding its footer permanently;
    - only the active authoring facet is persistently highlighted in Style; actual mutations pulse only changed sections;
    - clicking a deterministic prompt section jumps back to its explicit authoring facet;

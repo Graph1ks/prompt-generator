@@ -966,3 +966,19 @@ The global manual Style editor exists for deliberate final output corrections, n
 - A persisted/existing manual override may be locked and reopened without repeating the first-transition guard; the warning is a mode-boundary acknowledgement, not recurring friction.
 
 The guard stays inline in the Live Prompt and does not move central editing into a modal, dropdown, or hidden surface.
+
+## ADR-055 — Deterministic Style rows are text-first; source navigation is a separate affordance
+
+**Status:** accepted
+
+Locked deterministic Style output must derive its density from the rendered prompt text, not from control geometry.
+
+- A structured Style line is rendered as plain themed text with zero button/control padding.
+- Reverse Prompt→Source navigation is a separate icon action positioned in the prompt gutter outside normal text flow.
+- The source action remains keyboard focusable, labeled with the owning section and may expose `aria-current="location"`; hiding its visual chrome on desktop must never remove it from keyboard access.
+- The source action must not reserve inline space, force minimum row height, change line wrapping or turn the renderer line into a card/button surface.
+- Active-facet and changed-section causality attach to the semantic line container and may use non-layout-affecting emphasis.
+- Mobile may keep the secondary source action persistently visible while retaining the compact text rhythm accepted by ADR-053.
+- Exclude remains a separate output action and is not forced into this dense structured-line treatment.
+
+This refines ADR-051/ADR-053: reverse navigation remains explicit and accessible without making the prompt text itself an oversized interaction target.

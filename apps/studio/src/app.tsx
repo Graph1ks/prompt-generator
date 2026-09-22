@@ -1952,17 +1952,27 @@ export function App() {
                   />
                 ) : compilation?.sections.length ? (
                   compilation.sections.map((section) => (
-                    <div className="prompt-line-group" key={section.sectionKey}>
+                    <div
+                      className="prompt-line-group"
+                      key={section.sectionKey}
+                      data-active={
+                        activeFacetTarget === section.sectionKey || undefined
+                      }
+                      data-changed={
+                        recentPromptTargets.includes(section.sectionKey) ||
+                        undefined
+                      }
+                    >
+                      <div className="prompt-line">
+                        <span className="bracket">[</span>
+                        <span className="prompt-key">{section.label}</span>
+                        <span className="bracket">: </span>
+                        <span className="prompt-value">{section.content}</span>
+                        <span className="bracket">]</span>
+                      </div>
                       <button
                         type="button"
-                        className="prompt-line prompt-line-source"
-                        data-active={
-                          activeFacetTarget === section.sectionKey || undefined
-                        }
-                        data-changed={
-                          recentPromptTargets.includes(section.sectionKey) ||
-                          undefined
-                        }
+                        className="prompt-source-action"
                         aria-current={
                           activeFacetTarget === section.sectionKey
                             ? "location"
@@ -1976,14 +1986,7 @@ export function App() {
                         })}
                         onClick={() => jumpToPromptSource(section.sectionKey)}
                       >
-                        <span className="bracket">[</span>
-                        <span className="prompt-key">{section.label}</span>
-                        <span className="bracket">: </span>
-                        <span className="prompt-value">{section.content}</span>
-                        <span className="bracket">]</span>
-                        <span className="prompt-source-cue" aria-hidden="true">
-                          <Icon name="edit" />
-                        </span>
+                        <Icon name="edit" />
                       </button>
                     </div>
                   ))

@@ -204,12 +204,14 @@ When the user edits a facet:
 - copy always returns clean plain text without UI markup;
 - the Live Prompt itself should expand with content rather than introduce a nested vertical scrollbar; normal page scroll is the primary desktop scroll path, while a bottom-aware sticky preview may follow the editor without trapping scroll;
 - manual prompt editing keeps the structured bracket/key/value visual theme even though the editable value remains plain text;
-- locked deterministic Style output and unlocked manual Style editing should keep the same compact typographic rhythm; unlocking must not be the only way to get a dense readable prompt.
+- locked deterministic Style output and unlocked manual Style editing should keep the same compact typographic rhythm; unlocking must not be the only way to get a dense readable prompt;
+- deterministic Style text is text-first, not a full-row button: source navigation must not impose button padding, minimum height, reserved inline width, or card chrome on the rendered prompt line.
 
 Causality also works in reverse for deterministic output:
 
-- each rendered Style section is an editable source link, not a dead preview line;
-- activating a section navigates to the Studio chapter/facet that owns it and brings that authoring surface into view;
+- each rendered Style section exposes a dedicated source-jump affordance beside the text rather than turning the entire text row into a button;
+- the source affordance is positioned out of normal text flow so wrapping and line height remain renderer-text driven;
+- activating that affordance navigates to the Studio chapter/facet that owns the section and brings that authoring surface into view;
 - on mobile, source navigation closes the Live Prompt surface and returns to the editor automatically;
 - Exclude output links back to the separate Exclude authoring surface;
 - manual Style override text is deliberately not reverse-parsed into MusicSpec and therefore does not expose guessed source links.
