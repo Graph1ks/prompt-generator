@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-22  
-**Current milestone:** **Explain UX + authored Product Knowledge + multi-project library implemented** — current: ordinary-facet state visibility/mobile ergonomics
+**Current milestone:** **Studio UX stabilization through compact Live Prompt parity** — Database V1/Product Knowledge/project library remain closed/implemented; next: owner-local interaction smoke, then targeted visual/motion refinement
 
 ## Completion verdict
 
@@ -201,6 +201,13 @@ Proceed in this order:
 - Selected Genre labels, ordinary facet section labels, Advanced parameter labels and the Instruments section can expose reviewed definitions when their Runtime records carry Knowledge IDs.
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
+
+## Compact locked/unlocked Live Prompt parity
+
+- Mobile locked Style output now uses the same compact vertical rhythm as the themed manual editor: no per-section 9 px margin and no forced 44 px minimum height on every structured Style line.
+- Structured Style lines use the same 12 px / 1.72 line-height family as the unlocked themed editor, so locking/unlocking does not visually expand/collapse the prompt into different densities.
+- The source-navigation edit cue was reduced to 24 px on mobile so it does not force or visually overlap compact prompt rows. Exclude keeps its larger touch target because it is a separate block, not a dense structured section list.
+- This is presentation-only: compiler text, section order, copy output, source navigation and MusicSpec are unchanged.
 
 ## Bottom-aware Live Prompt follow + scoped causality highlight
 
