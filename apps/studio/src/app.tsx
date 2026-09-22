@@ -1901,6 +1901,11 @@ export function App() {
                           recentPromptTargets.includes(section.sectionKey) ||
                           undefined
                         }
+                        aria-current={
+                          activeFacetTarget === section.sectionKey
+                            ? "location"
+                            : undefined
+                        }
                         aria-label={t("preview.editSection", {
                           section: section.label,
                         })}
@@ -1935,6 +1940,9 @@ export function App() {
                   data-active={activeFacetTarget === "exclude" || undefined}
                   data-changed={
                     recentPromptTargets.includes("exclude") || undefined
+                  }
+                  aria-current={
+                    activeFacetTarget === "exclude" ? "location" : undefined
                   }
                   aria-label={t("preview.editExclude")}
                   title={t("preview.editExclude")}
