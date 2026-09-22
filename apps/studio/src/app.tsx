@@ -1855,8 +1855,16 @@ export function App() {
                 type="button"
                 className={promptUnlocked ? "prompt-edit active" : "prompt-edit"}
                 disabled={!compiledStyleText && manualStyleText === null}
-                aria-expanded={!promptUnlocked ? manualEditGuardOpen : undefined}
-                aria-controls={!promptUnlocked ? "manual-style-edit-guard" : undefined}
+                aria-expanded={
+                  !promptUnlocked && manualStyleText === null
+                    ? manualEditGuardOpen
+                    : undefined
+                }
+                aria-controls={
+                  !promptUnlocked && manualStyleText === null
+                    ? "manual-style-edit-guard"
+                    : undefined
+                }
                 onClick={togglePromptUnlock}
               >
                 <Icon name={promptUnlocked ? "lock" : "unlock"} />
