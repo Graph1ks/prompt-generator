@@ -16,6 +16,23 @@ CONTRACT = "vgine-runtime-pack-v1"
 SCHEMA_VERSION = 1
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_EDITOR_FOUNDATION = ROOT / "data" / "product" / "editor-foundation-v1.json"
+EDITOR_FOUNDATION_FACETS = {
+    "era",
+    "bpm",
+    "key_mode",
+    "groove",
+    "melody",
+    "harmony",
+    "drums",
+    "bass",
+    "exciters",
+    "texture",
+    "vocal",
+    "dynamics",
+    "space_mix",
+    "production",
+    "structure",
+}
 
 PAYLOAD_FILES = (
     "core.json",
@@ -77,6 +94,61 @@ def load_editor_foundation(path: Path) -> dict[str, Any]:
             "editor foundation parameter options reference missing parameters: "
             + ", ".join(str(item) for item in missing_parameters)
         )
+
+    parameter_sections = {row.get("section_key") for row in value["parameters"]}
+    statement_sections = {row.get("section_key") for row in value["statements"]}
+    if parameter_sections != EDITOR_FOUNDATION_FACETS:
+        raise RuntimeError(
+            "editor foundation parameter facet coverage mismatch: "
+            + ", ".join(sorted(str(item) for item in parameter_sections))
+        )
+    if statement_sections != EDITOR_FOUNDATION_FACETS:
+        raise RuntimeError(
+            "editor foundation Easy-statement facet coverage mismatch: "
+            + ", ".join(sorted(str(item) for item in statement_sections))
+        )
+
+    options_by_parameter: dict[str, int] = {}
+    for row in value["parameter_options"]:
+        pid = row["parameter_id"]
+        options_by_parameter[pid] = options_by_parameter.get(pid, 0) + 1
+
+    for row in value["parameters"]:
+        pid = row["id"]
+        if options_by_parameter.get(pid, 0) == 0 and row.get("value_type") not in ("text",):
+            raise RuntimeError(
+                f"editor foundation parameter has no selectable values: {pid}"
+            )
+        ui = row.get("ui")
+        if ui is not None:
+            if not isinstance(ui, dict) or ui.get("control") != "number":
+                raise RuntimeError(f"unsupported editor foundation UI metadata: {pid}")
+            minimum = ui.get("min")
+            maximum = ui.get("max")
+            step = ui.get("step")
+            recommended = ui.get("recommended_values")
+            if (
+                not isinstance(minimum, (int, float))
+                or not isinstance(maximum, (int, float))
+                or not isinstance(step, (int, float))
+                or maximum <= minimum
+                or step <= 0
+                or not isinstance(recommended, list)
+                or any(
+                    not isinstance(item, (int, float))
+                    or item < minimum
+                    or item > maximum
+                    for item in recommended
+                )
+            ):
+                raise RuntimeError(
+                    f"invalid editor foundation number UI metadata: {pid}"
+                )
+
+    if any(not str(row.get("output_text") or "").strip() for row in value["statements"]):
+        raise RuntimeError("editor foundation contains an empty Easy statement")
+    if any(not str(row.get("output_text") or "").strip() for row in value["exclude"]):
+        raise RuntimeError("editor foundation contains an empty Exclude entry")
     return value
 
 
