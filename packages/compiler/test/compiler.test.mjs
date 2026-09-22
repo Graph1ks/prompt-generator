@@ -156,3 +156,26 @@ test("is deterministic for the same MusicSpec and runtime knowledge", () => {
   const second = compileMusicSpec(spec, knowledge());
   assert.deepEqual(second, first);
 });
+
+
+test("compiles a valid genre-free MusicSpec without fabricating a Genre section", () => {
+  const spec = {
+    schema_version: "music-spec-v1",
+    genre_influences: [],
+    facets: {
+      groove: {
+        locked: false,
+        selections: [
+          { kind: "freeform", value: "laid-back pocket", origin: "user", locked: false },
+        ],
+        custom_text: null,
+      },
+    },
+    exclude: [],
+  };
+
+  const result = compileMusicSpec(spec, knowledge());
+  assert.equal(result.budget.valid, true);
+  assert.equal(result.sections.some((section) => section.sectionKey === "genre"), false);
+  assert.match(result.styleText, /\[Groove: laid-back pocket\]/u);
+});
