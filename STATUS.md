@@ -210,3 +210,13 @@ Proceed in this order:
 - Added generic IndexedDB user-data storage and migrated pool Favorites, Theme and locale away from active `localStorage` persistence.
 - Editor-depth preferences and Advanced presets persist locally in IndexedDB.
 - No server/cloud persistence path exists for these user data.
+
+## Product Knowledge Foundation + live prompt explanations
+
+- Added tracked Product Knowledge Foundation v1 with 400 explicit entries covering all Product Editor parameters/options/Easy statements/Exclude baseline entries.
+- Product Knowledge definitions currently ship in English and German.
+- Product Editor Foundation records now carry stable Knowledge links instead of null semantic references.
+- Runtime export merges Product Knowledge into `knowledge.json`, indexes it for Knowledge search, fingerprints it separately and validates reference integrity.
+- Explain mode now exposes Knowledge-origin chips beneath rendered live-prompt sections without changing copyable prompt text.
+- Ordinary Product Editor selections, numeric BPM, Genre and Instrument selections resolve through their actual Runtime semantic origins.
+- Arbitrary custom wording remains intentionally unexplained unless a semantic link exists.
