@@ -9,6 +9,7 @@ import {
   resetMusicSpec,
   resetMusicSpecFacets,
   setFacetSelection,
+  setFacetCustomText,
   removeFacetSelection,
   hasFacetSelection,
   setGenreInfluence,
@@ -161,5 +162,25 @@ test("adds, replaces and removes stable facet selections", () => {
     "instrument-expression:warm-rhodes",
   );
   assert.equal(spec.facets.instruments.selections.length, 0);
+  assert.equal(validateMusicSpec(spec).valid, true);
+});
+
+
+test("sets and clears facet custom text without disturbing selections", () => {
+  let spec = createMusicSpec();
+  spec = setFacetSelection(spec, "texture", {
+    id: "statement:texture:test",
+    kind: "statement",
+    value: "grainy analog texture",
+    origin: "user",
+    locked: false,
+  });
+  spec = setFacetCustomText(spec, "texture", "subtle tape flutter");
+  assert.equal(spec.facets.texture.custom_text, "subtle tape flutter");
+  assert.equal(spec.facets.texture.selections.length, 1);
+
+  spec = setFacetCustomText(spec, "texture", null);
+  assert.equal(spec.facets.texture.custom_text, null);
+  assert.equal(spec.facets.texture.selections.length, 1);
   assert.equal(validateMusicSpec(spec).valid, true);
 });
