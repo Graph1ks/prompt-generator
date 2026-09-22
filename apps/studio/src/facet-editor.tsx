@@ -203,6 +203,12 @@ export function FacetEditor({
     return Number.isFinite(value) ? value : null;
   }
 
+  function clearNumberParameter(parameter: RuntimeParameter) {
+    const valueId = parameter.id + ":value";
+    if (!hasFacetSelection(spec, facet, valueId)) return;
+    onSpecChange(removeFacetSelection(spec, facet, valueId));
+  }
+
   function toggleOption(
     option: RuntimeParameterOption,
     parameter: RuntimeParameter,
@@ -374,43 +380,65 @@ export function FacetEditor({
                     <div className="number-parameter-control">
                       {(() => {
                         const selectedValue =
-                          selectedNumberValue(parameter) ??
+                          selectedNumberValue(parameter);
+                        const rangeValue =
+                          selectedValue ??
                           parameter.ui.recommended_values[0] ??
                           parameter.ui.min;
                         return (
                           <>
-                            <div className="number-parameter-readout">
+                            <div
+                              className="number-parameter-readout"
+                              data-selected={selectedValue !== null}
+                            >
                               <strong>
-                                {t("facetEditor.numberValue", {
-                                  label: parameter.label,
-                                  value: selectedValue,
-                                  unit: parameter.ui.unit
-                                    ? " " + parameter.ui.unit
-                                    : "",
-                                })}
+                                {selectedValue === null
+                                  ? t("facetEditor.notSet")
+                                  : t("facetEditor.numberValue", {
+                                      label: parameter.label,
+                                      value: selectedValue,
+                                      unit: parameter.ui.unit
+                                        ? " " + parameter.ui.unit
+                                        : "",
+                                    })}
                               </strong>
-                              <input
-                                type="number"
-                                min={parameter.ui.min}
-                                max={parameter.ui.max}
-                                step={parameter.ui.step}
-                                value={selectedValue}
-                                aria-label={parameter.label}
-                                onChange={(event) =>
-                                  setNumberParameter(
-                                    parameter,
-                                    Number(event.currentTarget.value),
-                                  )
-                                }
-                              />
+                              <div className="number-parameter-inputs">
+                                <input
+                                  type="number"
+                                  min={parameter.ui.min}
+                                  max={parameter.ui.max}
+                                  step={parameter.ui.step}
+                                  value={selectedValue ?? ""}
+                                  placeholder={String(rangeValue)}
+                                  aria-label={parameter.label}
+                                  onChange={(event) => {
+                                    const raw = event.currentTarget.value;
+                                    if (!raw) {
+                                      clearNumberParameter(parameter);
+                                      return;
+                                    }
+                                    setNumberParameter(parameter, Number(raw));
+                                  }}
+                                />
+                                {selectedValue !== null && (
+                                  <button
+                                    type="button"
+                                    className="text-btn number-parameter-clear"
+                                    onClick={() => clearNumberParameter(parameter)}
+                                  >
+                                    {t("facetEditor.clear")}
+                                  </button>
+                                )}
+                              </div>
                             </div>
                             <input
                               className="number-parameter-range"
+                              data-selected={selectedValue !== null}
                               type="range"
                               min={parameter.ui.min}
                               max={parameter.ui.max}
                               step={parameter.ui.step}
-                              value={selectedValue}
+                              value={rangeValue}
                               aria-label={parameter.label}
                               onChange={(event) =>
                                 setNumberParameter(
@@ -430,7 +458,7 @@ export function FacetEditor({
                                       className={
                                         selectedValue === value
                                           ? "parameter-option selected"
-                                          : "parameter-option"
+                                          : "parameter-option recommended"
                                       }
                                       aria-pressed={selectedValue === value}
                                       onClick={() =>
