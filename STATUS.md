@@ -104,10 +104,10 @@ Future enrichment does not reopen the V1 database milestone unless it changes sc
 
 Proceed in this order:
 
-1. owner-locally re-export Runtime Pack v1 and reproduce the reference prompt with Explain enabled;
-2. verify selection-time Explain on Product controls, Genre, Instruments and Exclude; fix only genuine explicit-link/UX defects — never infer Knowledge identity from rendered strings;
-3. owner-locally exercise the project library: legacy restore, create, rename, switch, duplicate, export/import and active-project deletion;
-4. continue Studio ergonomics/visual refinement; reserve broad motion polish until interaction/functionality is accepted.
+1. owner-locally `git pull` + `pnpm dev`; no Runtime rebuild is required for the latest Studio-only slices;
+2. smoke locked/unlocked prompt density, bottom-aware preview following, facet-scoped highlight/source-jump behavior, direct BPM >220, Explain click-through, Undo/Redo, project library operations and large-pool mouse/touch/keyboard flows;
+3. fix only reproducible interaction/layout defects found in that smoke; keep Database V1, Genre crosswalk, Instruments semantic completion and authored Product Knowledge closed;
+4. after interaction acceptance, continue targeted visual refinement and restrained causal motion polish rather than broad decorative animation.
 
 ## Do not redo
 
