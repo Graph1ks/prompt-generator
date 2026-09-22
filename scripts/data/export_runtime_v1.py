@@ -16,6 +16,7 @@ CONTRACT = "vgine-runtime-pack-v1"
 SCHEMA_VERSION = 1
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_EDITOR_FOUNDATION = ROOT / "data" / "product" / "editor-foundation-v1.json"
+DEFAULT_KNOWLEDGE_FOUNDATION = ROOT / "data" / "product" / "knowledge-foundation-v1.json"
 EDITOR_FOUNDATION_FACETS = {
     "era",
     "bpm",
@@ -149,6 +150,45 @@ def load_editor_foundation(path: Path) -> dict[str, Any]:
         raise RuntimeError("editor foundation contains an empty Easy statement")
     if any(not str(row.get("output_text") or "").strip() for row in value["exclude"]):
         raise RuntimeError("editor foundation contains an empty Exclude entry")
+    return value
+
+
+def load_product_knowledge_foundation(path: Path) -> dict[str, Any]:
+    if not path.is_file():
+        raise RuntimeError(f"product knowledge foundation not found: {path}")
+    value = read_json(path)
+    if (
+        value.get("schema") != "vgine-product-knowledge-foundation-v1"
+        or value.get("version") != 1
+    ):
+        raise RuntimeError("unsupported product knowledge foundation contract")
+    entries = value.get("entries")
+    if not isinstance(entries, list):
+        raise RuntimeError("product knowledge foundation entries must be a list")
+    ids = [entry.get("id") for entry in entries if isinstance(entry, dict)]
+    if len(ids) != len(entries) or any(not isinstance(item, str) or not item for item in ids):
+        raise RuntimeError("product knowledge foundation contains an invalid entry id")
+    if len(ids) != len(set(ids)):
+        raise RuntimeError("product knowledge foundation contains duplicate entry ids")
+    for entry in entries:
+        for key in (
+            "entry_type",
+            "canonical_label",
+            "canonical_slug",
+            "difficulty",
+            "variants",
+            "definitions",
+            "context_definitions",
+            "relations",
+        ):
+            if key not in entry:
+                raise RuntimeError(
+                    f"product knowledge entry {entry['id']} is missing {key}"
+                )
+        if not entry["definitions"]:
+            raise RuntimeError(
+                f"product knowledge entry {entry['id']} has no definitions"
+            )
     return value
 
 
@@ -421,14 +461,17 @@ def export_editor(
     }
 
 
-def export_knowledge(conn: sqlite3.Connection) -> dict[str, Any]:
-    entries = rows(
+def export_knowledge(
+    conn: sqlite3.Connection,
+    foundation: dict[str, Any],
+) -> dict[str, Any]:
+    database_entries = rows(
         conn,
         """SELECT id,entry_type,canonical_label,canonical_slug,difficulty,replaces_entry_id
            FROM knowledge_entry WHERE status IN ('reviewed','approved')
            ORDER BY canonical_slug,id""",
     )
-    ids = {x["id"] for x in entries}
+    ids = {x["id"] for x in database_entries}
     variants: dict[str, list[dict[str, Any]]] = {}
     for x in rows(
         conn,
@@ -466,16 +509,30 @@ def export_knowledge(conn: sqlite3.Connection) -> dict[str, Any]:
         source = x.pop("source_entry_id")
         if source in ids and x["target_entry_id"] in ids:
             relations.setdefault(source, []).append(x)
-    for entry in entries:
+    for entry in database_entries:
         eid = entry["id"]
         entry["variants"] = variants.get(eid, [])
         entry["definitions"] = definitions.get(eid, [])
         entry["context_definitions"] = context.get(eid, [])
         entry["relations"] = relations.get(eid, [])
-    return {"schema": "vgine-runtime-knowledge-v1", "entries": entries}
+
+    entries = merge_records(
+        foundation["entries"],
+        database_entries,
+        sort_key=lambda row: (row["canonical_slug"], row["id"]),
+    )
+    return {
+        "schema": "vgine-runtime-knowledge-v1",
+        "foundation_schema": foundation["schema"],
+        "foundation_version": foundation["version"],
+        "entries": entries,
+    }
 
 
-def export_search(conn: sqlite3.Connection) -> dict[str, Any]:
+def export_search(
+    conn: sqlite3.Connection,
+    knowledge_foundation: dict[str, Any],
+) -> dict[str, Any]:
     docs: list[dict[str, Any]] = []
     major_labels = {x["id"]: x["label"] for x in rows(conn, "SELECT id,label FROM major_genre")}
     genre_data = export_genres(conn)["genres"]
@@ -490,7 +547,7 @@ def export_search(conn: sqlite3.Connection) -> dict[str, Any]:
         terms = [e["label"], *(inst_labels.get(x["instrument_id"], "") for x in e["instruments"]), *(entry_labels.get(x["entry_id"], "") for x in e["concepts"])]
         docs.append({"id": e["id"], "kind": "instrument_expression", "label": e["label"], "terms": sorted({t for t in terms if t}, key=str.casefold)})
 
-    knowledge_data = export_knowledge(conn)["entries"]
+    knowledge_data = export_knowledge(conn, knowledge_foundation)["entries"]
     for e in knowledge_data:
         terms = [e["canonical_label"], *(v["surface"] for v in e["variants"])]
         text = [d["text"] for d in e["definitions"] if d["kind"] in ("one_liner", "plain")]
@@ -548,7 +605,8 @@ def validate_source_database(conn: sqlite3.Connection) -> dict[str, Any]:
 def validate_work_dir(
     work_dir: Path,
     expected_source_expressions: int,
-    foundation: dict[str, Any],
+    editor_foundation: dict[str, Any],
+    knowledge_foundation: dict[str, Any],
 ) -> dict[str, Any]:
     payloads = {name: read_json(work_dir / name) for name in PAYLOAD_FILES}
     expressions = payloads["instrument-expressions.json"]["expressions"]
@@ -562,13 +620,50 @@ def validate_work_dir(
         raise RuntimeError("runtime source instrument-expression wording/selectable invariant failed")
     editor = payloads["editor.json"]
     for key in ("parameters", "parameter_options", "statements", "exclude"):
-        expected_ids = {row["id"] for row in foundation[key]}
+        expected_ids = {row["id"] for row in editor_foundation[key]}
         actual_ids = {row["id"] for row in editor[key]}
         missing = sorted(expected_ids - actual_ids)
         if missing:
             raise RuntimeError(
                 f"runtime editor dropped foundation {key}: {', '.join(missing[:10])}"
             )
+    knowledge_ids = {
+        row["id"] for row in payloads["knowledge.json"]["entries"]
+    }
+    expected_knowledge_ids = {
+        row["id"] for row in knowledge_foundation["entries"]
+    }
+    missing_knowledge = sorted(expected_knowledge_ids - knowledge_ids)
+    if missing_knowledge:
+        raise RuntimeError(
+            "runtime knowledge dropped product foundation entries: "
+            + ", ".join(missing_knowledge[:10])
+        )
+
+    for key in ("parameters", "parameter_options", "exclude"):
+        for row in editor[key]:
+            knowledge_id = row.get("knowledge_entry_id")
+            if (
+                isinstance(knowledge_id, str)
+                and knowledge_id.startswith("product:knowledge:")
+                and knowledge_id not in knowledge_ids
+            ):
+                raise RuntimeError(
+                    f"runtime editor {key} references missing product knowledge: {knowledge_id}"
+                )
+    for row in editor["statements"]:
+        for concept in row.get("concepts", []):
+            knowledge_id = concept.get("entry_id")
+            if (
+                isinstance(knowledge_id, str)
+                and knowledge_id.startswith("product:knowledge:")
+                and knowledge_id not in knowledge_ids
+            ):
+                raise RuntimeError(
+                    "runtime statement references missing product knowledge: "
+                    + knowledge_id
+                )
+
     profiles = payloads["core.json"]["renderer_profiles"]
     suno = next((x for x in profiles if x["id"] == "suno-structured-v1"), None)
     if suno and suno["max_characters"] != 1000:
@@ -588,7 +683,8 @@ def save_state(work_dir: Path, state: dict[str, Any]) -> None:
 def existing_up_to_date(
     out_dir: Path,
     db_sha: str,
-    foundation_sha: str,
+    editor_foundation_sha: str,
+    knowledge_foundation_sha: str,
 ) -> bool:
     manifest = out_dir / "manifest.json"
     if not manifest.is_file():
@@ -600,25 +696,33 @@ def existing_up_to_date(
     return (
         data.get("schema") == CONTRACT
         and data.get("knowledge_db_sha256") == db_sha
-        and data.get("editor_foundation_sha256") == foundation_sha
+        and data.get("editor_foundation_sha256") == editor_foundation_sha
+        and data.get("product_knowledge_foundation_sha256")
+        == knowledge_foundation_sha
     )
 
 
 def plan(
     conn: sqlite3.Connection,
     db_sha: str,
-    foundation: dict[str, Any],
-    foundation_sha: str,
+    editor_foundation: dict[str, Any],
+    editor_foundation_sha: str,
+    knowledge_foundation: dict[str, Any],
+    knowledge_foundation_sha: str,
 ) -> dict[str, Any]:
     return {
         "schema": CONTRACT,
         "knowledge_db_sha256": db_sha,
-        "editor_foundation_sha256": foundation_sha,
+        "editor_foundation_sha256": editor_foundation_sha,
+        "product_knowledge_foundation_sha256": knowledge_foundation_sha,
         "editor_foundation_counts": {
-            "parameters": len(foundation["parameters"]),
-            "parameter_options": len(foundation["parameter_options"]),
-            "statements": len(foundation["statements"]),
-            "exclude": len(foundation["exclude"]),
+            "parameters": len(editor_foundation["parameters"]),
+            "parameter_options": len(editor_foundation["parameter_options"]),
+            "statements": len(editor_foundation["statements"]),
+            "exclude": len(editor_foundation["exclude"]),
+        },
+        "product_knowledge_foundation_counts": {
+            "entries": len(knowledge_foundation["entries"]),
         },
         "counts": {
             "major_genres": conn.execute("SELECT COUNT(*) FROM major_genre").fetchone()[0],
@@ -648,20 +752,34 @@ def compile_runtime(
     knowledge_db: Path,
     out_dir: Path,
     editor_foundation: Path,
+    knowledge_foundation_path: Path,
     reset_incomplete: bool = False,
 ) -> dict[str, Any]:
     db_sha = sha256_file(knowledge_db)
-    foundation = load_editor_foundation(editor_foundation)
-    foundation_sha = sha256_file(editor_foundation)
+    editor_foundation_data = load_editor_foundation(editor_foundation)
+    editor_foundation_sha = sha256_file(editor_foundation)
+    knowledge_foundation = load_product_knowledge_foundation(
+        knowledge_foundation_path
+    )
+    knowledge_foundation_sha = sha256_file(knowledge_foundation_path)
     work_dir = out_dir.with_name(out_dir.name + ".work")
     if reset_incomplete and work_dir.exists():
         shutil.rmtree(work_dir)
-    if existing_up_to_date(out_dir, db_sha, foundation_sha) and not work_dir.exists():
+    if (
+        existing_up_to_date(
+            out_dir,
+            db_sha,
+            editor_foundation_sha,
+            knowledge_foundation_sha,
+        )
+        and not work_dir.exists()
+    ):
         return {
             "status": "up-to-date",
             "out_dir": str(out_dir),
             "knowledge_db_sha256": db_sha,
-            "editor_foundation_sha256": foundation_sha,
+            "editor_foundation_sha256": editor_foundation_sha,
+            "product_knowledge_foundation_sha256": knowledge_foundation_sha,
         }
 
     work_dir.mkdir(parents=True, exist_ok=True)
@@ -671,14 +789,17 @@ def compile_runtime(
             "schema": CONTRACT,
             "schema_version": SCHEMA_VERSION,
             "knowledge_db_sha256": db_sha,
-            "editor_foundation_sha256": foundation_sha,
+            "editor_foundation_sha256": editor_foundation_sha,
+            "product_knowledge_foundation_sha256": knowledge_foundation_sha,
             "completed": {},
         }
         save_state(work_dir, state)
     elif (
         state.get("schema") != CONTRACT
         or state.get("knowledge_db_sha256") != db_sha
-        or state.get("editor_foundation_sha256") != foundation_sha
+        or state.get("editor_foundation_sha256") != editor_foundation_sha
+        or state.get("product_knowledge_foundation_sha256")
+        != knowledge_foundation_sha
     ):
         raise RuntimeError("stale runtime export work state; rerun with --reset-incomplete")
 
@@ -690,11 +811,14 @@ def compile_runtime(
             target = work_dir / filename
             if existing_hash and target.is_file() and sha256_file(target) == existing_hash:
                 continue
-            payload = (
-                export_editor(conn, foundation)
-                if filename == "editor.json"
-                else exporter_fn(conn)
-            )
+            if filename == "editor.json":
+                payload = export_editor(conn, editor_foundation_data)
+            elif filename == "knowledge.json":
+                payload = export_knowledge(conn, knowledge_foundation)
+            elif filename == "search.json":
+                payload = export_search(conn, knowledge_foundation)
+            else:
+                payload = exporter_fn(conn)
             digest = write_json_atomic(target, payload)
             state["completed"][filename] = digest
             save_state(work_dir, state)
@@ -702,7 +826,8 @@ def compile_runtime(
         validation = validate_work_dir(
             work_dir,
             source_validation["source_instrument_expressions"],
-            foundation,
+            editor_foundation_data,
+            knowledge_foundation,
         )
         files = {}
         build_material = []
@@ -717,7 +842,8 @@ def compile_runtime(
             "schema_version": SCHEMA_VERSION,
             "runtime_build_id": runtime_build_id,
             "knowledge_db_sha256": db_sha,
-            "editor_foundation_sha256": foundation_sha,
+            "editor_foundation_sha256": editor_foundation_sha,
+            "product_knowledge_foundation_sha256": knowledge_foundation_sha,
             "knowledge_build_meta": build_meta(conn),
             "files": files,
         }
@@ -735,10 +861,16 @@ def status(
     knowledge_db: Path,
     out_dir: Path,
     editor_foundation: Path,
+    knowledge_foundation: Path,
 ) -> dict[str, Any]:
     db_sha = sha256_file(knowledge_db) if knowledge_db.is_file() else None
     foundation_sha = (
         sha256_file(editor_foundation) if editor_foundation.is_file() else None
+    )
+    knowledge_foundation_sha = (
+        sha256_file(knowledge_foundation)
+        if knowledge_foundation.is_file()
+        else None
     )
     work_dir = out_dir.with_name(out_dir.name + ".work")
     final_manifest = read_json(out_dir / "manifest.json") if (out_dir / "manifest.json").is_file() else None
@@ -747,14 +879,18 @@ def status(
         "schema": CONTRACT,
         "knowledge_db_sha256": db_sha,
         "editor_foundation_sha256": foundation_sha,
+        "product_knowledge_foundation_sha256": knowledge_foundation_sha,
         "final": final_manifest,
         "work": work_state,
         "up_to_date": bool(
             final_manifest
             and db_sha
             and foundation_sha
+            and knowledge_foundation_sha
             and final_manifest.get("knowledge_db_sha256") == db_sha
             and final_manifest.get("editor_foundation_sha256") == foundation_sha
+            and final_manifest.get("product_knowledge_foundation_sha256")
+            == knowledge_foundation_sha
         ),
     }
 
@@ -769,6 +905,12 @@ def main() -> int:
         default=DEFAULT_EDITOR_FOUNDATION,
         help="Tracked Product Editor Foundation v1 JSON",
     )
+    ap.add_argument(
+        "--knowledge-foundation",
+        type=Path,
+        default=DEFAULT_KNOWLEDGE_FOUNDATION,
+        help="Tracked Product Knowledge Foundation v1 JSON",
+    )
     mode = ap.add_mutually_exclusive_group()
     mode.add_argument("--plan", action="store_true", help="Read-only preflight; do not write runtime artifacts")
     mode.add_argument("--status", action="store_true", help="Inspect final/incomplete runtime export state")
@@ -778,19 +920,31 @@ def main() -> int:
 
     try:
         if args.status:
-            result = status(args.knowledge, args.out_dir, args.editor_foundation)
+            result = status(
+                args.knowledge,
+                args.out_dir,
+                args.editor_foundation,
+                args.knowledge_foundation,
+            )
         else:
             db_sha = sha256_file(args.knowledge)
             if args.plan:
                 conn = connect_ro(args.knowledge)
                 try:
                     validate_source_database(conn)
-                    foundation = load_editor_foundation(args.editor_foundation)
+                    editor_foundation_data = load_editor_foundation(
+                        args.editor_foundation
+                    )
+                    knowledge_foundation = load_product_knowledge_foundation(
+                        args.knowledge_foundation
+                    )
                     result = plan(
                         conn,
                         db_sha,
-                        foundation,
+                        editor_foundation_data,
                         sha256_file(args.editor_foundation),
+                        knowledge_foundation,
+                        sha256_file(args.knowledge_foundation),
                     )
                 finally:
                     conn.close()
@@ -799,6 +953,7 @@ def main() -> int:
                     args.knowledge,
                     args.out_dir,
                     args.editor_foundation,
+                    args.knowledge_foundation,
                     args.reset_incomplete,
                 )
         report_path = args.report
