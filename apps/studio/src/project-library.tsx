@@ -4,7 +4,7 @@ import {
   useRef,
   useState,
   type ChangeEvent,
-  type KeyboardEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import { createPortal } from "react-dom";
 import type { ProjectSummary } from "@vgine/project-storage";
@@ -81,7 +81,7 @@ export function ProjectLibrary({
     if (!open) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const onKeyDown = (event: globalThis.KeyboardEvent) => {
+    const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
     document.addEventListener("keydown", onKeyDown);
@@ -102,7 +102,7 @@ export function ProjectLibrary({
   }
 
   function onTitleKeyDown(
-    event: KeyboardEvent<HTMLInputElement>,
+    event: ReactKeyboardEvent<HTMLInputElement>,
     project: ProjectSummary,
   ) {
     if (event.key === "Enter") {
@@ -115,7 +115,6 @@ export function ProjectLibrary({
         ...current,
         [project.id]: project.title ?? "",
       }));
-      event.currentTarget.blur();
     }
   }
 
