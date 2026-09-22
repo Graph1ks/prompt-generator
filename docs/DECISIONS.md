@@ -910,3 +910,18 @@ The BPM control separates fast bounded manipulation from explicit expert entry.
 
 The Live Prompt also follows a single-scroll-path rule: it grows with structured output and does not own an inner vertical scrollbar on desktop. Manual Style editing preserves the themed structured appearance while remaining plain-text and non-semantic.
 
+## ADR-051 — Live Prompt follows the page; causality highlight is facet-scoped
+
+**Status:** accepted
+
+The desktop Live Prompt may follow long Studio editing sessions, but it must preserve one page scroll path.
+
+- The preview has no inner vertical scroll container.
+- Sticky positioning uses the rendered preview height to derive a top offset. Short previews stay near the global top bar; tall previews scroll upward until their footer can fit in the viewport, then follow from that position.
+- The active authoring facet is the only deterministic prompt section given a persistent causality highlight.
+- A MusicSpec mutation briefly pulses only facet sections that actually changed; genre and Exclude are explicit targets too.
+- Active-facet identity comes from explicit `data-facet` / MusicSpec keys, not rendered prompt text.
+- Manual Style overrides remain plain text and are not reverse-classified into section ownership.
+
+This supersedes the indiscriminate `.preview.changed .changed-line` behavior where every structured section flashed after any Style change.
+
