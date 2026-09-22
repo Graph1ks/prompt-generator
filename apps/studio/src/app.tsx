@@ -21,7 +21,6 @@ import { FacetEditor } from "./facet-editor.js";
 import { GenrePicker } from "./genre-picker.js";
 import { InstrumentPicker } from "./instrument-picker.js";
 import { Icon } from "./icons.js";
-import { PromptKnowledgeOrigins } from "./prompt-knowledge-origins.js";
 import { SUPPORTED_LOCALES, useI18n, type MessageKey } from "./i18n.js";
 import { loadStudioRuntime, type StudioRuntime } from "./runtime-client.js";
 import {
@@ -755,6 +754,7 @@ export function App() {
                       runtime={runtime.value}
                       spec={spec}
                       onSpecChange={setSpec}
+                      assistOn={assistOn}
                     />
                   )}
                 </div>
@@ -897,15 +897,6 @@ export function App() {
                         <span className="prompt-value">{section.content}</span>
                         <span className="bracket">]</span>
                       </div>
-                      {studioRuntime && (
-                        <PromptKnowledgeOrigins
-                          enabled={assistOn}
-                          runtime={studioRuntime}
-                          spec={spec}
-                          sectionKey={section.sectionKey}
-                          sectionContent={section.content}
-                        />
-                      )}
                     </div>
                   ))
                 ) : (
