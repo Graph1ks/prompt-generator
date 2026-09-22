@@ -186,6 +186,13 @@ Proceed in this order:
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
 
+## Chapter navigation state clarity
+
+- The four Studio chapter tabs no longer imply completion merely because the user navigated past them.
+- Each chapter now derives a live active-item count from MusicSpec plus Finish Exclude state and surfaces that count directly in navigation.
+- Genre influences, ordinary selections, facet custom wording and Exclude entries contribute to the visible count; empty/optional chapters remain visually neutral.
+- Accessible chapter labels include the same active-choice count while mobile uses compact count badges.
+
 ## Live Prompt -> authoring source navigation
 
 - Deterministic Live Prompt Style lines are now interactive source links rather than read-only dead-end text.
