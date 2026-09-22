@@ -141,12 +141,80 @@ export function FacetEditor({
     return map;
   }, [data]);
 
+  const statementById = useMemo(
+    () => new Map(statements.map((statement) => [statement.id, statement] as const)),
+    [statements],
+  );
+  const optionById = useMemo(() => {
+    const map = new Map<string, RuntimeParameterOption>();
+    for (const options of optionsByParameter.values()) {
+      for (const option of options) map.set(option.id, option);
+    }
+    return map;
+  }, [optionsByParameter]);
+  const numberParameterByValueId = useMemo(
+    () =>
+      new Map(
+        parameters
+          .filter((parameter) => parameter.ui?.control === "number")
+          .map((parameter) => [parameter.id + ":value", parameter] as const),
+      ),
+    [parameters],
+  );
+
   const facetState = spec.facets[facet];
   const customText = facetState?.custom_text ?? "";
   const matchingPreset = advancedPresets.findByText(customText);
   const selectedCount =
     (facetState?.selections.length ?? 0) +
     (customText.trim() ? 1 : 0);
+
+  const currentSelections = useMemo(
+    () =>
+      (facetState?.selections ?? []).map((selection) => {
+        const statement = statementById.get(selection.id);
+        if (statement) {
+          return {
+            id: selection.id,
+            label: statement.label,
+            detail: statement.output_text,
+          };
+        }
+
+        const option = optionById.get(selection.id);
+        if (option) {
+          return {
+            id: selection.id,
+            label: option.label,
+            detail: option.output_fragment,
+          };
+        }
+
+        const numberParameter = numberParameterByValueId.get(selection.id);
+        if (numberParameter) {
+          const unit = numberParameter.ui?.unit
+            ? " " + numberParameter.ui.unit
+            : "";
+          return {
+            id: selection.id,
+            label: selection.value + unit,
+            detail: numberParameter.label,
+          };
+        }
+
+        return {
+          id: selection.id,
+          label: selection.value,
+          detail: selection.value,
+        };
+      }),
+    [
+      facetState?.selections,
+      numberParameterByValueId,
+      optionById,
+      statementById,
+    ],
+  );
 
   function replaceFacetState(
     source: MusicSpec,
@@ -300,6 +368,18 @@ export function FacetEditor({
     );
   }
 
+  function removeCurrentSelection(id: string) {
+    onSpecChange(removeFacetSelection(spec, facet, id));
+  }
+
+  function clearCurrentCustomText() {
+    onSpecChange(setFacetCustomText(spec, facet, null));
+  }
+
+  function clearFacetState() {
+    onSpecChange(replaceFacetState(spec, [], null));
+  }
+
   function updateCustomText(value: string) {
     const clean = value.trim().length > 0 ? withoutEasySelections(spec) : spec;
     onSpecChange(
@@ -396,6 +476,58 @@ export function FacetEditor({
           {t("facetEditor.advanced")}
         </button>
       </div>
+
+      {selectedCount > 0 && (
+        <div className="facet-current-state">
+          <div className="facet-current-head">
+            <div>
+              <strong>{t("facetEditor.current")}</strong>
+              <small>
+                {t("facetEditor.currentCount", { count: selectedCount })}
+              </small>
+            </div>
+            <button
+              type="button"
+              className="text-btn facet-current-clear"
+              onClick={clearFacetState}
+            >
+              {t("facetEditor.clearFacet")}
+            </button>
+          </div>
+
+          <div className="facet-current-items">
+            {currentSelections.map((selection) => (
+              <button
+                key={selection.id}
+                type="button"
+                className="facet-current-chip"
+                title={selection.detail}
+                aria-label={t("facetEditor.removeCurrent", {
+                  label: selection.label,
+                })}
+                onClick={() => removeCurrentSelection(selection.id)}
+              >
+                <span>{selection.label}</span>
+                <Icon name="close" />
+              </button>
+            ))}
+
+            {customText.trim().length > 0 && (
+              <button
+                type="button"
+                className="facet-current-chip custom"
+                title={customText}
+                aria-label={t("facetEditor.removeCustom")}
+                onClick={clearCurrentCustomText}
+              >
+                <small>{t("facetEditor.customShort")}</small>
+                <span>{customText}</span>
+                <Icon name="close" />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {editor.status === "loading" && (
         <div className="facet-editor-state">
