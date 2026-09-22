@@ -23,6 +23,9 @@ importers:
       '@vgine/music-spec':
         specifier: workspace:*
         version: link:../../packages/music-spec
+      '@vgine/project-storage':
+        specifier: workspace:*
+        version: link:../../packages/project-storage
       '@vgine/runtime-data':
         specifier: workspace:*
         version: link:../../packages/runtime-data
@@ -61,6 +64,12 @@ importers:
   packages/motion: {}
 
   packages/music-spec: {}
+
+  packages/project-storage:
+    dependencies:
+      '@vgine/music-spec':
+        specifier: workspace:*
+        version: link:../music-spec
 
   packages/runtime-data:
     dependencies:
