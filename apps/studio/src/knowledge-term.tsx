@@ -366,10 +366,11 @@ export function KnowledgeTerm({
         role="button"
         tabIndex={0}
         className="knowledge-term"
-        aria-expanded={open}
+        aria-expanded={!onActivate ? open : undefined}
         aria-describedby={open ? cardId : undefined}
-        aria-label={t("knowledge.toggle", { label })}
+        aria-label={onActivate ? label : t("knowledge.toggle", { label })}
         data-pinned={pinned || undefined}
+        data-selectable={onActivate ? "" : undefined}
         data-context-type={contextType}
         data-context-key={contextKey}
         onPointerDown={(event) => {
@@ -385,9 +386,7 @@ export function KnowledgeTerm({
             closeTransient(HOVER_CLOSE_DELAY_MS);
           }
         }}
-        onFocus={() => {
-          if (!onActivate) openTransient();
-        }}
+        onFocus={() => openTransient()}
         onBlur={() => closeTransient(HOVER_CLOSE_DELAY_MS)}
         onClick={(event) => {
           event.preventDefault();
