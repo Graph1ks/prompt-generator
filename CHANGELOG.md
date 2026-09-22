@@ -6,6 +6,9 @@ This file records meaningful product, behavior, compatibility, security, data, a
 
 ### Added
 
+- Added global All Easy / All Advanced depth switching with persistent per-facet overrides and facet-scoped personal Advanced custom-text presets.
+- Added a generic IndexedDB user-data store for local preferences/presets.
+
 - Added Product Editor Foundation v1 with 49 parameters, 262 Advanced options, 79 Easy statements and 10 baseline Exclude entries, giving every ordinary MusicSpec facet real selectable content.
 - Added free numeric BPM editing (40–220 BPM) with recommended values while keeping the facet unset until explicit selection.
 
@@ -72,6 +75,9 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Fixed the Studio white-screen regression where Vite development could load stale ignored `packages/*/dist` output and miss newly added workspace exports such as `createMusicSpec`. `pnpm dev` now rebuilds workspace packages first, and Vite dev resolves exact internal `@vgine/*` imports from source.
 
 ### Changed
+
+- Easy and Advanced now behave as mutually exclusive authoring layers once a facet is edited, preventing contradictory mixed states.
+- Pool Favorites, Theme and locale now persist through IndexedDB; legacy localStorage data is migration-only.
 
 - Runtime Pack export now fingerprints and merges the tracked Product Editor Foundation before reviewed/approved DB editor records, and fails closed if required facet coverage regresses.
 - Sound DNA now renders Era and Key/Mode alongside Genre instead of hiding them behind the Genre special case.
