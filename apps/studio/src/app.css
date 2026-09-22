@@ -3278,6 +3278,10 @@
   }
 
   @media (min-width: 1280px) {
+    .statement-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
     .advanced-facet-content {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       align-items: start;
