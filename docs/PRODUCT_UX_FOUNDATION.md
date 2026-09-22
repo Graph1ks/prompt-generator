@@ -385,3 +385,19 @@ Studio automatically restores and locally saves the active project.
 - Theme, language and Favorites are user preferences and do not travel inside the project document;
 - corrupted/unsupported persisted documents must not be silently reinterpreted or overwrite domain state;
 - the top bar communicates restoring/saving/saved/error/unavailable state without blocking editing.
+
+## 23. Complete selectable facet baseline
+
+Every ordinary MusicSpec facet exposed in the four Studio chapters must have meaningful selectable product controls even when no Genre is selected and even when the user never opens Explanation mode.
+
+- Sound DNA renders Genre plus Era and Key/Mode; the Genre special case must not hide the other DNA facets.
+- Pulse renders BPM, Groove, Drums, Bass and Dynamics.
+- Palette renders Melody, Harmony, Instruments, Exciters, Texture and Vocal.
+- Finish renders Space/Mix, Production and Structure plus the separate Exclude pool.
+- Easy offers curated complete musical statements.
+- Advanced offers finer parameter/value dimensions.
+- controls start semantically unset unless the user explicitly selects a value;
+- recommended values are suggestions/affordances, never implicit MusicSpec state;
+- BPM supports direct numeric entry and a continuous 40–220 control in addition to recommended values.
+
+Explanation mode enriches controls; it is never a substitute for the controls themselves.
