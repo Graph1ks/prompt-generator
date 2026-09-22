@@ -8,6 +8,9 @@ import {
   removeGenreInfluence,
   resetMusicSpec,
   resetMusicSpecFacets,
+  setFacetSelection,
+  removeFacetSelection,
+  hasFacetSelection,
   setGenreInfluence,
   validateMusicSpec,
 } from "../dist/index.js";
@@ -121,4 +124,42 @@ test("can clear Foundation and reset a chapter without invalidating the project"
   assert.equal(validateMusicSpec(spec).valid, true);
 
   assert.deepEqual(resetMusicSpec(), createMusicSpec());
+});
+
+
+test("adds, replaces and removes stable facet selections", () => {
+  let spec = createMusicSpec();
+  spec = setFacetSelection(spec, "instruments", {
+    id: "instrument-expression:warm-rhodes",
+    kind: "option",
+    value: "warm Rhodes electric piano",
+    origin: "user",
+    locked: false,
+  });
+  assert.equal(
+    hasFacetSelection(spec, "instruments", "instrument-expression:warm-rhodes"),
+    true,
+  );
+  assert.equal(spec.facets.instruments.selections.length, 1);
+
+  spec = setFacetSelection(spec, "instruments", {
+    id: "instrument-expression:warm-rhodes",
+    kind: "option",
+    value: "warm saturated Rhodes electric piano",
+    origin: "user",
+    locked: false,
+  });
+  assert.equal(spec.facets.instruments.selections.length, 1);
+  assert.equal(
+    spec.facets.instruments.selections[0].value,
+    "warm saturated Rhodes electric piano",
+  );
+
+  spec = removeFacetSelection(
+    spec,
+    "instruments",
+    "instrument-expression:warm-rhodes",
+  );
+  assert.equal(spec.facets.instruments.selections.length, 0);
+  assert.equal(validateMusicSpec(spec).valid, true);
 });
