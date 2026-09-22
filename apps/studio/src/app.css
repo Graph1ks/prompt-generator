@@ -835,6 +835,7 @@
   }
 
   .genre-picker-panel {
+    scroll-margin-block-start: 220px;
     border: 1px solid color-mix(in srgb, var(--studio-line-strong) 70%, transparent);
     border-radius: 17px;
     background: var(--studio-card);
@@ -1150,6 +1151,16 @@
     inset-block-start: 98px;
     overflow: hidden;
     box-shadow: var(--studio-shadow);
+  }
+
+  .preview:focus {
+    outline: none;
+  }
+
+  .preview[data-review-focus="true"] {
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--studio-acid) 68%, transparent),
+      var(--studio-shadow);
   }
 
   .preview-top {
@@ -2469,6 +2480,10 @@
   }
 
   @media (max-width: 760px) {
+    .genre-picker-panel {
+      scroll-margin-block-start: 132px;
+    }
+
     .section-head-actions {
       align-items: flex-end;
     }
