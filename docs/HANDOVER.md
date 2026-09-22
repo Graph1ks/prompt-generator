@@ -233,6 +233,13 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Explanation mode uses icon-only global chrome, but linked controls and live-prompt origins now expose real Knowledge definitions when enabled.
 - Do not spend the next implementation slice on motion polish; prioritize production facet/pool functionality first.
 
+## Recent-choice carry-forward
+
+- Pool preferences already persisted `lastUsedAt`; the Studio now exposes that data as a six-item recently-used quick row for Genre, Instruments and Exclude.
+- Recent choices remain user preference state in IndexedDB and never enter ProjectDocument/MusicSpec until the user activates one.
+- Recent rows are browse aids: they hide under active search/filter intent and wrap on mobile.
+- Instrument/Exclude recents toggle directly; Genre recents apply to the currently open Foundation/Fusion/Accent role.
+
 ## Specialized selected-state rail carry-forward
 
 - Instruments and Exclude expose explicit current-state rails with per-item removal and pool-scoped clear-all actions.
