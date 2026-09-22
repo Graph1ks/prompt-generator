@@ -535,6 +535,22 @@
     color: var(--studio-ink);
   }
 
+  .facet-jump-item.active {
+    border-color: color-mix(
+      in srgb,
+      var(--studio-ink) 22%,
+      var(--studio-line)
+    );
+    background: var(--studio-card);
+    color: var(--studio-ink);
+    box-shadow: inset 2px 0 0 var(--studio-ink);
+  }
+
+  .facet-jump-item.active small {
+    background: var(--studio-ink);
+    color: var(--studio-paper);
+  }
+
   .facet-jump-item small {
     min-inline-size: 18px;
     block-size: 18px;
