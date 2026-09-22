@@ -347,3 +347,113 @@ export function createIndexedDbProjectStorage(
     },
   };
 }
+
+
+export interface UserDataStorage {
+  get<T>(key: string): Promise<T | null>;
+  set<T>(key: string, value: T): Promise<void>;
+  delete(key: string): Promise<void>;
+}
+
+export function createMemoryUserDataStorage(
+  initial: Readonly<Record<string, unknown>> = {},
+): UserDataStorage {
+  const records = new Map<string, unknown>(Object.entries(initial));
+  return {
+    async get<T>(key: string) {
+      return (records.has(key) ? records.get(key) : null) as T | null;
+    },
+    async set<T>(key: string, value: T) {
+      records.set(key, value);
+    },
+    async delete(key: string) {
+      records.delete(key);
+    },
+  };
+}
+
+export interface IndexedDbUserDataStorageOptions {
+  readonly databaseName?: string;
+  readonly storeName?: string;
+  readonly indexedDb?: IDBFactory;
+}
+
+export function createIndexedDbUserDataStorage(
+  options: IndexedDbUserDataStorageOptions = {},
+): UserDataStorage {
+  const databaseName = options.databaseName ?? "vgine-user-data";
+  const storeName = options.storeName ?? "entries";
+  const factory = options.indexedDb ?? globalThis.indexedDB;
+
+  let databasePromise: Promise<IDBDatabase> | null = null;
+
+  function openDatabase(): Promise<IDBDatabase> {
+    if (!factory) {
+      return Promise.reject(
+        new ProjectStorageError(
+          "indexeddb_unavailable",
+          "IndexedDB is unavailable in this environment",
+        ),
+      );
+    }
+    if (databasePromise) return databasePromise;
+
+    databasePromise = new Promise<IDBDatabase>((resolve, reject) => {
+      const request = factory.open(databaseName, 1);
+      request.onupgradeneeded = () => {
+        const database = request.result;
+        if (!database.objectStoreNames.contains(storeName)) {
+          database.createObjectStore(storeName, { keyPath: "key" });
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => {
+        databasePromise = null;
+        reject(
+          new ProjectStorageError(
+            "indexeddb_open_failed",
+            request.error?.message ?? "Unable to open IndexedDB user data",
+          ),
+        );
+      };
+      request.onblocked = () => {
+        databasePromise = null;
+        reject(
+          new ProjectStorageError(
+            "indexeddb_open_blocked",
+            "IndexedDB user-data upgrade is blocked by another Studio instance",
+          ),
+        );
+      };
+    });
+
+    return databasePromise;
+  }
+
+  return {
+    async get<T>(key: string) {
+      const database = await openDatabase();
+      const transaction = database.transaction(storeName, "readonly");
+      const done = transactionDone(transaction);
+      const record = await requestResult<{ key: string; value: T } | undefined>(
+        transaction.objectStore(storeName).get(key),
+      );
+      await done;
+      return record?.value ?? null;
+    },
+
+    async set<T>(key: string, value: T) {
+      const database = await openDatabase();
+      const transaction = database.transaction(storeName, "readwrite");
+      transaction.objectStore(storeName).put({ key, value });
+      await transactionDone(transaction);
+    },
+
+    async delete(key: string) {
+      const database = await openDatabase();
+      const transaction = database.transaction(storeName, "readwrite");
+      transaction.objectStore(storeName).delete(key);
+      await transactionDone(transaction);
+    },
+  };
+}
