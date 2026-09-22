@@ -407,7 +407,6 @@ export function KnowledgeTerm({
             id={cardId}
             className="knowledge-popover"
             role={pinned ? "dialog" : "tooltip"}
-            aria-modal={pinned && position.mobile ? true : undefined}
             aria-label={pinned ? t("knowledge.dialogLabel", { label }) : undefined}
             data-pinned={pinned || undefined}
             data-mobile={position.mobile || undefined}
