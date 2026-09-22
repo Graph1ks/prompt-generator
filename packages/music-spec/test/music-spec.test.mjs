@@ -6,6 +6,8 @@ import {
   createMusicSpec,
   parseMusicSpec,
   removeGenreInfluence,
+  resetMusicSpec,
+  resetMusicSpecFacets,
   setGenreInfluence,
   validateMusicSpec,
 } from "../dist/index.js";
@@ -78,4 +80,45 @@ test("creates and updates ordered genre influence state", () => {
     ["foundation", "fusion"],
   );
   assert.equal(validateMusicSpec(spec).valid, true);
+});
+
+
+test("accepts genre-free MusicSpec projects", () => {
+  const spec = createMusicSpec();
+  assert.deepEqual(spec.genre_influences, []);
+  assert.equal(validateMusicSpec(spec).valid, true);
+});
+
+test("can clear Foundation and reset a chapter without invalidating the project", () => {
+  let spec = createMusicSpec("genre:boom-bap");
+  spec = {
+    ...spec,
+    facets: {
+      era: {
+        locked: false,
+        selections: [
+          { kind: "freeform", value: "1990s", origin: "user", locked: false },
+        ],
+        custom_text: null,
+      },
+      drums: {
+        locked: false,
+        selections: [
+          { kind: "freeform", value: "dry drums", origin: "user", locked: false },
+        ],
+        custom_text: null,
+      },
+    },
+  };
+
+  spec = removeGenreInfluence(spec, "foundation");
+  assert.deepEqual(spec.genre_influences, []);
+  assert.equal(validateMusicSpec(spec).valid, true);
+
+  spec = resetMusicSpecFacets(spec, ["genre", "era"]);
+  assert.equal(spec.facets.era, undefined);
+  assert.ok(spec.facets.drums);
+  assert.equal(validateMusicSpec(spec).valid, true);
+
+  assert.deepEqual(resetMusicSpec(), createMusicSpec());
 });
