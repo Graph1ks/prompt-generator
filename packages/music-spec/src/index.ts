@@ -184,12 +184,12 @@ export function validateMusicSpec(value: unknown): MusicSpecValidationResult {
   if (!Array.isArray(value.genre_influences)) {
     issue(issues, "$.genre_influences", "invalid_genre_influences", "genre_influences must be an array");
   } else {
-    if (value.genre_influences.length < 1 || value.genre_influences.length > 3) {
+    if (value.genre_influences.length > 3) {
       issue(
         issues,
         "$.genre_influences",
         "invalid_genre_influence_count",
-        "MusicSpec v1 requires one to three genre influences",
+        "MusicSpec v1 allows zero to three genre influences",
       );
     }
     const seenRoles = new Set<string>();
@@ -321,23 +321,29 @@ const GENRE_ROLE_ORDER: Readonly<Record<GenreInfluenceRole, number>> = {
   accent: 2,
 };
 
-export function createMusicSpec(foundationGenreId: string): MusicSpec {
-  if (!foundationGenreId) {
-    throw new Error("foundation genre ID must be non-empty");
+export function createMusicSpec(foundationGenreId?: string): MusicSpec {
+  if (foundationGenreId !== undefined && !foundationGenreId) {
+    throw new Error("foundation genre ID must be non-empty when provided");
   }
   return {
     schema_version: MUSIC_SPEC_SCHEMA_VERSION,
-    genre_influences: [
-      {
-        role: "foundation",
-        genre_id: foundationGenreId,
-        routing: [],
-        locked: false,
-      },
-    ],
+    genre_influences: foundationGenreId
+      ? [
+          {
+            role: "foundation",
+            genre_id: foundationGenreId,
+            routing: [],
+            locked: false,
+          },
+        ]
+      : [],
     facets: {},
     exclude: [],
   };
+}
+
+export function resetMusicSpec(): MusicSpec {
+  return createMusicSpec();
 }
 
 export function setGenreInfluence(
@@ -362,10 +368,29 @@ export function setGenreInfluence(
 
 export function removeGenreInfluence(
   spec: MusicSpec,
-  role: Exclude<GenreInfluenceRole, "foundation">,
+  role: GenreInfluenceRole,
 ): MusicSpec {
   return {
     ...spec,
     genre_influences: spec.genre_influences.filter((entry) => entry.role !== role),
+  };
+}
+
+
+export function resetMusicSpecFacets(
+  spec: MusicSpec,
+  facetKeys: readonly FacetKey[],
+  options: { readonly clearExclude?: boolean } = {},
+): MusicSpec {
+  const facets = { ...spec.facets };
+  for (const key of facetKeys) {
+    delete facets[key];
+  }
+
+  return {
+    ...spec,
+    genre_influences: facetKeys.includes("genre") ? [] : spec.genre_influences,
+    facets,
+    exclude: options.clearExclude ? [] : spec.exclude,
   };
 }

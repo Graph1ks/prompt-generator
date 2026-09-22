@@ -173,7 +173,7 @@ The TypeScript foundation now adds:
 
 `packages/ui` now provides the semantic token contract, Paradise/Ash themes and the first React primitives. `packages/motion` centralizes causal motion recipes and reduced-motion behavior.
 
-`apps/studio` now stages/loads the owner-local Runtime Pack, validates the bootstrap payload, builds one shared local search index, browses/searches the real 24 Major Genres + 1,564 taxonomy genres, creates/updates Foundation/Fusion/Accent MusicSpec state, and renders the pure compiler live prompt/budget output. Its presentation is deliberately aligned to the supplied V'GINE Studio concept: editorial intro, horizontal four-stage workflow, large role cards, inline picker, sticky record-sleeve preview and mobile Studio/Preview dock. It intentionally does not invent missing editor content and still does not add Router, Radix, Motion-for-React, Zustand or TanStack.
+`apps/studio` now stages/loads the owner-local Runtime Pack, validates the bootstrap payload, builds one shared local search index, browses/searches the real 24 Major Genres + 1,564 taxonomy genres, supports valid genre-free MusicSpec plus optional Foundation/Fusion/Accent state, and renders the pure compiler live prompt/budget output. Its presentation is deliberately aligned to the supplied V'GINE Studio concept: editorial intro, horizontal four-stage workflow, large role cards, inline picker, sticky record-sleeve preview and mobile Studio/Preview dock. It intentionally does not invent missing editor content and still does not add Router, Radix, Motion-for-React, Zustand or TanStack.
 
 Real search benchmark acceptance: 10,348 documents; 92.014 ms index build; median 4.900 ms; P95 10.117 ms; P99/max 14.472 ms. Keep the dependency-free kernel unless later profiling proves a concrete need.
 
@@ -188,7 +188,7 @@ Recommended order:
 1. **Reusable Picker pattern** — generalize the proven Genre browse/search/bounded-result mechanics without coupling the pattern to genre semantics.
 2. **Instrument-expression repository + picker** — load the detailed expression payload lazily and expose all 6,035 source expressions with stable IDs/search.
 3. **Knowledge detail surfaces** — lazy-load dictionary entries/context only when the UI requests them.
-4. **Project persistence** — add IndexedDB behind the documented ProjectStorage interface; persist MusicSpec, never rendered prompt text as source truth.
+4. **Project persistence** — add IndexedDB behind the documented ProjectStorage interface; persist MusicSpec as semantic source truth and model any manual rendered-output override explicitly as secondary project/output state.
 5. **Remaining facets / editor enrichment** — expand controls incrementally; add Radix/Motion-for-React only where a concrete interaction warrants the dependency.
 
 ## Post-V1 enrichment is allowed but is not a blocker
@@ -207,3 +207,13 @@ The following can be added incrementally without declaring Database V1 unfinishe
 Do not spend the next thread re-mining the database. Produce runtime/compiler/application progress while preserving the V1 DB contract.
 
 If a proposed implementation requires changing a Database V1 invariant, call that out explicitly as a schema/architecture change rather than silently mutating the foundation.
+
+## Interaction additions carried forward
+
+- MusicSpec v1 now accepts zero to three genre influences. Existing v1 documents remain valid.
+- Sound DNA can be skipped after one per-prompt warning confirmation.
+- Large pools have reusable user favorites with 1.5 s add / 2 s remove hold gestures and usage-based ranking.
+- Explicit Show All replaces repeated 12-item paging; expanded Genre lists include a floating return-to-top action and collapse after selection.
+- Page reset clears only the current chapter's state; new prompt reset clears the complete prompt session but not user favorites.
+- The final Style output may be manually overridden. The override never mutates MusicSpec; restoring the original returns to the current deterministic compiler result.
+- `docs/VGINE_LEXICON_ENTRY.md` documents the verified product-name history. The knowledge compiler seeds the V'gine entry reproducibly; rebuild owner-local knowledge/runtime data to surface it.

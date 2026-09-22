@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { compileMusicSpec } from "@vgine/compiler";
-import type {
-  FacetKey,
-  GenreInfluenceRole,
-  MusicSpec,
+import { compileMusicSpec, countCharacters } from "@vgine/compiler";
+import {
+  createMusicSpec,
+  resetMusicSpec,
+  resetMusicSpecFacets,
+  type FacetKey,
+  type GenreInfluenceRole,
+  type MusicSpec,
 } from "@vgine/music-spec";
 import { isVgineTheme, type VgineTheme } from "@vgine/ui";
 
@@ -75,13 +78,16 @@ export function App() {
   const [chapterId, setChapterId] = useState(STUDIO_CHAPTERS[0].id);
   const [activeGenreRole, setActiveGenreRole] =
     useState<GenreInfluenceRole>("foundation");
-  const [spec, setSpec] = useState<MusicSpec | null>(null);
+  const [spec, setSpec] = useState<MusicSpec>(() => createMusicSpec());
   const [runtime, setRuntime] = useState<RuntimeState>({ status: "loading" });
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [outputTab, setOutputTab] = useState<OutputTab>("style");
   const [assistOn, setAssistOn] = useState(true);
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
   const [previewPulse, setPreviewPulse] = useState(false);
+  const [genreSkipAcknowledged, setGenreSkipAcknowledged] = useState(false);
+  const [manualStyleText, setManualStyleText] = useState<string | null>(null);
+  const [promptUnlocked, setPromptUnlocked] = useState(false);
 
   const chapter =
     STUDIO_CHAPTERS.find((candidate) => candidate.id === chapterId) ??
@@ -119,7 +125,7 @@ export function App() {
   }, [runtime]);
 
   const compilation = useMemo(() => {
-    if (runtime.status !== "ready" || spec === null) return null;
+    if (runtime.status !== "ready") return null;
     return compileMusicSpec(spec, runtime.value.compilerKnowledge);
   }, [runtime, spec]);
 
@@ -132,22 +138,70 @@ export function App() {
 
   const selectedGenreLabels = useMemo(
     () =>
-      spec?.genre_influences.map(
+      spec.genre_influences.map(
         (entry) => genreLabels.get(entry.genre_id) ?? entry.genre_id,
-      ) ?? [],
+      ),
     [genreLabels, spec],
   );
 
   const [coverLineOne, coverLineTwo] = coverLines(
     selectedGenreLabels[0] ?? "Build your sound",
   );
-  const budgetUsed = compilation?.budget.used ?? 0;
+  const compiledStyleText = compilation?.styleText ?? "";
+  const effectiveStyleText = manualStyleText ?? compiledStyleText;
   const budgetMax = compilation?.budget.max || 1000;
+  const budgetUsed =
+    manualStyleText === null
+      ? compilation?.budget.used ?? 0
+      : countCharacters(manualStyleText);
+  const manualBudgetValid = budgetUsed <= budgetMax;
   const budgetPercent = Math.min(100, Math.max(0, (budgetUsed / budgetMax) * 100));
+  const hasGenre = spec.genre_influences.length > 0;
 
   function chooseChapter(nextId: (typeof STUDIO_CHAPTERS)[number]["id"]) {
     setChapterId(nextId);
     setMobilePreviewOpen(false);
+  }
+
+  function requestChapter(nextId: (typeof STUDIO_CHAPTERS)[number]["id"]) {
+    const targetIndex = STUDIO_CHAPTERS.findIndex((entry) => entry.id === nextId);
+    const leavingDnaForward = chapter.id === "dna" && targetIndex > currentChapterIndex;
+    if (leavingDnaForward && !hasGenre && !genreSkipAcknowledged) {
+      setGenreSkipAcknowledged(true);
+      return;
+    }
+    chooseChapter(nextId);
+  }
+
+  function resetCurrentChapter() {
+    setSpec(
+      resetMusicSpecFacets(spec, chapter.facets, {
+        clearExclude: chapter.id === "finish",
+      }),
+    );
+  }
+
+  function startNewPrompt() {
+    setSpec(resetMusicSpec());
+    setChapterId(STUDIO_CHAPTERS[0].id);
+    setActiveGenreRole("foundation");
+    setGenreSkipAcknowledged(false);
+    setManualStyleText(null);
+    setPromptUnlocked(false);
+    setOutputTab("style");
+    setMobilePreviewOpen(false);
+  }
+
+  function togglePromptUnlock() {
+    if (!promptUnlocked && manualStyleText === null) {
+      setManualStyleText(compiledStyleText);
+    }
+    setPromptUnlocked((current) => !current);
+  }
+
+  function resetManualPrompt() {
+    setManualStyleText(null);
+    setPromptUnlocked(false);
   }
 
   function facetSummary(facet: FacetKey): string {
@@ -164,8 +218,9 @@ export function App() {
 
   async function copyPrompt() {
     const value =
-      outputTab === "exclude" ? compilation?.excludeText : compilation?.styleText;
+      outputTab === "exclude" ? compilation?.excludeText : effectiveStyleText;
     if (!value) return;
+    if (outputTab === "style" && !manualBudgetValid) return;
     try {
       await copyText(value);
       setCopyState("copied");
@@ -210,6 +265,15 @@ export function App() {
           <button
             type="button"
             className="icon-btn"
+            aria-label="Neuen Prompt beginnen"
+            title="Prompt vollständig zurücksetzen"
+            onClick={startNewPrompt}
+          >
+            <Icon name="reset" />
+          </button>
+          <button
+            type="button"
+            className="icon-btn"
             aria-label="Farbschema wechseln"
             title="Farbschema wechseln"
             onClick={() =>
@@ -230,7 +294,7 @@ export function App() {
           <button
             type="button"
             className="btn primary"
-            disabled={!compilation?.styleText}
+            disabled={!effectiveStyleText || !manualBudgetValid}
             onClick={copyPrompt}
           >
             <Icon name="copy" />
@@ -285,7 +349,7 @@ export function App() {
                           : "step"
                     }
                     aria-current={active ? "step" : undefined}
-                    onClick={() => chooseChapter(item.id)}
+                    onClick={() => requestChapter(item.id)}
                   >
                     <span className="num">0{index + 1}</span>
                     {item.label}
@@ -300,11 +364,22 @@ export function App() {
                   <h2>{chapterCopy.title}</h2>
                   <p>{chapterCopy.description}</p>
                 </div>
-                <span className="section-index">
+                <div className="section-head-actions">
+                  <button
+                    type="button"
+                    className="section-reset"
+                    onClick={resetCurrentChapter}
+                    title="Diese Seite zurücksetzen"
+                  >
+                    <Icon name="reset" />
+                    Seite zurücksetzen
+                  </button>
+                  <span className="section-index">
                   0
                   {STUDIO_CHAPTERS.findIndex((item) => item.id === chapter.id) + 1}
                   {" / 04"}
-                </span>
+                  </span>
+                </div>
               </div>
 
               {runtime.status === "loading" && (
@@ -367,17 +442,31 @@ export function App() {
               <div className="stage-footer">
                 <p>
                   {chapter.id === "dna"
-                    ? "Foundation ist Pflicht. Fusion und Accent bleiben optional."
-                    : "Easy und Advanced werden denselben MusicSpec-Zustand bearbeiten."}
+                    ? genreSkipAcknowledged && !hasGenre
+                      ? "Kein Genre gesetzt. Das ist erlaubt — bestätige einmalig für diesen Prompt."
+                      : "Genre ist optional. Ohne Genre gibt es beim Weitergehen genau einen Hinweis."
+                    : "Easy und Advanced bearbeiten denselben MusicSpec-Zustand."}
                 </p>
                 <button
                   type="button"
-                  className="btn primary"
-                  disabled={chapter.id === "dna" && spec === null}
-                  onClick={() => chooseChapter(nextChapter.id)}
+                  className={
+                    chapter.id === "dna" && genreSkipAcknowledged && !hasGenre
+                      ? "btn warning-next"
+                      : "btn primary"
+                  }
+                  onClick={() => requestChapter(nextChapter.id)}
                 >
-                  {chapter.id === "finish" ? "Fertig" : nextChapter.label}
-                  <Icon name="arrow" />
+                  {chapter.id === "dna" && genreSkipAcknowledged && !hasGenre ? (
+                    <>
+                      <Icon name="warning" />
+                      Ohne Genre weiter
+                    </>
+                  ) : (
+                    <>
+                      {chapter.id === "finish" ? "Fertig" : nextChapter.label}
+                      <Icon name="arrow" />
+                    </>
+                  )}
                 </button>
               </div>
             </section>
@@ -412,10 +501,32 @@ export function App() {
               <div className="cover-code">
                 {selectedGenreLabels.length
                   ? selectedGenreLabels.slice(0, 3).join(" × ").toUpperCase()
-                  : "FOUNDATION × FUSION × ACCENT"}
+                  : "GENRE FREE × USER DIRECTED"}
               </div>
               <div className="record" aria-hidden="true" />
               <div className="cover-barcode" aria-hidden="true" />
+            </div>
+
+            <div className="prompt-edit-controls">
+              <button
+                type="button"
+                className={promptUnlocked ? "prompt-edit active" : "prompt-edit"}
+                disabled={!compiledStyleText && manualStyleText === null}
+                onClick={togglePromptUnlock}
+              >
+                <Icon name={promptUnlocked ? "lock" : "unlock"} />
+                {promptUnlocked ? "Prompt sperren" : "Prompt entsperren"}
+              </button>
+              {(manualStyleText !== null || promptUnlocked) && (
+                <button
+                  type="button"
+                  className="prompt-edit"
+                  onClick={resetManualPrompt}
+                >
+                  <Icon name="reset" />
+                  Original wiederherstellen
+                </button>
+              )}
             </div>
 
             <div className="preview-tabs">
@@ -441,7 +552,21 @@ export function App() {
 
             <div className="prompt-area">
               {outputTab === "style" ? (
-                compilation?.sections.length ? (
+                promptUnlocked ? (
+                  <label className="manual-prompt-editor">
+                    <span className="sr-only">Style Prompt manuell bearbeiten</span>
+                    <textarea
+                      value={manualStyleText ?? compiledStyleText}
+                      spellCheck={false}
+                      onChange={(event) => setManualStyleText(event.currentTarget.value)}
+                    />
+                    <small>
+                      Manueller Output-Override. MusicSpec bleibt unverändert.
+                    </small>
+                  </label>
+                ) : manualStyleText !== null ? (
+                  <pre className="manual-prompt-output">{manualStyleText}</pre>
+                ) : compilation?.sections.length ? (
                   compilation.sections.map((section) => (
                     <div className="prompt-line changed-line" key={section.sectionKey}>
                       <span className="bracket">[</span>
@@ -455,8 +580,8 @@ export function App() {
                   <div className="preview-empty">
                     <Icon name="spark" />
                     <p>
-                      Wähle eine Foundation. Jede Änderung landet direkt hier —
-                      aus dem echten MusicSpec, nicht aus Demo-State.
+                      Bau deinen Sound aus den vier Seiten. Genre ist optional;
+                      der Compiler erzeugt nur Abschnitte, die du tatsächlich setzt.
                     </p>
                   </div>
                 )
@@ -465,6 +590,12 @@ export function App() {
               ) : (
                 <div className="preview-empty">
                   <p>Noch keine Ausschlüsse gesetzt.</p>
+                </div>
+              )}
+
+              {!manualBudgetValid && outputTab === "style" && (
+                <div className="diagnostic error">
+                  Manueller Prompt liegt {budgetUsed - budgetMax} Zeichen über dem Suno-Limit.
                 </div>
               )}
 
@@ -493,7 +624,7 @@ export function App() {
                 className="btn acid"
                 disabled={
                   outputTab === "style"
-                    ? !compilation?.styleText
+                    ? !effectiveStyleText || !manualBudgetValid
                     : !compilation?.excludeText
                 }
                 onClick={copyPrompt}
@@ -507,7 +638,9 @@ export function App() {
                 <span className="copy-shortcut">Ctrl / ⌘ ↵</span>
               </button>
               <div className="preview-note">
-                Deine Auswahl wird deterministisch in den Prompt übersetzt.
+                {manualStyleText !== null
+                  ? "Manueller Override aktiv · Original bleibt jederzeit wiederherstellbar."
+                  : "Deine Auswahl wird deterministisch in den Prompt übersetzt."}
               </div>
             </div>
           </aside>
@@ -538,7 +671,7 @@ export function App() {
         <button
           type="button"
           className="btn acid"
-          disabled={!compilation?.styleText}
+          disabled={!effectiveStyleText || !manualBudgetValid}
           onClick={copyPrompt}
         >
           <Icon name="copy" />

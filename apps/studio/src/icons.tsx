@@ -11,7 +11,14 @@ type IconName =
   | "plus"
   | "search"
   | "spark"
-  | "theme";
+  | "star"
+  | "theme"
+  | "up"
+  | "lock"
+  | "unlock"
+  | "reset"
+  | "edit"
+  | "warning";
 
 const paths: Readonly<Record<IconName, ReactNode>> = {
   arrow: <><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></>,
@@ -24,7 +31,14 @@ const paths: Readonly<Record<IconName, ReactNode>> = {
   plus: <><path d="M12 5v14" /><path d="M5 12h14" /></>,
   search: <><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4.5 4.5" /></>,
   spark: <><path d="m12 3 2.7 6.3L21 12l-6.3 2.7L12 21l-2.7-6.3L3 12l6.3-2.7Z" /><path d="M20 2v4" /><path d="M18 4h4" /></>,
+  star: <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2 7.5 14 3 9.6l6.2-.9Z" />,
   theme: <><circle cx="12" cy="12" r="8" /><path d="M12 4v16" /><path d="M12 4a8 8 0 0 1 0 16" /></>,
+  up: <><path d="m6 14 6-6 6 6" /><path d="M12 8v12" /></>,
+  lock: <><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></>,
+  unlock: <><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 7-2.6" /></>,
+  reset: <><path d="M4 8V4h4" /><path d="M5.5 5.5A8 8 0 1 1 4 14" /></>,
+  edit: <><path d="m4 20 4.5-1 10-10a2 2 0 0 0-3-3l-10 10Z" /><path d="m14 7 3 3" /></>,
+  warning: <><path d="M12 3 2.7 20h18.6Z" /><path d="M12 9v5" /><path d="M12 17v.1" /></>,
 };
 
 export interface IconProps extends SVGProps<SVGSVGElement> {

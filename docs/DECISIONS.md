@@ -100,14 +100,14 @@ Desktop hover/focus may preview; click can pin/expand. Mobile uses tap/popover/b
 
 ---
 
-## ADR-006 — Genre influence is 1–3 ordered roles, not percentages
+## ADR-006 — Genre influence is 0–3 ordered roles, not percentages
 
 **Status:** accepted  
 **Date:** 2026-09-21
 
 ### Decision
 
-A project can have Foundation, Fusion, and Accent genre influences. Genres can be drag-swapped between roles. The product does not expose default numeric influence percentages because the prompt target expresses language rather than meaningful numeric mixing weights.
+A project can have no genre influence at all, or Foundation, Fusion, and Accent genre influences. Genre-free MusicSpec is valid. When genre influences are used, roles remain semantic rather than numeric. The product does not expose default numeric influence percentages because the prompt target expresses language rather than meaningful numeric mixing weights.
 
 The taxonomy is many-to-many: a subgenre is one entity even when tagged with multiple Major Genres.
 
@@ -687,3 +687,26 @@ The production visual foundation is modern native CSS, CSS Modules and semantic 
 ### Consequences
 
 The application keeps a distinct V'gine visual language while still allowing reviewed headless/behavior primitives where technically justified.
+
+
+## ADR-030 — Large-pool favorites are preference state, not project semantics
+
+**Status:** accepted
+
+Genres, Instruments and other high-cardinality option pools may expose persistent user favorites. Favoriting uses one shared interaction contract and is stored independently from MusicSpec. Favorites rank before non-favorites and are ordered by actual usage count with recency as a tie-breaker.
+
+The initial browser implementation may use local storage; the preference interface must remain replaceable by the future storage layer.
+
+## ADR-031 — Manual rendered-prompt editing is an explicit output override
+
+**Status:** accepted
+
+The deterministic compiler result remains reproducible from MusicSpec. Users may unlock the final rendered Style prompt and edit/delete text manually. This creates a separate output override; it never back-parses into MusicSpec and never becomes semantic source truth.
+
+Resetting the override restores the current compiler result. The hard renderer budget still applies to the manual output.
+
+## ADR-032 — Chapter reset is scoped; new prompt reset is global
+
+**Status:** accepted
+
+Each of the four Studio chapters can clear only the MusicSpec facets it owns. Starting a new prompt clears the whole MusicSpec plus prompt-scoped UI acknowledgements and manual output overrides. User-level preferences such as favorites survive project resets.

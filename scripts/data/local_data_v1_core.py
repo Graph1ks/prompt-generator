@@ -139,6 +139,22 @@ def build_knowledge(c,g,corpus,gsha):
  for key,label,order in OUTPUT_SECTIONS: cur.execute("INSERT INTO prompt_section_definition(section_key,output_label,output_order,optional,easy_visible,advanced_visible) VALUES (?,?,?,?,?,?)",(key,label,order,1,1,1))
  cur.execute("INSERT INTO renderer_profile(id,label,version,active,max_characters,overflow_policy,notes) VALUES (?,?,?,?,?,?,?)",("suno-structured-v1","Suno structured prompt",1,1,STYLE_PROMPT_MAX_CHARACTERS,"semantic-budget","[Header: content] lines; hard 1000-character style-prompt budget; Exclude is separate comma-list output."))
  cur.executemany("INSERT INTO renderer_section(renderer_profile_id,section_key,output_order,emit_when_empty,soft_max_characters,source_sample_count) VALUES (?,?,?,0,?,?)",[("suno-structured-v1",k,o,RENDERER_SECTION_SOFT_MAX.get(k),RENDERER_SECTION_SOURCE_SAMPLES.get(k,0)) for k,_,o in OUTPUT_SECTIONS])
+
+ # Product-owned lexicon entries are reproducible tracked knowledge, not Factory evidence.
+ product_prov="vgine-product-lexicon"
+ product_eid="knowledge:product:vgine"
+ cur.execute("INSERT INTO provenance(provenance_key,source_kind,source_ref,notes) VALUES (?,?,?,?)",(product_prov,"curated","docs/VGINE_LEXICON_ENTRY.md","Tracked V'gine product lexicon entry with historical-source notes."))
+ cur.execute("INSERT INTO knowledge_entry(id,entry_type,canonical_label,canonical_slug,status,difficulty,created_from,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?)",(product_eid,"product_term","V'gine","vgine","approved","beginner","product",stamp,stamp))
+ cur.execute("INSERT INTO term_variant(entry_id,surface,surface_norm,locale,match_kind,match_priority,is_primary) VALUES (?,?,?,?,?,?,1)",(product_eid,"V'gine",norm("V'gine"),"und","manual",500))
+ product_definitions=[
+  ("de","one_liner","V'gine ist der Name des Graph1ks Sound-Studios; die Schreibweise hat einen realen historischen Vorläufer als spätmittelalterliche Kürzung von „virgine“."),
+  ("de","plain","Die Form „v'gine“ ist in spätmittelalterlichen Handschriften und frühen Drucken als gekürzte Schreibweise von „virgine“ belegt. In lateinischen Kontexten ist „virgine“ eine Flexionsform von „virgo“ („Jungfrau“, „Mädchen“) und erscheint häufig in marianischen Formulierungen."),
+  ("de","expert_note","Die historischen Belege stützen die Abkürzungsform, aber keine einzige universelle Aussprache von „V'gine“. Die Aussprache des Produktnamens ist daher eine eigenständige Markenentscheidung."),
+  ("en","one_liner","V'gine is the Graph1ks sound-studio name; its spelling has a documented historical precedent as a late-medieval abbreviation of “virgine”."),
+  ("en","plain","The form “v'gine” is attested in late-medieval manuscript and early-print material as an abbreviated spelling of “virgine”. In Latin contexts, “virgine” is an inflected form of “virgo” (“maiden”, “virgin”) and frequently occurs in Marian language."),
+  ("en","expert_note","The historical evidence supports the abbreviated spelling, not one universal pronunciation of the modern product name. Brand pronunciation is therefore a separate product convention."),
+ ]
+ cur.executemany("INSERT INTO definition(entry_id,locale,definition_kind,text,status,revision) VALUES (?,?,?,?,?,1)",[(product_eid,locale,kind,text,"approved") for locale,kind,text in product_definitions])
  mids={}
  for i,label in enumerate(g["major_genres"],1):
   mid=sid("major",label); eid=sid("knowledge:genre",f"major::{label}"); mids[label]=mid

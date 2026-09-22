@@ -85,13 +85,13 @@ Expected result: acceptance remains `status: ok`; the compiled knowledge DB is s
 - `@vgine/motion` now owns durations/easings/springs and named causal recipes with reduced-motion behavior; no animation library dependency is required at this layer.
 - Real 10,348-document search benchmark accepted: 92.014 ms one-time index build; median 4.900 ms, P95 10.117 ms, P99/max 14.472 ms. The dependency-free kernel remains the production baseline; no fuzzy/index dependency or Worker is justified by current measurements.
 - React 19.3.0 + React DOM 19.3.0 + Vite 8.3.0 + @vitejs/plugin-react 6.1.1 are now pinned and reviewed; no Router/Radix/Motion-for-React/Zustand/TanStack package is installed yet.
-- `apps/studio` now stages and validates the real Runtime Pack, builds one shared search index, renders the production Genre picker over 24 Major Genres / 1,564 taxonomy genres, writes stable IDs into shared MusicSpec state, and drives the pure compiler/live 1,000-character budget preview. The product shell now follows the accepted Studio concept composition: editorial top bar/intro, horizontal four-stage workflow, large Foundation/Fusion/Accent cards, inline picker, sticky record-sleeve Live Prompt, and a mobile Studio/Preview dock.
+- `apps/studio` now stages and validates the real Runtime Pack, builds one shared search index, renders the production Genre picker over 24 Major Genres / 1,564 taxonomy genres, writes stable IDs into shared MusicSpec state, and drives the pure compiler/live 1,000-character budget preview. Genre guidance is optional (0–3 influences), large-pool favorites persist independently of projects and rank by usage, long result sets have explicit Show All/top-return behavior, chapter/new-prompt resets are scoped, and the final Style output can be manually overridden/restored without mutating MusicSpec.
 - `@vgine/ui` now includes the first reusable React primitives (`Surface`, `Button`, `IconButton`, `Text`, `Stack`, `Cluster`) styled only through V'gine semantic tokens.
 - Local operator outputs are standardized: flat `reports/`, separate `logs/`, durable `.local-data/backups/`; legacy nested report folders have a safe plan/apply migrator.
 
 ## Current blocker
 
-**No implementation blocker.** Search performance, Runtime Pack loading, Genre selection, MusicSpec creation and live compiler preview are validated. The stale-workspace-build white-screen regression is fixed by rebuilding packages before `pnpm dev` and resolving exact internal `@vgine/*` imports from workspace source during Vite development. Owner-local visual/touch review remains required before treating the Studio presentation as final.
+**No implementation blocker.** Search performance, Runtime Pack loading, genre-free/genre-guided MusicSpec creation and live compiler preview are validated. The stale-workspace-build white-screen regression is fixed by rebuilding packages before `pnpm dev` and resolving exact internal `@vgine/*` imports from workspace source during Vite development. Owner-local visual/touch review remains required before treating the Studio presentation as final.
 
 Future enrichment does not reopen the V1 database milestone unless it changes schema/invariants.
 
@@ -131,3 +131,13 @@ Proceed in this order:
 - `docs/DESIGN_SYSTEM_V1.md` — semantic themes/tokens/motion foundation
 - `docs/STUDIO_RUNTIME_GENRE_V1.md` — real Runtime Pack staging, Genre picker and live compiler integration
 - `docs/LOCAL_OUTPUT_LAYOUT.md` — canonical local reports/logs/backups layout
+
+## Current interaction contract additions
+
+- Valid MusicSpec genre count is **0–3**; no Genre section is emitted when none is selected.
+- The first forward navigation from Sound DNA without a genre asks once; the acknowledgement resets with a new prompt.
+- High-cardinality pools use persistent favorites with mouse/touch hold gestures and usage-based ordering.
+- Genre result expansion is explicit `Alle anzeigen`; selection returns the picker to compact state.
+- Every Studio page can reset its owned facets; new prompt reset is global.
+- Final Style output can be unlocked, manually edited/deleted and restored to the deterministic compiler result.
+- Product-owned knowledge now includes a tracked V'gine lexicon seed; owner-local knowledge/runtime rebuild is required before that new entry appears in generated Runtime Pack data.

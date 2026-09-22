@@ -6,6 +6,10 @@ This file records meaningful product, behavior, compatibility, security, data, a
 
 ### Added
 
+- Added reusable large-pool favorites with browser persistence, mouse/touch long-press progress (1.5 s add, 2 s remove), usage-based favorite ordering, explicit Genre `Alle anzeigen`, expanded-list return-to-top, and automatic compact reset after selection.
+- Added scoped Studio page reset, global new-prompt reset, one-time genre-free continuation warning, and final Style prompt unlock/manual-edit/restore controls while keeping MusicSpec as semantic source truth.
+- Added a verified product-owned V'gine lexicon seed plus `docs/VGINE_LEXICON_ENTRY.md`; the historical spelling is documented as a late-medieval abbreviation of `virgine` without inventing one universal pronunciation.
+
 - Added accepted production application architecture: strict TypeScript/React/Vite/pnpm, Tauri 2 packaging direction, pure compiler boundaries, modular V'gine design system, selective Radix/shadcn boundary, centralized Motion recipes, adaptive four-chapter Studio layout, and storage/search module contracts.
 - Added the strict pnpm/TypeScript workspace with `@vgine/music-spec` runtime validation and a pure deterministic `@vgine/compiler` implementing structured Suno rendering, separate Exclude output, semantic deduplication, prioritized budget omission, Unicode code-point counting, diagnostics and compaction receipts.
 - Added `@vgine/runtime-data` Runtime Pack v1 bootstrap validation/compiler adaptation plus a dependency-free `@vgine/search` kernel with deterministic ranking, kind filters, worker-ready protocol, and a real 10,348-document benchmark harness.
@@ -52,6 +56,9 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Fixed the Studio white-screen regression where Vite development could load stale ignored `packages/*/dist` output and miss newly added workspace exports such as `createMusicSpec`. `pnpm dev` now rebuilds workspace packages first, and Vite dev resolves exact internal `@vgine/*` imports from source.
 
 ### Changed
+
+- Relaxed MusicSpec v1 genre influences from 1–3 to **0–3**. Genre is now optional; the compiler simply omits the Genre section when none is selected.
+- Fixed hover-state contrast for primary/accent Studio buttons.
 
 - Reworked the Studio presentation to preserve the supplied V'GINE concept's product composition instead of a generic dashboard shell: editorial top bar/intro, horizontal four-stage navigation, large color-coded Genre Influence cards, inline taxonomy picker, sticky record-sleeve Live Prompt, Style/Exclude tabs, budget treatment and mobile Studio/Preview dock. Runtime Pack, MusicSpec and compiler contracts remain the production source of truth.
 

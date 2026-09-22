@@ -29,7 +29,7 @@
 
 ### In scope
 
-- One-to-three Genre Influence model with Foundation / Fusion / Accent roles.
+- Zero-to-three Genre Influence model with optional Foundation / Fusion / Accent roles; genre-free prompts are valid.
 - 24-Major-Genre + subgenre browsing/search based on the Graph1ks genre taxonomy.
 - Easy mode with curated words/combination statements.
 - Advanced mode with granular parameters, explicit routing/ownership, and custom section input.
