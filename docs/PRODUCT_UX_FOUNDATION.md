@@ -15,7 +15,7 @@ The internal product model must remain richer than the exported prompt. Suno is 
 ## 2. UX principles
 
 1. **Do not hide creative content behind constraints.** Constraints/quality checks advise, explain relationships, and surface conflicts. They do not decide what the user is allowed to select.
-2. **Genre influence comes first.** The primary style decision is one to three genre influences. All other musical facets follow as structured detail.
+2. **Genre influence is powerful but optional.** A project may use zero to three genre influences. If genre is omitted, the rest of the musical facets remain fully usable.
 3. **Progressive disclosure, not feature removal.** Easy and Advanced modes operate on the same underlying MusicSpec. Easy uses curated statements/combinations; Advanced reveals atomic controls and custom text.
 4. **Words in, words out.** Do not expose pseudo-precision such as percentage sliders when the compiled prompt can only express language. A control must map to a meaningful verbal state.
 5. **No option-wall UI.** Large vocabularies use search-first animated pickers, categories, recent/favorite items, and browsing. Avoid huge native dropdowns.
@@ -56,9 +56,9 @@ Switching modes must never destroy state. A value authored in Advanced can be su
 
 ## 4. Genre Influence model
 
-A project has **one, two, or three** genre influences:
+A project has **zero, one, two, or three** genre influences:
 
-1. **Foundation** — primary musical grammar.
+1. **Foundation** — primary musical grammar when the user chooses genre guidance.
 2. **Fusion** — secondary language integrated into the foundation.
 3. **Accent** — optional color, texture, or production influence.
 
@@ -298,3 +298,30 @@ Copy is a primary workflow. Use progressive fallback:
 3. final fallback opens/selects clean plaintext so the user can copy manually.
 
 The UI must never end at an unexplained `clipboard unavailable` dead-end.
+
+
+## 15. Large-pool favorites and explicit expansion
+
+Large selectable pools such as Genres and Instruments use the same preference contract:
+
+- long-press with mouse or touch for approximately 1.5 seconds to favorite;
+- long-press an existing favorite for approximately 2 seconds to remove it;
+- hold progress is visible and does not accidentally activate the underlying option;
+- favorites are shown first and ordered by actual use count, then recency;
+- favorites are user preference state, not MusicSpec/project semantics;
+- compact result views use an explicit **Show all** action rather than repeated fixed-size paging;
+- expanded long lists provide an obvious return-to-top control and collapse back to compact after selection.
+
+## 16. Genre-free continuation
+
+Leaving Sound DNA without a genre is valid. The first forward action with no genre changes into a concise one-time confirmation. The second action continues. That acknowledgement belongs to the current prompt session and resets with a new prompt.
+
+## 17. Manual prompt override and reset
+
+The compiled Style prompt can be unlocked for manual editing. Manual edits are an explicit output override layered above the deterministic compiler result:
+
+- MusicSpec remains unchanged and remains the semantic source truth;
+- the original current compiler output is always recoverable with one reset action;
+- manual output still obeys the renderer character budget;
+- every Studio chapter exposes a page reset that clears only the semantic state owned by that chapter;
+- starting a new prompt resets MusicSpec, chapter warning acknowledgements and manual output overrides.
