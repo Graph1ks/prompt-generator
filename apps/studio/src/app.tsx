@@ -10,6 +10,7 @@ import {
 } from "@vgine/music-spec";
 import { isVgineTheme, type VgineTheme } from "@vgine/ui";
 
+import { ExcludePicker } from "./exclude-picker.js";
 import { FacetEditor } from "./facet-editor.js";
 import { GenrePicker } from "./genre-picker.js";
 import { InstrumentPicker } from "./instrument-picker.js";
@@ -449,6 +450,13 @@ export function App() {
                         onSpecChange={setSpec}
                       />
                     ),
+                  )}
+                  {chapter.id === "finish" && (
+                    <ExcludePicker
+                      runtime={runtime.value}
+                      spec={spec}
+                      onSpecChange={setSpec}
+                    />
                   )}
                 </div>
               )}
