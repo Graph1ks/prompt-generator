@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-22  
-**Current milestone:** **Explain UX + authored Product Knowledge complete; multi-project library implemented** — next: CI/owner-local acceptance, then remaining Studio ergonomics
+**Current milestone:** **Explain UX + authored Product Knowledge + multi-project library implemented** — current: ordinary-facet state visibility/mobile ergonomics
 
 ## Completion verdict
 
@@ -185,6 +185,15 @@ Proceed in this order:
 - Selected Genre labels, ordinary facet section labels, Advanced parameter labels and the Instruments section can expose reviewed definitions when their Runtime records carry Knowledge IDs.
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
+
+## Ordinary facet state rail + mobile Explain access
+
+- Every ordinary FacetEditor now keeps its active MusicSpec state visible above the Easy/Advanced authoring surface.
+- Selected Easy statements, Advanced options, numeric values and custom wording are represented as compact removable chips; users no longer need to hunt through an expanded option set merely to see or remove current state.
+- The rail exposes a facet-scoped clear action without changing the Easy/Advanced view contract.
+- State labels come from the same Runtime statement/option/parameter records that created the selection; no prompt-string parsing or semantic guessing was added.
+- Mobile chips and clear controls use practical touch targets and wrap rather than introducing a nested horizontal scroller.
+- Explain mode remains directly toggleable on narrow/mobile screens through the persistent bottom dock instead of disappearing when the top bar becomes constrained.
 
 ## Project library v1
 
