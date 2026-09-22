@@ -1,7 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type MutableRefObject,
+} from "react";
 
 export interface ExpandedPoolSegmentController {
-  readonly segmentRef: React.MutableRefObject<HTMLElement | null>;
+  readonly segmentRef: MutableRefObject<HTMLElement | null>;
   readonly showReturnToStart: boolean;
   readonly scrollToStart: () => void;
 }
