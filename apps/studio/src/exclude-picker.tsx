@@ -246,6 +246,7 @@ export function ExcludePicker({
                   loadKnowledge={runtime.loadKnowledge}
                   contextType="exclude"
                   contextKey={entry.id}
+                  onActivate={() => toggleEntry(entry)}
                 />
               </span>
               <small>{entry.output_text}</small>
