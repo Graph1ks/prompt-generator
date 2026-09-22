@@ -15,12 +15,17 @@ export interface CopyFallbackProps {
 
 export function CopyFallback({ text, onClose }: CopyFallbackProps) {
   const { t } = useI18n();
+  const dialogRef = useRef<HTMLElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     if (text === null) return;
 
     const previousOverflow = document.body.style.overflow;
+    const previousFocus =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
     document.body.style.overflow = "hidden";
 
     const frame = window.requestAnimationFrame(() => {
@@ -32,6 +37,25 @@ export function CopyFallback({ text, onClose }: CopyFallbackProps) {
       if (event.key === "Escape") {
         event.preventDefault();
         onClose();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+      const dialog = dialogRef.current;
+      if (!dialog) return;
+      const focusable = [...dialog.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      )];
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
       }
     }
 
@@ -40,6 +64,7 @@ export function CopyFallback({ text, onClose }: CopyFallbackProps) {
       window.cancelAnimationFrame(frame);
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
+      previousFocus?.focus();
     };
   }, [onClose, text]);
 
@@ -61,6 +86,7 @@ export function CopyFallback({ text, onClose }: CopyFallbackProps) {
       onPointerDown={closeFromBackdrop}
     >
       <section
+        ref={dialogRef}
         className="copy-fallback"
         role="dialog"
         aria-modal="true"
