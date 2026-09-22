@@ -731,10 +731,6 @@ export function App() {
                         spec={spec}
                         onSpecChange={setSpec}
                         assistOn={assistOn}
-                        mode={facetModes[facet] ?? globalEditorMode}
-                        onModeChange={(next) =>
-                          setFacetEditorMode(facet, next)
-                        }
                       />
                     ) : (
                       <FacetEditor
@@ -745,6 +741,10 @@ export function App() {
                         spec={spec}
                         onSpecChange={setSpec}
                         assistOn={assistOn}
+                        mode={facetModes[facet] ?? globalEditorMode}
+                        onModeChange={(next) =>
+                          setFacetEditorMode(facet, next)
+                        }
                       />
                     ),
                   )}
