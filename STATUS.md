@@ -186,6 +186,14 @@ Proceed in this order:
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
 
+## Clipboard reliability + active-output copy
+
+- Copy now follows the documented progressive fallback contract: Clipboard API -> legacy `execCommand` -> explicit manual-copy surface.
+- Clipboard API permission failure no longer skips directly to an unexplained error; the legacy path is attempted even when the modern API exists but rejects.
+- The final fallback opens a focused, fully selected clean-output dialog/sheet with keyboard focus containment, Select All and explicit close controls.
+- Copy availability is derived from the active Style/Exclude tab, so Exclude can be copied even when Style is empty and all header/preview/mobile copy controls share one validity rule.
+- `Ctrl / ⌘ + Enter` follows that same active-output rule and is suppressed while project/manual-copy overlays are open.
+
 ## Ordinary facet state rail + mobile Explain access
 
 - Every ordinary FacetEditor now keeps its active MusicSpec state visible above the Easy/Advanced authoring surface.
