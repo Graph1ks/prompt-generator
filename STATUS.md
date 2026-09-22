@@ -156,6 +156,14 @@ Proceed in this order:
 - Hover contrast is explicitly defined across the current Studio button families.
 - Motion remains intentionally restrained until interaction/functionality coverage is further along.
 
+## Recently used quick choices
+
+- Genre, Instruments and Exclude now surface up to six locally remembered recently used choices when the pool is in its unfiltered browse state.
+- Recency comes from the existing `lastUsedAt` values already stored in IndexedDB-backed pool preferences; no new persistence channel or project semantics were introduced.
+- Instrument/Exclude recent chips reflect current selection state and toggle directly; Genre recent chips apply to the role the user explicitly opened.
+- Recent rows disappear while search/filter intent is active so they do not compete with the user's current query.
+- Mobile recent chips use practical 44 px targets and wrap instead of introducing horizontal-scroll traps.
+
 ## Specialized selected-state rails
 
 - Instruments and Exclude now use the same visible-current-state pattern as ordinary facets instead of exposing only a count plus a loose chip row.

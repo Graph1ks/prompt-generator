@@ -318,6 +318,7 @@ Large selectable pools such as Genres and Instruments use the same preference co
 - long-press an existing favorite for approximately 1.0 second to remove it;
 - hold progress is visible and does not accidentally activate the underlying option; adding uses theme-semantic success green and draws a completion checkmark, removing uses explicit red square/X feedback;
 - favorites are shown first and ordered by actual use count, then recency;
+- the same local usage metadata exposes a small recently-used quick row in unfiltered browse state; active search/filter intent suppresses that row rather than adding more competing chrome;
 - favorites are user preference state, not MusicSpec/project semantics;
 - compact result views use an explicit **Show all** action rather than repeated fixed-size paging;
 - expanded long lists provide an obvious return-to-top control and collapse back to compact after selection;
