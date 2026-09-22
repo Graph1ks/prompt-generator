@@ -3,14 +3,15 @@ import {
   useState,
   type ButtonHTMLAttributes,
   type PointerEvent as ReactPointerEvent,
+  type CSSProperties,
   type ReactNode,
 } from "react";
 
 import { Icon } from "./icons.js";
 import { useI18n } from "./i18n.js";
 
-const ADD_HOLD_MS = 1500;
-const REMOVE_HOLD_MS = 2000;
+const ADD_HOLD_MS = 800;
+const REMOVE_HOLD_MS = 1000;
 
 export interface HoldFavoriteOptionProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick" | "children"> {
@@ -77,6 +78,10 @@ export function HoldFavoriteOption({
       data-favorite={favorite || undefined}
       data-holding={holding || undefined}
       data-hold-action={favorite ? "remove" : "add"}
+      style={{
+        ...props.style,
+        "--favorite-hold-ms": (favorite ? REMOVE_HOLD_MS : ADD_HOLD_MS) + "ms",
+      } as CSSProperties}
       title={
         favorite
           ? t("favorite.removeTitle")
@@ -109,6 +114,7 @@ export function HoldFavoriteOption({
           ) : (
             <svg className="hold-add" viewBox="0 0 48 48">
               <circle cx="24" cy="24" r="18" pathLength="1" />
+              <path className="hold-add-check" d="m15 24 6 6 12-13" pathLength="1" />
             </svg>
           )}
         </span>
