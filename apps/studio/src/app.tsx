@@ -14,7 +14,7 @@ import { GenrePicker } from "./genre-picker.js";
 import { Icon } from "./icons.js";
 import { SUPPORTED_LOCALES, useI18n, type MessageKey } from "./i18n.js";
 import { loadStudioRuntime, type StudioRuntime } from "./runtime-client.js";
-import { FACET_LABELS, STUDIO_CHAPTERS } from "./studio-config.js";
+import { STUDIO_CHAPTERS } from "./studio-config.js";
 
 const THEME_KEY = "vgine.theme";
 
@@ -652,7 +652,7 @@ export function App() {
               >
                 <Icon name="copy" />
                 {copyState === "copied"
-                  ? "Kopiert"
+                  ? t("app.copied")
                   : outputTab === "style"
                     ? t("preview.copyStyle")
                     : t("preview.copyExclude")}
