@@ -158,6 +158,69 @@ export interface RuntimeInstrumentLibrary {
   readonly expressions: RuntimeInstrumentExpressionsPayload;
 }
 
+export interface RuntimeParameter {
+  readonly id: string;
+  readonly section_key: FacetKey;
+  readonly label: string;
+  readonly canonical_slug: string;
+  readonly value_type: string;
+  readonly easy_visible: boolean;
+  readonly advanced_visible: boolean;
+  readonly allow_custom_text: boolean;
+  readonly knowledge_entry_id: string | null;
+  readonly sort_order: number;
+}
+
+export interface RuntimeParameterOption {
+  readonly id: string;
+  readonly parameter_id: string;
+  readonly label: string;
+  readonly canonical_slug: string;
+  readonly output_fragment: string;
+  readonly easy_visible: boolean;
+  readonly advanced_visible: boolean;
+  readonly knowledge_entry_id: string | null;
+  readonly sort_order: number;
+}
+
+export interface RuntimeStatementConceptLink {
+  readonly entry_id: string;
+  readonly role: string | null;
+  readonly ordinal: number;
+}
+
+export interface RuntimeStatementOptionLink {
+  readonly option_id: string;
+  readonly ordinal: number;
+}
+
+export interface RuntimeStatement {
+  readonly id: string;
+  readonly section_key: FacetKey;
+  readonly label: string;
+  readonly output_text: string;
+  readonly mode_scope: string;
+  readonly statement_kind: string;
+  readonly source_frequency: number;
+  readonly concepts: readonly RuntimeStatementConceptLink[];
+  readonly options: readonly RuntimeStatementOptionLink[];
+}
+
+export interface RuntimeExcludeEntry {
+  readonly id: string;
+  readonly label: string;
+  readonly output_text: string;
+  readonly knowledge_entry_id: string | null;
+}
+
+export interface RuntimeEditorPayload {
+  readonly schema: "vgine-runtime-editor-v1";
+  readonly parameters: readonly RuntimeParameter[];
+  readonly parameter_options: readonly RuntimeParameterOption[];
+  readonly statements: readonly RuntimeStatement[];
+  readonly exclude: readonly RuntimeExcludeEntry[];
+}
+
 export type RuntimeSearchKind = "genre" | "instrument_expression" | "knowledge";
 
 export interface RuntimeSearchDocument {
@@ -548,6 +611,124 @@ export function parseRuntimeInstrumentExpressions(
   return { schema: "vgine-runtime-instrument-expressions-v1", expressions };
 }
 
+export function parseRuntimeEditor(value: unknown): RuntimeEditorPayload {
+  const root = asRecord(value, "editor");
+  assertSchema(root, "vgine-runtime-editor-v1", "editor");
+
+  const parameters = asArray(root.parameters, "editor.parameters").map(
+    (entry, index) => {
+      const path = `editor.parameters[${index}]`;
+      const row = asRecord(entry, path);
+      const sectionKey = asString(row.section_key, `${path}.section_key`);
+      if (!isFacetKey(sectionKey)) {
+        fail("invalid_editor_facet", `${path}.section_key`, `unsupported facet: ${sectionKey}`);
+      }
+      return {
+        id: asString(row.id, `${path}.id`),
+        section_key: sectionKey,
+        label: asString(row.label, `${path}.label`),
+        canonical_slug: asString(row.canonical_slug, `${path}.canonical_slug`),
+        value_type: asString(row.value_type, `${path}.value_type`),
+        easy_visible: asBoolean(row.easy_visible, `${path}.easy_visible`),
+        advanced_visible: asBoolean(row.advanced_visible, `${path}.advanced_visible`),
+        allow_custom_text: asBoolean(row.allow_custom_text, `${path}.allow_custom_text`),
+        knowledge_entry_id: asNullableString(
+          row.knowledge_entry_id,
+          `${path}.knowledge_entry_id`,
+        ),
+        sort_order: asInteger(row.sort_order, `${path}.sort_order`),
+      };
+    },
+  );
+
+  const parameterOptions = asArray(
+    root.parameter_options,
+    "editor.parameter_options",
+  ).map((entry, index) => {
+    const path = `editor.parameter_options[${index}]`;
+    const row = asRecord(entry, path);
+    return {
+      id: asString(row.id, `${path}.id`),
+      parameter_id: asString(row.parameter_id, `${path}.parameter_id`),
+      label: asString(row.label, `${path}.label`),
+      canonical_slug: asString(row.canonical_slug, `${path}.canonical_slug`),
+      output_fragment: asString(row.output_fragment, `${path}.output_fragment`),
+      easy_visible: asBoolean(row.easy_visible, `${path}.easy_visible`),
+      advanced_visible: asBoolean(row.advanced_visible, `${path}.advanced_visible`),
+      knowledge_entry_id: asNullableString(
+        row.knowledge_entry_id,
+        `${path}.knowledge_entry_id`,
+      ),
+      sort_order: asInteger(row.sort_order, `${path}.sort_order`),
+    };
+  });
+
+  const statements = asArray(root.statements, "editor.statements").map(
+    (entry, index) => {
+      const path = `editor.statements[${index}]`;
+      const row = asRecord(entry, path);
+      const sectionKey = asString(row.section_key, `${path}.section_key`);
+      if (!isFacetKey(sectionKey)) {
+        fail("invalid_editor_facet", `${path}.section_key`, `unsupported facet: ${sectionKey}`);
+      }
+      const concepts = asArray(row.concepts, `${path}.concepts`).map(
+        (linkEntry, linkIndex) => {
+          const linkPath = `${path}.concepts[${linkIndex}]`;
+          const link = asRecord(linkEntry, linkPath);
+          return {
+            entry_id: asString(link.entry_id, `${linkPath}.entry_id`),
+            role: asNullableString(link.role, `${linkPath}.role`),
+            ordinal: asInteger(link.ordinal, `${linkPath}.ordinal`),
+          };
+        },
+      );
+      const optionLinks = asArray(row.options, `${path}.options`).map(
+        (linkEntry, linkIndex) => {
+          const linkPath = `${path}.options[${linkIndex}]`;
+          const link = asRecord(linkEntry, linkPath);
+          return {
+            option_id: asString(link.option_id, `${linkPath}.option_id`),
+            ordinal: asInteger(link.ordinal, `${linkPath}.ordinal`),
+          };
+        },
+      );
+      return {
+        id: asString(row.id, `${path}.id`),
+        section_key: sectionKey,
+        label: asString(row.label, `${path}.label`),
+        output_text: asString(row.output_text, `${path}.output_text`),
+        mode_scope: asString(row.mode_scope, `${path}.mode_scope`),
+        statement_kind: asString(row.statement_kind, `${path}.statement_kind`),
+        source_frequency: asInteger(row.source_frequency, `${path}.source_frequency`),
+        concepts,
+        options: optionLinks,
+      };
+    },
+  );
+
+  const exclude = asArray(root.exclude, "editor.exclude").map((entry, index) => {
+    const path = `editor.exclude[${index}]`;
+    const row = asRecord(entry, path);
+    return {
+      id: asString(row.id, `${path}.id`),
+      label: asString(row.label, `${path}.label`),
+      output_text: asString(row.output_text, `${path}.output_text`),
+      knowledge_entry_id: asNullableString(
+        row.knowledge_entry_id,
+        `${path}.knowledge_entry_id`,
+      ),
+    };
+  });
+
+  return {
+    schema: "vgine-runtime-editor-v1",
+    parameters,
+    parameter_options: parameterOptions,
+    statements,
+    exclude,
+  };
+}
+
 export function parseRuntimeSearch(value: unknown): RuntimeSearchPayload {
   const root = asRecord(value, "search");
   assertSchema(root, "vgine-runtime-search-documents-v1", "search");
@@ -673,6 +854,32 @@ export async function loadRuntimeInstrumentLibrary(
   );
 
   return { instruments, expressions };
+}
+
+export async function loadRuntimeEditor(
+  reader: RuntimePackReader,
+  manifest: RuntimeManifest,
+  options: LoadRuntimeBootstrapOptions = {},
+): Promise<RuntimeEditorPayload> {
+  const editorText = await readAndVerify(
+    reader,
+    manifest,
+    "editor.json",
+    options.sha256Hex,
+  );
+  const editor = parseRuntimeEditor(parseJson(editorText, "editor.json"));
+
+  assertCount(manifest, "editor.json", "parameters", editor.parameters.length);
+  assertCount(
+    manifest,
+    "editor.json",
+    "parameter_options",
+    editor.parameter_options.length,
+  );
+  assertCount(manifest, "editor.json", "statements", editor.statements.length);
+  assertCount(manifest, "editor.json", "exclude", editor.exclude.length);
+
+  return editor;
 }
 
 export function buildCompilerKnowledge(bootstrap: RuntimeBootstrap): RuntimeCompilerKnowledge {
