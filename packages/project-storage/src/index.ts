@@ -304,10 +304,11 @@ export function createIndexedDbProjectStorage(
     async load(id) {
       const database = await openDatabase();
       const transaction = database.transaction(storeName, "readonly");
+      const done = transactionDone(transaction);
       const result = await requestResult(
         transaction.objectStore(storeName).get(id),
       );
-      await transactionDone(transaction);
+      await done;
       return result === undefined ? null : parseProjectDocument(result);
     },
 
@@ -329,10 +330,11 @@ export function createIndexedDbProjectStorage(
     async list() {
       const database = await openDatabase();
       const transaction = database.transaction(storeName, "readonly");
+      const done = transactionDone(transaction);
       const values = await requestResult(
         transaction.objectStore(storeName).getAll(),
       );
-      await transactionDone(transaction);
+      await done;
       return values
         .map((value) => parseProjectDocument(value))
         .map(({ id, title, created_at, updated_at }) => ({
