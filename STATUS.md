@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-22  
-**Current milestone:** **Explain UX rebuilt + Product Knowledge authoring pipeline ready** — next: replace generated/meta definitions, owner-local Runtime smoke validation, then project-library / remaining UX refinement
+**Current milestone:** **Explain UX rebuilt + Product Knowledge v1 authored** — next: owner-local Runtime/Explain smoke validation, then project-library / remaining UX refinement
 
 ## Completion verdict
 
@@ -92,11 +92,11 @@ Expected result: acceptance remains `status: ok`; the compiled knowledge DB is s
 
 ## Current blocker
 
-**No implementation blocker.** PR #37 is merged and CI-green at `dd503031ed546f0ed508763ebab2efe2269ec83c`.
+**No implementation blocker.** The accepted 400-entry Product Knowledge authoring batch has been imported into the tracked Product Knowledge Foundation: all 49 parameter concepts, 262 Advanced values, 79 Easy statements and 10 Exclude entries now carry substantive English/German musical explanations instead of generated editor-meta copy.
 
-The remaining Product Knowledge issue is editorial, not semantic-link coverage: the current 400-entry foundation still contains generated/meta wording for many option/statement/Exclude definitions. The complete replacement batch is prepared in `data/product/knowledge-foundation-v1-authoring-request.txt` and can be validated/imported with `scripts/data/import_product_knowledge_authoring.py`.
+The authored text is preserved as supplied; UI labels and prompt-facing English terminology are not localized or renamed by the Knowledge layer. CI now guards the tracked foundation against reintroducing the rejected preset/control/rendering meta templates.
 
-Owner-local Runtime rebuild and visual/touch smoke remain required because this environment does not have the owner's `.local-data/current/knowledge.sqlite` or desktop/browser session.
+Owner-local Runtime rebuild and visual/touch smoke remain required because generated Runtime Pack artifacts and the owner's desktop/browser session are local-only.
 
 Future enrichment does not reopen the V1 database milestone unless it changes schema/invariants.
 
@@ -104,12 +104,10 @@ Future enrichment does not reopen the V1 database milestone unless it changes sc
 
 Proceed in this order:
 
-1. run the 400-entry Product Knowledge authoring request through the dedicated writing/research thread and save the strict `ID / EN / DE / ---` response;
-2. validate/import that response with `scripts/data/import_product_knowledge_authoring.py`;
-3. owner-locally re-export Runtime Pack v1 and reproduce the reference prompt with Explain enabled;
-4. verify selection-time Explain on Product controls, Genre, Instruments and Exclude; fix only genuine explicit-link/UX defects — never infer Knowledge identity from rendered strings;
-5. continue project naming/library/duplicate/import-export on the existing `ProjectStorage` contract;
-6. continue Studio ergonomics/visual refinement; reserve broad motion polish until interaction/functionality is accepted.
+1. owner-locally re-export Runtime Pack v1 and reproduce the reference prompt with Explain enabled;
+2. verify selection-time Explain on Product controls, Genre, Instruments and Exclude; fix only genuine explicit-link/UX defects — never infer Knowledge identity from rendered strings;
+3. continue project naming/library/duplicate/import-export on the existing `ProjectStorage` contract;
+4. continue Studio ergonomics/visual refinement; reserve broad motion polish until interaction/functionality is accepted.
 
 ## Do not redo
 
