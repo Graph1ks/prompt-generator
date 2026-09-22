@@ -31,6 +31,7 @@ export function HoldFavoriteOption({
   onActivate,
   children,
   className = "",
+  title,
   ...props
 }: HoldFavoriteOptionProps) {
   const { t } = useI18n();
@@ -87,7 +88,7 @@ export function HoldFavoriteOption({
         "--favorite-remove-x-delay-ms": Math.round(REMOVE_HOLD_MS * 0.7) + "ms",
         "--favorite-remove-x-ms": Math.round(REMOVE_HOLD_MS * 0.3) + "ms",
       } as CSSProperties}
-      title={favorite ? t("favorite.removeTitle") : t("favorite.addTitle")}
+      title={title ?? (favorite ? t("favorite.removeTitle") : t("favorite.addTitle"))}
       onPointerDown={startHold}
       onPointerUp={stopTimer}
       onPointerCancel={stopTimer}
