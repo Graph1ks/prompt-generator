@@ -3484,3 +3484,94 @@
     }
   }
 }
+
+
+@layer studio {
+  .prompt-line-group {
+    display: grid;
+    gap: 5px;
+  }
+
+  .prompt-knowledge-origins {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    padding-inline-start: 14px;
+  }
+
+  .prompt-knowledge-label {
+    flex: 0 0 auto;
+    padding-block-start: 4px;
+    color: var(--studio-muted);
+    font-family: var(--vg-font-mono);
+    font-size: 7px;
+    font-weight: 760;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .prompt-knowledge-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-inline-size: 0;
+  }
+
+  .prompt-knowledge-chips .knowledge-term {
+    padding: 0;
+    text-decoration: none;
+  }
+
+  .prompt-knowledge-chip {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 25px;
+    padding: 4px 7px;
+    border: 1px solid color-mix(
+      in srgb,
+      var(--vg-color-accent) 36%,
+      var(--studio-line)
+    );
+    border-radius: 999px;
+    background: color-mix(
+      in srgb,
+      var(--vg-color-accent) 7%,
+      var(--studio-card)
+    );
+    color: var(--studio-muted);
+    font-family: var(--vg-font-mono);
+    font-size: 8px;
+    font-weight: 680;
+    line-height: 1.2;
+  }
+
+  .prompt-knowledge-chips .knowledge-term:hover .prompt-knowledge-chip,
+  .prompt-knowledge-chips .knowledge-term[aria-expanded="true"] .prompt-knowledge-chip {
+    color: var(--studio-ink);
+    border-color: var(--vg-color-accent);
+    background: color-mix(
+      in srgb,
+      var(--vg-color-accent) 13%,
+      var(--studio-card)
+    );
+  }
+
+  .prompt-knowledge-chips .knowledge-inline-card {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+    inline-size: min(340px, calc(100vw - 56px));
+    z-index: calc(var(--vg-z-popover) + 4);
+  }
+
+  @media (max-width: 760px) {
+    .prompt-knowledge-origins {
+      padding-inline-start: 9px;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .prompt-knowledge-label {
+      padding-block-start: 0;
+    }
+  }
+}
