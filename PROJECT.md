@@ -41,6 +41,7 @@
 - Quality checks/relations that explain conflicts without blocking creative choices.
 - Local-only corpus mining, knowledge database generation, and runtime data compilation.
 - Responsive/mobile-first interaction patterns and accessible non-hover fallbacks.
+- Multilingual UI with German/English initially and an extensible typed locale architecture; Suno renderer output remains English in v1.
 - Motion used for causality, reorder, picker transitions, and live-output diff feedback.
 
 ### Explicitly out of scope for the current foundation

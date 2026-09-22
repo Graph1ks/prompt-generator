@@ -6,6 +6,9 @@ This file records meaningful product, behavior, compatibility, security, data, a
 
 ### Added
 
+- Added typed German/English Studio localization with persisted browser/user locale selection and an extension path for additional UI languages while keeping Suno renderer output English.
+- Made all 24 Major Genres permanently visible and selectable as first-class Genre influences; Major browse results now start with the pure Major Genre before its subgenres.
+
 - Added reusable large-pool favorites with browser persistence, mouse/touch long-press progress (1.5 s add, 2 s remove), usage-based favorite ordering, explicit Genre `Alle anzeigen`, expanded-list return-to-top, and automatic compact reset after selection.
 - Added scoped Studio page reset, global new-prompt reset, one-time genre-free continuation warning, and final Style prompt unlock/manual-edit/restore controls while keeping MusicSpec as semantic source truth.
 - Added a verified product-owned V'gine lexicon seed plus `docs/VGINE_LEXICON_ENTRY.md`; the historical spelling is documented as a late-medieval abbreviation of `virgine` without inventing one universal pronunciation.
@@ -56,6 +59,9 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Fixed the Studio white-screen regression where Vite development could load stale ignored `packages/*/dist` output and miss newly added workspace exports such as `createMusicSpec`. `pnpm dev` now rebuilds workspace packages first, and Vite dev resolves exact internal `@vgine/*` imports from source.
 
 ### Changed
+
+- Reworked expanded Genre-list return-to-start behavior so the floating control appears only while scrolled down inside the active expanded segment.
+- Reduced Explanation mode chrome to an icon-only accessible control and hardened hover contrast across current Studio button families.
 
 - Relaxed MusicSpec v1 genre influences from 1–3 to **0–3**. Genre is now optional; the compiler simply omits the Genre section when none is selected.
 - Fixed hover-state contrast for primary/accent Studio buttons.

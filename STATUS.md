@@ -141,3 +141,13 @@ Proceed in this order:
 - Every Studio page can reset its owned facets; new prompt reset is global.
 - Final Style output can be unlocked, manually edited/deleted and restored to the deterministic compiler result.
 - Product-owned knowledge now includes a tracked V'gine lexicon seed; owner-local knowledge/runtime rebuild is required before that new entry appears in generated Runtime Pack data.
+
+## Current Studio UX/i18n additions
+
+- All 24 Major Genres are permanently visible in the picker.
+- A selected Major Genre is itself the first selectable result before its subgenres and compiles through the same Genre influence path.
+- Studio UI has typed German/English catalogs with persisted locale preference; renderer/prompt output remains English.
+- Explanation mode is icon-only with accessible label/title.
+- Expanded Genre lists use viewport/segment-scoped return-to-start visibility rather than an always-present sticky control.
+- Hover contrast is explicitly defined across the current Studio button families.
+- Motion remains intentionally restrained until interaction/functionality coverage is further along.

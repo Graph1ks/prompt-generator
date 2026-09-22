@@ -2175,3 +2175,175 @@
     }
   }
 }
+
+
+@layer studio {
+  /* Universal Studio hover contract: interactive text and background may never collapse to the same color. */
+  .btn:hover:not(:disabled) {
+    color: var(--studio-ink);
+    background: color-mix(in srgb, var(--studio-card) 76%, var(--studio-mint));
+    border-color: var(--studio-line-strong);
+  }
+
+  .btn.primary:hover:not(:disabled) {
+    color: var(--studio-paper);
+    background: color-mix(in srgb, var(--studio-ink) 88%, #65705f);
+    border-color: color-mix(in srgb, var(--studio-ink) 88%, #65705f);
+  }
+
+  .btn.acid:hover:not(:disabled) {
+    color: #1c211b;
+    background: color-mix(in srgb, var(--studio-acid) 82%, #ffffff);
+    border-color: transparent;
+  }
+
+  .icon-btn:hover:not(:disabled),
+  .search-clear:hover:not(:disabled),
+  .section-reset:hover:not(:disabled) {
+    color: var(--studio-ink);
+    background: color-mix(in srgb, var(--studio-card) 72%, var(--studio-mint));
+  }
+
+  .step:hover:not(:disabled) {
+    color: var(--studio-ink);
+    background: color-mix(in srgb, var(--studio-card) 68%, var(--studio-mint));
+  }
+
+  .step.active:hover:not(:disabled) {
+    color: var(--studio-ink);
+    background: var(--studio-card);
+  }
+
+  .add-genre:hover:not(:disabled) {
+    color: var(--studio-ink);
+  }
+
+  .genre-actions button:hover:not(:disabled) {
+    color: inherit;
+  }
+
+  .chip:hover:not(:disabled) {
+    color: var(--studio-ink);
+    background: color-mix(in srgb, var(--studio-card) 70%, var(--studio-mint));
+  }
+
+  .chip.selected:hover:not(:disabled) {
+    color: var(--studio-paper);
+    background: var(--studio-ink);
+    border-color: var(--studio-ink);
+  }
+
+  .genre-result:hover:not(:disabled),
+  .show-all-btn:hover:not(:disabled) {
+    color: var(--studio-ink);
+  }
+
+  .genre-result.major-option {
+    border-color: color-mix(in srgb, var(--studio-acid) 46%, var(--studio-line));
+    background: color-mix(in srgb, var(--studio-acid) 12%, var(--studio-card));
+  }
+
+  .genre-result.major-option > span:first-child::after {
+    content: " · MAJOR";
+    font-size: 8px;
+    letter-spacing: 0.09em;
+    opacity: 0.55;
+    font-family: var(--vg-font-mono);
+  }
+
+  .preview-tab:hover:not(:disabled),
+  .prompt-edit:hover:not(:disabled) {
+    color: #eff4e7;
+  }
+
+  .picker-back-to-top:hover:not(:disabled) {
+    color: var(--studio-paper);
+    background: color-mix(in srgb, var(--studio-ink) 86%, #65705f);
+  }
+
+  .mobile-dock .mobile-preview-button:hover:not(:disabled) {
+    color: #ffffff;
+    background: color-mix(in srgb, var(--studio-dark) 86%, #52604d);
+    border-color: transparent;
+  }
+
+  .language-switch {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px;
+    border: 1px solid var(--studio-line);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--studio-card) 78%, transparent);
+  }
+
+  .language-switch button {
+    min-inline-size: 34px;
+    min-block-size: 34px;
+    padding: 0 7px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--studio-muted);
+    font-family: var(--vg-font-mono);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+  }
+
+  .language-switch button:hover:not(:disabled) {
+    color: var(--studio-ink);
+    background: color-mix(in srgb, var(--studio-mint) 30%, var(--studio-card));
+  }
+
+  .language-switch button.active,
+  .language-switch button.active:hover:not(:disabled) {
+    color: var(--studio-paper);
+    background: var(--studio-ink);
+  }
+
+  .genre-picker-panel {
+    scroll-margin-block-start: 96px;
+  }
+
+  .picker-back-to-top {
+    position: fixed;
+    inset-block-end: 28px;
+    inset-inline-end: max(32px, calc((100vw - 1540px) / 2 + 395px));
+    margin: 0;
+    z-index: var(--vg-z-sheet);
+  }
+
+  @media (max-width: 980px) {
+    .picker-back-to-top {
+      inset-inline-end: 28px;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .language-switch {
+      margin-inline-start: auto;
+    }
+
+    .language-switch button {
+      min-inline-size: 32px;
+      min-block-size: 32px;
+    }
+
+    .picker-back-to-top {
+      inset-inline-end: 18px;
+      inset-block-end: calc(88px + env(safe-area-inset-bottom));
+    }
+  }
+
+  @media (max-width: 430px) {
+    .top-actions > .icon-btn:first-of-type {
+      display: none;
+    }
+
+    .language-switch button {
+      min-inline-size: 30px;
+      padding-inline: 5px;
+    }
+  }
+}

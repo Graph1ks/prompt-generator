@@ -79,11 +79,11 @@ The genre picker must be a modal/sheet rather than a permanent sidebar.
 Top level:
 
 - search field;
-- the 24 Major Genres;
+- **all 24 Major Genres always visible** as browse/filter controls;
 - recent/favorite choices;
-- `Show more` / browse mode.
+- explicit compact / **Show all** result modes.
 
-Browsing a Major Genre reveals its subgenres. A subgenre that belongs to multiple Major Genres is represented **once** in a result set and displays all applicable Major Genre tags. The taxonomy is many-to-many and the UI must not duplicate an entity just because it has multiple parents.
+Browsing a Major Genre reveals its options with the **pure Major Genre itself as the first selectable result**, followed by its subgenres. A subgenre that belongs to multiple Major Genres is represented **once** in a result set and displays all applicable Major Genre tags. The taxonomy is many-to-many and the UI must not duplicate an entity just because it has multiple parents.
 
 ## 5. Large-option interaction pattern
 
@@ -310,7 +310,8 @@ Large selectable pools such as Genres and Instruments use the same preference co
 - favorites are shown first and ordered by actual use count, then recency;
 - favorites are user preference state, not MusicSpec/project semantics;
 - compact result views use an explicit **Show all** action rather than repeated fixed-size paging;
-- expanded long lists provide an obvious return-to-top control and collapse back to compact after selection.
+- expanded long lists provide an obvious return-to-top control and collapse back to compact after selection;
+- the return-to-top control appears only after the user has scrolled down inside that expanded segment, disappears again at the segment start, above the segment, and after the viewport has passed the segment.
 
 ## 16. Genre-free continuation
 
@@ -325,3 +326,17 @@ The compiled Style prompt can be unlocked for manual editing. Manual edits are a
 - manual output still obeys the renderer character budget;
 - every Studio chapter exposes a page reset that clears only the semantic state owned by that chapter;
 - starting a new prompt resets MusicSpec, chapter warning acknowledgements and manual output overrides.
+
+## 18. Localization contract
+
+The application UI is multilingual; renderer/prompt language is a separate contract.
+
+- v1 UI locales: German (`de`) and English (`en`);
+- locale defaults from the browser when no explicit preference exists;
+- the user's locale preference is persisted locally;
+- UI strings live in typed message catalogs rather than inline component literals;
+- adding another UI language extends the locale registry/catalog without changing MusicSpec or renderer logic;
+- **Suno prompt output remains English** unless a future renderer profile explicitly defines another output language;
+- genre/instrument canonical labels are domain data and are not silently translated unless a future knowledge layer supplies explicit localized display labels.
+
+Localization includes accessibility labels, warnings, picker guidance and user-facing diagnostics, not just headings.

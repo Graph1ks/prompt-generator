@@ -1,0 +1,334 @@
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+
+export const SUPPORTED_LOCALES = ["de", "en"] as const;
+export type AppLocale = (typeof SUPPORTED_LOCALES)[number];
+
+const LOCALE_STORAGE_KEY = "vgine.locale";
+
+const en = {
+  "app.soundStudio": "Your personal sound studio",
+  "app.runtimeReady": "{count} genres connected",
+  "app.runtimeLoading": "Loading runtime",
+  "app.runtimeError": "Runtime unavailable",
+  "app.newPrompt": "Start new prompt",
+  "app.theme": "Change color scheme",
+  "app.explain": "Explanation mode",
+  "app.explainOn": "Explanation mode on",
+  "app.explainOff": "Explanation mode off",
+  "app.copyPrompt": "Copy prompt",
+  "app.copied": "Copied",
+  "intro.eyebrow": "Less syntax. More music.",
+  "intro.titleA": "Your sound.",
+  "intro.titleB": "Your rules.",
+  "intro.body": "Connect genres. Give them character. Build your prompt.",
+  "intro.noteA": "Three influences.",
+  "intro.noteB": "Infinite directions.",
+  "chapter.dna": "Sound DNA",
+  "chapter.pulse": "Pulse",
+  "chapter.palette": "Palette",
+  "chapter.finish": "Finish",
+  "chapter.dna.title": "Where should the journey go?",
+  "chapter.dna.description": "One foundation. Up to two new perspectives.",
+  "chapter.pulse.title": "Give your sound a pulse.",
+  "chapter.pulse.description": "Tempo is a number. Groove is a feeling.",
+  "chapter.palette.title": "Now make it your sound.",
+  "chapter.palette.description": "Instrument, role and character stay freely combinable.",
+  "chapter.finish.title": "The final polish.",
+  "chapter.finish.description": "Nearness, depth, dynamics. Details make the difference.",
+  "chapter.reset": "Reset page",
+  "runtime.validating": "Validating Runtime Pack.",
+  "runtime.validatingBody": "Genres, search index and compiler knowledge are loaded locally.",
+  "runtime.unavailable": "Runtime Pack unavailable.",
+  "runtime.unavailableBody": "Run pnpm runtime:stage and reload Studio.",
+  "placeholder.notSelected": "Not selected yet",
+  "placeholder.notSet": "Not set yet",
+  "placeholder.selection": "{count} selection",
+  "placeholder.selections": "{count} selections",
+  "placeholder.future": "Production control follows in the next slice. No demo values are presented as real data.",
+  "footer.genreSkipConfirm": "No genre set. That is valid — confirm once for this prompt.",
+  "footer.genreOptional": "Genre is optional. Continuing without one asks exactly once.",
+  "footer.sharedState": "Easy and Advanced edit the same MusicSpec state.",
+  "footer.continueNoGenre": "Continue without genre",
+  "footer.done": "Done",
+  "preview.aria": "Your live prompt",
+  "preview.eyebrow": "Your sound, in words.",
+  "preview.live": "LIVE PROMPT",
+  "preview.genreFree": "GENRE FREE × USER DIRECTED",
+  "preview.coverEmptyA": "Build your",
+  "preview.coverEmptyB": "sound.",
+  "preview.unlock": "Unlock prompt",
+  "preview.lock": "Lock prompt",
+  "preview.restore": "Restore original",
+  "preview.manualAria": "Edit Style prompt manually",
+  "preview.manualHint": "Manual output override. MusicSpec remains unchanged.",
+  "preview.empty": "Build your sound across the four pages. Genre is optional; the compiler only emits sections you actually set.",
+  "preview.noExclude": "No exclusions set yet.",
+  "preview.manualOver": "Manual prompt is {count} characters over the Suno limit.",
+  "preview.sunoStyle": "Suno Style",
+  "preview.copyStyle": "Copy Style",
+  "preview.copyExclude": "Copy Exclude",
+  "preview.manualActive": "Manual override active · original can be restored at any time.",
+  "preview.deterministic": "Your selection is translated deterministically into the prompt.",
+  "diagnostic.missingGenre": "A selected genre label is missing from the Runtime Pack.",
+  "diagnostic.budgetConflict": "Explicit content exceeds the renderer budget. Remove or shorten content.",
+  "diagnostic.budgetCompacted": "Lower-priority suggested material was omitted to fit the renderer budget.",
+  "mobile.backStudio": "Back to Studio",
+  "mobile.livePrompt": "Live prompt",
+  "mobile.preserved": "Your selection is preserved",
+  "mobile.characters": "{used} / {max} characters",
+  "mobile.copy": "Copy",
+  "genre.influencesAria": "Genre influences",
+  "genre.foundation": "Foundation",
+  "genre.fusion": "Fusion",
+  "genre.accent": "Accent",
+  "genre.foundationPurpose": "Leads the musical language.",
+  "genre.fusionPurpose": "Adds a second perspective.",
+  "genre.accentPurpose": "Colors the sound without taking over.",
+  "genre.chooseFoundation": "Choose Foundation",
+  "genre.addFusion": "Add Fusion",
+  "genre.addAccent": "Add Accent",
+  "genre.foundationHint": "Optional — your prompt also works without genre.",
+  "genre.fusionHint": "A new perspective.",
+  "genre.accentHint": "A small change of color.",
+  "genre.change": "Change",
+  "genre.remove": "Remove {role}",
+  "genre.roleInfo": "Genres are optional. If you set them: Foundation leads, Fusion complements, Accent colors. No percentage sliders.",
+  "genre.chooseRole": "Choose {role}",
+  "genre.pickerSubtitle": "Major Genre or subgenre — both are selectable.",
+  "genre.close": "Close genre selection",
+  "genre.searchAria": "Search genres",
+  "genre.searchPlaceholder": "Search {count} genres & subgenres …",
+  "genre.clearSearch": "Clear search",
+  "genre.all": "All",
+  "genre.majorGenre": "Major Genre",
+  "genre.results": "{count} results",
+  "genre.favorites": "{count} favorites",
+  "genre.favoriteHint": "Hold 1.5 s = favorite · 2 s = remove",
+  "genre.noResults": "No result. Try another term or Major Genre.",
+  "genre.showAll": "Show all {count}",
+  "genre.compact": "Show compact",
+  "genre.backTop": "Back to start of genre list",
+  "genre.guideTitle": "Your pool learns with you.",
+  "genre.guideBody": "Favorites come first and are sorted there by actual use. The preference is independent of the current prompt.",
+  "genre.reviewed": "{count} reviewed",
+  "favorite.addTitle": "Hold 1.5 seconds to favorite",
+  "favorite.removeTitle": "Favorite · hold 2 seconds to remove",
+  "favorite.aria": "Favorite · {count} uses",
+  "language.label": "Interface language",
+  "facet.genre": "Genre",
+  "facet.era": "Era",
+  "facet.bpm": "BPM",
+  "facet.key_mode": "Key / Mode",
+  "facet.groove": "Groove",
+  "facet.melody": "Melody",
+  "facet.harmony": "Harmony",
+  "facet.drums": "Drums",
+  "facet.bass": "Bass",
+  "facet.instruments": "Instruments",
+  "facet.exciters": "Exciters",
+  "facet.texture": "Texture",
+  "facet.vocal": "Vocal",
+  "facet.dynamics": "Dynamics",
+  "facet.space_mix": "Space / Mix",
+  "facet.production": "Production",
+  "facet.structure": "Structure",
+} as const;
+
+export type MessageKey = keyof typeof en;
+type Catalog = Readonly<Record<MessageKey, string>>;
+
+const de: Catalog = {
+  "app.soundStudio": "Dein persönliches Sound-Studio",
+  "app.runtimeReady": "{count} Genres verbunden",
+  "app.runtimeLoading": "Runtime wird geladen",
+  "app.runtimeError": "Runtime nicht verfügbar",
+  "app.newPrompt": "Neuen Prompt beginnen",
+  "app.theme": "Farbschema wechseln",
+  "app.explain": "Erklärmodus",
+  "app.explainOn": "Erklärmodus an",
+  "app.explainOff": "Erklärmodus aus",
+  "app.copyPrompt": "Prompt kopieren",
+  "app.copied": "Kopiert",
+  "intro.eyebrow": "Weniger Syntax. Mehr Musik.",
+  "intro.titleA": "Dein Sound.",
+  "intro.titleB": "Deine Regeln.",
+  "intro.body": "Verbinde Genres. Gib ihnen Charakter. Bau deinen Prompt.",
+  "intro.noteA": "Drei Einflüsse.",
+  "intro.noteB": "Unendlich viele Richtungen.",
+  "chapter.dna": "Sound DNA",
+  "chapter.pulse": "Puls",
+  "chapter.palette": "Palette",
+  "chapter.finish": "Finish",
+  "chapter.dna.title": "Wo soll die Reise hingehen?",
+  "chapter.dna.description": "Ein Fundament. Bis zu zwei neue Perspektiven.",
+  "chapter.pulse.title": "Gib deinem Sound einen Puls.",
+  "chapter.pulse.description": "Tempo ist eine Zahl. Groove ist ein Gefühl.",
+  "chapter.palette.title": "Jetzt wird es dein Sound.",
+  "chapter.palette.description": "Instrument, Rolle und Charakter bleiben frei kombinierbar.",
+  "chapter.finish.title": "Der letzte Schliff.",
+  "chapter.finish.description": "Nähe, Tiefe, Dynamik. Die Details machen den Unterschied.",
+  "chapter.reset": "Seite zurücksetzen",
+  "runtime.validating": "Runtime Pack wird validiert.",
+  "runtime.validatingBody": "Genres, Suchindex und Compilerwissen werden lokal geladen.",
+  "runtime.unavailable": "Runtime Pack nicht verfügbar.",
+  "runtime.unavailableBody": "Führe pnpm runtime:stage aus und lade das Studio neu.",
+  "placeholder.notSelected": "Noch nicht gewählt",
+  "placeholder.notSet": "Noch nicht gesetzt",
+  "placeholder.selection": "{count} Auswahl",
+  "placeholder.selections": "{count} Auswahlen",
+  "placeholder.future": "Produktionscontrol folgt im nächsten Slice. Hier werden bewusst keine Demo-Werte als echte Daten ausgegeben.",
+  "footer.genreSkipConfirm": "Kein Genre gesetzt. Das ist erlaubt — bestätige einmalig für diesen Prompt.",
+  "footer.genreOptional": "Genre ist optional. Ohne Genre gibt es beim Weitergehen genau einen Hinweis.",
+  "footer.sharedState": "Easy und Advanced bearbeiten denselben MusicSpec-Zustand.",
+  "footer.continueNoGenre": "Ohne Genre weiter",
+  "footer.done": "Fertig",
+  "preview.aria": "Dein Live-Prompt",
+  "preview.eyebrow": "Dein Sound, in Worten.",
+  "preview.live": "LIVE PROMPT",
+  "preview.genreFree": "GENRE FREE × USER DIRECTED",
+  "preview.coverEmptyA": "Bau deinen",
+  "preview.coverEmptyB": "Sound.",
+  "preview.unlock": "Prompt entsperren",
+  "preview.lock": "Prompt sperren",
+  "preview.restore": "Original wiederherstellen",
+  "preview.manualAria": "Style Prompt manuell bearbeiten",
+  "preview.manualHint": "Manueller Output-Override. MusicSpec bleibt unverändert.",
+  "preview.empty": "Bau deinen Sound aus den vier Seiten. Genre ist optional; der Compiler erzeugt nur Abschnitte, die du tatsächlich setzt.",
+  "preview.noExclude": "Noch keine Ausschlüsse gesetzt.",
+  "preview.manualOver": "Manueller Prompt liegt {count} Zeichen über dem Suno-Limit.",
+  "preview.sunoStyle": "Suno Style",
+  "preview.copyStyle": "Style kopieren",
+  "preview.copyExclude": "Exclude kopieren",
+  "preview.manualActive": "Manueller Override aktiv · Original bleibt jederzeit wiederherstellbar.",
+  "preview.deterministic": "Deine Auswahl wird deterministisch in den Prompt übersetzt.",
+  "diagnostic.missingGenre": "Für ein gewähltes Genre fehlt das Label im Runtime Pack.",
+  "diagnostic.budgetConflict": "Expliziter Inhalt überschreitet das Renderer-Budget. Kürze oder entferne Inhalt.",
+  "diagnostic.budgetCompacted": "Niedriger priorisiertes Vorschlagsmaterial wurde entfernt, um das Renderer-Budget einzuhalten.",
+  "mobile.backStudio": "Zurück zum Studio",
+  "mobile.livePrompt": "Live-Prompt",
+  "mobile.preserved": "Deine Auswahl bleibt erhalten",
+  "mobile.characters": "{used} / {max} Zeichen",
+  "mobile.copy": "Kopieren",
+  "genre.influencesAria": "Genre-Einflüsse",
+  "genre.foundation": "Foundation",
+  "genre.fusion": "Fusion",
+  "genre.accent": "Accent",
+  "genre.foundationPurpose": "Führt die musikalische Sprache.",
+  "genre.fusionPurpose": "Bringt eine zweite Perspektive hinein.",
+  "genre.accentPurpose": "Färbt den Sound, ohne ihn zu übernehmen.",
+  "genre.chooseFoundation": "Foundation wählen",
+  "genre.addFusion": "Fusion hinzufügen",
+  "genre.addAccent": "Accent hinzufügen",
+  "genre.foundationHint": "Optional — dein Prompt funktioniert auch ohne Genre.",
+  "genre.fusionHint": "Eine neue Perspektive.",
+  "genre.accentHint": "Ein kleines bisschen anders.",
+  "genre.change": "Ändern",
+  "genre.remove": "{role} entfernen",
+  "genre.roleInfo": "Genres sind optional. Wenn du welche setzt: Foundation führt, Fusion ergänzt, Accent färbt. Keine Prozentregler.",
+  "genre.chooseRole": "{role} wählen",
+  "genre.pickerSubtitle": "Major Genre oder Subgenre — beides ist auswählbar.",
+  "genre.close": "Genre-Auswahl schließen",
+  "genre.searchAria": "Genres durchsuchen",
+  "genre.searchPlaceholder": "{count} Genres & Subgenres durchsuchen …",
+  "genre.clearSearch": "Suche leeren",
+  "genre.all": "Alle",
+  "genre.majorGenre": "Major Genre",
+  "genre.results": "{count} Treffer",
+  "genre.favorites": "{count} Favoriten",
+  "genre.favoriteHint": "1,5 s halten = Favorit · 2 s = entfernen",
+  "genre.noResults": "Kein Treffer. Versuch einen anderen Begriff oder ein anderes Major Genre.",
+  "genre.showAll": "Alle {count} anzeigen",
+  "genre.compact": "Kompakt anzeigen",
+  "genre.backTop": "Zurück zum Anfang der Genre-Liste",
+  "genre.guideTitle": "Dein Pool lernt mit.",
+  "genre.guideBody": "Favoriten stehen zuerst und werden dort nach tatsächlicher Nutzung sortiert. Die Präferenz gilt unabhängig vom aktuellen Prompt.",
+  "genre.reviewed": "{count} reviewed",
+  "favorite.addTitle": "1,5 Sekunden halten für Favorit",
+  "favorite.removeTitle": "Favorit · 2 Sekunden halten zum Entfernen",
+  "favorite.aria": "Favorit · {count} Nutzungen",
+  "language.label": "Oberflächensprache",
+  "facet.genre": "Genre",
+  "facet.era": "Ära",
+  "facet.bpm": "BPM",
+  "facet.key_mode": "Tonart / Modus",
+  "facet.groove": "Groove",
+  "facet.melody": "Melodie",
+  "facet.harmony": "Harmonie",
+  "facet.drums": "Drums",
+  "facet.bass": "Bass",
+  "facet.instruments": "Instrumente",
+  "facet.exciters": "Exciter",
+  "facet.texture": "Textur",
+  "facet.vocal": "Vocal",
+  "facet.dynamics": "Dynamik",
+  "facet.space_mix": "Raum / Mix",
+  "facet.production": "Produktion",
+  "facet.structure": "Struktur",
+};
+
+const CATALOGS: Readonly<Record<AppLocale, Catalog>> = { de, en };
+
+function isLocale(value: string | null | undefined): value is AppLocale {
+  return SUPPORTED_LOCALES.includes(value as AppLocale);
+}
+
+function browserLocale(): AppLocale {
+  const stored = globalThis.localStorage?.getItem(LOCALE_STORAGE_KEY);
+  if (isLocale(stored)) return stored;
+  const language = globalThis.navigator?.language?.toLowerCase() ?? "en";
+  return language.startsWith("de") ? "de" : "en";
+}
+
+function formatMessage(
+  template: string,
+  values: Readonly<Record<string, string | number>> = {},
+): string {
+  return template.replace(/\{([a-zA-Z0-9_]+)\}/gu, (_, key: string) =>
+    String(values[key] ?? "{" + key + "}"),
+  );
+}
+
+export type Translate = (
+  key: MessageKey,
+  values?: Readonly<Record<string, string | number>>,
+) => string;
+
+interface I18nContextValue {
+  readonly locale: AppLocale;
+  readonly setLocale: (locale: AppLocale) => void;
+  readonly t: Translate;
+}
+
+const I18nContext = createContext<I18nContextValue | null>(null);
+
+export function I18nProvider({ children }: { readonly children: ReactNode }) {
+  const [locale, setLocaleState] = useState<AppLocale>(browserLocale);
+
+  const value = useMemo<I18nContextValue>(() => {
+    const setLocale = (next: AppLocale) => {
+      setLocaleState(next);
+      try {
+        globalThis.localStorage?.setItem(LOCALE_STORAGE_KEY, next);
+      } catch {
+        // Locale persistence is a preference enhancement.
+      }
+    };
+    const t: Translate = (key, values) =>
+      formatMessage(CATALOGS[locale][key], values);
+    return { locale, setLocale, t };
+  }, [locale]);
+
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+}
+
+export function useI18n(): I18nContextValue {
+  const value = useContext(I18nContext);
+  if (!value) throw new Error("useI18n must be used inside I18nProvider");
+  return value;
+}
