@@ -18,6 +18,7 @@ import type {
 
 import { HoldFavoriteOption } from "./hold-favorite-option.js";
 import { Icon } from "./icons.js";
+import { KnowledgeTerm } from "./knowledge-term.js";
 import { useI18n } from "./i18n.js";
 import { usePoolPreferences } from "./pool-preferences.js";
 import type { StudioRuntime } from "./runtime-client.js";
@@ -35,6 +36,7 @@ export interface InstrumentPickerProps {
   readonly runtime: StudioRuntime;
   readonly spec: MusicSpec;
   readonly onSpecChange: (spec: MusicSpec) => void;
+  readonly assistOn: boolean;
 }
 
 function defaultExpressionOrder(
@@ -52,6 +54,7 @@ export function InstrumentPicker({
   runtime,
   spec,
   onSpecChange,
+  assistOn,
 }: InstrumentPickerProps) {
   const { locale, t } = useI18n();
   const [library, setLibrary] = useState<LibraryState>({ status: "loading" });
@@ -93,6 +96,10 @@ export function InstrumentPicker({
   }, [query, familyId]);
 
   const data = library.status === "ready" ? library.value : null;
+  const sectionKnowledgeEntryId =
+    runtime.bootstrap.core.sections.find(
+      (section) => section.key === "instruments",
+    )?.knowledge_entry_id ?? null;
 
   const instrumentById = useMemo(
     () =>
@@ -282,7 +289,16 @@ export function InstrumentPicker({
       <div className="instrument-panel-head">
         <div>
           <div className="field-label">
-            <span>{t("instrument.title")}</span>
+            <span>
+              <KnowledgeTerm
+                entryId={sectionKnowledgeEntryId}
+                label={t("instrument.title")}
+                enabled={assistOn}
+                loadKnowledge={runtime.loadKnowledge}
+                contextType="section"
+                contextKey="instruments"
+              />
+            </span>
             <span className="badge">
               {library.value.expressions.expressions.length.toLocaleString(locale)}
             </span>
