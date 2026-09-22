@@ -1,8 +1,8 @@
-# Handover — Runtime-backed Genre Studio
+# Handover — Studio editor depth + Product Knowledge
 
-**Last updated:** 2026-09-21  
-**Handoff target:** reusable picker pattern + Instruments/knowledge runtime controls  
-**Milestone:** Database V1 remains closed; the React/Vite Studio now consumes the real Runtime Pack, edits Genre influences in MusicSpec and renders the production compiler preview
+**Last updated:** 2026-09-22  
+**Handoff target:** owner-local smoke validation of Product Knowledge + continued Studio/project UX  
+**Milestone:** Database V1 remains closed; all ordinary facets now have Product Editor controls, Easy/Advanced depth is coherent, user state is local IndexedDB data, and Explain mode resolves explicit semantic origins into the live prompt
 
 ## Read this first
 
@@ -152,14 +152,10 @@ The exporter writes `core.json`, `genres.json`, `instruments.json`, `instrument-
 
 Owner-local real Runtime Pack validation completed successfully:
 
-- runtime build ID: `3b774ba611011ef9771c6700e2c5b156f73639a948ad0f83316c28bca8c99bfe`;
-- 1,564 genres;
-- 6,035 source instrument expressions;
-- 9 instrument families / 164 canonical instruments;
-- 2,749 knowledge entries;
-- 10,348 search documents;
-- total uncompressed JSON payload ~10.53 MiB;
-- editor payload currently has no statements/parameters/options/Exclude content.
+- the historical accepted snapshot above predates Product Editor Foundation v1 and Product Knowledge Foundation v1;
+- keep its Genre/Instrument/Search performance evidence, but do not treat its Knowledge/editor counts or runtime build ID as the current post-#35 local pack;
+- after PR #35, owner-local Runtime Pack must be re-exported because both `editor.json` and `knowledge.json` are now supplemented by tracked Product foundations;
+- current manifest identity includes `knowledge_db_sha256`, `editor_foundation_sha256`, and `product_knowledge_foundation_sha256`.
 
 The TypeScript foundation now adds:
 
@@ -173,7 +169,7 @@ The TypeScript foundation now adds:
 
 `packages/ui` now provides the semantic token contract, Paradise/Ash themes and the first React primitives. `packages/motion` centralizes causal motion recipes and reduced-motion behavior.
 
-`apps/studio` now stages/loads the owner-local Runtime Pack, validates the bootstrap payload, builds one shared local search index, browses/searches the real 24 Major Genres + 1,564 taxonomy genres, supports valid genre-free MusicSpec plus optional Foundation/Fusion/Accent state, and renders the pure compiler live prompt/budget output. Its presentation is deliberately aligned to the supplied V'GINE Studio concept: editorial intro, horizontal four-stage workflow, large role cards, inline picker, sticky record-sleeve preview and mobile Studio/Preview dock. It intentionally does not invent missing editor content and still does not add Router, Radix, Motion-for-React, Zustand or TanStack.
+`apps/studio` now stages/loads the owner-local Runtime Pack, validates the bootstrap payload, builds one shared local search index, browses/searches the real 24 Major Genres + 1,564 taxonomy genres, exposes all 6,035 source-backed Instrument expressions, and provides complete Product Editor controls across Era/BPM/Key-Mode/Groove/Melody/Harmony/Drums/Bass/Exciters/Texture/Vocal/Dynamics/Space-Mix/Production/Structure. It supports valid genre-free MusicSpec, optional Foundation/Fusion/Accent state, local ProjectStorage autosave, global/per-facet Easy/Advanced depth, personal Advanced presets and the pure compiler live prompt/budget output. Its presentation remains aligned to the supplied V'GINE Studio concept and still does not add Router, Radix, Motion-for-React, Zustand or TanStack.
 
 Real search benchmark acceptance: 10,348 documents; 92.014 ms index build; median 4.900 ms; P95 10.117 ms; P99/max 14.472 ms. Keep the dependency-free kernel unless later profiling proves a concrete need.
 
@@ -181,15 +177,15 @@ Development-runtime rule: `pnpm dev` must build the internal workspace packages 
 
 ## Next-thread mission
 
-Treat Database V1 and Runtime Pack v1 as accepted dependencies and move upward in the stack.
+Treat Database V1, Runtime Pack v1, Product Editor Foundation v1 and Product Knowledge Foundation v1 as accepted dependencies.
 
 Recommended order:
 
-1. **Reusable Picker pattern** — generalize the proven Genre browse/search/bounded-result mechanics without coupling the pattern to genre semantics.
-2. **Instrument-expression repository + picker** — load the detailed expression payload lazily and expose all 6,035 source expressions with stable IDs/search.
-3. **Knowledge detail surfaces** — lazy-load dictionary entries/context only when the UI requests them.
-4. **Project persistence** — add IndexedDB behind the documented ProjectStorage interface; persist MusicSpec as semantic source truth and model any manual rendered-output override explicitly as secondary project/output state.
-5. **Remaining facets / editor enrichment** — expand controls incrementally; add Radix/Motion-for-React only where a concrete interaction warrants the dependency.
+1. **Re-export owner-local Runtime Pack** after pulling `main`; Product Editor/Product Knowledge changes are independent fingerprints and are not supplied by the old generated pack.
+2. **Rebuild the user's reference prompt** and inspect Explain mode section by section. Product sections must expose provenance-backed Knowledge origins without changing copied prompt text.
+3. **Investigate only explicit-link gaps.** Product controls resolve through Product Knowledge; Genre resolves through existing Genre Knowledge; Instruments resolve through canonical instrument/concept Knowledge. Never add rendered-string guessing.
+4. **Continue project UX** on the existing IndexedDB `ProjectStorage`: project naming/library, duplicate, import/export are the next persistence layer.
+5. **Continue Studio ergonomics and visual refinement** while keeping broad motion polish late. Add external UI/motion dependencies only when a concrete interaction justifies the license/maintenance cost.
 
 ## Post-V1 enrichment is allowed but is not a blocker
 
@@ -204,9 +200,9 @@ The following can be added incrementally without declaring Database V1 unfinishe
 
 ## Definition of success for the next thread
 
-Do not spend the next thread re-mining the database. Produce runtime/compiler/application progress while preserving the V1 DB contract.
+Do not spend the next thread re-mining the database. The first success criterion is a fresh local Runtime Pack in which the user's representative multi-section prompt has Explain-mode coverage for Product Foundation selections and no explanation UI leaks into copied prompt text.
 
-If a proposed implementation requires changing a Database V1 invariant, call that out explicitly as a schema/architecture change rather than silently mutating the foundation.
+Then continue runtime/application UX while preserving the V1 DB contract. If a proposed implementation requires changing a Database V1 invariant, call that out explicitly as a schema/architecture change rather than silently mutating the foundation.
 
 ## Interaction additions carried forward
 
@@ -225,7 +221,7 @@ If a proposed implementation requires changing a Database V1 invariant, call tha
 - Major Genre Runtime IDs are valid MusicSpec Genre influence IDs; compiler knowledge resolves them alongside subgenres.
 - Browsing a Major starts with the pure Major itself, then subgenres.
 - Expanded-list return controls are viewport/segment scoped and must not remain visible outside their active expanded segment.
-- Explanation mode currently uses icon-only chrome.
+- Explanation mode uses icon-only global chrome, but linked controls and live-prompt origins now expose real Knowledge definitions when enabled.
 - Do not spend the next implementation slice on motion polish; prioritize production facet/pool functionality first.
 
 ## Production Instruments carry-forward
