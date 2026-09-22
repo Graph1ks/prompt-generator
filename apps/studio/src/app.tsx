@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { compileMusicSpec, countCharacters } from "@vgine/compiler";
 import {
   createMusicSpec,
@@ -9,6 +9,12 @@ import {
   type MusicSpec,
 } from "@vgine/music-spec";
 import { isVgineTheme, type VgineTheme } from "@vgine/ui";
+import {
+  ACTIVE_PROJECT_ID,
+  ProjectStorageError,
+  createIndexedDbProjectStorage,
+  createProjectDocument,
+} from "@vgine/project-storage";
 
 import { ExcludePicker } from "./exclude-picker.js";
 import { FacetEditor } from "./facet-editor.js";
@@ -20,6 +26,8 @@ import { loadStudioRuntime, type StudioRuntime } from "./runtime-client.js";
 import { STUDIO_CHAPTERS } from "./studio-config.js";
 
 const THEME_KEY = "vgine.theme";
+const projectStorage = createIndexedDbProjectStorage();
+const PROJECT_AUTOSAVE_DELAY_MS = 320;
 
 type RuntimeState =
   | { readonly status: "loading" }
@@ -27,6 +35,13 @@ type RuntimeState =
   | { readonly status: "error"; readonly message: string };
 
 type OutputTab = "style" | "exclude";
+type ProjectSaveState =
+  | "loading"
+  | "restored"
+  | "saving"
+  | "saved"
+  | "error"
+  | "unavailable";
 
 function initialTheme(): VgineTheme {
   const stored = globalThis.localStorage?.getItem(THEME_KEY);
@@ -58,6 +73,12 @@ function coverLines(label: string): readonly [string, string] {
   return [words.slice(0, split).join(" "), words.slice(split).join(" ")];
 }
 
+function isChapterId(
+  value: string | null,
+): value is (typeof STUDIO_CHAPTERS)[number]["id"] {
+  return STUDIO_CHAPTERS.some((chapter) => chapter.id === value);
+}
+
 export function App() {
   const { locale, setLocale, t } = useI18n();
   const [theme, setTheme] = useState<VgineTheme>(initialTheme);
@@ -74,6 +95,11 @@ export function App() {
   const [genreSkipAcknowledged, setGenreSkipAcknowledged] = useState(false);
   const [manualStyleText, setManualStyleText] = useState<string | null>(null);
   const [promptUnlocked, setPromptUnlocked] = useState(false);
+  const [projectReady, setProjectReady] = useState(false);
+  const [projectSaveState, setProjectSaveState] =
+    useState<ProjectSaveState>("loading");
+  const projectCreatedAtRef = useRef(new Date().toISOString());
+  const saveRevisionRef = useRef(0);
 
   const chapter =
     STUDIO_CHAPTERS.find((candidate) => candidate.id === chapterId) ??
@@ -105,6 +131,93 @@ export function App() {
       live = false;
     };
   }, []);
+
+  useEffect(() => {
+    let live = true;
+
+    void projectStorage
+      .load(ACTIVE_PROJECT_ID)
+      .then((project) => {
+        if (!live) return;
+
+        if (project) {
+          setSpec(project.music_spec);
+          setManualStyleText(project.output.manual_style_override);
+          if (isChapterId(project.workspace.active_chapter)) {
+            setChapterId(project.workspace.active_chapter);
+          }
+          setGenreSkipAcknowledged(
+            project.workspace.genre_skip_acknowledged,
+          );
+          projectCreatedAtRef.current = project.created_at;
+          setProjectSaveState("restored");
+        } else {
+          setProjectSaveState("saved");
+        }
+
+        setProjectReady(true);
+      })
+      .catch((error: unknown) => {
+        if (!live) return;
+        if (
+          error instanceof ProjectStorageError &&
+          error.code === "indexeddb_unavailable"
+        ) {
+          setProjectSaveState("unavailable");
+        } else {
+          setProjectSaveState("error");
+        }
+      });
+
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!projectReady) return;
+
+    const revision = ++saveRevisionRef.current;
+    setProjectSaveState("saving");
+
+    const timer = window.setTimeout(() => {
+      const updatedAt = new Date().toISOString();
+      const project = createProjectDocument(ACTIVE_PROJECT_ID, spec, {
+        createdAt: projectCreatedAtRef.current,
+        updatedAt,
+        manualStyleOverride: manualStyleText,
+        activeChapter: chapterId,
+        genreSkipAcknowledged,
+      });
+
+      void projectStorage
+        .save(project)
+        .then(() => {
+          if (saveRevisionRef.current === revision) {
+            setProjectSaveState("saved");
+          }
+        })
+        .catch((error: unknown) => {
+          if (saveRevisionRef.current !== revision) return;
+          if (
+            error instanceof ProjectStorageError &&
+            error.code === "indexeddb_unavailable"
+          ) {
+            setProjectSaveState("unavailable");
+          } else {
+            setProjectSaveState("error");
+          }
+        });
+    }, PROJECT_AUTOSAVE_DELAY_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    chapterId,
+    genreSkipAcknowledged,
+    manualStyleText,
+    projectReady,
+    spec,
+  ]);
 
   const genreLabels = useMemo(() => {
     if (runtime.status !== "ready") return new Map<string, string>();
@@ -176,6 +289,8 @@ export function App() {
   }
 
   function startNewPrompt() {
+    projectCreatedAtRef.current = new Date().toISOString();
+    setProjectSaveState(projectReady ? "saving" : projectSaveState);
     setSpec(resetMusicSpec());
     setChapterId(STUDIO_CHAPTERS[0].id);
     setActiveGenreRole("foundation");
@@ -222,6 +337,19 @@ export function App() {
         ? t("app.runtimeLoading")
         : t("app.runtimeError");
 
+  const projectSaveLabel =
+    projectSaveState === "loading"
+      ? t("project.loading")
+      : projectSaveState === "restored"
+        ? t("project.restored")
+        : projectSaveState === "saving"
+          ? t("project.saving")
+          : projectSaveState === "saved"
+            ? t("project.saved")
+            : projectSaveState === "unavailable"
+              ? t("project.unavailable")
+              : t("project.error");
+
   const currentChapterIndex = STUDIO_CHAPTERS.findIndex(
     (entry) => entry.id === chapter.id,
   );
@@ -259,7 +387,13 @@ export function App() {
         <span className="top-label">{t("app.soundStudio")}</span>
 
         <div className="top-actions">
-          <span className="save-status">{runtimeLabel}</span>
+          <span
+            className="save-status"
+            data-state={projectSaveState}
+            title={runtimeLabel}
+          >
+            {runtime.status === "ready" ? projectSaveLabel : runtimeLabel}
+          </span>
           <button
             type="button"
             className="icon-btn"
