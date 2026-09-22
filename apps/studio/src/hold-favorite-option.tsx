@@ -129,7 +129,7 @@ export function HoldFavoriteOption({
         aria-keyshortcuts={
           ariaKeyShortcuts ? ariaKeyShortcuts + " Shift+F" : "Shift+F"
         }
-        title={title ?? favoriteTitle}
+        title={title ?? activationLabel ?? favoriteTitle}
         onKeyDown={handleKeyDown}
         onPointerDown={startHold}
         onPointerUp={stopTimer}
