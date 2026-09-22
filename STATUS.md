@@ -193,6 +193,13 @@ Proceed in this order:
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
 
+## Persistent chapter navigation + desktop shortcuts
+
+- Chapter navigation now remains sticky below the global top bar during long Genre/Instrument/Advanced editing sessions instead of disappearing after the first viewport.
+- Source-jump scroll margins account for the sticky chapter bar so reverse Live Prompt navigation does not place the target facet underneath navigation chrome.
+- Desktop keyboard users can jump directly with `Alt+1` through `Alt+4`; the shortcuts route through the same chapter guard logic as mouse navigation and do not fire while typing/editing or while project/manual-copy overlays are active.
+- Shortcut hints stay visually quiet until chapter hover/focus and are hidden on touch/mobile layouts.
+
 ## Chapter navigation state clarity
 
 - The four Studio chapter tabs no longer imply completion merely because the user navigated past them.
