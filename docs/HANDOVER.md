@@ -262,6 +262,12 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Locale resolution is UI-locale -> English fallback; renderer language remains independent.
 - Favorite hold durations remain 0.8 s add / 1.0 s remove internally, but duration instructions are intentionally hidden from normal UI/hover copy.
 
+## Chapter navigation state carry-forward
+
+- Chapter navigation reflects actual active MusicSpec/Exclude content rather than treating previously visited chapters as "done".
+- Counts are derived, not persisted: Genre influences, ordinary selections/custom wording and Finish Exclude entries contribute.
+- Chapters remain fully optional; a zero count is neutral and never treated as invalid/incomplete.
+
 ## Live Prompt source-navigation carry-forward
 
 - In deterministic Style mode, each rendered section can navigate directly back to its owning authoring facet.
