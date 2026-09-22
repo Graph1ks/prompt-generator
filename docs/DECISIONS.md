@@ -612,7 +612,7 @@ Responsive behavior changes composition, not capability. Genre, instrument-expre
 
 Persisted musical state remains versioned MusicSpec plus project metadata behind a `ProjectStorage` adapter. Web/PWA initially targets IndexedDB. A later Tauri-native implementation may use application data/filesystem storage behind the same interface.
 
-`localStorage` is limited to lightweight preferences.
+Web user preferences are stored through the separate IndexedDB-backed user-data adapter. `localStorage` is legacy-migration input only.
 
 ### Consequences
 
@@ -695,7 +695,7 @@ The application keeps a distinct V'gine visual language while still allowing rev
 
 Genres, Instruments and other high-cardinality option pools may expose persistent user favorites. Favoriting uses one shared interaction contract and is stored independently from MusicSpec. Favorites rank before non-favorites and are ordered by actual usage count with recency as a tie-breaker.
 
-The initial browser implementation may use local storage; the preference interface must remain replaceable by the future storage layer.
+The browser implementation uses the IndexedDB-backed user-data adapter. Favorite state remains independent from ProjectDocument/MusicSpec and must remain replaceable behind that storage boundary.
 
 ## ADR-031 — Manual rendered-prompt editing is an explicit output override
 
