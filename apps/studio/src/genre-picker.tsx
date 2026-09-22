@@ -455,10 +455,6 @@ export function GenrePicker({
                   })
                 : ""}
             </span>
-            <span className="favorite-hint">
-              <Icon name="star" />
-              {t("genre.favoriteHint")}
-            </span>
           </div>
 
           <div
