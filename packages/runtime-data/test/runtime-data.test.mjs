@@ -6,6 +6,7 @@ import {
   buildCompilerKnowledge,
   loadRuntimeBootstrap,
   loadRuntimeInstrumentLibrary,
+  loadRuntimeEditor,
   parseRuntimeManifest,
 } from "../dist/index.js";
 
@@ -23,7 +24,7 @@ function manifest() {
       "genres.json": { sha256: hash, bytes: 1, counts: { genres: 1 } },
       "instruments.json": { sha256: hash, bytes: 1, counts: { families: 1, instruments: 1 } },
       "instrument-expressions.json": { sha256: hash, bytes: 1, counts: { expressions: 1 } },
-      "editor.json": { sha256: hash, bytes: 1, counts: { parameters: 0, parameter_options: 0, statements: 0, exclude: 0 } },
+      "editor.json": { sha256: hash, bytes: 1, counts: { parameters: 1, parameter_options: 1, statements: 1, exclude: 1 } },
       "knowledge.json": { sha256: hash, bytes: 1, counts: { entries: 0 } },
       "search.json": { sha256: hash, bytes: 1, counts: { documents: 2 } },
     },
@@ -133,6 +134,62 @@ function payloads() {
         },
       ],
     },
+    "editor.json": {
+      schema: "vgine-runtime-editor-v1",
+      parameters: [
+        {
+          id: "parameter:groove:swing",
+          section_key: "groove",
+          label: "Swing",
+          canonical_slug: "swing",
+          value_type: "enum",
+          easy_visible: true,
+          advanced_visible: true,
+          allow_custom_text: true,
+          knowledge_entry_id: null,
+          sort_order: 10,
+        },
+      ],
+      parameter_options: [
+        {
+          id: "option:groove:swing:laid-back",
+          parameter_id: "parameter:groove:swing",
+          label: "Laid-back",
+          canonical_slug: "laid-back",
+          output_fragment: "laid-back swing",
+          easy_visible: true,
+          advanced_visible: true,
+          knowledge_entry_id: null,
+          sort_order: 10,
+        },
+      ],
+      statements: [
+        {
+          id: "statement:groove:laid-back",
+          section_key: "groove",
+          label: "Laid-back pocket",
+          output_text: "laid-back swung pocket",
+          mode_scope: "easy",
+          statement_kind: "combination",
+          source_frequency: 7,
+          concepts: [],
+          options: [
+            {
+              option_id: "option:groove:swing:laid-back",
+              ordinal: 0,
+            },
+          ],
+        },
+      ],
+      exclude: [
+        {
+          id: "exclude:glossy-pop-synths",
+          label: "Glossy pop synths",
+          output_text: "bright glossy pop synths",
+          knowledge_entry_id: null,
+        },
+      ],
+    },
     "search.json": {
       schema: "vgine-runtime-search-documents-v1",
       documents: [
@@ -231,4 +288,16 @@ test("lazy-loads and validates the Instrument Library", async () => {
     "warm Rhodes electric piano",
   );
   assert.equal(library.expressions.expressions[0].semantic_coverage, 1);
+});
+
+
+test("lazy-loads and validates the editor payload", async () => {
+  const data = payloads();
+  const bootstrap = await loadRuntimeBootstrap(reader(data));
+  const editor = await loadRuntimeEditor(reader(data), bootstrap.manifest);
+
+  assert.equal(editor.parameters[0].section_key, "groove");
+  assert.equal(editor.parameter_options[0].output_fragment, "laid-back swing");
+  assert.equal(editor.statements[0].output_text, "laid-back swung pocket");
+  assert.equal(editor.exclude[0].output_text, "bright glossy pop synths");
 });
