@@ -134,21 +134,23 @@ function isTextEntryTarget(target: EventTarget | null): boolean {
   );
 }
 
+function facetActiveItemCount(spec: MusicSpec, facet: FacetKey): number {
+  if (facet === "genre") return spec.genre_influences.length;
+  const state = spec.facets[facet];
+  return (
+    (state?.selections.length ?? 0) +
+    (state?.custom_text?.trim() ? 1 : 0)
+  );
+}
+
 function chapterActiveItemCount(
   spec: MusicSpec,
   chapter: (typeof STUDIO_CHAPTERS)[number],
 ): number {
-  let count = chapter.facets.reduce((total, facet) => {
-    if (facet === "genre") {
-      return total + spec.genre_influences.length;
-    }
-    const state = spec.facets[facet];
-    return (
-      total +
-      (state?.selections.length ?? 0) +
-      (state?.custom_text?.trim() ? 1 : 0)
-    );
-  }, 0);
+  let count = chapter.facets.reduce(
+    (total, facet) => total + facetActiveItemCount(spec, facet),
+    0,
+  );
 
   if (chapter.id === "finish") count += spec.exclude.length;
   return count;
@@ -1212,6 +1214,69 @@ export function App() {
                   </span>
                 </div>
               </div>
+
+              {runtime.status === "ready" && (
+                <nav
+                  className="facet-jump-rail"
+                  aria-label={t("chapter.facetsAria", {
+                    chapter: chapterLabel(chapter.id),
+                  })}
+                >
+                  {chapter.facets.map((facet) => {
+                    const count = facetActiveItemCount(spec, facet);
+                    const label = facetLabel(facet);
+                    return (
+                      <button
+                        key={facet}
+                        type="button"
+                        className={
+                          count > 0
+                            ? "facet-jump-item filled"
+                            : "facet-jump-item"
+                        }
+                        aria-label={
+                          count > 0
+                            ? t("chapter.facetWithCount", {
+                                facet: label,
+                                count,
+                              })
+                            : label
+                        }
+                        onClick={() => jumpToPromptSource(facet)}
+                      >
+                        <span>{label}</span>
+                        {count > 0 && (
+                          <small aria-hidden="true">{count}</small>
+                        )}
+                      </button>
+                    );
+                  })}
+                  {chapter.id === "finish" && (
+                    <button
+                      type="button"
+                      className={
+                        spec.exclude.length > 0
+                          ? "facet-jump-item filled"
+                          : "facet-jump-item"
+                      }
+                      aria-label={
+                        spec.exclude.length > 0
+                          ? t("chapter.facetWithCount", {
+                              facet: t("exclude.title"),
+                              count: spec.exclude.length,
+                            })
+                          : t("exclude.title")
+                      }
+                      onClick={() => jumpToPromptSource("exclude")}
+                    >
+                      <span>{t("exclude.title")}</span>
+                      {spec.exclude.length > 0 && (
+                        <small aria-hidden="true">{spec.exclude.length}</small>
+                      )}
+                    </button>
+                  )}
+                </nav>
+              )}
 
               {runtime.status === "loading" && (
                 <div className="field-card runtime-card">
