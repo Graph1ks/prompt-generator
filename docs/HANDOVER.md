@@ -33,7 +33,7 @@ Real Factory files, generated SQLite databases, reports, checkpoints and backups
 - PR #37 merged CI-green as `dd503031ed546f0ed508763ebab2efe2269ec83c`.
 - Explain no longer renders chip rows beneath Live Prompt sections.
 - Explicitly linked terms are explainable before selection via dashed inline affordances.
-- One viewport-level explanation surface is active at a time; desktop supports hover/focus + pin, mobile uses tap + bottom sheet.
+- One viewport-level explanation surface is active at a time; desktop hover/focus previews Explain, selectable clicks still activate the control, and mobile uses the separate Explain affordance + bottom sheet.
 - Compact favorite/preset hold feedback is no longer clipped inside the 38 px control.
 - Product Knowledge content remediation is complete for v1: all 400 Product Foundation entries now use the accepted authored EN/DE musical explanations; the old generated preset/control/rendering prose is no longer the tracked baseline.
 
