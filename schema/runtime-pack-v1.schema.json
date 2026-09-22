@@ -69,6 +69,9 @@
     },
     "editor_foundation_sha256": {
       "$ref": "#/$defs/sha256"
+    },
+    "product_knowledge_foundation_sha256": {
+      "$ref": "#/$defs/sha256"
     }
   },
   "$defs": {
