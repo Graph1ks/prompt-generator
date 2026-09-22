@@ -156,13 +156,56 @@ class RuntimeExportV1Tests(unittest.TestCase):
 
             planned = self.run_exporter(db, out, "--plan")
             self.assertFalse(out.exists())
-            self.assertEqual(json.loads(planned.stdout)["counts"]["instrument_expressions"], 1)
+            plan_payload = json.loads(planned.stdout)
+            self.assertEqual(plan_payload["counts"]["instrument_expressions"], 1)
+            self.assertGreater(plan_payload["editor_foundation_counts"]["parameters"], 0)
+            self.assertGreater(plan_payload["editor_foundation_counts"]["statements"], 0)
 
             result = self.run_exporter(db, out)
             self.assertEqual(json.loads(result.stdout)["status"], "ok")
             manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["schema"], "vgine-runtime-pack-v1")
+            self.assertEqual(
+                len(manifest["editor_foundation_sha256"]),
+                64,
+            )
             self.assertEqual(manifest["files"]["instrument-expressions.json"]["counts"]["expressions"], 1)
+
+            editor = json.loads((out / "editor.json").read_text(encoding="utf-8"))
+            expected_facets = {
+                "era",
+                "bpm",
+                "key_mode",
+                "groove",
+                "melody",
+                "harmony",
+                "drums",
+                "bass",
+                "exciters",
+                "texture",
+                "vocal",
+                "dynamics",
+                "space_mix",
+                "production",
+                "structure",
+            }
+            self.assertEqual(
+                {row["section_key"] for row in editor["parameters"] if row["id"].startswith("product:")},
+                expected_facets,
+            )
+            self.assertEqual(
+                {row["section_key"] for row in editor["statements"] if row["id"].startswith("product:")},
+                expected_facets,
+            )
+            bpm = next(
+                row
+                for row in editor["parameters"]
+                if row["id"] == "product:parameter:bpm:tempo"
+            )
+            self.assertEqual(bpm["value_type"], "number")
+            self.assertEqual(bpm["ui"]["min"], 40)
+            self.assertEqual(bpm["ui"]["max"], 220)
+            self.assertIn(96, bpm["ui"]["recommended_values"])
 
             expressions = json.loads(
                 (out / "instrument-expressions.json").read_text(encoding="utf-8")
@@ -175,6 +218,66 @@ class RuntimeExportV1Tests(unittest.TestCase):
 
             rerun = self.run_exporter(db, out)
             self.assertEqual(json.loads(rerun.stdout)["status"], "up-to-date")
+
+    def test_database_editor_rows_overlay_matching_product_foundation_ids(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            db = root / "knowledge.sqlite"
+            out = root / "runtime-v1"
+            self.make_db(db)
+
+            conn = sqlite3.connect(db)
+            conn.execute(
+                "INSERT INTO parameter VALUES(?,?,?,?,?,?,?,?,?,?)",
+                (
+                    "product:parameter:groove:pocket",
+                    "groove",
+                    "Pocket (reviewed override)",
+                    "pocket",
+                    "enum",
+                    0,
+                    1,
+                    0,
+                    None,
+                    7,
+                ),
+            )
+            conn.execute(
+                "INSERT INTO parameter_option VALUES(?,?,?,?,?,?,?,?,?,?)",
+                (
+                    "product:option:groove:pocket:laid-back",
+                    "product:parameter:groove:pocket",
+                    "Laid-back reviewed",
+                    "laid-back",
+                    "reviewed laid-back pocket",
+                    "approved",
+                    0,
+                    1,
+                    None,
+                    7,
+                ),
+            )
+            conn.commit()
+            conn.close()
+
+            self.run_exporter(db, out)
+            editor = json.loads((out / "editor.json").read_text(encoding="utf-8"))
+
+            parameter = next(
+                row
+                for row in editor["parameters"]
+                if row["id"] == "product:parameter:groove:pocket"
+            )
+            option = next(
+                row
+                for row in editor["parameter_options"]
+                if row["id"] == "product:option:groove:pocket:laid-back"
+            )
+
+            self.assertEqual(parameter["label"], "Pocket (reviewed override)")
+            self.assertEqual(parameter["sort_order"], 7)
+            self.assertEqual(option["label"], "Laid-back reviewed")
+            self.assertEqual(option["output_fragment"], "reviewed laid-back pocket")
 
     def test_rejects_nonselectable_source_expression(self):
         with tempfile.TemporaryDirectory() as td:
