@@ -827,3 +827,26 @@ The Product Knowledge Foundation is independently fingerprinted in Runtime manif
 Explain mode derives live-prompt explanations from MusicSpec selection IDs and their Runtime semantic links. It may verify that the selection's rendered value is present in the final section before surfacing the explanation.
 
 The product does not string-guess arbitrary custom prompt wording into Knowledge concepts. Unlinked user text remains unannotated.
+
+## ADR-045 — Explain is a selection-time singleton overlay, not layout content
+
+**Status:** accepted
+
+Explain mode exists primarily where a user makes a choice. Any selectable Runtime entity with an explicit Knowledge link should expose that definition before selection, while the rendered/copyable prompt remains semantically unchanged.
+
+Desktop interaction uses a subtle dashed term affordance with delayed hover/focus preview; click pins the explanation. Touch uses tap to pin the same concept in a mobile-safe sheet. Only one explanation surface may be active at a time.
+
+Explanation surfaces render through a viewport-level portal rather than inside cards/pickers. They must not be clipped by parent overflow, create layout shift, or accumulate overlapping popovers. The old live-prompt explanation-chip rows are not part of the accepted Studio UX.
+
+This interaction rule does not relax ADR-038/ADR-044: explainability still requires an explicit Runtime Knowledge ID or semantic relation. No rendered-string inference is introduced.
+
+## ADR-046 — Product Knowledge prose defines music concepts, never editor mechanics
+
+**Status:** accepted
+
+A Product Knowledge definition must answer what the musical term, value, phrase, production characteristic or undesirable condition means. It must not explain that an item is an Easy preset, Advanced option, UI control, prompt fragment, or Exclude action.
+
+Product Knowledge authoring therefore treats stable IDs and editor metadata as context only. User-facing definitions should explain audible/structural/production meaning in clear English and German, with context-dependent caveats where needed.
+
+The complete v1 authoring batch lives beside the Product Knowledge source as `data/product/knowledge-foundation-v1-authoring-request.txt`. Returned ID/EN/DE text is validated and imported through `scripts/data/import_product_knowledge_authoring.py`; the importer preserves IDs/links and replaces only localized `plain` definitions with revision bumps.
+
