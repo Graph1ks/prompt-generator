@@ -217,6 +217,12 @@ Proceed in this order:
 - Copy availability is derived from the active Style/Exclude tab, so Exclude can be copied even when Style is empty and all header/preview/mobile copy controls share one validity rule.
 - `Ctrl / ⌘ + Enter` follows that same active-output rule and is suppressed while project/manual-copy overlays are open.
 
+## Explain click-through + real slash-search shortcuts
+
+- Knowledge-linked selectable labels no longer steal the primary click/tap. Hover/focus previews Explain; clicking the label selects/toggles the actual Easy/Advanced/Genre/Instrument/Exclude control.
+- Touch gets a separate compact explanation affordance beside selectable Knowledge terms so the label itself remains a normal selection target.
+- Genre, Instruments and Exclude now implement the `/` shortcut already advertised in their search fields. The shortcut focuses/selects the active search input and ignores text-entry/editable targets and modifier chords.
+
 ## Ordinary facet state rail + mobile Explain access
 
 - Every ordinary FacetEditor now keeps its active MusicSpec state visible above the Easy/Advanced authoring surface.
@@ -272,7 +278,7 @@ Proceed in this order:
 - Product Knowledge Foundation v1 still contains 400 explicit stable entries covering all Product Editor parameters/options/Easy statements/Exclude baseline entries.
 - Product Editor Foundation records keep their explicit Knowledge links; Genre/Instrument explanation still uses Database V1 semantic links. No rendered-string inference was introduced.
 - Explain is now available at authoring time: Easy statement labels, Advanced option/recommended-value labels, Genre results, Instrument-expression results and Exclude results can expose their linked Knowledge before the user selects them.
-- Desktop Explain uses a subtle dashed term affordance with delayed hover/focus and click-to-pin. Touch uses tap-to-pin with a mobile bottom-sheet presentation.
+- Desktop Explain uses a subtle dashed term affordance with delayed hover/focus. On selectable labels, click/keyboard activation now performs the actual option action instead of pinning Explain; non-selectable terms may still pin. Touch keeps label taps for selection and uses a separate compact explanation affordance for the mobile sheet.
 - Explanation UI is a singleton viewport portal, so parent overflow cannot clip it and multiple cards cannot overlap.
 - The old Knowledge-origin chip rows beneath the Live Prompt were removed. Explain UI no longer consumes prompt-preview layout space and still never enters copied Style/Exclude text.
 - Favorite hold feedback now renders outside the small preset control's clipping boundary; hit areas are separated from explainable labels so favorite/select gestures and Explain can coexist.
