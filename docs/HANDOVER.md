@@ -256,3 +256,14 @@ If a proposed implementation requires changing a Database V1 invariant, call tha
 - Current first consumers: selected Genres, facet section labels, Advanced parameter headings and Instruments section heading.
 - Locale resolution is UI-locale -> English fallback; renderer language remains independent.
 - Favorite hold durations remain 0.8 s add / 1.0 s remove internally, but duration instructions are intentionally hidden from normal UI/hover copy.
+
+## Project persistence v1 carry-forward
+
+- `@vgine/project-storage` owns the versioned ProjectDocument contract and `ProjectStorage` interface.
+- The web adapter is IndexedDB; do not move project state into `localStorage`.
+- Current active project ID is `active`; the adapter already supports load/save/delete/list so a multi-project library can be layered on later.
+- Persisted semantic state is MusicSpec. Manual Style override is explicit secondary output state.
+- Current prompt-scoped workspace persistence includes active chapter and genre-skip acknowledgement.
+- User preferences (Theme, locale, Favorites) stay outside ProjectDocument.
+- Restore validates MusicSpec before accepting persisted state.
+- Next persistence expansion should be project naming/library/import-export rather than replacing this adapter contract.

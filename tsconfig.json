@@ -6,6 +6,7 @@
     { "path": "./packages/runtime-data" },
     { "path": "./packages/search" },
     { "path": "./packages/ui" },
-    { "path": "./packages/motion" }
+    { "path": "./packages/motion" },
+    { "path": "./packages/project-storage" }
   ]
 }

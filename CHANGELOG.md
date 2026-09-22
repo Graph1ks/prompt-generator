@@ -6,6 +6,8 @@ This file records meaningful product, behavior, compatibility, security, data, a
 
 ### Added
 
+- Added `@vgine/project-storage`, versioned `vgine-project-v1` documents, dependency-free IndexedDB persistence, contract tests, and automatic local restore/autosave of MusicSpec, manual Style override and minimal prompt workspace state.
+
 - Added lazy manifest-validated Runtime Knowledge loading and the first inline Explanation-mode surfaces for explicitly linked Genre, facet, parameter and Instruments terms, including localized definitions, context definitions, difficulty and related terms.
 
 - Added lazy validated `editor.json` Runtime loading plus the shared production Easy/Advanced FacetEditor for Pulse/Palette/Finish, using real statements, parameter options and per-facet custom English renderer text.
@@ -67,6 +69,8 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Fixed the Studio white-screen regression where Vite development could load stale ignored `packages/*/dist` output and miss newly added workspace exports such as `createMusicSpec`. `pnpm dev` now rebuilds workspace packages first, and Vite dev resolves exact internal `@vgine/*` imports from source.
 
 ### Changed
+
+- The Studio top-bar status now reports actual local project restore/autosave state once Runtime loading is complete.
 
 - Removed visible Favorites hold-duration instructions from result metadata and hover titles while preserving the accepted internal gesture timing.
 

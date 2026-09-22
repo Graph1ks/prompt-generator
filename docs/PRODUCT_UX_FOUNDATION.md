@@ -372,3 +372,16 @@ Explanation mode exposes knowledge only where Runtime data provides an explicit 
 - unlinked labels remain ordinary text; the UI does not invent definitions from label wording.
 
 Favorite gesture timings are implementation behavior and are not displayed as instructional copy in pool result metadata or hover titles.
+
+## 22. Local project persistence
+
+Studio automatically restores and locally saves the active project.
+
+- web/PWA persistence uses IndexedDB behind `ProjectStorage`;
+- autosave is local/offline and does not require an account or backend;
+- MusicSpec remains the persisted semantic source truth;
+- a manual final-Style override is persisted explicitly as secondary output state;
+- the last active Studio chapter and per-prompt genre-skip acknowledgement may be restored;
+- Theme, language and Favorites are user preferences and do not travel inside the project document;
+- corrupted/unsupported persisted documents must not be silently reinterpreted or overwrite domain state;
+- the top bar communicates restoring/saving/saved/error/unavailable state without blocking editing.

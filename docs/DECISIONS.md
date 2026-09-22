@@ -762,3 +762,20 @@ The application does not load the full Knowledge payload during initial Studio b
 A UI label becomes an interactive Knowledge term only when its Runtime entity carries a concrete `knowledge_entry_id` (or an equivalent explicit semantic relation). The UI does not infer dictionary identity from matching visible strings.
 
 Definition selection follows UI locale first, English fallback second. This localization path is independent of the English v1 prompt renderer.
+
+## ADR-039 — Project persistence uses versioned ProjectDocument v1 over ProjectStorage
+
+**Status:** accepted
+
+The persisted web project is a versioned `vgine-project-v1` document behind the existing `ProjectStorage` abstraction.
+
+The document stores MusicSpec as semantic source truth plus explicit secondary project/output state:
+
+- stable project ID/title/timestamps;
+- MusicSpec;
+- manual Style output override, when present;
+- minimal prompt-scoped workspace state such as active Studio chapter and genre-skip acknowledgement.
+
+Theme, UI locale, Favorites and other user preferences are not project state and remain outside ProjectDocument.
+
+The first web adapter uses IndexedDB without an external dependency. Tauri/native storage may later implement the same interface without changing domain/compiler state.

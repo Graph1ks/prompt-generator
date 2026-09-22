@@ -13,6 +13,7 @@
     "@vgine/compiler": "workspace:*",
     "@vgine/motion": "workspace:*",
     "@vgine/music-spec": "workspace:*",
+    "@vgine/project-storage": "workspace:*",
     "@vgine/runtime-data": "workspace:*",
     "@vgine/search": "workspace:*",
     "@vgine/ui": "workspace:*",
