@@ -1,7 +1,7 @@
 # Project Status
 
-**Last updated:** 2026-09-21  
-**Current milestone:** **Runtime-backed Genre Studio slice implemented** — next: reusable picker pattern + Instruments/knowledge controls
+**Last updated:** 2026-09-22  
+**Current milestone:** **Studio editor-depth + Product Knowledge foundations implemented** — next: owner-local smoke validation, explanation-gap cleanup, then project-library / remaining UX refinement
 
 ## Completion verdict
 
@@ -74,8 +74,9 @@ Expected result: acceptance remains `status: ok`; the compiled knowledge DB is s
 
 - Application architecture is frozen in `docs/APPLICATION_ARCHITECTURE.md` and ADR-021 through ADR-029.
 - Runtime Pack v1 is frozen in `docs/RUNTIME_DATA_CONTRACT_V1.md` + `schema/runtime-pack-v1.schema.json`.
-- Owner-local Runtime Pack v1 validation succeeded against the completed real `knowledge.sqlite`: runtime build ID `3b774ba611011ef9771c6700e2c5b156f73639a948ad0f83316c28bca8c99bfe`; 1,564 genres; 6,035 instrument expressions; 164 canonical instruments across 9 families; 2,749 knowledge entries; 10,348 search documents; ~10.53 MiB uncompressed payload total.
-- The validated runtime `editor.json` currently contains 0 parameters/options/statements/Exclude entries. That is a Post-V1 enrichment/product-content gap, not a Runtime Pack failure.
+- The previously recorded owner-local Runtime Pack snapshot predates Product Editor Foundation v1 and Product Knowledge Foundation v1. Do not use its Knowledge/Search/editor counts as the current product snapshot after PR #35.
+- Current Runtime Pack identity separately fingerprints `knowledge.sqlite`, `data/product/editor-foundation-v1.json`, and `data/product/knowledge-foundation-v1.json`. Pulling Foundation changes requires an owner-local Runtime re-export even when `knowledge.sqlite` itself is unchanged.
+- Product Editor Foundation v1 now supplies 49 parameters, 262 Advanced options, 79 Easy statements and 10 Exclude entries across every ordinary facet. Product Knowledge Foundation v1 adds 400 explicit English/German Knowledge entries linked to those controls.
 - `scripts/data/export_runtime_v1.py` compiles deterministic runtime payloads from `knowledge.sqlite` with plan/status, resumable staged work, stale-source rejection, validation, atomic promotion and previous-pack retention.
 - Strict TypeScript/pnpm workspace is present with `@vgine/music-spec` and pure `@vgine/compiler`.
 - Compiler v1 performs MusicSpec runtime validation, canonical structured rendering, separate Exclude output, exact semantic deduplication, deterministic lower-priority omission, Unicode code-point budgeting and explicit `budget_conflict` diagnostics without blind truncation.
@@ -91,7 +92,7 @@ Expected result: acceptance remains `status: ok`; the compiled knowledge DB is s
 
 ## Current blocker
 
-**No implementation blocker.** Search performance, Runtime Pack loading, genre-free/genre-guided MusicSpec creation and live compiler preview are validated. The stale-workspace-build white-screen regression is fixed by rebuilding packages before `pnpm dev` and resolving exact internal `@vgine/*` imports from workspace source during Vite development. Owner-local visual/touch review remains required before treating the Studio presentation as final.
+**No implementation blocker.** PR #34 and PR #35 are merged and CI-green. The immediate owner-local requirement is to re-export Runtime Pack v1 so the local `editor.json` and `knowledge.json` include the new Product Editor/Product Knowledge foundations, then smoke-test the posted multi-section prompt in Explain mode. Missing explanations must be treated as missing explicit semantic links, not patched with label-string guessing. Owner-local visual/touch review still remains required before treating the Studio presentation as final.
 
 Future enrichment does not reopen the V1 database milestone unless it changes schema/invariants.
 
@@ -99,11 +100,11 @@ Future enrichment does not reopen the V1 database milestone unless it changes sc
 
 Proceed in this order:
 
-1. extract the Genre browse/search/result mechanics into the reusable V'gine Picker/SearchResults pattern;
-2. add lazy Runtime Pack repositories for instrument expressions and knowledge detail payloads;
-3. implement the production Instruments picker over all 6,035 source expressions without mounting giant lists;
-4. add ProjectStorage/IndexedDB persistence for versioned MusicSpec projects;
-5. expand the remaining facets and additive editor-content enrichment without reopening Database V1.
+1. owner-local re-export Runtime Pack v1 and reproduce the current reference prompt with Explain mode enabled;
+2. verify that Product sections resolve explanation origins through explicit Knowledge IDs and that Genre/Instruments continue to use Database V1 semantic links;
+3. fix only genuine missing semantic links/UX defects found by that smoke test — never infer Knowledge identity from rendered strings;
+4. continue project-library work (naming/listing/duplicate/import-export) on top of the existing `ProjectStorage` contract;
+5. continue Studio ergonomics/visual refinement; reserve broad motion polish until interaction/functionality is accepted.
 
 ## Do not redo
 
@@ -189,7 +190,7 @@ Proceed in this order:
 - The active project restores MusicSpec, explicit manual Style override, active chapter and genre-skip acknowledgement after reload.
 - Studio debounces local autosave and exposes restoring/saving/saved/error/unavailable status in the top bar.
 - MusicSpec validation is reused when loading persisted projects; unsupported/corrupt project data is not silently accepted.
-- Theme, locale and Favorites remain separate lightweight user preferences rather than project data.
+- Theme, locale and Favorites remain separate device-local IndexedDB user data rather than project data.
 
 ## Product Editor Foundation v1
 

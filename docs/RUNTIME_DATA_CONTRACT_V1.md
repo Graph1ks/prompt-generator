@@ -64,6 +64,8 @@ Contains:
 - contract/schema version;
 - deterministic `runtime_build_id`;
 - SHA-256 of the source `knowledge.sqlite`;
+- SHA-256 of tracked Product Editor Foundation v1;
+- SHA-256 of tracked Product Knowledge Foundation v1;
 - source knowledge build metadata;
 - per-file SHA-256, byte size and key record counts.
 
@@ -221,7 +223,11 @@ Before promotion the exporter checks:
 - source output wording is present and not normalized away;
 - expression IDs are unique;
 - `suno-structured-v1` keeps the Database V1 budget contract when present;
-- every payload is valid JSON and receives a recorded hash/count.
+- every payload is valid JSON and receives a recorded hash/count;
+- all Product Editor Foundation records retain complete facet coverage;
+- all 400 Product Knowledge Foundation entries survive export;
+- every Product Editor Knowledge link resolves to an included Knowledge entry;
+- Product Knowledge entries are present in the Runtime search corpus.
 
 Synthetic CI additionally tests plan/no-write behavior, lossless expression export, no-op reruns, stale-work rejection/recovery and previous-pack retention.
 
