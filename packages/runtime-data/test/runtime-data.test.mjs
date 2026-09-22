@@ -171,7 +171,7 @@ function payloads() {
           output_text: "laid-back swung pocket",
           mode_scope: "easy",
           statement_kind: "combination",
-          source_frequency: 7,
+          source_frequency: null,
           concepts: [],
           options: [
             {
@@ -299,5 +299,6 @@ test("lazy-loads and validates the editor payload", async () => {
   assert.equal(editor.parameters[0].section_key, "groove");
   assert.equal(editor.parameter_options[0].output_fragment, "laid-back swing");
   assert.equal(editor.statements[0].output_text, "laid-back swung pocket");
+  assert.equal(editor.statements[0].source_frequency, null);
   assert.equal(editor.exclude[0].output_text, "bright glossy pop synths");
 });
