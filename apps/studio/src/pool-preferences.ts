@@ -58,6 +58,7 @@ export interface PoolPreferences {
   readonly usageCount: (id: string) => number;
   readonly setFavorite: (id: string, favorite: boolean) => void;
   readonly recordUse: (id: string) => void;
+  readonly recentIds: (limit?: number) => readonly string[];
   readonly sortFavoriteFirst: <T>(
     items: readonly T[],
     idOf: (item: T) => string,
@@ -140,6 +141,21 @@ export function usePoolPreferences(poolId: string): PoolPreferences {
     [mutate],
   );
 
+  const recentIds = useCallback(
+    (limit = 6): readonly string[] =>
+      Object.entries(items)
+        .filter(([, preference]) => preference.lastUsedAt > 0)
+        .sort(
+          (a, b) =>
+            b[1].lastUsedAt - a[1].lastUsedAt ||
+            b[1].useCount - a[1].useCount ||
+            a[0].localeCompare(b[0]),
+        )
+        .slice(0, Math.max(0, limit))
+        .map(([id]) => id),
+    [items],
+  );
+
   const sortFavoriteFirst = useCallback(
     <T,>(source: readonly T[], idOf: (item: T) => string): T[] => {
       return source
@@ -170,8 +186,16 @@ export function usePoolPreferences(poolId: string): PoolPreferences {
       usageCount,
       setFavorite,
       recordUse,
+      recentIds,
       sortFavoriteFirst,
     }),
-    [isFavorite, recordUse, setFavorite, sortFavoriteFirst, usageCount],
+    [
+      isFavorite,
+      recentIds,
+      recordUse,
+      setFavorite,
+      sortFavoriteFirst,
+      usageCount,
+    ],
   );
 }
