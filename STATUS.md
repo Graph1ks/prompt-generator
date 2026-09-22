@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-22  
-**Current milestone:** **Studio editor-depth + Product Knowledge foundations implemented** — next: owner-local smoke validation, explanation-gap cleanup, then project-library / remaining UX refinement
+**Current milestone:** **Explain UX rebuilt + Product Knowledge authoring pipeline ready** — next: replace generated/meta definitions, owner-local Runtime smoke validation, then project-library / remaining UX refinement
 
 ## Completion verdict
 
@@ -74,7 +74,7 @@ Expected result: acceptance remains `status: ok`; the compiled knowledge DB is s
 
 - Application architecture is frozen in `docs/APPLICATION_ARCHITECTURE.md` and ADR-021 through ADR-029.
 - Runtime Pack v1 is frozen in `docs/RUNTIME_DATA_CONTRACT_V1.md` + `schema/runtime-pack-v1.schema.json`.
-- The previously recorded owner-local Runtime Pack snapshot predates Product Editor Foundation v1 and Product Knowledge Foundation v1. Do not use its Knowledge/Search/editor counts as the current product snapshot after PR #35.
+- The previously recorded owner-local Runtime Pack snapshot predates Product Editor Foundation v1, Product Knowledge Foundation v1 and the PR #37 Explain UX/content-authoring changes. Do not use its Knowledge/Search/editor counts as the current product snapshot.
 - Current Runtime Pack identity separately fingerprints `knowledge.sqlite`, `data/product/editor-foundation-v1.json`, and `data/product/knowledge-foundation-v1.json`. Pulling Foundation changes requires an owner-local Runtime re-export even when `knowledge.sqlite` itself is unchanged.
 - Product Editor Foundation v1 now supplies 49 parameters, 262 Advanced options, 79 Easy statements and 10 Exclude entries across every ordinary facet. Product Knowledge Foundation v1 adds 400 explicit English/German Knowledge entries linked to those controls.
 - `scripts/data/export_runtime_v1.py` compiles deterministic runtime payloads from `knowledge.sqlite` with plan/status, resumable staged work, stale-source rejection, validation, atomic promotion and previous-pack retention.
@@ -92,7 +92,11 @@ Expected result: acceptance remains `status: ok`; the compiled knowledge DB is s
 
 ## Current blocker
 
-**No implementation blocker.** PR #34 and PR #35 are merged and CI-green. The immediate owner-local requirement is to re-export Runtime Pack v1 so the local `editor.json` and `knowledge.json` include the new Product Editor/Product Knowledge foundations, then smoke-test the posted multi-section prompt in Explain mode. Missing explanations must be treated as missing explicit semantic links, not patched with label-string guessing. Owner-local visual/touch review still remains required before treating the Studio presentation as final.
+**No implementation blocker.** PR #37 is merged and CI-green at `dd503031ed546f0ed508763ebab2efe2269ec83c`.
+
+The remaining Product Knowledge issue is editorial, not semantic-link coverage: the current 400-entry foundation still contains generated/meta wording for many option/statement/Exclude definitions. The complete replacement batch is prepared in `data/product/knowledge-foundation-v1-authoring-request.txt` and can be validated/imported with `scripts/data/import_product_knowledge_authoring.py`.
+
+Owner-local Runtime rebuild and visual/touch smoke remain required because this environment does not have the owner's `.local-data/current/knowledge.sqlite` or desktop/browser session.
 
 Future enrichment does not reopen the V1 database milestone unless it changes schema/invariants.
 
@@ -100,11 +104,12 @@ Future enrichment does not reopen the V1 database milestone unless it changes sc
 
 Proceed in this order:
 
-1. owner-local re-export Runtime Pack v1 and reproduce the current reference prompt with Explain mode enabled;
-2. verify that Product sections resolve explanation origins through explicit Knowledge IDs and that Genre/Instruments continue to use Database V1 semantic links;
-3. fix only genuine missing semantic links/UX defects found by that smoke test — never infer Knowledge identity from rendered strings;
-4. continue project-library work (naming/listing/duplicate/import-export) on top of the existing `ProjectStorage` contract;
-5. continue Studio ergonomics/visual refinement; reserve broad motion polish until interaction/functionality is accepted.
+1. run the 400-entry Product Knowledge authoring request through the dedicated writing/research thread and save the strict `ID / EN / DE / ---` response;
+2. validate/import that response with `scripts/data/import_product_knowledge_authoring.py`;
+3. owner-locally re-export Runtime Pack v1 and reproduce the reference prompt with Explain enabled;
+4. verify selection-time Explain on Product controls, Genre, Instruments and Exclude; fix only genuine explicit-link/UX defects — never infer Knowledge identity from rendered strings;
+5. continue project naming/library/duplicate/import-export on the existing `ProjectStorage` contract;
+6. continue Studio ergonomics/visual refinement; reserve broad motion polish until interaction/functionality is accepted.
 
 ## Do not redo
 
