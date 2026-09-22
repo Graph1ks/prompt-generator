@@ -8,6 +8,7 @@ import {
   type FacetKey,
   type GenreInfluenceRole,
   type MusicSpec,
+  type Selection,
 } from "@vgine/music-spec";
 import { isVgineTheme, type VgineTheme } from "@vgine/ui";
 import {
@@ -160,6 +161,7 @@ function specHistoryGroup(current: MusicSpec, next: MusicSpec): string | null {
   if (changedFacets.length !== 1) return null;
 
   const facet = changedFacets[0];
+  if (!facet) return null;
   const before = current.facets[facet];
   const after = next.facets[facet];
   if (!before || !after) return null;
@@ -173,12 +175,12 @@ function specHistoryGroup(current: MusicSpec, next: MusicSpec): string | null {
 
   if (before.custom_text !== after.custom_text) return null;
 
-  const beforeById = new Map(
+  const beforeById = new Map<string, Selection>(
     before.selections
       .filter((selection) => Boolean(selection.id))
       .map((selection) => [selection.id as string, selection] as const),
   );
-  const afterById = new Map(
+  const afterById = new Map<string, Selection>(
     after.selections
       .filter((selection) => Boolean(selection.id))
       .map((selection) => [selection.id as string, selection] as const),
@@ -200,6 +202,7 @@ function specHistoryGroup(current: MusicSpec, next: MusicSpec): string | null {
 
   if (changedIds.size !== 1) return null;
   const changedId = [...changedIds][0];
+  if (!changedId) return null;
   if (!beforeById.has(changedId) || !afterById.has(changedId)) return null;
   return "facet:" + facet + ":selection:" + changedId;
 }
