@@ -16,6 +16,7 @@ import type {
   RuntimeKnowledgePayload,
 } from "@vgine/runtime-data";
 
+import { Icon } from "./icons.js";
 import { useI18n } from "./i18n.js";
 
 type KnowledgeState =
@@ -405,7 +406,9 @@ export function KnowledgeTerm({
             ref={cardRef}
             id={cardId}
             className="knowledge-popover"
-            role="tooltip"
+            role={pinned ? "dialog" : "tooltip"}
+            aria-modal={pinned && position.mobile ? true : undefined}
+            aria-label={pinned ? t("knowledge.dialogLabel", { label }) : undefined}
             data-pinned={pinned || undefined}
             data-mobile={position.mobile || undefined}
             style={cardStyle}
@@ -427,11 +430,27 @@ export function KnowledgeTerm({
             {state.status === "ready" && (
               <>
                 <span className="knowledge-inline-head">
-                  <strong>{entry?.canonical_label ?? label}</strong>
-                  {difficultyLabel && (
-                    <small>
-                      {t("knowledge.difficulty", { level: difficultyLabel })}
-                    </small>
+                  <span className="knowledge-inline-title">
+                    <strong>{entry?.canonical_label ?? label}</strong>
+                    {difficultyLabel && (
+                      <small>
+                        {t("knowledge.difficulty", { level: difficultyLabel })}
+                      </small>
+                    )}
+                  </span>
+                  {pinned && (
+                    <button
+                      type="button"
+                      className="knowledge-popover-close"
+                      aria-label={t("knowledge.close")}
+                      title={t("knowledge.close")}
+                      onClick={() => {
+                        setActiveKnowledge(null);
+                        triggerRef.current?.focus();
+                      }}
+                    >
+                      <Icon name="close" />
+                    </button>
                   )}
                 </span>
 
