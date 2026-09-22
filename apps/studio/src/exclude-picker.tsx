@@ -213,10 +213,6 @@ export function ExcludePicker({
             count: matchingEntries.length.toLocaleString(locale),
           })}
         </span>
-        <span className="favorite-hint">
-          <Icon name="star" />
-          {t("exclude.favoriteHint")}
-        </span>
       </div>
 
       <div
