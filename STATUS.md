@@ -177,6 +177,13 @@ Proceed in this order:
 - Parameter cardinality follows schema value types: `multi` is multi-select, other option-bearing types are exclusive within their parameter.
 - Finish now exposes the real Runtime Exclude catalog and writes only to `MusicSpec.exclude[]` / separate Exclude compiler output.
 
+## Explain loading defect fix
+
+- Fixed a React effect dependency bug that could leave every opened Knowledge popover permanently stuck on `Loading explanation …`.
+- The loader effect previously set local state to `loading` while also depending on that same status; the rerender immediately ran effect cleanup, marked the in-flight request stale, and then discarded its eventual result.
+- Knowledge loading now depends only on the actual load triggers (open state, entry ID and loader identity), so successful payloads can transition to ready/error normally.
+- Lazy Runtime payload promises now clear their cache after rejection, allowing a later user retry instead of permanently reusing one rejected promise.
+
 ## Runtime Knowledge surface slice
 
 - Favorite hold duration instructions have been removed from visible pool hints and hover titles; gesture timing remains internal behavior.

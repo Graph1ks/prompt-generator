@@ -226,7 +226,8 @@ export function KnowledgeTerm({
   }, [entryId]);
 
   useEffect(() => {
-    if (!open || state.status !== "idle") return;
+    if (!open || !entryId) return;
+
     let live = true;
     setState({ status: "loading" });
     void loadKnowledge()
@@ -241,10 +242,11 @@ export function KnowledgeTerm({
       .catch(() => {
         if (live) setState({ status: "error" });
       });
+
     return () => {
       live = false;
     };
-  }, [entryId, loadKnowledge, open, state.status]);
+  }, [entryId, loadKnowledge, open]);
 
   useEffect(
     () => () => {
