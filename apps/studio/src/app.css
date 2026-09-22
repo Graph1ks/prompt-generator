@@ -1486,10 +1486,6 @@
     }
 
     .assist-toggle {
-      padding-inline: 10px;
-    }
-
-    .assist-toggle span {
       display: none;
     }
 
@@ -1751,6 +1747,20 @@
       font-weight: 400;
     }
 
+    .mobile-explain-button {
+      inline-size: 49px;
+      min-inline-size: 49px;
+      block-size: 49px;
+      border-color: var(--studio-line-strong);
+      background: var(--studio-card);
+    }
+
+    .mobile-explain-button.active {
+      color: var(--studio-ink);
+      background: color-mix(in srgb, var(--studio-mint) 46%, var(--studio-card));
+      border-color: color-mix(in srgb, var(--studio-mint) 78%, var(--studio-line));
+    }
+
     .mobile-dock .btn.acid {
       min-inline-size: 108px;
       min-block-size: 49px;
@@ -1808,9 +1818,6 @@
       font-size: 9px;
     }
 
-    .assist-toggle {
-      display: none;
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {
