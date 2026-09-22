@@ -2,6 +2,7 @@ import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import {
   hasExcludeItem,
   removeExcludeItem,
+  resetMusicSpecFacets,
   setExcludeItem,
   type MusicSpec,
 } from "@vgine/music-spec";
@@ -167,26 +168,42 @@ export function ExcludePicker({
       </div>
 
       {spec.exclude.length > 0 && (
-        <div className="instrument-selected-list">
-          {spec.exclude.map((item, index) => {
-            const runtimeEntry = item.id ? excludeById.get(item.id) : undefined;
-            const label = runtimeEntry?.label ?? item.text;
-            return (
-              <button
-                key={item.id ?? item.text + index}
-                type="button"
-                className="instrument-selected-chip exclude-selected-chip"
-                title={t("exclude.remove", { label })}
-                onClick={() => {
-                  if (!item.id) return;
-                  onSpecChange(removeExcludeItem(spec, item.id));
-                }}
-              >
-                <span>{label}</span>
-                {item.id && <Icon name="close" />}
-              </button>
-            );
-          })}
+        <div className="selected-pool">
+          <div className="selected-pool-head">
+            <strong>{t("exclude.current")}</strong>
+            <button
+              type="button"
+              className="text-btn selected-pool-clear"
+              onClick={() =>
+                onSpecChange(
+                  resetMusicSpecFacets(spec, [], { clearExclude: true }),
+                )
+              }
+            >
+              {t("exclude.clearAll")}
+            </button>
+          </div>
+          <div className="instrument-selected-list">
+            {spec.exclude.map((item, index) => {
+              const runtimeEntry = item.id ? excludeById.get(item.id) : undefined;
+              const label = runtimeEntry?.label ?? item.text;
+              return (
+                <button
+                  key={item.id ?? item.text + index}
+                  type="button"
+                  className="instrument-selected-chip exclude-selected-chip"
+                  title={t("exclude.remove", { label })}
+                  onClick={() => {
+                    if (!item.id) return;
+                    onSpecChange(removeExcludeItem(spec, item.id));
+                  }}
+                >
+                  <span>{label}</span>
+                  {item.id && <Icon name="close" />}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 
