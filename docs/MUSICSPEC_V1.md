@@ -14,7 +14,7 @@ Easy and Advanced modes are different editing surfaces over the same object.
 ```text
 MusicSpec
 ├─ schema_version
-├─ genre_influences[1..3]
+├─ genre_influences[0..3]
 │  ├─ Foundation
 │  ├─ Fusion
 │  └─ Accent
@@ -43,7 +43,7 @@ The JSON Schema lives in `schema/music-spec-v1.schema.json`. The executable Type
 
 ## 3. Genre influences
 
-A project has one to three ordered influences.
+A project has zero to three ordered influences.
 
 ```json
 {
@@ -71,7 +71,7 @@ Every facet can contain structured selections plus optional custom text.
 A selection records:
 
 - stable selected object ID when available;
-- kind: statement / parameter option / concept / freeform;
+- kind: statement / option / concept / freeform; `option` also covers stable runtime-selectable source expressions such as an `instrument_expression`;
 - value/output fragment when needed;
 - origin/provenance;
 - lock state.
