@@ -56,6 +56,7 @@ export function ProjectLibrary({
 }: ProjectLibraryProps) {
   const { locale, t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const pendingRenameRef = useRef(new Map<string, Promise<void>>());
   const [titleDrafts, setTitleDrafts] = useState<Record<string, string>>({});
   const [armedDeleteId, setArmedDeleteId] = useState<string | null>(null);
 
@@ -94,11 +95,30 @@ export function ProjectLibrary({
   if (!open) return null;
 
   async function commitTitle(project: ProjectSummary) {
+    const pending = pendingRenameRef.current.get(project.id);
+    if (pending) {
+      await pending;
+      return;
+    }
+
     const draft = titleDrafts[project.id] ?? "";
     const normalized = draft.trim().replace(/\s+/gu, " ");
     const nextTitle = normalized.length > 0 ? normalized : null;
     if (nextTitle === project.title) return;
-    await onRename(project.id, nextTitle);
+
+    const rename = onRename(project.id, nextTitle).finally(() => {
+      pendingRenameRef.current.delete(project.id);
+    });
+    pendingRenameRef.current.set(project.id, rename);
+    await rename;
+  }
+
+  async function afterTitleCommit(
+    project: ProjectSummary,
+    action: () => Promise<void>,
+  ) {
+    await commitTitle(project);
+    await action();
   }
 
   function onTitleKeyDown(
@@ -215,7 +235,9 @@ export function ProjectLibrary({
                     type="button"
                     className="project-row-open"
                     disabled={busy || active}
-                    onClick={() => void onOpen(project.id)}
+                    onClick={() =>
+                      void afterTitleCommit(project, () => onOpen(project.id))
+                    }
                     aria-label={t("project.openNamed", {
                       title: project.title ?? t("project.untitled"),
                     })}
@@ -260,7 +282,11 @@ export function ProjectLibrary({
                       disabled={busy}
                       title={t("project.duplicate")}
                       aria-label={t("project.duplicate")}
-                      onClick={() => void onDuplicate(project.id)}
+                      onClick={() =>
+                        void afterTitleCommit(project, () =>
+                          onDuplicate(project.id),
+                        )
+                      }
                     >
                       <Icon name="duplicate" />
                     </button>
@@ -270,7 +296,9 @@ export function ProjectLibrary({
                       disabled={busy}
                       title={t("project.export")}
                       aria-label={t("project.export")}
-                      onClick={() => void onExport(project.id)}
+                      onClick={() =>
+                        void afterTitleCommit(project, () => onExport(project.id))
+                      }
                     >
                       <Icon name="download" />
                     </button>
@@ -281,12 +309,14 @@ export function ProjectLibrary({
                       title={armed ? t("project.deleteConfirm") : t("project.delete")}
                       aria-label={armed ? t("project.deleteConfirm") : t("project.delete")}
                       onClick={() => {
-                        if (armed) {
-                          setArmedDeleteId(null);
-                          void onDelete(project.id);
-                        } else {
-                          setArmedDeleteId(project.id);
-                        }
+                        void afterTitleCommit(project, async () => {
+                          if (armed) {
+                            setArmedDeleteId(null);
+                            await onDelete(project.id);
+                          } else {
+                            setArmedDeleteId(project.id);
+                          }
+                        });
                       }}
                     >
                       <Icon name={armed ? "warning" : "trash"} />
