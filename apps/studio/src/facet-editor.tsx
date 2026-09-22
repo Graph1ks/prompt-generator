@@ -344,6 +344,22 @@ export function FacetEditor({
     onSpecChange(removeFacetSelection(clean, facet, valueId));
   }
 
+  function clearParameter(parameter: RuntimeParameter) {
+    let next = spec;
+    for (const option of optionsByParameter.get(parameter.id) ?? []) {
+      if (hasFacetSelection(next, facet, option.id)) {
+        next = removeFacetSelection(next, facet, option.id);
+      }
+    }
+
+    const numberValueId = parameter.id + ":value";
+    if (hasFacetSelection(next, facet, numberValueId)) {
+      next = removeFacetSelection(next, facet, numberValueId);
+    }
+
+    if (next !== spec) onSpecChange(next);
+  }
+
   function toggleOption(
     option: RuntimeParameterOption,
     parameter: RuntimeParameter,
@@ -637,9 +653,31 @@ export function FacetEditor({
               const visible = expanded
                 ? options
                 : options.slice(0, COMPACT_OPTIONS_PER_PARAMETER);
+              const selectedValue = selectedNumberValue(parameter);
+              const selectedOptions = options.filter((option) =>
+                hasFacetSelection(spec, facet, option.id),
+              );
+              const activeLabels =
+                selectedValue !== null
+                  ? [
+                      String(selectedValue) +
+                        (parameter.ui?.unit ? " " + parameter.ui.unit : ""),
+                    ]
+                  : selectedOptions.map((option) => option.label);
+              const activeSummary =
+                activeLabels.length <= 2
+                  ? activeLabels.join(" · ")
+                  : activeLabels.slice(0, 2).join(" · ") +
+                    " +" +
+                    (activeLabels.length - 2);
+              const activeTitle = activeLabels.join(", ");
 
               return (
-                <section key={parameter.id} className="parameter-group">
+                <section
+                  key={parameter.id}
+                  className="parameter-group"
+                  data-active={activeLabels.length > 0 || undefined}
+                >
                   <div className="parameter-head">
                     <strong>
                       <KnowledgeTerm
@@ -651,13 +689,37 @@ export function FacetEditor({
                         contextKey={parameter.id}
                       />
                     </strong>
-                    <small>{parameter.value_type}</small>
+                    <span className="parameter-head-meta">
+                      {activeLabels.length > 0 && (
+                        <span
+                          className="parameter-active-summary"
+                          title={activeTitle}
+                        >
+                          {activeSummary}
+                        </span>
+                      )}
+                      <small>{parameter.value_type}</small>
+                      {activeLabels.length > 0 && (
+                        <button
+                          type="button"
+                          className="parameter-clear"
+                          aria-label={t("facetEditor.clearParameter", {
+                            label: parameter.label,
+                          })}
+                          title={t("facetEditor.clearParameter", {
+                            label: parameter.label,
+                          })}
+                          onClick={() => clearParameter(parameter)}
+                        >
+                          <Icon name="close" />
+                        </button>
+                      )}
+                    </span>
                   </div>
 
                   {parameter.ui?.control === "number" ? (
                     <div className="number-parameter-control">
                       {(() => {
-                        const selectedValue = selectedNumberValue(parameter);
                         const rangeValue =
                           selectedValue ??
                           parameter.ui.recommended_values[0] ??
