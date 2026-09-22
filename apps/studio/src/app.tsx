@@ -197,21 +197,6 @@ export function App() {
     setPromptUnlocked(false);
   }
 
-  function facetSummary(facet: FacetKey): string {
-    if (facet === "genre") {
-      return selectedGenreLabels.length
-        ? selectedGenreLabels.join(" · ")
-        : t("placeholder.notSelected");
-    }
-    const state = spec?.facets[facet];
-    if (!state) return t("placeholder.notSet");
-    const count = state.selections.length + (state.custom_text?.trim() ? 1 : 0);
-    if (count === 0) return t("placeholder.notSet");
-    return t(count === 1 ? "placeholder.selection" : "placeholder.selections", {
-      count,
-    });
-  }
-
   async function copyPrompt() {
     const value =
       outputTab === "exclude" ? compilation?.excludeText : effectiveStyleText;
