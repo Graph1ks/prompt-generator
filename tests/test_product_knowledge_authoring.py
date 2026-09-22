@@ -59,6 +59,23 @@ DE: Eine weitere nützliche musikalische Definition mit genügend konkreter Erkl
                 require_complete=True,
             )
 
+    def test_tracked_foundation_plain_definitions_pass_editorial_guard(self) -> None:
+        knowledge_path = Path(__file__).resolve().parents[1] / "data" / "product" / "knowledge-foundation-v1.json"
+        payload = MODULE.load_payload(knowledge_path)
+        entries = payload["entries"]
+
+        self.assertEqual(len(entries), 400)
+        for entry in entries:
+            by_locale = {
+                item["locale"]: item["text"]
+                for item in entry["definitions"]
+                if item["kind"] == "plain" and item["locale"] in {"en", "de"}
+            }
+            self.assertEqual(set(by_locale), {"en", "de"}, entry["id"])
+            MODULE._validate_explanation(entry["id"], "EN", by_locale["en"])
+            MODULE._validate_explanation(entry["id"], "DE", by_locale["de"])
+
+
     def test_apply_replaces_plain_definitions_and_bumps_revision(self) -> None:
         payload = {
             "schema": MODULE.EXPECTED_SCHEMA,

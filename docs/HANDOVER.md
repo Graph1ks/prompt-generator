@@ -1,8 +1,8 @@
-# Handover — Explain UX + Product Knowledge authoring
+# Handover — Explain UX + authored Product Knowledge
 
 **Last updated:** 2026-09-22  
-**Handoff target:** replace generated Product Knowledge prose, owner-local Runtime/Explain smoke, then Studio project-library UX  
-**Milestone:** Database V1 remains closed; Product Editor/Easy-Advanced/local persistence foundations stand; PR #37 moved Explain to selection-time singleton overlays and prepared the complete 400-entry bilingual Knowledge-authoring workflow
+**Handoff target:** owner-local Runtime/Explain smoke, then Studio project-library UX  
+**Milestone:** Database V1 remains closed; Product Editor/Easy-Advanced/local persistence foundations stand; Explain is selection-time/portal-based and the complete 400-entry Product Knowledge Foundation now contains authored bilingual musical explanations
 
 ## Read this first
 
@@ -35,7 +35,7 @@ Real Factory files, generated SQLite databases, reports, checkpoints and backups
 - Explicitly linked terms are explainable before selection via dashed inline affordances.
 - One viewport-level explanation surface is active at a time; desktop supports hover/focus + pin, mobile uses tap + bottom sheet.
 - Compact favorite/preset hold feedback is no longer clipped inside the 38 px control.
-- Product Knowledge content remediation is intentionally separate: use the tracked 400-entry authoring request/importer before declaring the dictionary copy accepted.
+- Product Knowledge content remediation is complete for v1: all 400 Product Foundation entries now use the accepted authored EN/DE musical explanations; the old generated preset/control/rendering prose is no longer the tracked baseline.
 
 ## What has been completed
 
@@ -190,11 +190,11 @@ Treat Database V1, Runtime Pack v1, Product Editor Foundation v1 and Product Kno
 
 Recommended order:
 
-1. **Re-export owner-local Runtime Pack** after pulling `main`; Product Editor/Product Knowledge changes are independent fingerprints and are not supplied by the old generated pack.
-2. **Rebuild the user's reference prompt** and inspect Explain mode section by section. Product sections must expose provenance-backed Knowledge origins without changing copied prompt text.
+1. **Re-export owner-local Runtime Pack** after pulling `main`; the authored Product Knowledge file changes its independent Runtime fingerprint.
+2. **Rebuild the user's reference prompt** and inspect selection-time Explain section by section. Product definitions should now teach the actual concept before selection without changing copied prompt text.
 3. **Investigate only explicit-link gaps.** Product controls resolve through Product Knowledge; Genre resolves through existing Genre Knowledge; Instruments resolve through canonical instrument/concept Knowledge. Never add rendered-string guessing.
 4. **Continue project UX** on the existing IndexedDB `ProjectStorage`: project naming/library, duplicate, import/export are the next persistence layer.
-5. **Continue Studio ergonomics and visual refinement** while keeping broad motion polish late. Add external UI/motion dependencies only when a concrete interaction justifies the license/maintenance cost.
+5. **Continue Studio ergonomics and visual refinement** while keeping broad motion polish late.
 
 ## Post-V1 enrichment is allowed but is not a blocker
 
