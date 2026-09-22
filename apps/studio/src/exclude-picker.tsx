@@ -217,39 +217,41 @@ export function ExcludePicker({
         </div>
       )}
 
-      <label className="searchbox exclude-search">
-        <Icon name="search" />
-        <span className="sr-only">{t("exclude.searchAria")}</span>
-        <input
-          ref={searchInputRef}
-          type="search"
-          value={query}
-          autoComplete="off"
-          placeholder={t("exclude.searchPlaceholder", {
-            count: editor.value.exclude.length.toLocaleString(locale),
-          })}
-          onChange={(event) => setQuery(event.currentTarget.value)}
-        />
-        {query ? (
-          <button
-            type="button"
-            className="search-clear"
-            aria-label={t("exclude.clearSearch")}
-            onClick={() => setQuery("")}
-          >
-            <Icon name="close" />
-          </button>
-        ) : (
-          <kbd>/</kbd>
-        )}
-      </label>
+      <div className="pool-control-stack exclude-pool-controls">
+        <label className="searchbox exclude-search">
+          <Icon name="search" />
+          <span className="sr-only">{t("exclude.searchAria")}</span>
+          <input
+            ref={searchInputRef}
+            type="search"
+            value={query}
+            autoComplete="off"
+            placeholder={t("exclude.searchPlaceholder", {
+              count: editor.value.exclude.length.toLocaleString(locale),
+            })}
+            onChange={(event) => setQuery(event.currentTarget.value)}
+          />
+          {query ? (
+            <button
+              type="button"
+              className="search-clear"
+              aria-label={t("exclude.clearSearch")}
+              onClick={() => setQuery("")}
+            >
+              <Icon name="close" />
+            </button>
+          ) : (
+            <kbd>/</kbd>
+          )}
+        </label>
 
-      <div className="result-meta">
-        <span>
-          {t("exclude.results", {
-            count: matchingEntries.length.toLocaleString(locale),
-          })}
-        </span>
+        <div className="result-meta">
+          <span>
+            {t("exclude.results", {
+              count: matchingEntries.length.toLocaleString(locale),
+            })}
+          </span>
+        </div>
       </div>
 
       <div
