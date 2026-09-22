@@ -15,6 +15,7 @@ const workspacePackages = [
   ["search", "search"],
   ["ui", "ui"],
   ["motion", "motion"],
+  ["project-storage", "project-storage"],
 ] as const;
 
 const workspaceSourceAliases = workspacePackages.map(([packageName, directory]) => ({
