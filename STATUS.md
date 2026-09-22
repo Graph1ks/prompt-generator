@@ -202,6 +202,15 @@ Proceed in this order:
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
 
+## BPM direct entry + full-height Live Prompt
+
+- BPM keeps the ergonomic 40–220 slider/recommended range, but direct numeric entry is no longer clamped to 220. A user-entered value such as 400 BPM is preserved in MusicSpec/compiler output; direct BPM remains positive and step-snapped.
+- When a direct BPM lies outside the slider range, the slider handle stays clamped to its nearest physical endpoint while the large centered numeric value remains authoritative.
+- Numeric parameter entry is now centered above the slider with a large bold monospaced value and explicit unit rather than a small right-aligned box.
+- Desktop Live Prompt no longer creates an internal scrolling region. The preview grows to its full content height and the document/page scroll reaches budget/copy controls.
+- Generated prompt sections no longer add artificial blank vertical gaps between `[Genre]`, `[Era]`, `[BPM]`, etc.
+- Manual Style editing now uses a syntax-themed overlay that preserves the same bracket/key/value visual language while the underlying textarea remains the editable plain-text source. Locked manual output uses the same themed renderer.
+
 ## MusicSpec undo / redo
 
 - Studio now maintains a bounded in-memory undo/redo history for MusicSpec authoring changes without changing the persisted project schema.
