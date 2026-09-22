@@ -305,3 +305,22 @@ Merge precedence is **Foundation first, reviewed/approved database editor rows s
 The Runtime manifest records `editor_foundation_sha256`. A Foundation change invalidates an existing local Runtime Pack even when `knowledge.sqlite` itself is unchanged.
 
 Runtime export fails closed when required Foundation facets lose either parameter coverage or Easy-statement coverage. The UI must never silently substitute ad-hoc React demo options for a missing product catalog.
+
+## Product Knowledge Foundation v1
+
+The Product Editor Foundation is accompanied by the tracked `data/product/knowledge-foundation-v1.json` explanatory layer.
+
+Current v1 coverage is 400 stable Product Knowledge entries:
+
+- 49 parameter concepts;
+- 262 Advanced parameter-option values;
+- 79 Easy statements;
+- 10 Exclude entries.
+
+Entries provide English and German definitions plus context metadata. Product Editor records reference them by stable Knowledge IDs: parameters/options/Exclude use `knowledge_entry_id`; Easy statements use their semantic concept links.
+
+Runtime compilation merges Product Knowledge first and reviewed/approved `knowledge.sqlite` entries second by stable ID. Database knowledge therefore remains authoritative when an ID is deliberately overlaid.
+
+The Runtime manifest records `product_knowledge_foundation_sha256`. Changes to the explanatory foundation invalidate an otherwise unchanged local Runtime Pack. Product Knowledge is also included in Runtime search.
+
+Runtime validation fails when Product Knowledge entries disappear or Product Editor references point at missing Product Knowledge IDs.

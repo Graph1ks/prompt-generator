@@ -160,6 +160,10 @@ class RuntimeExportV1Tests(unittest.TestCase):
             self.assertEqual(plan_payload["counts"]["instrument_expressions"], 1)
             self.assertGreater(plan_payload["editor_foundation_counts"]["parameters"], 0)
             self.assertGreater(plan_payload["editor_foundation_counts"]["statements"], 0)
+            self.assertEqual(
+                plan_payload["product_knowledge_foundation_counts"]["entries"],
+                400,
+            )
 
             result = self.run_exporter(db, out)
             self.assertEqual(json.loads(result.stdout)["status"], "ok")
@@ -167,6 +171,10 @@ class RuntimeExportV1Tests(unittest.TestCase):
             self.assertEqual(manifest["schema"], "vgine-runtime-pack-v1")
             self.assertEqual(
                 len(manifest["editor_foundation_sha256"]),
+                64,
+            )
+            self.assertEqual(
+                len(manifest["product_knowledge_foundation_sha256"]),
                 64,
             )
             self.assertEqual(manifest["files"]["instrument-expressions.json"]["counts"]["expressions"], 1)
@@ -202,10 +210,41 @@ class RuntimeExportV1Tests(unittest.TestCase):
                 for row in editor["parameters"]
                 if row["id"] == "product:parameter:bpm:tempo"
             )
+            self.assertTrue(bpm["knowledge_entry_id"].startswith("product:knowledge:"))
             self.assertEqual(bpm["value_type"], "number")
             self.assertEqual(bpm["ui"]["min"], 40)
             self.assertEqual(bpm["ui"]["max"], 220)
             self.assertIn(96, bpm["ui"]["recommended_values"])
+
+            knowledge = json.loads(
+                (out / "knowledge.json").read_text(encoding="utf-8")
+            )
+            product_knowledge = [
+                row
+                for row in knowledge["entries"]
+                if row["id"].startswith("product:knowledge:")
+            ]
+            self.assertEqual(len(product_knowledge), 400)
+            self.assertTrue(
+                all(
+                    any(
+                        definition["locale"] == "en"
+                        for definition in row["definitions"]
+                    )
+                    for row in product_knowledge
+                )
+            )
+
+            search = json.loads(
+                (out / "search.json").read_text(encoding="utf-8")
+            )["documents"]
+            self.assertTrue(
+                any(
+                    row["kind"] == "knowledge"
+                    and row["id"] == bpm["knowledge_entry_id"]
+                    for row in search
+                )
+            )
 
             expressions = json.loads(
                 (out / "instrument-expressions.json").read_text(encoding="utf-8")

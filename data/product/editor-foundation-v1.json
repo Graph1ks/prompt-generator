@@ -34,7 +34,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:era:period",
       "sort_order": 10
     },
     {
@@ -46,7 +46,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:bpm:tempo",
       "sort_order": 10,
       "ui": {
         "control": "number",
@@ -75,7 +75,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:key_mode:tonality",
       "sort_order": 10
     },
     {
@@ -87,7 +87,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:groove:pocket",
       "sort_order": 10
     },
     {
@@ -99,7 +99,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:groove:swing",
       "sort_order": 20
     },
     {
@@ -111,7 +111,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:groove:syncopation",
       "sort_order": 30
     },
     {
@@ -123,7 +123,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:groove:subdivision",
       "sort_order": 40
     },
     {
@@ -135,7 +135,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:melody:shape",
       "sort_order": 10
     },
     {
@@ -147,7 +147,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:melody:density",
       "sort_order": 20
     },
     {
@@ -159,7 +159,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:melody:role",
       "sort_order": 30
     },
     {
@@ -171,7 +171,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:melody:register",
       "sort_order": 40
     },
     {
@@ -183,7 +183,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:harmony:color",
       "sort_order": 10
     },
     {
@@ -195,7 +195,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:harmony:motion",
       "sort_order": 20
     },
     {
@@ -207,7 +207,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:harmony:voicing",
       "sort_order": 30
     },
     {
@@ -219,7 +219,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:drums:kit",
       "sort_order": 10
     },
     {
@@ -231,7 +231,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:drums:snare",
       "sort_order": 20
     },
     {
@@ -243,7 +243,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:drums:hats",
       "sort_order": 30
     },
     {
@@ -255,7 +255,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:drums:fills",
       "sort_order": 40
     },
     {
@@ -267,7 +267,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:drums:impact",
       "sort_order": 50
     },
     {
@@ -279,7 +279,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:bass:source",
       "sort_order": 10
     },
     {
@@ -291,7 +291,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:bass:motion",
       "sort_order": 20
     },
     {
@@ -303,7 +303,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:bass:length",
       "sort_order": 30
     },
     {
@@ -315,7 +315,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:bass:kick_relation",
       "sort_order": 40
     },
     {
@@ -327,7 +327,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:exciters:type",
       "sort_order": 10
     },
     {
@@ -339,7 +339,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:exciters:density",
       "sort_order": 20
     },
     {
@@ -351,7 +351,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:exciters:placement",
       "sort_order": 30
     },
     {
@@ -363,7 +363,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:texture:character",
       "sort_order": 10
     },
     {
@@ -375,7 +375,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:texture:density",
       "sort_order": 20
     },
     {
@@ -387,7 +387,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:texture:movement",
       "sort_order": 30
     },
     {
@@ -399,7 +399,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:vocal:presence",
       "sort_order": 10
     },
     {
@@ -411,7 +411,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:vocal:delivery",
       "sort_order": 20
     },
     {
@@ -423,7 +423,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:vocal:arrangement",
       "sort_order": 30
     },
     {
@@ -435,7 +435,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:vocal:processing",
       "sort_order": 40
     },
     {
@@ -447,7 +447,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:dynamics:range",
       "sort_order": 10
     },
     {
@@ -459,7 +459,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:dynamics:arc",
       "sort_order": 20
     },
     {
@@ -471,7 +471,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:dynamics:accents",
       "sort_order": 30
     },
     {
@@ -483,7 +483,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:space_mix:width",
       "sort_order": 10
     },
     {
@@ -495,7 +495,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:space_mix:depth",
       "sort_order": 20
     },
     {
@@ -507,7 +507,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:space_mix:low_end",
       "sort_order": 30
     },
     {
@@ -519,7 +519,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:space_mix:focus",
       "sort_order": 40
     },
     {
@@ -531,7 +531,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:space_mix:reverb",
       "sort_order": 50
     },
     {
@@ -543,7 +543,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:production:aesthetic",
       "sort_order": 10
     },
     {
@@ -555,7 +555,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:production:transients",
       "sort_order": 20
     },
     {
@@ -567,7 +567,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:production:saturation",
       "sort_order": 30
     },
     {
@@ -579,7 +579,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:production:fidelity",
       "sort_order": 40
     },
     {
@@ -591,7 +591,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:structure:form",
       "sort_order": 10
     },
     {
@@ -603,7 +603,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:structure:intro",
       "sort_order": 20
     },
     {
@@ -615,7 +615,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:structure:transitions",
       "sort_order": 30
     },
     {
@@ -627,7 +627,7 @@
       "easy_visible": false,
       "advanced_visible": true,
       "allow_custom_text": false,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:parameter:structure:outro",
       "sort_order": 40
     }
   ],
@@ -640,7 +640,7 @@
       "output_fragment": "1950s studio production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:era:period:1950s",
       "sort_order": 10
     },
     {
@@ -651,7 +651,7 @@
       "output_fragment": "1960s studio production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:era:period:1960s",
       "sort_order": 20
     },
     {
@@ -662,7 +662,7 @@
       "output_fragment": "1970s studio production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:era:period:1970s",
       "sort_order": 30
     },
     {
@@ -673,7 +673,7 @@
       "output_fragment": "1980s studio production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:era:period:1980s",
       "sort_order": 40
     },
     {
@@ -684,7 +684,7 @@
       "output_fragment": "1990s studio production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:era:period:1990s",
       "sort_order": 50,
       "recommended": true
     },
@@ -696,7 +696,7 @@
       "output_fragment": "2000s studio production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:era:period:2000s",
       "sort_order": 60
     },
     {
@@ -707,7 +707,7 @@
       "output_fragment": "2010s studio production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:era:period:2010s",
       "sort_order": 70
     },
     {
@@ -718,7 +718,7 @@
       "output_fragment": "2020s studio production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:era:period:2020s",
       "sort_order": 80,
       "recommended": true
     },
@@ -730,7 +730,7 @@
       "output_fragment": "contemporary studio production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:era:period:contemporary",
       "sort_order": 90,
       "recommended": true
     },
@@ -742,7 +742,7 @@
       "output_fragment": "72",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bpm:tempo:72",
       "sort_order": 10
     },
     {
@@ -753,7 +753,7 @@
       "output_fragment": "84",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bpm:tempo:84",
       "sort_order": 20
     },
     {
@@ -764,7 +764,7 @@
       "output_fragment": "96",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bpm:tempo:96",
       "sort_order": 30,
       "recommended": true
     },
@@ -776,7 +776,7 @@
       "output_fragment": "100",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bpm:tempo:100",
       "sort_order": 40
     },
     {
@@ -787,7 +787,7 @@
       "output_fragment": "110",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bpm:tempo:110",
       "sort_order": 50
     },
     {
@@ -798,7 +798,7 @@
       "output_fragment": "120",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bpm:tempo:120",
       "sort_order": 60,
       "recommended": true
     },
@@ -810,7 +810,7 @@
       "output_fragment": "128",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bpm:tempo:128",
       "sort_order": 70,
       "recommended": true
     },
@@ -822,7 +822,7 @@
       "output_fragment": "140",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bpm:tempo:140",
       "sort_order": 80
     },
     {
@@ -833,7 +833,7 @@
       "output_fragment": "C major",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:c-major",
       "sort_order": 10,
       "recommended": true
     },
@@ -845,7 +845,7 @@
       "output_fragment": "G major",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:g-major",
       "sort_order": 20,
       "recommended": true
     },
@@ -857,7 +857,7 @@
       "output_fragment": "D major",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:d-major",
       "sort_order": 30
     },
     {
@@ -868,7 +868,7 @@
       "output_fragment": "A major",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:a-major",
       "sort_order": 40
     },
     {
@@ -879,7 +879,7 @@
       "output_fragment": "E major",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:e-major",
       "sort_order": 50
     },
     {
@@ -890,7 +890,7 @@
       "output_fragment": "F major",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:f-major",
       "sort_order": 60
     },
     {
@@ -901,7 +901,7 @@
       "output_fragment": "B-flat major",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:bb-major",
       "sort_order": 70
     },
     {
@@ -912,7 +912,7 @@
       "output_fragment": "E-flat major",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:eb-major",
       "sort_order": 80
     },
     {
@@ -923,7 +923,7 @@
       "output_fragment": "D-flat major",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:db-major",
       "sort_order": 90
     },
     {
@@ -934,7 +934,7 @@
       "output_fragment": "A-flat major",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:ab-major",
       "sort_order": 100
     },
     {
@@ -945,7 +945,7 @@
       "output_fragment": "B major",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:b-major",
       "sort_order": 110
     },
     {
@@ -956,7 +956,7 @@
       "output_fragment": "F-sharp major",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:fs-major",
       "sort_order": 120
     },
     {
@@ -967,7 +967,7 @@
       "output_fragment": "A minor",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:a-minor",
       "sort_order": 130,
       "recommended": true
     },
@@ -979,7 +979,7 @@
       "output_fragment": "E minor",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:e-minor",
       "sort_order": 140,
       "recommended": true
     },
@@ -991,7 +991,7 @@
       "output_fragment": "B minor",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:b-minor",
       "sort_order": 150
     },
     {
@@ -1002,7 +1002,7 @@
       "output_fragment": "D minor",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:d-minor",
       "sort_order": 160
     },
     {
@@ -1013,7 +1013,7 @@
       "output_fragment": "G minor",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:g-minor",
       "sort_order": 170
     },
     {
@@ -1024,7 +1024,7 @@
       "output_fragment": "C minor",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:c-minor",
       "sort_order": 180
     },
     {
@@ -1035,7 +1035,7 @@
       "output_fragment": "F minor",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:f-minor",
       "sort_order": 190
     },
     {
@@ -1046,7 +1046,7 @@
       "output_fragment": "F-sharp minor",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:fs-minor",
       "sort_order": 200
     },
     {
@@ -1057,7 +1057,7 @@
       "output_fragment": "C-sharp minor",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:cs-minor",
       "sort_order": 210
     },
     {
@@ -1068,7 +1068,7 @@
       "output_fragment": "B-flat minor",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:bb-minor",
       "sort_order": 220
     },
     {
@@ -1079,7 +1079,7 @@
       "output_fragment": "Dorian modal color",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:dorian",
       "sort_order": 230
     },
     {
@@ -1090,7 +1090,7 @@
       "output_fragment": "Mixolydian modal color",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:mixolydian",
       "sort_order": 240
     },
     {
@@ -1101,7 +1101,7 @@
       "output_fragment": "Phrygian modal color",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:phrygian",
       "sort_order": 250
     },
     {
@@ -1112,7 +1112,7 @@
       "output_fragment": "Lydian modal color",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:key_mode:tonality:lydian",
       "sort_order": 260
     },
     {
@@ -1123,7 +1123,7 @@
       "output_fragment": "straight pocket",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:pocket:straight",
       "sort_order": 10,
       "recommended": true
     },
@@ -1135,7 +1135,7 @@
       "output_fragment": "laid-back pocket",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:pocket:laid-back",
       "sort_order": 20,
       "recommended": true
     },
@@ -1147,7 +1147,7 @@
       "output_fragment": "driving pocket",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:pocket:driving",
       "sort_order": 30
     },
     {
@@ -1158,7 +1158,7 @@
       "output_fragment": "tight pocket",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:pocket:tight",
       "sort_order": 40
     },
     {
@@ -1169,7 +1169,7 @@
       "output_fragment": "loose pocket",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:pocket:loose",
       "sort_order": 50
     },
     {
@@ -1180,7 +1180,7 @@
       "output_fragment": "behind-the-beat pocket",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:pocket:behind",
       "sort_order": 60
     },
     {
@@ -1191,7 +1191,7 @@
       "output_fragment": "straight subdivisions",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:swing:straight",
       "sort_order": 10,
       "recommended": true
     },
@@ -1203,7 +1203,7 @@
       "output_fragment": "subtle swing",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:swing:subtle",
       "sort_order": 20,
       "recommended": true
     },
@@ -1215,7 +1215,7 @@
       "output_fragment": "medium swing",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:swing:medium",
       "sort_order": 30
     },
     {
@@ -1226,7 +1226,7 @@
       "output_fragment": "hard swing / shuffle",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:swing:hard",
       "sort_order": 40
     },
     {
@@ -1237,7 +1237,7 @@
       "output_fragment": "minimal syncopation",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:syncopation:minimal",
       "sort_order": 10
     },
     {
@@ -1248,7 +1248,7 @@
       "output_fragment": "light syncopation",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:syncopation:light",
       "sort_order": 20
     },
     {
@@ -1259,7 +1259,7 @@
       "output_fragment": "syncopated accents",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:syncopation:syncopated",
       "sort_order": 30,
       "recommended": true
     },
@@ -1271,7 +1271,7 @@
       "output_fragment": "heavy syncopation",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:syncopation:heavy",
       "sort_order": 40
     },
     {
@@ -1282,7 +1282,7 @@
       "output_fragment": "eighth-note pulse",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:subdivision:eighth",
       "sort_order": 10
     },
     {
@@ -1293,7 +1293,7 @@
       "output_fragment": "sixteenth-note pulse",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:subdivision:sixteenth",
       "sort_order": 20
     },
     {
@@ -1304,7 +1304,7 @@
       "output_fragment": "triplet subdivision",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:subdivision:triplet",
       "sort_order": 30
     },
     {
@@ -1315,7 +1315,7 @@
       "output_fragment": "half-time feel",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:subdivision:half-time",
       "sort_order": 40
     },
     {
@@ -1326,7 +1326,7 @@
       "output_fragment": "double-time feel",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:groove:subdivision:double-time",
       "sort_order": 50
     },
     {
@@ -1337,7 +1337,7 @@
       "output_fragment": "rising melodic phrase",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:shape:rising",
       "sort_order": 10
     },
     {
@@ -1348,7 +1348,7 @@
       "output_fragment": "descending melodic phrase",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:shape:descending",
       "sort_order": 20,
       "recommended": true
     },
@@ -1360,7 +1360,7 @@
       "output_fragment": "arching melodic contour",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:shape:arching",
       "sort_order": 30
     },
     {
@@ -1371,7 +1371,7 @@
       "output_fragment": "repeated short motif",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:shape:repeated",
       "sort_order": 40,
       "recommended": true
     },
@@ -1383,7 +1383,7 @@
       "output_fragment": "compact repeating melodic cell",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:shape:cell",
       "sort_order": 50
     },
     {
@@ -1394,7 +1394,7 @@
       "output_fragment": "sparse melodic activity",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:density:sparse",
       "sort_order": 10
     },
     {
@@ -1405,7 +1405,7 @@
       "output_fragment": "restrained melodic density",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:density:restrained",
       "sort_order": 20,
       "recommended": true
     },
@@ -1417,7 +1417,7 @@
       "output_fragment": "moderate melodic density",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:density:moderate",
       "sort_order": 30
     },
     {
@@ -1428,7 +1428,7 @@
       "output_fragment": "active melodic movement",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:density:active",
       "sort_order": 40
     },
     {
@@ -1439,7 +1439,7 @@
       "output_fragment": "hook-led melody",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:role:hook",
       "sort_order": 10,
       "recommended": true
     },
@@ -1451,7 +1451,7 @@
       "output_fragment": "riff-led melody",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:role:riff",
       "sort_order": 20,
       "recommended": true
     },
@@ -1463,7 +1463,7 @@
       "output_fragment": "call-and-response phrases",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:role:call-response",
       "sort_order": 30
     },
     {
@@ -1474,7 +1474,7 @@
       "output_fragment": "supporting counterline",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:role:counterline",
       "sort_order": 40
     },
     {
@@ -1485,7 +1485,7 @@
       "output_fragment": "short motif-led melody",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:role:motif",
       "sort_order": 50,
       "recommended": true
     },
@@ -1497,7 +1497,7 @@
       "output_fragment": "low-register melody",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:register:low",
       "sort_order": 10
     },
     {
@@ -1508,7 +1508,7 @@
       "output_fragment": "mid-register melody",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:register:mid",
       "sort_order": 20,
       "recommended": true
     },
@@ -1520,7 +1520,7 @@
       "output_fragment": "high-register melody",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:register:high",
       "sort_order": 30
     },
     {
@@ -1531,7 +1531,7 @@
       "output_fragment": "wide-register melodic range",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:melody:register:wide",
       "sort_order": 40
     },
     {
@@ -1542,7 +1542,7 @@
       "output_fragment": "bright major-key harmony",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:color:major",
       "sort_order": 10,
       "recommended": true
     },
@@ -1554,7 +1554,7 @@
       "output_fragment": "dark minor-key harmony",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:color:minor",
       "sort_order": 20,
       "recommended": true
     },
@@ -1566,7 +1566,7 @@
       "output_fragment": "modal harmonic color",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:color:modal",
       "sort_order": 30
     },
     {
@@ -1577,7 +1577,7 @@
       "output_fragment": "dominant-heavy blues harmony",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:color:dominant",
       "sort_order": 40
     },
     {
@@ -1588,7 +1588,7 @@
       "output_fragment": "suspended harmonic color",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:color:suspended",
       "sort_order": 50,
       "recommended": true
     },
@@ -1600,7 +1600,7 @@
       "output_fragment": "chromatic tension",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:color:chromatic",
       "sort_order": 60
     },
     {
@@ -1611,7 +1611,7 @@
       "output_fragment": "static harmonic vamp",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:motion:static",
       "sort_order": 10
     },
     {
@@ -1622,7 +1622,7 @@
       "output_fragment": "slow harmonic movement",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:motion:slow",
       "sort_order": 20,
       "recommended": true
     },
@@ -1634,7 +1634,7 @@
       "output_fragment": "moderate chord movement",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:motion:moderate",
       "sort_order": 30
     },
     {
@@ -1645,7 +1645,7 @@
       "output_fragment": "fast harmonic changes",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:motion:fast",
       "sort_order": 40
     },
     {
@@ -1656,7 +1656,7 @@
       "output_fragment": "looped harmonic cycle",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:motion:loop",
       "sort_order": 50,
       "recommended": true
     },
@@ -1668,7 +1668,7 @@
       "output_fragment": "open voicings",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:voicing:open",
       "sort_order": 10
     },
     {
@@ -1679,7 +1679,7 @@
       "output_fragment": "close voicings",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:voicing:close",
       "sort_order": 20
     },
     {
@@ -1690,7 +1690,7 @@
       "output_fragment": "sparse chord voicings",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:voicing:sparse",
       "sort_order": 30,
       "recommended": true
     },
@@ -1702,7 +1702,7 @@
       "output_fragment": "dense chord voicings",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:voicing:dense",
       "sort_order": 40
     },
     {
@@ -1713,7 +1713,7 @@
       "output_fragment": "extended-color voicings",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:harmony:voicing:extended",
       "sort_order": 50
     },
     {
@@ -1724,7 +1724,7 @@
       "output_fragment": "acoustic kit",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:kit:acoustic",
       "sort_order": 10,
       "recommended": true
     },
@@ -1736,7 +1736,7 @@
       "output_fragment": "electronic drums",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:kit:electronic",
       "sort_order": 20,
       "recommended": true
     },
@@ -1748,7 +1748,7 @@
       "output_fragment": "hybrid acoustic/electronic drums",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:kit:hybrid",
       "sort_order": 30
     },
     {
@@ -1759,7 +1759,7 @@
       "output_fragment": "percussion-led drum pattern",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:kit:percussion",
       "sort_order": 40
     },
     {
@@ -1770,7 +1770,7 @@
       "output_fragment": "dry snare",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:snare:dry",
       "sort_order": 10,
       "recommended": true
     },
@@ -1782,7 +1782,7 @@
       "output_fragment": "crisp snare",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:snare:crisp",
       "sort_order": 20,
       "recommended": true
     },
@@ -1794,7 +1794,7 @@
       "output_fragment": "soft snare",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:snare:soft",
       "sort_order": 30
     },
     {
@@ -1805,7 +1805,7 @@
       "output_fragment": "hard snare",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:snare:hard",
       "sort_order": 40
     },
     {
@@ -1816,7 +1816,7 @@
       "output_fragment": "side-stick / rim-click",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:snare:side-stick",
       "sort_order": 50
     },
     {
@@ -1827,7 +1827,7 @@
       "output_fragment": "tight closed hats",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:hats:tight",
       "sort_order": 10,
       "recommended": true
     },
@@ -1839,7 +1839,7 @@
       "output_fragment": "open bright hats",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:hats:open",
       "sort_order": 20
     },
     {
@@ -1850,7 +1850,7 @@
       "output_fragment": "sparse hats",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:hats:sparse",
       "sort_order": 30
     },
     {
@@ -1861,7 +1861,7 @@
       "output_fragment": "busy hat subdivision",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:hats:busy",
       "sort_order": 40
     },
     {
@@ -1872,7 +1872,7 @@
       "output_fragment": "light cymbal accents",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:hats:cymbal-light",
       "sort_order": 50
     },
     {
@@ -1883,7 +1883,7 @@
       "output_fragment": "restrained fills",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:fills:restrained",
       "sort_order": 10,
       "recommended": true
     },
@@ -1895,7 +1895,7 @@
       "output_fragment": "sparse fills",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:fills:sparse",
       "sort_order": 20
     },
     {
@@ -1906,7 +1906,7 @@
       "output_fragment": "active fills",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:fills:active",
       "sort_order": 30
     },
     {
@@ -1917,7 +1917,7 @@
       "output_fragment": "explosive fills",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:fills:explosive",
       "sort_order": 40
     },
     {
@@ -1928,7 +1928,7 @@
       "output_fragment": "soft rounded drum impact",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:impact:soft",
       "sort_order": 10
     },
     {
@@ -1939,7 +1939,7 @@
       "output_fragment": "tight punchy drums",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:impact:tight",
       "sort_order": 20,
       "recommended": true
     },
@@ -1951,7 +1951,7 @@
       "output_fragment": "hard aggressive drum impact",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:drums:impact:hard",
       "sort_order": 30
     },
     {
@@ -1962,7 +1962,7 @@
       "output_fragment": "electric bass",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:source:electric",
       "sort_order": 10,
       "recommended": true
     },
@@ -1974,7 +1974,7 @@
       "output_fragment": "synth bass",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:source:synth",
       "sort_order": 20,
       "recommended": true
     },
@@ -1986,7 +1986,7 @@
       "output_fragment": "upright bass",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:source:upright",
       "sort_order": 30
     },
     {
@@ -1997,7 +1997,7 @@
       "output_fragment": "sub bass",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:source:sub",
       "sort_order": 40
     },
     {
@@ -2008,7 +2008,7 @@
       "output_fragment": "808 bass",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:source:808",
       "sort_order": 50
     },
     {
@@ -2019,7 +2019,7 @@
       "output_fragment": "root-led bass movement",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:motion:roots",
       "sort_order": 10,
       "recommended": true
     },
@@ -2031,7 +2031,7 @@
       "output_fragment": "walking bass",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:motion:walking",
       "sort_order": 20
     },
     {
@@ -2042,7 +2042,7 @@
       "output_fragment": "syncopated bass movement",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:motion:syncopated",
       "sort_order": 30,
       "recommended": true
     },
@@ -2054,7 +2054,7 @@
       "output_fragment": "melodic bass movement",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:motion:melodic",
       "sort_order": 40
     },
     {
@@ -2065,7 +2065,7 @@
       "output_fragment": "pedal-tone bass movement",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:motion:pedal",
       "sort_order": 50
     },
     {
@@ -2076,7 +2076,7 @@
       "output_fragment": "short punchy bass notes",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:length:short",
       "sort_order": 10,
       "recommended": true
     },
@@ -2088,7 +2088,7 @@
       "output_fragment": "medium-length bass notes",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:length:medium",
       "sort_order": 20
     },
     {
@@ -2099,7 +2099,7 @@
       "output_fragment": "long sustained bass notes",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:length:long",
       "sort_order": 30,
       "recommended": true
     },
@@ -2111,7 +2111,7 @@
       "output_fragment": "locked to the kick",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:kick_relation:locked",
       "sort_order": 10,
       "recommended": true
     },
@@ -2123,7 +2123,7 @@
       "output_fragment": "counter-rhythmic to the kick",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:kick_relation:counter",
       "sort_order": 20
     },
     {
@@ -2134,7 +2134,7 @@
       "output_fragment": "leaves space around the kick",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:kick_relation:space",
       "sort_order": 30
     },
     {
@@ -2145,7 +2145,7 @@
       "output_fragment": "independent from the kick pattern",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:bass:kick_relation:independent",
       "sort_order": 40
     },
     {
@@ -2156,7 +2156,7 @@
       "output_fragment": "tambourine accents",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:type:tambourine",
       "sort_order": 10,
       "recommended": true
     },
@@ -2168,7 +2168,7 @@
       "output_fragment": "shaker subdivision",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:type:shaker",
       "sort_order": 20
     },
     {
@@ -2179,7 +2179,7 @@
       "output_fragment": "hand percussion",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:type:hand-percussion",
       "sort_order": 30,
       "recommended": true
     },
@@ -2191,7 +2191,7 @@
       "output_fragment": "handclap accents",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:type:claps",
       "sort_order": 40
     },
     {
@@ -2202,7 +2202,7 @@
       "output_fragment": "woodblock / triangle accents",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:type:woodblock",
       "sort_order": 50
     },
     {
@@ -2213,7 +2213,7 @@
       "output_fragment": "short noise sweeps",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:type:sweeps",
       "sort_order": 60
     },
     {
@@ -2224,7 +2224,7 @@
       "output_fragment": "short accent stabs",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:type:stabs",
       "sort_order": 70
     },
     {
@@ -2235,7 +2235,7 @@
       "output_fragment": "sparse exciters",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:density:sparse",
       "sort_order": 10,
       "recommended": true
     },
@@ -2247,7 +2247,7 @@
       "output_fragment": "occasional exciters",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:density:occasional",
       "sort_order": 20,
       "recommended": true
     },
@@ -2259,7 +2259,7 @@
       "output_fragment": "regular exciter accents",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:density:regular",
       "sort_order": 30
     },
     {
@@ -2270,7 +2270,7 @@
       "output_fragment": "busy exciter layer",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:density:busy",
       "sort_order": 40
     },
     {
@@ -2281,7 +2281,7 @@
       "output_fragment": "on selected backbeats",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:placement:backbeat",
       "sort_order": 10,
       "recommended": true
     },
@@ -2293,7 +2293,7 @@
       "output_fragment": "on offbeats",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:placement:offbeat",
       "sort_order": 20
     },
     {
@@ -2304,7 +2304,7 @@
       "output_fragment": "on subdivision accents",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:placement:subdivision",
       "sort_order": 30
     },
     {
@@ -2315,7 +2315,7 @@
       "output_fragment": "at transitions",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:placement:transition",
       "sort_order": 40
     },
     {
@@ -2326,7 +2326,7 @@
       "output_fragment": "at phrase endings",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:exciters:placement:ending",
       "sort_order": 50
     },
     {
@@ -2337,7 +2337,7 @@
       "output_fragment": "warm texture",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:character:warm",
       "sort_order": 10,
       "recommended": true
     },
@@ -2349,7 +2349,7 @@
       "output_fragment": "clean texture",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:character:clean",
       "sort_order": 20,
       "recommended": true
     },
@@ -2361,7 +2361,7 @@
       "output_fragment": "dry texture",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:character:dry",
       "sort_order": 30
     },
     {
@@ -2372,7 +2372,7 @@
       "output_fragment": "polished surface",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:character:polished",
       "sort_order": 40
     },
     {
@@ -2383,7 +2383,7 @@
       "output_fragment": "filtered texture",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:character:filtered",
       "sort_order": 50,
       "recommended": true
     },
@@ -2395,7 +2395,7 @@
       "output_fragment": "grainy texture",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:character:grainy",
       "sort_order": 60
     },
     {
@@ -2406,7 +2406,7 @@
       "output_fragment": "airy ambience",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:character:airy",
       "sort_order": 70
     },
     {
@@ -2417,7 +2417,7 @@
       "output_fragment": "saturated texture",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:character:saturated",
       "sort_order": 80
     },
     {
@@ -2428,7 +2428,7 @@
       "output_fragment": "dusty texture",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:character:dusty",
       "sort_order": 90
     },
     {
@@ -2439,7 +2439,7 @@
       "output_fragment": "bright texture",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:character:bright",
       "sort_order": 100
     },
     {
@@ -2450,7 +2450,7 @@
       "output_fragment": "sparse texture",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:density:sparse",
       "sort_order": 10
     },
     {
@@ -2461,7 +2461,7 @@
       "output_fragment": "restrained texture",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:density:restrained",
       "sort_order": 20,
       "recommended": true
     },
@@ -2473,7 +2473,7 @@
       "output_fragment": "layered texture",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:density:layered",
       "sort_order": 30,
       "recommended": true
     },
@@ -2485,7 +2485,7 @@
       "output_fragment": "dense texture",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:density:dense",
       "sort_order": 40
     },
     {
@@ -2496,7 +2496,7 @@
       "output_fragment": "static texture",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:movement:static",
       "sort_order": 10
     },
     {
@@ -2507,7 +2507,7 @@
       "output_fragment": "subtle textural movement",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:movement:subtle",
       "sort_order": 20,
       "recommended": true
     },
@@ -2519,7 +2519,7 @@
       "output_fragment": "pulsing texture",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:movement:pulsing",
       "sort_order": 30
     },
     {
@@ -2530,7 +2530,7 @@
       "output_fragment": "evolving texture",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:texture:movement:evolving",
       "sort_order": 40
     },
     {
@@ -2541,7 +2541,7 @@
       "output_fragment": "instrumental / no lead vocal",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:presence:instrumental",
       "sort_order": 10,
       "recommended": true
     },
@@ -2553,7 +2553,7 @@
       "output_fragment": "lead vocal",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:presence:lead",
       "sort_order": 20
     },
     {
@@ -2564,7 +2564,7 @@
       "output_fragment": "duet vocals",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:presence:duet",
       "sort_order": 30
     },
     {
@@ -2575,7 +2575,7 @@
       "output_fragment": "group / choir vocals",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:presence:group",
       "sort_order": 40
     },
     {
@@ -2586,7 +2586,7 @@
       "output_fragment": "spoken / rap vocal",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:presence:spoken",
       "sort_order": 50
     },
     {
@@ -2597,7 +2597,7 @@
       "output_fragment": "intimate vocal delivery",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:delivery:intimate",
       "sort_order": 10,
       "recommended": true
     },
@@ -2609,7 +2609,7 @@
       "output_fragment": "breathy vocal delivery",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:delivery:breathy",
       "sort_order": 20
     },
     {
@@ -2620,7 +2620,7 @@
       "output_fragment": "smooth vocal delivery",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:delivery:smooth",
       "sort_order": 30
     },
     {
@@ -2631,7 +2631,7 @@
       "output_fragment": "gritty vocal delivery",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:delivery:gritty",
       "sort_order": 40
     },
     {
@@ -2642,7 +2642,7 @@
       "output_fragment": "powerful vocal delivery",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:delivery:powerful",
       "sort_order": 50
     },
     {
@@ -2653,7 +2653,7 @@
       "output_fragment": "restrained vocal delivery",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:delivery:restrained",
       "sort_order": 60
     },
     {
@@ -2664,7 +2664,7 @@
       "output_fragment": "single lead vocal",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:arrangement:single",
       "sort_order": 10,
       "recommended": true
     },
@@ -2676,7 +2676,7 @@
       "output_fragment": "vocal doubles",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:arrangement:double",
       "sort_order": 20
     },
     {
@@ -2687,7 +2687,7 @@
       "output_fragment": "stacked vocal harmonies",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:arrangement:harmony",
       "sort_order": 30
     },
     {
@@ -2698,7 +2698,7 @@
       "output_fragment": "vocal call-and-response",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:arrangement:call-response",
       "sort_order": 40
     },
     {
@@ -2709,7 +2709,7 @@
       "output_fragment": "vocal ad-libs",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:arrangement:adlibs",
       "sort_order": 50
     },
     {
@@ -2720,7 +2720,7 @@
       "output_fragment": "dry close vocal",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:processing:dry",
       "sort_order": 10,
       "recommended": true
     },
@@ -2732,7 +2732,7 @@
       "output_fragment": "light vocal reverb",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:processing:light-reverb",
       "sort_order": 20
     },
     {
@@ -2743,7 +2743,7 @@
       "output_fragment": "wide doubled vocal",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:processing:wide",
       "sort_order": 30
     },
     {
@@ -2754,7 +2754,7 @@
       "output_fragment": "saturated vocal",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:processing:saturated",
       "sort_order": 40
     },
     {
@@ -2765,7 +2765,7 @@
       "output_fragment": "filtered vocal",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:vocal:processing:filtered",
       "sort_order": 50
     },
     {
@@ -2776,7 +2776,7 @@
       "output_fragment": "steady controlled dynamics",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:dynamics:range:steady",
       "sort_order": 10
     },
     {
@@ -2787,7 +2787,7 @@
       "output_fragment": "restrained dynamic range",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:dynamics:range:restrained",
       "sort_order": 20,
       "recommended": true
     },
@@ -2799,7 +2799,7 @@
       "output_fragment": "moderate dynamic contrast",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:dynamics:range:moderate",
       "sort_order": 30,
       "recommended": true
     },
@@ -2811,7 +2811,7 @@
       "output_fragment": "broad dynamic range",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:dynamics:range:broad",
       "sort_order": 40
     },
     {
@@ -2822,7 +2822,7 @@
       "output_fragment": "extreme dynamic contrast",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:dynamics:range:extreme",
       "sort_order": 50
     },
     {
@@ -2833,7 +2833,7 @@
       "output_fragment": "consistent energy",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:dynamics:arc:consistent",
       "sort_order": 10
     },
     {
@@ -2844,7 +2844,7 @@
       "output_fragment": "gradual dynamic build",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:dynamics:arc:build",
       "sort_order": 20,
       "recommended": true
     },
@@ -2856,7 +2856,7 @@
       "output_fragment": "controlled sectional contrast",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:dynamics:arc:sectional",
       "sort_order": 30,
       "recommended": true
     },
@@ -2868,7 +2868,7 @@
       "output_fragment": "dynamic drop and rebuild",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:dynamics:arc:drop",
       "sort_order": 40
     },
     {
@@ -2879,7 +2879,7 @@
       "output_fragment": "final dynamic peak",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:dynamics:arc:peak",
       "sort_order": 50,
       "recommended": true
     },
@@ -2891,7 +2891,7 @@
       "output_fragment": "subtle dynamic accents",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:dynamics:accents:subtle",
       "sort_order": 10
     },
     {
@@ -2902,7 +2902,7 @@
       "output_fragment": "sectional dynamic accents",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:dynamics:accents:sectional",
       "sort_order": 20,
       "recommended": true
     },
@@ -2914,7 +2914,7 @@
       "output_fragment": "strong dynamic accents",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:dynamics:accents:strong",
       "sort_order": 30
     },
     {
@@ -2925,7 +2925,7 @@
       "output_fragment": "narrow mono-era image",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:width:mono",
       "sort_order": 10
     },
     {
@@ -2936,7 +2936,7 @@
       "output_fragment": "centered stereo image",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:width:centered",
       "sort_order": 20
     },
     {
@@ -2947,7 +2947,7 @@
       "output_fragment": "balanced stereo width",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:width:balanced",
       "sort_order": 30,
       "recommended": true
     },
@@ -2959,7 +2959,7 @@
       "output_fragment": "wide stereo image",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:width:wide",
       "sort_order": 40,
       "recommended": true
     },
@@ -2971,7 +2971,7 @@
       "output_fragment": "dry close depth",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:depth:dry",
       "sort_order": 10,
       "recommended": true
     },
@@ -2983,7 +2983,7 @@
       "output_fragment": "shallow room depth",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:depth:shallow",
       "sort_order": 20
     },
     {
@@ -2994,7 +2994,7 @@
       "output_fragment": "controlled moderate depth",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:depth:moderate",
       "sort_order": 30,
       "recommended": true
     },
@@ -3006,7 +3006,7 @@
       "output_fragment": "deep spacious mix depth",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:depth:deep",
       "sort_order": 40
     },
     {
@@ -3017,7 +3017,7 @@
       "output_fragment": "tight centered low end",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:low_end:tight",
       "sort_order": 10,
       "recommended": true
     },
@@ -3029,7 +3029,7 @@
       "output_fragment": "warm rounded low end",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:low_end:warm",
       "sort_order": 20
     },
     {
@@ -3040,7 +3040,7 @@
       "output_fragment": "sub-heavy low end",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:low_end:sub",
       "sort_order": 30
     },
     {
@@ -3051,7 +3051,7 @@
       "output_fragment": "restrained low end",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:low_end:restrained",
       "sort_order": 40
     },
     {
@@ -3062,7 +3062,7 @@
       "output_fragment": "forward rhythm section",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:focus:rhythm",
       "sort_order": 10,
       "recommended": true
     },
@@ -3074,7 +3074,7 @@
       "output_fragment": "forward vocal",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:focus:vocal",
       "sort_order": 20
     },
     {
@@ -3085,7 +3085,7 @@
       "output_fragment": "centered bass",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:focus:bass",
       "sort_order": 30
     },
     {
@@ -3096,7 +3096,7 @@
       "output_fragment": "wide upper layers",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:focus:upper",
       "sort_order": 40
     },
     {
@@ -3107,7 +3107,7 @@
       "output_fragment": "clear controlled mids",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:focus:mids",
       "sort_order": 50,
       "recommended": true
     },
@@ -3119,7 +3119,7 @@
       "output_fragment": "dry reflections",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:reverb:dry",
       "sort_order": 10,
       "recommended": true
     },
@@ -3131,7 +3131,7 @@
       "output_fragment": "short room reflections",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:reverb:room",
       "sort_order": 20,
       "recommended": true
     },
@@ -3143,7 +3143,7 @@
       "output_fragment": "plate reverb",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:reverb:plate",
       "sort_order": 30
     },
     {
@@ -3154,7 +3154,7 @@
       "output_fragment": "hall reverb",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:reverb:hall",
       "sort_order": 40
     },
     {
@@ -3165,7 +3165,7 @@
       "output_fragment": "washed ambient reverb",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:space_mix:reverb:ambient",
       "sort_order": 50
     },
     {
@@ -3176,7 +3176,7 @@
       "output_fragment": "raw live production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:aesthetic:raw",
       "sort_order": 10
     },
     {
@@ -3187,7 +3187,7 @@
       "output_fragment": "vintage analog production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:aesthetic:vintage",
       "sort_order": 20
     },
     {
@@ -3198,7 +3198,7 @@
       "output_fragment": "clean studio production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:aesthetic:clean",
       "sort_order": 30,
       "recommended": true
     },
@@ -3210,7 +3210,7 @@
       "output_fragment": "polished modern production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:aesthetic:polished",
       "sort_order": 40,
       "recommended": true
     },
@@ -3222,7 +3222,7 @@
       "output_fragment": "lo-fi textured production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:aesthetic:lofi",
       "sort_order": 50
     },
     {
@@ -3233,7 +3233,7 @@
       "output_fragment": "aggressive punchy production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:aesthetic:aggressive",
       "sort_order": 60
     },
     {
@@ -3244,7 +3244,7 @@
       "output_fragment": "soft transients",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:transients:soft",
       "sort_order": 10
     },
     {
@@ -3255,7 +3255,7 @@
       "output_fragment": "controlled transients",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:transients:controlled",
       "sort_order": 20,
       "recommended": true
     },
@@ -3267,7 +3267,7 @@
       "output_fragment": "crisp transients",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:transients:crisp",
       "sort_order": 30,
       "recommended": true
     },
@@ -3279,7 +3279,7 @@
       "output_fragment": "hard transients",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:transients:hard",
       "sort_order": 40
     },
     {
@@ -3290,7 +3290,7 @@
       "output_fragment": "clean saturation profile",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:saturation:clean",
       "sort_order": 10
     },
     {
@@ -3301,7 +3301,7 @@
       "output_fragment": "subtle saturation",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:saturation:subtle",
       "sort_order": 20,
       "recommended": true
     },
@@ -3313,7 +3313,7 @@
       "output_fragment": "warm tape-like saturation",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:saturation:tape",
       "sort_order": 30
     },
     {
@@ -3324,7 +3324,7 @@
       "output_fragment": "driven saturation",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:saturation:driven",
       "sort_order": 40
     },
     {
@@ -3335,7 +3335,7 @@
       "output_fragment": "distorted production color",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:saturation:distorted",
       "sort_order": 50
     },
     {
@@ -3346,7 +3346,7 @@
       "output_fragment": "mono-era production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:fidelity:mono-era",
       "sort_order": 10
     },
     {
@@ -3357,7 +3357,7 @@
       "output_fragment": "vintage hi-fi production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:fidelity:vintage-hifi",
       "sort_order": 20
     },
     {
@@ -3368,7 +3368,7 @@
       "output_fragment": "contemporary hi-fi production",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:fidelity:modern-hifi",
       "sort_order": 30,
       "recommended": true
     },
@@ -3380,7 +3380,7 @@
       "output_fragment": "intentionally degraded fidelity",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:production:fidelity:degraded",
       "sort_order": 40
     },
     {
@@ -3391,7 +3391,7 @@
       "output_fragment": "short hook-led form",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:form:hook-led",
       "sort_order": 10,
       "recommended": true
     },
@@ -3403,7 +3403,7 @@
       "output_fragment": "verse-chorus song form",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:form:verse-chorus",
       "sort_order": 20,
       "recommended": true
     },
@@ -3415,7 +3415,7 @@
       "output_fragment": "AABA song form",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:form:aaba",
       "sort_order": 30
     },
     {
@@ -3426,7 +3426,7 @@
       "output_fragment": "cyclic theme-based form",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:form:cyclic",
       "sort_order": 40
     },
     {
@@ -3437,7 +3437,7 @@
       "output_fragment": "through-composed form",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:form:through",
       "sort_order": 50
     },
     {
@@ -3448,7 +3448,7 @@
       "output_fragment": "extended instrumental form",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:form:extended",
       "sort_order": 60
     },
     {
@@ -3459,7 +3459,7 @@
       "output_fragment": "cold open",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:intro:cold",
       "sort_order": 10
     },
     {
@@ -3470,7 +3470,7 @@
       "output_fragment": "short intro",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:intro:short",
       "sort_order": 20,
       "recommended": true
     },
@@ -3482,7 +3482,7 @@
       "output_fragment": "gradual opening",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:intro:gradual",
       "sort_order": 30
     },
     {
@@ -3493,7 +3493,7 @@
       "output_fragment": "instrumental opening",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:intro:instrumental",
       "sort_order": 40
     },
     {
@@ -3504,7 +3504,7 @@
       "output_fragment": "transition fills",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:transitions:fills",
       "sort_order": 10
     },
     {
@@ -3515,7 +3515,7 @@
       "output_fragment": "short breaks",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:transitions:breaks",
       "sort_order": 20,
       "recommended": true
     },
@@ -3527,7 +3527,7 @@
       "output_fragment": "riser transitions",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:transitions:risers",
       "sort_order": 30
     },
     {
@@ -3538,7 +3538,7 @@
       "output_fragment": "drop transitions",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:transitions:drops",
       "sort_order": 40
     },
     {
@@ -3549,7 +3549,7 @@
       "output_fragment": "turnaround transitions",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:transitions:turnarounds",
       "sort_order": 50,
       "recommended": true
     },
@@ -3561,7 +3561,7 @@
       "output_fragment": "hard stop",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:outro:hard-stop",
       "sort_order": 10
     },
     {
@@ -3572,7 +3572,7 @@
       "output_fragment": "short outro",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:outro:short",
       "sort_order": 20,
       "recommended": true
     },
@@ -3584,7 +3584,7 @@
       "output_fragment": "fade-out",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:outro:fade",
       "sort_order": 30
     },
     {
@@ -3595,7 +3595,7 @@
       "output_fragment": "extended outro",
       "easy_visible": false,
       "advanced_visible": true,
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:option:structure:outro:extended",
       "sort_order": 40
     }
   ],
@@ -3608,7 +3608,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:era:60s-studio",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 10
     },
@@ -3620,7 +3626,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:era:70s-warm",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 20
     },
@@ -3632,7 +3644,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:era:80s-polished",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 30
     },
@@ -3644,7 +3662,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:era:90s-studio",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 40
     },
@@ -3656,7 +3680,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:era:modern-polished",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 50
     },
@@ -3668,7 +3698,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:bpm:slow-72",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 10
     },
@@ -3680,7 +3716,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:bpm:laid-back-84",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 20
     },
@@ -3692,7 +3734,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:bpm:head-nod-96",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 30
     },
@@ -3704,7 +3752,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:bpm:midtempo-110",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 40
     },
@@ -3716,7 +3770,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:bpm:driving-120",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 50
     },
@@ -3728,7 +3788,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:bpm:club-128",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 60
     },
@@ -3740,7 +3806,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:key_mode:c-major",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 10
     },
@@ -3752,7 +3824,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:key_mode:e-minor",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 20
     },
@@ -3764,7 +3842,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:key_mode:a-minor",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 30
     },
@@ -3776,7 +3860,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:key_mode:bb-major",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 40
     },
@@ -3788,7 +3878,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:key_mode:dorian",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 50
     },
@@ -3800,7 +3896,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:key_mode:mixolydian",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 60
     },
@@ -3812,7 +3914,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:groove:straight-backbeat",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 10
     },
@@ -3824,7 +3932,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:groove:laid-back-swing",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 20
     },
@@ -3836,7 +3950,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:groove:syncopated-kick",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 30
     },
@@ -3848,7 +3968,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:groove:rock-drive",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 40
     },
@@ -3860,7 +3986,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:groove:half-time",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 50
     },
@@ -3872,7 +4004,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:groove:four-floor",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 60
     },
@@ -3884,7 +4022,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:melody:motif-hook",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 10
     },
@@ -3896,7 +4040,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:melody:descending-hook",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 20
     },
@@ -3908,7 +4058,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:melody:call-response",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 30
     },
@@ -3920,7 +4076,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:melody:sparse-cell",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 40
     },
@@ -3932,7 +4094,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:melody:rising-phrase",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 50
     },
@@ -3944,7 +4112,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:harmony:major-pop",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 10
     },
@@ -3956,7 +4130,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:harmony:minor-loop",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 20
     },
@@ -3968,7 +4148,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:harmony:suspended",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 30
     },
@@ -3980,7 +4166,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:harmony:blues",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 40
     },
@@ -3992,7 +4184,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:harmony:modal-vamp",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 50
     },
@@ -4004,7 +4202,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:drums:acoustic-backbeat",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 10
     },
@@ -4016,7 +4220,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:drums:dry-punchy",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 20
     },
@@ -4028,7 +4238,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:drums:crisp-restrained",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 30
     },
@@ -4040,7 +4256,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:drums:electronic-tight",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 40
     },
@@ -4052,7 +4274,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:drums:sparse-percussion",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 50
     },
@@ -4064,7 +4292,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:bass:electric-roots",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 10
     },
@@ -4076,7 +4310,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:bass:short-kick",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 20
     },
@@ -4088,7 +4328,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:bass:sync-synth",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 30
     },
@@ -4100,7 +4346,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:bass:sustained",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 40
     },
@@ -4112,7 +4364,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:bass:melodic",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 50
     },
@@ -4124,7 +4382,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:exciters:tambourine",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 10
     },
@@ -4136,7 +4400,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:exciters:hand-perc",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 20
     },
@@ -4148,7 +4418,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:exciters:shaker",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 30
     },
@@ -4160,7 +4436,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:exciters:claps",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 40
     },
@@ -4172,7 +4454,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:exciters:sweeps",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 50
     },
@@ -4184,7 +4472,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:texture:warm-analog",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 10
     },
@@ -4196,7 +4490,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:texture:clean-polished",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 20
     },
@@ -4208,7 +4508,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:texture:dry-intimate",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 30
     },
@@ -4220,7 +4526,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:texture:filtered-grain",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 40
     },
@@ -4232,7 +4544,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:texture:airy",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 50
     },
@@ -4244,7 +4562,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:vocal:instrumental",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 10
     },
@@ -4256,7 +4580,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:vocal:intimate",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 20
     },
@@ -4268,7 +4598,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:vocal:airy",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 30
     },
@@ -4280,7 +4616,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:vocal:gritty",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 40
     },
@@ -4292,7 +4634,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:vocal:layered",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 50
     },
@@ -4304,7 +4652,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:dynamics:restrained-build",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 10
     },
@@ -4316,7 +4670,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:dynamics:sectional",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 20
     },
@@ -4328,7 +4688,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:dynamics:broad-arc",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 30
     },
@@ -4340,7 +4706,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:dynamics:steady",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 40
     },
@@ -4352,7 +4724,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:dynamics:final-peak",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 50
     },
@@ -4364,7 +4742,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:space_mix:dry-center",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 10
     },
@@ -4376,7 +4760,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:space_mix:wide-low-center",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 20
     },
@@ -4388,7 +4778,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:space_mix:forward-rhythm",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 30
     },
@@ -4400,7 +4796,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:space_mix:mono-era",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 40
     },
@@ -4412,7 +4814,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:space_mix:spacious",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 50
     },
@@ -4424,7 +4832,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:production:clean-polished",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 10
     },
@@ -4436,7 +4850,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:production:raw-analog",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 20
     },
@@ -4448,7 +4868,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:production:controlled",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 30
     },
@@ -4460,7 +4886,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:production:tape",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 40
     },
@@ -4472,7 +4904,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:production:modern-punch",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 50
     },
@@ -4484,7 +4922,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:production:lofi",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 60
     },
@@ -4496,7 +4940,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:structure:hook-led",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 10
     },
@@ -4508,7 +4958,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:structure:verse-chorus",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 20
     },
@@ -4520,7 +4976,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:structure:extended",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 30
     },
@@ -4532,7 +4994,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:structure:build",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 40
     },
@@ -4544,7 +5012,13 @@
       "mode_scope": "easy",
       "statement_kind": "combo",
       "source_frequency": null,
-      "concepts": [],
+      "concepts": [
+        {
+          "entry_id": "product:knowledge:statement:structure:cyclic",
+          "role": "preset",
+          "ordinal": 0
+        }
+      ],
       "options": [],
       "sort_order": 50
     }
@@ -4554,70 +5028,70 @@
       "id": "product:exclude:muddy-low-end",
       "label": "Muddy low end",
       "output_text": "muddy low end",
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:exclude:muddy-low-end",
       "sort_order": 10
     },
     {
       "id": "product:exclude:excessive-reverb",
       "label": "Excessive reverb",
       "output_text": "excessive reverb",
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:exclude:excessive-reverb",
       "sort_order": 20
     },
     {
       "id": "product:exclude:competing-leads",
       "label": "Competing lead instruments",
       "output_text": "competing lead instruments",
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:exclude:competing-leads",
       "sort_order": 30
     },
     {
       "id": "product:exclude:busy-fills",
       "label": "Busy fills",
       "output_text": "overly busy fills",
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:exclude:busy-fills",
       "sort_order": 40
     },
     {
       "id": "product:exclude:harsh-highs",
       "label": "Harsh high end",
       "output_text": "harsh brittle high end",
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:exclude:harsh-highs",
       "sort_order": 50
     },
     {
       "id": "product:exclude:overcompressed",
       "label": "Overcompression",
       "output_text": "overcompressed mastering",
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:exclude:overcompressed",
       "sort_order": 60
     },
     {
       "id": "product:exclude:constant-density",
       "label": "Constant maximum density",
       "output_text": "constant maximum density",
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:exclude:constant-density",
       "sort_order": 70
     },
     {
       "id": "product:exclude:glossy-pop-synths",
       "label": "Glossy pop synths",
       "output_text": "bright glossy pop synths",
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:exclude:glossy-pop-synths",
       "sort_order": 80
     },
     {
       "id": "product:exclude:generic-risers",
       "label": "Generic risers",
       "output_text": "generic oversized risers",
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:exclude:generic-risers",
       "sort_order": 90
     },
     {
       "id": "product:exclude:washed-drums",
       "label": "Washed-out drums",
       "output_text": "cavernous washed-out drum reverb",
-      "knowledge_entry_id": null,
+      "knowledge_entry_id": "product:knowledge:exclude:washed-drums",
       "sort_order": 100
     }
   ]

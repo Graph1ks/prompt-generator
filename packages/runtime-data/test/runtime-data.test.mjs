@@ -20,6 +20,7 @@ function manifest() {
     runtime_build_id: "b".repeat(64),
     knowledge_db_sha256: "c".repeat(64),
     editor_foundation_sha256: "d".repeat(64),
+    product_knowledge_foundation_sha256: "e".repeat(64),
     knowledge_build_meta: { build_revision: "test" },
     files: {
       "core.json": { sha256: hash, bytes: 1, counts: { major_genres: 1, sections: 1, renderer_profiles: 1 } },
@@ -293,6 +294,10 @@ test("loads bootstrap payloads and builds compiler knowledge", async () => {
 
   assert.equal(bootstrap.search.documents.length, 2);
   assert.equal(compilerKnowledge.runtimeBuildId, "b".repeat(64));
+  assert.equal(
+    bootstrap.manifest.product_knowledge_foundation_sha256,
+    "e".repeat(64),
+  );
   assert.equal(compilerKnowledge.genreLabels["major:hip-hop"], "Hip-Hop");
   assert.equal(compilerKnowledge.genreLabels["genre:boom-bap"], "Boom Bap");
   assert.equal(

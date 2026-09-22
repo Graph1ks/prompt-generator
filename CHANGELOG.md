@@ -6,6 +6,9 @@ This file records meaningful product, behavior, compatibility, security, data, a
 
 ### Added
 
+- Added Product Knowledge Foundation v1 with 400 English/German explanatory entries covering Product Editor parameters, Advanced values, Easy statements and Exclude entries.
+- Added provenance-backed Explain-mode chips below rendered live-prompt sections for selections with explicit Runtime Knowledge links.
+
 - Added global All Easy / All Advanced depth switching with persistent per-facet overrides and facet-scoped personal Advanced custom-text presets.
 - Added a generic IndexedDB user-data store for local preferences/presets.
 
@@ -75,6 +78,8 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Fixed the Studio white-screen regression where Vite development could load stale ignored `packages/*/dist` output and miss newly added workspace exports such as `createMusicSpec`. `pnpm dev` now rebuilds workspace packages first, and Vite dev resolves exact internal `@vgine/*` imports from source.
 
 ### Changed
+
+- Runtime Pack export now merges, searches, fingerprints and validates the Product Knowledge Foundation independently from `knowledge.sqlite` and the Product Editor Foundation.
 
 - Easy and Advanced now behave as mutually exclusive authoring layers once a facet is edited, preventing contradictory mixed states.
 - Pool Favorites, Theme and locale now persist through IndexedDB; legacy localStorage data is migration-only.

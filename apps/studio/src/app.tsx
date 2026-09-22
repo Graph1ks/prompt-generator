@@ -21,6 +21,7 @@ import { FacetEditor } from "./facet-editor.js";
 import { GenrePicker } from "./genre-picker.js";
 import { InstrumentPicker } from "./instrument-picker.js";
 import { Icon } from "./icons.js";
+import { PromptKnowledgeOrigins } from "./prompt-knowledge-origins.js";
 import { SUPPORTED_LOCALES, useI18n, type MessageKey } from "./i18n.js";
 import { loadStudioRuntime, type StudioRuntime } from "./runtime-client.js";
 import {
@@ -340,10 +341,11 @@ export function App() {
     ]);
   }, [runtime]);
 
+  const studioRuntime = runtime.status === "ready" ? runtime.value : null;
   const compilation = useMemo(() => {
-    if (runtime.status !== "ready") return null;
-    return compileMusicSpec(spec, runtime.value.compilerKnowledge);
-  }, [runtime, spec]);
+    if (!studioRuntime) return null;
+    return compileMusicSpec(spec, studioRuntime.compilerKnowledge);
+  }, [studioRuntime, spec]);
 
   useEffect(() => {
     if (!compilation?.styleText) return;
@@ -887,12 +889,23 @@ export function App() {
                   <pre className="manual-prompt-output">{manualStyleText}</pre>
                 ) : compilation?.sections.length ? (
                   compilation.sections.map((section) => (
-                    <div className="prompt-line changed-line" key={section.sectionKey}>
-                      <span className="bracket">[</span>
-                      <span className="prompt-key">{section.label}</span>
-                      <span className="bracket">: </span>
-                      <span className="prompt-value">{section.content}</span>
-                      <span className="bracket">]</span>
+                    <div className="prompt-line-group" key={section.sectionKey}>
+                      <div className="prompt-line changed-line">
+                        <span className="bracket">[</span>
+                        <span className="prompt-key">{section.label}</span>
+                        <span className="bracket">: </span>
+                        <span className="prompt-value">{section.content}</span>
+                        <span className="bracket">]</span>
+                      </div>
+                      {studioRuntime && (
+                        <PromptKnowledgeOrigins
+                          enabled={assistOn}
+                          runtime={studioRuntime}
+                          spec={spec}
+                          sectionKey={section.sectionKey}
+                          sectionContent={section.content}
+                        />
+                      )}
                     </div>
                   ))
                 ) : (

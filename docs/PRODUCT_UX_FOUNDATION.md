@@ -417,3 +417,17 @@ The Studio exposes one global Easy/Advanced depth control plus the existing per-
 - Delete all uses a second explicit confirmation click.
 
 All user-generated/personal data remains local to the device. Projects and user preferences use IndexedDB-backed adapters; no server persistence is required.
+
+## 25. Explain mode follows rendered semantic origins
+
+Explain mode must explain the user's actual musical selections rather than merely decorate section headings.
+
+- Product Editor parameters, Advanced values, Easy statements and Exclude choices link to explicit Product Knowledge IDs.
+- The live prompt may show explanation-origin chips below a rendered section; these controls are outside the exact copyable prompt text.
+- Explanation origins are shown only for selections that survive into the rendered section content.
+- numeric selections such as BPM explain through their governing parameter concept;
+- Genre uses existing Genre Knowledge links;
+- Instruments use canonical instrument/concept links from the existing Database V1 expression model;
+- arbitrary user custom text is not guessed, classified or explained without an explicit semantic link.
+
+Explanation localization follows the active UI locale with English fallback and never changes the English prompt renderer.

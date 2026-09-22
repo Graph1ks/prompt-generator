@@ -287,3 +287,12 @@ If a proposed implementation requires changing a Database V1 invariant, call tha
 - Advanced custom-text presets are user data, not Runtime/Knowledge data; they live in local IndexedDB and are scoped per facet.
 - Pool Favorites, Theme, locale and editor-depth preferences now use the IndexedDB user-data adapter. `localStorage` is legacy-migration input only.
 - No user preference/preset/project data is sent to a server.
+
+## Product Knowledge / Explain mode carry-forward
+
+- Product Knowledge Foundation v1 lives at `data/product/knowledge-foundation-v1.json`; current coverage is 400 entries.
+- Product Editor Foundation carries stable links into this Knowledge layer. Do not replace these with label-string matching in React.
+- Runtime manifest now fingerprints both Editor Foundation and Product Knowledge Foundation; changing either requires Runtime re-export.
+- Live-prompt Explain mode resolves selected MusicSpec IDs back to Runtime semantic origins and shows explanation chips outside the copied prompt.
+- Product ordinary facets use Product Knowledge links; Genre/Instrument explanation continues to use Database V1 links.
+- User custom text is not semantically inferred. Add an explicit semantic contract before making it explainable.

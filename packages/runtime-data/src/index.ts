@@ -27,6 +27,7 @@ export interface RuntimeManifest {
   readonly runtime_build_id: string;
   readonly knowledge_db_sha256: string;
   readonly editor_foundation_sha256?: string;
+  readonly product_knowledge_foundation_sha256?: string;
   readonly knowledge_build_meta: Readonly<Record<string, string>>;
   readonly files: Readonly<Record<RuntimePayloadFileName, RuntimeManifestFile>>;
 }
@@ -525,6 +526,13 @@ export function parseRuntimeManifest(value: unknown): RuntimeManifest {
           root.editor_foundation_sha256,
           "manifest.editor_foundation_sha256",
         );
+  const productKnowledgeFoundationSha =
+    root.product_knowledge_foundation_sha256 === undefined
+      ? undefined
+      : assertSha256(
+          root.product_knowledge_foundation_sha256,
+          "manifest.product_knowledge_foundation_sha256",
+        );
 
   return {
     schema: RUNTIME_PACK_SCHEMA,
@@ -534,6 +542,12 @@ export function parseRuntimeManifest(value: unknown): RuntimeManifest {
     ...(editorFoundationSha === undefined
       ? {}
       : { editor_foundation_sha256: editorFoundationSha }),
+    ...(productKnowledgeFoundationSha === undefined
+      ? {}
+      : {
+          product_knowledge_foundation_sha256:
+            productKnowledgeFoundationSha,
+        }),
     knowledge_build_meta: knowledgeBuildMeta,
     files,
   };
