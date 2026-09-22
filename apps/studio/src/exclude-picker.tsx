@@ -18,6 +18,7 @@ import { PoolQuickView, type PoolQuickViewMode } from "./pool-quick-view.js";
 import { usePoolPreferences } from "./pool-preferences.js";
 import type { StudioRuntime } from "./runtime-client.js";
 import { useExpandedPoolSegment } from "./use-expanded-pool-segment.js";
+import { usePoolKeyboardNavigation } from "./use-pool-keyboard-navigation.js";
 import { useSlashSearchShortcut } from "./use-slash-search-shortcut.js";
 
 const COMPACT_RESULT_COUNT = 12;
@@ -47,6 +48,11 @@ export function ExcludePicker({
   const [quickView, setQuickView] = useState<PoolQuickViewMode>("all");
   const [showAllResults, setShowAllResults] = useState(false);
   const searchInputRef = useSlashSearchShortcut();
+  const {
+    resultsRef,
+    onSearchKeyDown,
+    onResultsKeyDown,
+  } = usePoolKeyboardNavigation(searchInputRef);
   const preferences = usePoolPreferences("exclude");
   const {
     segmentRef,
@@ -267,6 +273,7 @@ export function ExcludePicker({
               count: editor.value.exclude.length.toLocaleString(locale),
             })}
             onChange={(event) => setQuery(event.currentTarget.value)}
+            onKeyDown={onSearchKeyDown}
           />
           {query ? (
             <button
@@ -299,7 +306,9 @@ export function ExcludePicker({
       </div>
 
       <div
+        ref={resultsRef}
         className={showAllResults ? "exclude-results expanded" : "exclude-results"}
+        onKeyDown={onResultsKeyDown}
       >
         {visibleEntries.map((entry) => {
           const selected = hasExcludeItem(spec, entry.id);
@@ -310,6 +319,7 @@ export function ExcludePicker({
               favorite={preferences.isFavorite(entry.id)}
               usageCount={preferences.usageCount(entry.id)}
               activationLabel={entry.label}
+              data-pool-result=""
               onFavorite={() => preferences.setFavorite(entry.id, true)}
               onUnfavorite={() => preferences.setFavorite(entry.id, false)}
               onActivate={() => toggleEntry(entry)}
