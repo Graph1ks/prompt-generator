@@ -21,6 +21,7 @@ import { useI18n } from "./i18n.js";
 import { PoolQuickView, type PoolQuickViewMode } from "./pool-quick-view.js";
 import { usePoolPreferences } from "./pool-preferences.js";
 import { useExpandedPoolSegment } from "./use-expanded-pool-segment.js";
+import { usePoolKeyboardNavigation } from "./use-pool-keyboard-navigation.js";
 import { useSlashSearchShortcut } from "./use-slash-search-shortcut.js";
 
 const COMPACT_RESULT_COUNT = 12;
@@ -113,6 +114,11 @@ export function GenrePicker({
     Partial<Record<GenreInfluenceRole, HTMLButtonElement | null>>
   >({});
   const searchInputRef = useSlashSearchShortcut(pickerOpen);
+  const {
+    resultsRef,
+    onSearchKeyDown,
+    onResultsKeyDown,
+  } = usePoolKeyboardNavigation(searchInputRef);
   const {
     segmentRef: pickerRef,
     showReturnToStart: showBackToTop,
@@ -538,6 +544,7 @@ export function GenrePicker({
                   count: runtime.genres.genres.length.toLocaleString(locale),
                 })}
                 onChange={(event) => setQuery(event.currentTarget.value)}
+                onKeyDown={onSearchKeyDown}
               />
               {query ? (
                 <button
@@ -597,7 +604,9 @@ export function GenrePicker({
           </div>
 
           <div
+            ref={resultsRef}
             className={showAllResults ? "genre-results expanded" : "genre-results"}
+            onKeyDown={onResultsKeyDown}
           >
             {visibleOptions.map((option) => {
               const selectedRole = spec.genre_influences.find(
@@ -617,6 +626,7 @@ export function GenrePicker({
                   favorite={favorite}
                   usageCount={genrePreferences.usageCount(option.id)}
                   activationLabel={option.label}
+                  data-pool-result=""
                   onFavorite={() => genrePreferences.setFavorite(option.id, true)}
                   onUnfavorite={() => genrePreferences.setFavorite(option.id, false)}
                   onActivate={() => {
