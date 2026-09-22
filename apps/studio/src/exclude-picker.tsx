@@ -103,6 +103,17 @@ export function ExcludePicker({
     ? matchingEntries
     : matchingEntries.slice(0, COMPACT_RESULT_COUNT);
 
+  const recentEntries = useMemo(
+    () =>
+      preferences
+        .recentIds(6)
+        .map((id) => excludeById.get(id))
+        .filter(
+          (entry): entry is RuntimeExcludeEntry => entry !== undefined,
+        ),
+    [excludeById, preferences],
+  );
+
   function toggleEntry(entry: RuntimeExcludeEntry) {
     if (hasExcludeItem(spec, entry.id)) {
       onSpecChange(removeExcludeItem(spec, entry.id));
@@ -213,6 +224,29 @@ export function ExcludePicker({
                 </button>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {!query && recentEntries.length > 0 && (
+        <div className="pool-recent" aria-label={t("pool.recent")}>
+          <span>{t("pool.recent")}</span>
+          <div>
+            {recentEntries.map((entry) => (
+              <button
+                key={entry.id}
+                type="button"
+                className={
+                  hasExcludeItem(spec, entry.id)
+                    ? "pool-recent-chip selected"
+                    : "pool-recent-chip"
+                }
+                aria-pressed={hasExcludeItem(spec, entry.id)}
+                onClick={() => toggleEntry(entry)}
+              >
+                {entry.label}
+              </button>
+            ))}
           </div>
         </div>
       )}
