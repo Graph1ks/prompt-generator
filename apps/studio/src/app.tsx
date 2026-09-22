@@ -34,6 +34,10 @@ import { SUPPORTED_LOCALES, useI18n, type MessageKey } from "./i18n.js";
 import { ProjectLibrary } from "./project-library.js";
 import { loadStudioRuntime, type StudioRuntime } from "./runtime-client.js";
 import {
+  ThemedPromptEditor,
+  ThemedPromptText,
+} from "./themed-prompt-text.js";
+import {
   STUDIO_CHAPTERS,
   type StudioEditorMode,
 } from "./studio-config.js";
@@ -1766,19 +1770,17 @@ export function App() {
             <div className="prompt-area">
               {outputTab === "style" ? (
                 promptUnlocked ? (
-                  <label className="manual-prompt-editor">
-                    <span className="sr-only">{t("preview.manualAria")}</span>
-                    <textarea
-                      value={manualStyleText ?? compiledStyleText}
-                      spellCheck={false}
-                      onChange={(event) => setManualStyleText(event.currentTarget.value)}
-                    />
-                    <small>
-                      {t("preview.manualHint")}
-                    </small>
-                  </label>
+                  <ThemedPromptEditor
+                    value={manualStyleText ?? compiledStyleText}
+                    ariaLabel={t("preview.manualAria")}
+                    hint={t("preview.manualHint")}
+                    onChange={setManualStyleText}
+                  />
                 ) : manualStyleText !== null ? (
-                  <pre className="manual-prompt-output">{manualStyleText}</pre>
+                  <ThemedPromptText
+                    value={manualStyleText}
+                    className="manual-prompt-output"
+                  />
                 ) : compilation?.sections.length ? (
                   compilation.sections.map((section) => (
                     <div className="prompt-line-group" key={section.sectionKey}>
