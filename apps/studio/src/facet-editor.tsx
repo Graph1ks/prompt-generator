@@ -596,6 +596,9 @@ export function FacetEditor({
                         loadKnowledge={runtime.loadKnowledge}
                         contextType="section"
                         contextKey={facet}
+                        onActivate={() =>
+                          toggleStatement(statement.id, statement.output_text)
+                        }
                       />
                     </span>
                     <small>{statement.output_text}</small>
@@ -760,6 +763,9 @@ export function FacetEditor({
                                               loadKnowledge={runtime.loadKnowledge}
                                               contextType="parameter"
                                               contextKey={parameter.id}
+                                              onActivate={() =>
+                                                setNumberParameter(parameter, value)
+                                              }
                                             />
                                           </span>
                                           <button
@@ -815,6 +821,9 @@ export function FacetEditor({
                                 loadKnowledge={runtime.loadKnowledge}
                                 contextType="parameter"
                                 contextKey={parameter.id}
+                                onActivate={() =>
+                                  toggleOption(option, parameter)
+                                }
                               />
                             </span>
                             <button
