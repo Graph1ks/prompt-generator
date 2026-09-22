@@ -7,6 +7,7 @@ import {
 } from "react";
 
 import { Icon } from "./icons.js";
+import { useI18n } from "./i18n.js";
 
 const ADD_HOLD_MS = 1500;
 const REMOVE_HOLD_MS = 2000;
@@ -31,6 +32,7 @@ export function HoldFavoriteOption({
   className = "",
   ...props
 }: HoldFavoriteOptionProps) {
+  const { t } = useI18n();
   const [holding, setHolding] = useState(false);
   const timerRef = useRef<number | null>(null);
   const suppressClickRef = useRef(false);
@@ -77,8 +79,8 @@ export function HoldFavoriteOption({
       data-hold-action={favorite ? "remove" : "add"}
       title={
         favorite
-          ? "Favorit · 2 Sekunden halten zum Entfernen"
-          : "1,5 Sekunden halten für Favorit"
+          ? t("favorite.removeTitle")
+          : t("favorite.addTitle")
       }
       onPointerDown={startHold}
       onPointerUp={stopTimer}
@@ -89,7 +91,10 @@ export function HoldFavoriteOption({
     >
       {children}
       {favorite && (
-        <span className="favorite-mark" aria-label={"Favorit · " + usageCount + " Nutzungen"}>
+        <span
+          className="favorite-mark"
+          aria-label={t("favorite.aria", { count: usageCount })}
+        >
           <Icon name="star" />
           {usageCount > 0 && <small>{usageCount}</small>}
         </span>
