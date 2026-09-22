@@ -3286,3 +3286,201 @@
     }
   }
 }
+
+
+@layer studio {
+  .global-editor-mode {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px;
+    border: 1px solid var(--studio-line);
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--studio-paper) 72%, var(--studio-card));
+  }
+
+  .global-editor-mode button {
+    min-block-size: 34px;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--studio-muted);
+    font-size: 9px;
+    font-weight: 760;
+    cursor: pointer;
+  }
+
+  .global-editor-mode button:hover:not(:disabled) {
+    color: var(--studio-ink);
+    background: color-mix(in srgb, var(--studio-mint) 24%, var(--studio-card));
+  }
+
+  .global-editor-mode button.active,
+  .global-editor-mode button.active:hover:not(:disabled) {
+    color: var(--studio-paper);
+    background: var(--studio-ink);
+  }
+
+  .facet-custom-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .facet-custom-head > span {
+    font-size: 10px;
+    font-weight: 760;
+  }
+
+  .advanced-presets-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--studio-muted);
+  }
+
+  .advanced-presets-toggle.active,
+  .advanced-presets-toggle:hover:not(:disabled) {
+    color: var(--studio-ink);
+  }
+
+  .facet-custom-input-shell {
+    position: relative;
+  }
+
+  .facet-custom-input-shell textarea {
+    padding-inline-end: 54px;
+  }
+
+  .custom-preset-hold {
+    position: absolute;
+    inset-block-start: 8px;
+    inset-inline-end: 8px;
+    inline-size: 38px;
+    block-size: 38px;
+    padding: 0;
+    border: 1px solid var(--studio-line);
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--studio-card) 88%, var(--studio-paper));
+    color: var(--studio-muted);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+
+  .custom-preset-hold:hover:not(:disabled),
+  .custom-preset-hold[data-favorite] {
+    color: var(--studio-ink);
+    background: color-mix(in srgb, var(--studio-mint) 30%, var(--studio-card));
+    border-color: var(--studio-line-strong);
+  }
+
+  .custom-preset-hold > .studio-icon {
+    inline-size: 16px;
+    block-size: 16px;
+  }
+
+  .custom-preset-hold .favorite-mark {
+    inset-block-start: -6px;
+    inset-inline-end: -6px;
+  }
+
+  .advanced-presets-menu {
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--studio-line);
+    border-radius: 11px;
+    background: color-mix(in srgb, var(--studio-card) 94%, var(--studio-paper));
+  }
+
+  .advanced-presets-menu-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .advanced-presets-menu-head > div {
+    display: grid;
+    gap: 2px;
+  }
+
+  .advanced-presets-menu-head strong {
+    font-size: 10px;
+  }
+
+  .advanced-presets-menu-head small {
+    color: var(--studio-muted);
+    font-size: 8px;
+  }
+
+  .advanced-presets-list {
+    display: grid;
+    gap: 6px;
+  }
+
+  .advanced-preset-option {
+    position: relative;
+    min-block-size: 46px;
+    padding: 9px 46px 9px 11px;
+    border: 1px solid var(--studio-line);
+    border-radius: 9px;
+    background: var(--studio-card);
+    color: var(--studio-ink);
+    text-align: start;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .advanced-preset-option:hover:not(:disabled) {
+    color: var(--studio-ink);
+    background: color-mix(in srgb, var(--studio-mint) 23%, var(--studio-card));
+    border-color: var(--studio-line-strong);
+  }
+
+  .advanced-preset-option > span:first-child {
+    font-size: 10px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  .advanced-presets-menu .text-btn.danger {
+    color: var(--vg-color-danger);
+  }
+
+  .advanced-presets-menu .text-btn.danger.armed {
+    border-color: color-mix(
+      in srgb,
+      var(--vg-color-danger) 55%,
+      var(--studio-line)
+    );
+    background: color-mix(
+      in srgb,
+      var(--vg-color-danger) 12%,
+      transparent
+    );
+  }
+
+  @media (max-width: 760px) {
+    .section-head-actions {
+      flex-wrap: wrap;
+    }
+
+    .global-editor-mode {
+      order: -1;
+      inline-size: 100%;
+    }
+
+    .global-editor-mode button {
+      flex: 1;
+    }
+
+    .advanced-presets-menu-head {
+      align-items: stretch;
+      flex-direction: column;
+    }
+  }
+}
