@@ -6,6 +6,9 @@ This file records meaningful product, behavior, compatibility, security, data, a
 
 ### Added
 
+- Added lazy validated Instrument Runtime loading and the first production Palette/Instrument picker over all 6,035 source-backed expressions, with shared search, family filters, persistent favorites, selected-state chips and direct MusicSpec/compiler wiring.
+- Added generic MusicSpec facet selection helpers and automatic DOM chunk loading for expanded high-cardinality Instrument results.
+
 - Added typed German/English Studio localization with persisted browser/user locale selection and an extension path for additional UI languages while keeping Suno renderer output English.
 - Made all 24 Major Genres permanently visible and selectable as first-class Genre influences; Major browse results now start with the pure Major Genre before its subgenres.
 
