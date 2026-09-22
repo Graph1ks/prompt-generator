@@ -85,6 +85,8 @@ export function FacetEditor({
         )
         .sort(
           (a, b) =>
+            (a.sort_order ?? Number.MAX_SAFE_INTEGER) -
+              (b.sort_order ?? Number.MAX_SAFE_INTEGER) ||
             (b.source_frequency ?? 0) - (a.source_frequency ?? 0) ||
             a.label.localeCompare(b.label),
         ),
@@ -150,6 +152,61 @@ export function FacetEditor({
         locked: false,
       }),
     );
+  }
+
+  function setNumberParameter(
+    parameter: RuntimeParameter,
+    value: number,
+  ) {
+    if (!parameter.ui || parameter.ui.control !== "number") return;
+
+    const normalized = Math.min(
+      parameter.ui.max,
+      Math.max(parameter.ui.min, value),
+    );
+    const snapped =
+      Math.round((normalized - parameter.ui.min) / parameter.ui.step) *
+        parameter.ui.step +
+      parameter.ui.min;
+    const displayValue = Number(snapped.toFixed(6));
+    let next = spec;
+
+    for (const sibling of optionsByParameter.get(parameter.id) ?? []) {
+      if (hasFacetSelection(next, facet, sibling.id)) {
+        next = removeFacetSelection(next, facet, sibling.id);
+      }
+    }
+
+    const valueId = parameter.id + ":value";
+    if (hasFacetSelection(next, facet, valueId)) {
+      next = removeFacetSelection(next, facet, valueId);
+    }
+
+    onSpecChange(
+      setFacetSelection(next, facet, {
+        id: valueId,
+        kind: "freeform",
+        value: String(displayValue),
+        origin: "user",
+        locked: false,
+      }),
+    );
+  }
+
+  function selectedNumberValue(parameter: RuntimeParameter): number | null {
+    if (!parameter.ui || parameter.ui.control !== "number") return null;
+    const selection = facetState?.selections.find(
+      (entry) => entry.id === parameter.id + ":value",
+    );
+    if (!selection) return null;
+    const value = Number(selection.value);
+    return Number.isFinite(value) ? value : null;
+  }
+
+  function clearNumberParameter(parameter: RuntimeParameter) {
+    const valueId = parameter.id + ":value";
+    if (!hasFacetSelection(spec, facet, valueId)) return;
+    onSpecChange(removeFacetSelection(spec, facet, valueId));
   }
 
   function toggleOption(
@@ -319,7 +376,111 @@ export function FacetEditor({
                     <small>{parameter.value_type}</small>
                   </div>
 
-                  {visible.length > 0 ? (
+                  {parameter.ui?.control === "number" ? (
+                    <div className="number-parameter-control">
+                      {(() => {
+                        const selectedValue =
+                          selectedNumberValue(parameter);
+                        const rangeValue =
+                          selectedValue ??
+                          parameter.ui.recommended_values[0] ??
+                          parameter.ui.min;
+                        return (
+                          <>
+                            <div
+                              className="number-parameter-readout"
+                              data-selected={selectedValue !== null}
+                            >
+                              <strong>
+                                {selectedValue === null
+                                  ? t("facetEditor.notSet")
+                                  : t("facetEditor.numberValue", {
+                                      label: parameter.label,
+                                      value: selectedValue,
+                                      unit: parameter.ui.unit
+                                        ? " " + parameter.ui.unit
+                                        : "",
+                                    })}
+                              </strong>
+                              <div className="number-parameter-inputs">
+                                <input
+                                  type="number"
+                                  min={parameter.ui.min}
+                                  max={parameter.ui.max}
+                                  step={parameter.ui.step}
+                                  value={selectedValue ?? ""}
+                                  placeholder={String(rangeValue)}
+                                  aria-label={parameter.label}
+                                  onChange={(event) => {
+                                    const raw = event.currentTarget.value;
+                                    if (!raw) {
+                                      clearNumberParameter(parameter);
+                                      return;
+                                    }
+                                    setNumberParameter(parameter, Number(raw));
+                                  }}
+                                />
+                                {selectedValue !== null && (
+                                  <button
+                                    type="button"
+                                    className="text-btn number-parameter-clear"
+                                    onClick={() => clearNumberParameter(parameter)}
+                                  >
+                                    {t("facetEditor.clear")}
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                            <input
+                              className="number-parameter-range"
+                              data-selected={selectedValue !== null}
+                              type="range"
+                              min={parameter.ui.min}
+                              max={parameter.ui.max}
+                              step={parameter.ui.step}
+                              value={rangeValue}
+                              aria-label={parameter.label}
+                              onChange={(event) =>
+                                setNumberParameter(
+                                  parameter,
+                                  Number(event.currentTarget.value),
+                                )
+                              }
+                            />
+                            {parameter.ui.recommended_values.length > 0 && (
+                              <div className="parameter-recommended">
+                                <small>{t("facetEditor.recommended")}</small>
+                                <div className="parameter-options">
+                                  {parameter.ui.recommended_values.map((value) => (
+                                    <button
+                                      key={value}
+                                      type="button"
+                                      className={
+                                        selectedValue === value
+                                          ? "parameter-option selected"
+                                          : "parameter-option recommended"
+                                      }
+                                      aria-pressed={selectedValue === value}
+                                      onClick={() =>
+                                        setNumberParameter(parameter, value)
+                                      }
+                                    >
+                                      <span>
+                                        {value}
+                                        {parameter.ui?.unit
+                                          ? " " + parameter.ui.unit
+                                          : ""}
+                                      </span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
+                  ) : visible.length > 0 ? (
                     <div className="parameter-options">
                       {visible.map((option) => {
                         const selected = hasFacetSelection(spec, facet, option.id);
@@ -327,8 +488,19 @@ export function FacetEditor({
                           <button
                             key={option.id}
                             type="button"
-                            className={selected ? "parameter-option selected" : "parameter-option"}
+                            className={[
+                              "parameter-option",
+                              selected ? "selected" : "",
+                              option.recommended ? "recommended" : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
                             aria-pressed={selected}
+                            title={
+                              option.recommended
+                                ? t("facetEditor.recommended")
+                                : undefined
+                            }
                             onClick={() => toggleOption(option, parameter)}
                           >
                             {selected && <Icon name="check" />}
@@ -343,7 +515,8 @@ export function FacetEditor({
                     </p>
                   )}
 
-                  {options.length > COMPACT_OPTIONS_PER_PARAMETER && (
+                  {parameter.ui?.control !== "number" &&
+                    options.length > COMPACT_OPTIONS_PER_PARAMETER && (
                     <button
                       type="button"
                       className="text-btn parameter-expand"

@@ -14,6 +14,26 @@ from typing import Any, Callable
 
 CONTRACT = "vgine-runtime-pack-v1"
 SCHEMA_VERSION = 1
+ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_EDITOR_FOUNDATION = ROOT / "data" / "product" / "editor-foundation-v1.json"
+EDITOR_FOUNDATION_FACETS = {
+    "era",
+    "bpm",
+    "key_mode",
+    "groove",
+    "melody",
+    "harmony",
+    "drums",
+    "bass",
+    "exciters",
+    "texture",
+    "vocal",
+    "dynamics",
+    "space_mix",
+    "production",
+    "structure",
+}
+
 PAYLOAD_FILES = (
     "core.json",
     "genres.json",
@@ -47,6 +67,104 @@ def write_json_atomic(path: Path, value: Any) -> str:
 
 def read_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def load_editor_foundation(path: Path) -> dict[str, Any]:
+    if not path.is_file():
+        raise RuntimeError(f"editor foundation not found: {path}")
+    value = read_json(path)
+    if value.get("schema") != "vgine-editor-foundation-v1" or value.get("version") != 1:
+        raise RuntimeError("unsupported editor foundation contract")
+    for key in ("parameters", "parameter_options", "statements", "exclude"):
+        if not isinstance(value.get(key), list):
+            raise RuntimeError(f"editor foundation {key} must be a list")
+        ids = [row.get("id") for row in value[key]]
+        if any(not isinstance(item, str) or not item for item in ids):
+            raise RuntimeError(f"editor foundation {key} contains an invalid id")
+        if len(ids) != len(set(ids)):
+            raise RuntimeError(f"editor foundation {key} contains duplicate ids")
+    parameter_ids = {row["id"] for row in value["parameters"]}
+    missing_parameters = sorted({
+        row.get("parameter_id")
+        for row in value["parameter_options"]
+        if row.get("parameter_id") not in parameter_ids
+    })
+    if missing_parameters:
+        raise RuntimeError(
+            "editor foundation parameter options reference missing parameters: "
+            + ", ".join(str(item) for item in missing_parameters)
+        )
+
+    parameter_sections = {row.get("section_key") for row in value["parameters"]}
+    statement_sections = {row.get("section_key") for row in value["statements"]}
+    if parameter_sections != EDITOR_FOUNDATION_FACETS:
+        raise RuntimeError(
+            "editor foundation parameter facet coverage mismatch: "
+            + ", ".join(sorted(str(item) for item in parameter_sections))
+        )
+    if statement_sections != EDITOR_FOUNDATION_FACETS:
+        raise RuntimeError(
+            "editor foundation Easy-statement facet coverage mismatch: "
+            + ", ".join(sorted(str(item) for item in statement_sections))
+        )
+
+    options_by_parameter: dict[str, int] = {}
+    for row in value["parameter_options"]:
+        pid = row["parameter_id"]
+        options_by_parameter[pid] = options_by_parameter.get(pid, 0) + 1
+
+    for row in value["parameters"]:
+        pid = row["id"]
+        if options_by_parameter.get(pid, 0) == 0 and row.get("value_type") not in ("text",):
+            raise RuntimeError(
+                f"editor foundation parameter has no selectable values: {pid}"
+            )
+        ui = row.get("ui")
+        if ui is not None:
+            if not isinstance(ui, dict) or ui.get("control") != "number":
+                raise RuntimeError(f"unsupported editor foundation UI metadata: {pid}")
+            minimum = ui.get("min")
+            maximum = ui.get("max")
+            step = ui.get("step")
+            recommended = ui.get("recommended_values")
+            if (
+                not isinstance(minimum, (int, float))
+                or not isinstance(maximum, (int, float))
+                or not isinstance(step, (int, float))
+                or maximum <= minimum
+                or step <= 0
+                or not isinstance(recommended, list)
+                or any(
+                    not isinstance(item, (int, float))
+                    or item < minimum
+                    or item > maximum
+                    for item in recommended
+                )
+            ):
+                raise RuntimeError(
+                    f"invalid editor foundation number UI metadata: {pid}"
+                )
+
+    if any(not str(row.get("output_text") or "").strip() for row in value["statements"]):
+        raise RuntimeError("editor foundation contains an empty Easy statement")
+    if any(not str(row.get("output_text") or "").strip() for row in value["exclude"]):
+        raise RuntimeError("editor foundation contains an empty Exclude entry")
+    return value
+
+
+def merge_records(
+    foundation_rows: list[dict[str, Any]],
+    database_rows: list[dict[str, Any]],
+    *,
+    sort_key: Callable[[dict[str, Any]], Any],
+) -> list[dict[str, Any]]:
+    merged: dict[str, dict[str, Any]] = {}
+    for row in foundation_rows:
+        merged[row["id"]] = dict(row)
+    for row in database_rows:
+        current = merged.get(row["id"], {})
+        merged[row["id"]] = {**current, **row}
+    return sorted(merged.values(), key=sort_key)
 
 
 def connect_ro(path: Path) -> sqlite3.Connection:
@@ -206,8 +324,11 @@ def export_instrument_expressions(conn: sqlite3.Connection) -> dict[str, Any]:
     return {"schema": "vgine-runtime-instrument-expressions-v1", "expressions": expressions}
 
 
-def export_editor(conn: sqlite3.Connection) -> dict[str, Any]:
-    parameters = [
+def export_editor(
+    conn: sqlite3.Connection,
+    foundation: dict[str, Any],
+) -> dict[str, Any]:
+    database_parameters = [
         bool_fields(x, "easy_visible", "advanced_visible", "allow_custom_text")
         for x in rows(
             conn,
@@ -216,7 +337,7 @@ def export_editor(conn: sqlite3.Connection) -> dict[str, Any]:
                FROM parameter ORDER BY section_key,sort_order,id""",
         )
     ]
-    options = [
+    database_options = [
         bool_fields(x, "easy_visible", "advanced_visible")
         for x in rows(
             conn,
@@ -232,23 +353,72 @@ def export_editor(conn: sqlite3.Connection) -> dict[str, Any]:
     option_links: dict[str, list[dict[str, Any]]] = {}
     for x in rows(conn, "SELECT statement_id,option_id,ordinal FROM statement_option ORDER BY statement_id,ordinal,option_id"):
         option_links.setdefault(x.pop("statement_id"), []).append(x)
-    statements = []
-    for s in rows(
+    database_statements = []
+    for statement in rows(
         conn,
         """SELECT id,section_key,label,output_text,mode_scope,statement_kind,source_frequency
            FROM statement WHERE status IN ('reviewed','approved')
            ORDER BY section_key,label,id""",
     ):
-        sid = s["id"]
-        s["concepts"] = concepts.get(sid, [])
-        s["options"] = option_links.get(sid, [])
-        statements.append(s)
-    exclude = rows(
+        statement_id = statement["id"]
+        statement["concepts"] = concepts.get(statement_id, [])
+        statement["options"] = option_links.get(statement_id, [])
+        database_statements.append(statement)
+    database_exclude = rows(
         conn,
         """SELECT id,label,output_text,knowledge_entry_id FROM exclude_entry
            WHERE status IN ('reviewed','approved') ORDER BY label,id""",
     )
-    return {"schema": "vgine-runtime-editor-v1", "parameters": parameters, "parameter_options": options, "statements": statements, "exclude": exclude}
+
+    parameters = merge_records(
+        foundation["parameters"],
+        database_parameters,
+        sort_key=lambda row: (row["section_key"], int(row.get("sort_order", 0)), row["id"]),
+    )
+    options = merge_records(
+        foundation["parameter_options"],
+        database_options,
+        sort_key=lambda row: (row["parameter_id"], int(row.get("sort_order", 0)), row["id"]),
+    )
+    statements = merge_records(
+        foundation["statements"],
+        database_statements,
+        sort_key=lambda row: (
+            row["section_key"],
+            int(row.get("sort_order", 1_000_000)),
+            row["label"].casefold(),
+            row["id"],
+        ),
+    )
+    exclude = merge_records(
+        foundation["exclude"],
+        database_exclude,
+        sort_key=lambda row: (
+            int(row.get("sort_order", 1_000_000)),
+            row["label"].casefold(),
+            row["id"],
+        ),
+    )
+
+    parameter_ids = {row["id"] for row in parameters}
+    dangling_options = [
+        row["id"] for row in options if row["parameter_id"] not in parameter_ids
+    ]
+    if dangling_options:
+        raise RuntimeError(
+            "runtime editor contains options with missing parameters: "
+            + ", ".join(dangling_options[:10])
+        )
+
+    return {
+        "schema": "vgine-runtime-editor-v1",
+        "foundation_schema": foundation["schema"],
+        "foundation_version": foundation["version"],
+        "parameters": parameters,
+        "parameter_options": options,
+        "statements": statements,
+        "exclude": exclude,
+    }
 
 
 def export_knowledge(conn: sqlite3.Connection) -> dict[str, Any]:
@@ -375,7 +545,11 @@ def validate_source_database(conn: sqlite3.Connection) -> dict[str, Any]:
     return {"integrity_check": integrity, "source_instrument_expressions": source_count}
 
 
-def validate_work_dir(work_dir: Path, expected_source_expressions: int) -> dict[str, Any]:
+def validate_work_dir(
+    work_dir: Path,
+    expected_source_expressions: int,
+    foundation: dict[str, Any],
+) -> dict[str, Any]:
     payloads = {name: read_json(work_dir / name) for name in PAYLOAD_FILES}
     expressions = payloads["instrument-expressions.json"]["expressions"]
     ids = [x["id"] for x in expressions]
@@ -386,6 +560,15 @@ def validate_work_dir(work_dir: Path, expected_source_expressions: int) -> dict[
         raise RuntimeError(f"runtime source instrument-expression count mismatch: {len(factory)} != {expected_source_expressions}")
     if any(not x["selectable"] or not x["output_text"] for x in factory):
         raise RuntimeError("runtime source instrument-expression wording/selectable invariant failed")
+    editor = payloads["editor.json"]
+    for key in ("parameters", "parameter_options", "statements", "exclude"):
+        expected_ids = {row["id"] for row in foundation[key]}
+        actual_ids = {row["id"] for row in editor[key]}
+        missing = sorted(expected_ids - actual_ids)
+        if missing:
+            raise RuntimeError(
+                f"runtime editor dropped foundation {key}: {', '.join(missing[:10])}"
+            )
     profiles = payloads["core.json"]["renderer_profiles"]
     suno = next((x for x in profiles if x["id"] == "suno-structured-v1"), None)
     if suno and suno["max_characters"] != 1000:
@@ -402,7 +585,11 @@ def save_state(work_dir: Path, state: dict[str, Any]) -> None:
     write_json_atomic(work_dir / "state.json", state)
 
 
-def existing_up_to_date(out_dir: Path, db_sha: str) -> bool:
+def existing_up_to_date(
+    out_dir: Path,
+    db_sha: str,
+    foundation_sha: str,
+) -> bool:
     manifest = out_dir / "manifest.json"
     if not manifest.is_file():
         return False
@@ -410,13 +597,29 @@ def existing_up_to_date(out_dir: Path, db_sha: str) -> bool:
         data = read_json(manifest)
     except Exception:
         return False
-    return data.get("schema") == CONTRACT and data.get("knowledge_db_sha256") == db_sha
+    return (
+        data.get("schema") == CONTRACT
+        and data.get("knowledge_db_sha256") == db_sha
+        and data.get("editor_foundation_sha256") == foundation_sha
+    )
 
 
-def plan(conn: sqlite3.Connection, db_sha: str) -> dict[str, Any]:
+def plan(
+    conn: sqlite3.Connection,
+    db_sha: str,
+    foundation: dict[str, Any],
+    foundation_sha: str,
+) -> dict[str, Any]:
     return {
         "schema": CONTRACT,
         "knowledge_db_sha256": db_sha,
+        "editor_foundation_sha256": foundation_sha,
+        "editor_foundation_counts": {
+            "parameters": len(foundation["parameters"]),
+            "parameter_options": len(foundation["parameter_options"]),
+            "statements": len(foundation["statements"]),
+            "exclude": len(foundation["exclude"]),
+        },
         "counts": {
             "major_genres": conn.execute("SELECT COUNT(*) FROM major_genre").fetchone()[0],
             "genres": conn.execute("SELECT COUNT(*) FROM genre WHERE status<>'deprecated'").fetchone()[0],
@@ -441,20 +644,42 @@ def promote(work_dir: Path, out_dir: Path) -> None:
         raise
 
 
-def compile_runtime(knowledge_db: Path, out_dir: Path, reset_incomplete: bool = False) -> dict[str, Any]:
+def compile_runtime(
+    knowledge_db: Path,
+    out_dir: Path,
+    editor_foundation: Path,
+    reset_incomplete: bool = False,
+) -> dict[str, Any]:
     db_sha = sha256_file(knowledge_db)
+    foundation = load_editor_foundation(editor_foundation)
+    foundation_sha = sha256_file(editor_foundation)
     work_dir = out_dir.with_name(out_dir.name + ".work")
     if reset_incomplete and work_dir.exists():
         shutil.rmtree(work_dir)
-    if existing_up_to_date(out_dir, db_sha) and not work_dir.exists():
-        return {"status": "up-to-date", "out_dir": str(out_dir), "knowledge_db_sha256": db_sha}
+    if existing_up_to_date(out_dir, db_sha, foundation_sha) and not work_dir.exists():
+        return {
+            "status": "up-to-date",
+            "out_dir": str(out_dir),
+            "knowledge_db_sha256": db_sha,
+            "editor_foundation_sha256": foundation_sha,
+        }
 
     work_dir.mkdir(parents=True, exist_ok=True)
     state = load_state(work_dir)
     if state is None:
-        state = {"schema": CONTRACT, "schema_version": SCHEMA_VERSION, "knowledge_db_sha256": db_sha, "completed": {}}
+        state = {
+            "schema": CONTRACT,
+            "schema_version": SCHEMA_VERSION,
+            "knowledge_db_sha256": db_sha,
+            "editor_foundation_sha256": foundation_sha,
+            "completed": {},
+        }
         save_state(work_dir, state)
-    elif state.get("schema") != CONTRACT or state.get("knowledge_db_sha256") != db_sha:
+    elif (
+        state.get("schema") != CONTRACT
+        or state.get("knowledge_db_sha256") != db_sha
+        or state.get("editor_foundation_sha256") != foundation_sha
+    ):
         raise RuntimeError("stale runtime export work state; rerun with --reset-incomplete")
 
     conn = connect_ro(knowledge_db)
@@ -465,12 +690,20 @@ def compile_runtime(knowledge_db: Path, out_dir: Path, reset_incomplete: bool = 
             target = work_dir / filename
             if existing_hash and target.is_file() and sha256_file(target) == existing_hash:
                 continue
-            payload = exporter_fn(conn)
+            payload = (
+                export_editor(conn, foundation)
+                if filename == "editor.json"
+                else exporter_fn(conn)
+            )
             digest = write_json_atomic(target, payload)
             state["completed"][filename] = digest
             save_state(work_dir, state)
 
-        validation = validate_work_dir(work_dir, source_validation["source_instrument_expressions"])
+        validation = validate_work_dir(
+            work_dir,
+            source_validation["source_instrument_expressions"],
+            foundation,
+        )
         files = {}
         build_material = []
         for filename in PAYLOAD_FILES:
@@ -484,6 +717,7 @@ def compile_runtime(knowledge_db: Path, out_dir: Path, reset_incomplete: bool = 
             "schema_version": SCHEMA_VERSION,
             "runtime_build_id": runtime_build_id,
             "knowledge_db_sha256": db_sha,
+            "editor_foundation_sha256": foundation_sha,
             "knowledge_build_meta": build_meta(conn),
             "files": files,
         }
@@ -497,17 +731,31 @@ def compile_runtime(knowledge_db: Path, out_dir: Path, reset_incomplete: bool = 
         conn.close()
 
 
-def status(knowledge_db: Path, out_dir: Path) -> dict[str, Any]:
+def status(
+    knowledge_db: Path,
+    out_dir: Path,
+    editor_foundation: Path,
+) -> dict[str, Any]:
     db_sha = sha256_file(knowledge_db) if knowledge_db.is_file() else None
+    foundation_sha = (
+        sha256_file(editor_foundation) if editor_foundation.is_file() else None
+    )
     work_dir = out_dir.with_name(out_dir.name + ".work")
     final_manifest = read_json(out_dir / "manifest.json") if (out_dir / "manifest.json").is_file() else None
     work_state = load_state(work_dir) if work_dir.exists() else None
     return {
         "schema": CONTRACT,
         "knowledge_db_sha256": db_sha,
+        "editor_foundation_sha256": foundation_sha,
         "final": final_manifest,
         "work": work_state,
-        "up_to_date": bool(final_manifest and db_sha and final_manifest.get("knowledge_db_sha256") == db_sha),
+        "up_to_date": bool(
+            final_manifest
+            and db_sha
+            and foundation_sha
+            and final_manifest.get("knowledge_db_sha256") == db_sha
+            and final_manifest.get("editor_foundation_sha256") == foundation_sha
+        ),
     }
 
 
@@ -515,6 +763,12 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--knowledge", type=Path, required=True, help="Path to compiled knowledge.sqlite")
     ap.add_argument("--out-dir", type=Path, required=True, help="Promoted runtime-v1 directory")
+    ap.add_argument(
+        "--editor-foundation",
+        type=Path,
+        default=DEFAULT_EDITOR_FOUNDATION,
+        help="Tracked Product Editor Foundation v1 JSON",
+    )
     mode = ap.add_mutually_exclusive_group()
     mode.add_argument("--plan", action="store_true", help="Read-only preflight; do not write runtime artifacts")
     mode.add_argument("--status", action="store_true", help="Inspect final/incomplete runtime export state")
@@ -524,18 +778,29 @@ def main() -> int:
 
     try:
         if args.status:
-            result = status(args.knowledge, args.out_dir)
+            result = status(args.knowledge, args.out_dir, args.editor_foundation)
         else:
             db_sha = sha256_file(args.knowledge)
             if args.plan:
                 conn = connect_ro(args.knowledge)
                 try:
                     validate_source_database(conn)
-                    result = plan(conn, db_sha)
+                    foundation = load_editor_foundation(args.editor_foundation)
+                    result = plan(
+                        conn,
+                        db_sha,
+                        foundation,
+                        sha256_file(args.editor_foundation),
+                    )
                 finally:
                     conn.close()
             else:
-                result = compile_runtime(args.knowledge, args.out_dir, args.reset_incomplete)
+                result = compile_runtime(
+                    args.knowledge,
+                    args.out_dir,
+                    args.editor_foundation,
+                    args.reset_incomplete,
+                )
         report_path = args.report
         if report_path is None and not args.plan and not args.status:
             report_path = args.out_dir.parent / "reports" / "runtime-export-v1.json"

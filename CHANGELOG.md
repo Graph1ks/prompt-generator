@@ -6,6 +6,9 @@ This file records meaningful product, behavior, compatibility, security, data, a
 
 ### Added
 
+- Added Product Editor Foundation v1 with 49 parameters, 262 Advanced options, 79 Easy statements and 10 baseline Exclude entries, giving every ordinary MusicSpec facet real selectable content.
+- Added free numeric BPM editing (40–220 BPM) with recommended values while keeping the facet unset until explicit selection.
+
 - Added `@vgine/project-storage`, versioned `vgine-project-v1` documents, dependency-free IndexedDB persistence, contract tests, and automatic local restore/autosave of MusicSpec, manual Style override and minimal prompt workspace state.
 
 - Added lazy manifest-validated Runtime Knowledge loading and the first inline Explanation-mode surfaces for explicitly linked Genre, facet, parameter and Instruments terms, including localized definitions, context definitions, difficulty and related terms.
@@ -69,6 +72,9 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Fixed the Studio white-screen regression where Vite development could load stale ignored `packages/*/dist` output and miss newly added workspace exports such as `createMusicSpec`. `pnpm dev` now rebuilds workspace packages first, and Vite dev resolves exact internal `@vgine/*` imports from source.
 
 ### Changed
+
+- Runtime Pack export now fingerprints and merges the tracked Product Editor Foundation before reviewed/approved DB editor records, and fails closed if required facet coverage regresses.
+- Sound DNA now renders Era and Key/Mode alongside Genre instead of hiding them behind the Genre special case.
 
 - The Studio top-bar status now reports actual local project restore/autosave state once Runtime loading is complete.
 

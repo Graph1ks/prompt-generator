@@ -26,6 +26,7 @@ export interface RuntimeManifest {
   readonly schema_version: typeof RUNTIME_PACK_SCHEMA_VERSION;
   readonly runtime_build_id: string;
   readonly knowledge_db_sha256: string;
+  readonly editor_foundation_sha256?: string;
   readonly knowledge_build_meta: Readonly<Record<string, string>>;
   readonly files: Readonly<Record<RuntimePayloadFileName, RuntimeManifestFile>>;
 }
@@ -166,6 +167,17 @@ export type RuntimeParameterValueType =
   | "boolean"
   | "relation";
 
+export interface RuntimeParameterNumberUi {
+  readonly control: "number";
+  readonly min: number;
+  readonly max: number;
+  readonly step: number;
+  readonly unit: string | null;
+  readonly recommended_values: readonly number[];
+}
+
+export type RuntimeParameterUi = RuntimeParameterNumberUi;
+
 export interface RuntimeParameter {
   readonly id: string;
   readonly section_key: FacetKey;
@@ -177,6 +189,7 @@ export interface RuntimeParameter {
   readonly allow_custom_text: boolean;
   readonly knowledge_entry_id: string | null;
   readonly sort_order: number;
+  readonly ui?: RuntimeParameterUi;
 }
 
 export interface RuntimeParameterOption {
@@ -189,6 +202,7 @@ export interface RuntimeParameterOption {
   readonly advanced_visible: boolean;
   readonly knowledge_entry_id: string | null;
   readonly sort_order: number;
+  readonly recommended?: boolean;
 }
 
 export interface RuntimeStatementConceptLink {
@@ -210,6 +224,7 @@ export interface RuntimeStatement {
   readonly mode_scope: string;
   readonly statement_kind: string;
   readonly source_frequency: number | null;
+  readonly sort_order?: number;
   readonly concepts: readonly RuntimeStatementConceptLink[];
   readonly options: readonly RuntimeStatementOptionLink[];
 }
@@ -219,10 +234,13 @@ export interface RuntimeExcludeEntry {
   readonly label: string;
   readonly output_text: string;
   readonly knowledge_entry_id: string | null;
+  readonly sort_order?: number;
 }
 
 export interface RuntimeEditorPayload {
   readonly schema: "vgine-runtime-editor-v1";
+  readonly foundation_schema?: string;
+  readonly foundation_version?: number;
   readonly parameters: readonly RuntimeParameter[];
   readonly parameter_options: readonly RuntimeParameterOption[];
   readonly statements: readonly RuntimeStatement[];
@@ -500,11 +518,22 @@ export function parseRuntimeManifest(value: unknown): RuntimeManifest {
     knowledgeBuildMeta[key] = asString(value, `manifest.knowledge_build_meta.${key}`);
   }
 
+  const editorFoundationSha =
+    root.editor_foundation_sha256 === undefined
+      ? undefined
+      : assertSha256(
+          root.editor_foundation_sha256,
+          "manifest.editor_foundation_sha256",
+        );
+
   return {
     schema: RUNTIME_PACK_SCHEMA,
     schema_version: RUNTIME_PACK_SCHEMA_VERSION,
     runtime_build_id: assertSha256(root.runtime_build_id, "manifest.runtime_build_id"),
     knowledge_db_sha256: assertSha256(root.knowledge_db_sha256, "manifest.knowledge_db_sha256"),
+    ...(editorFoundationSha === undefined
+      ? {}
+      : { editor_foundation_sha256: editorFoundationSha }),
     knowledge_build_meta: knowledgeBuildMeta,
     files,
   };
@@ -714,6 +743,51 @@ export function parseRuntimeEditor(value: unknown): RuntimeEditorPayload {
   const root = asRecord(value, "editor");
   assertSchema(root, "vgine-runtime-editor-v1", "editor");
 
+  const foundationSchema =
+    root.foundation_schema === undefined
+      ? undefined
+      : asString(root.foundation_schema, "editor.foundation_schema");
+  const foundationVersion =
+    root.foundation_version === undefined
+      ? undefined
+      : asInteger(root.foundation_version, "editor.foundation_version");
+
+  function parseParameterUi(value: unknown, path: string): RuntimeParameterUi {
+    const ui = asRecord(value, path);
+    const control = asString(ui.control, path + ".control");
+    if (control !== "number") {
+      fail(
+        "invalid_parameter_ui_control",
+        path + ".control",
+        "unsupported parameter UI control: " + control,
+      );
+    }
+    const min = asNumber(ui.min, path + ".min");
+    const max = asNumber(ui.max, path + ".max");
+    const step = asNumber(ui.step, path + ".step");
+    if (max <= min || step <= 0) {
+      fail(
+        "invalid_parameter_ui_range",
+        path,
+        "number UI requires max > min and step > 0",
+      );
+    }
+    const recommendedValues = asArray(
+      ui.recommended_values,
+      path + ".recommended_values",
+    ).map((entry, index) =>
+      asNumber(entry, path + ".recommended_values[" + index + "]"),
+    );
+    return {
+      control: "number",
+      min,
+      max,
+      step,
+      unit: asNullableString(ui.unit, path + ".unit"),
+      recommended_values: recommendedValues,
+    };
+  }
+
   const parameters = asArray(root.parameters, "editor.parameters").map(
     (entry, index) => {
       const path = `editor.parameters[${index}]`;
@@ -739,6 +813,9 @@ export function parseRuntimeEditor(value: unknown): RuntimeEditorPayload {
           `${path}.knowledge_entry_id`,
         ),
         sort_order: asInteger(row.sort_order, `${path}.sort_order`),
+        ...(row.ui === undefined
+          ? {}
+          : { ui: parseParameterUi(row.ui, `${path}.ui`) }),
       };
     },
   );
@@ -762,6 +839,14 @@ export function parseRuntimeEditor(value: unknown): RuntimeEditorPayload {
         `${path}.knowledge_entry_id`,
       ),
       sort_order: asInteger(row.sort_order, `${path}.sort_order`),
+      ...(row.recommended === undefined
+        ? {}
+        : {
+            recommended: asBoolean(
+              row.recommended,
+              `${path}.recommended`,
+            ),
+          }),
     };
   });
 
@@ -805,6 +890,14 @@ export function parseRuntimeEditor(value: unknown): RuntimeEditorPayload {
           row.source_frequency,
           `${path}.source_frequency`,
         ),
+        ...(row.sort_order === undefined
+          ? {}
+          : {
+              sort_order: asInteger(
+                row.sort_order,
+                `${path}.sort_order`,
+              ),
+            }),
         concepts,
         options: optionLinks,
       };
@@ -822,11 +915,25 @@ export function parseRuntimeEditor(value: unknown): RuntimeEditorPayload {
         row.knowledge_entry_id,
         `${path}.knowledge_entry_id`,
       ),
+      ...(row.sort_order === undefined
+        ? {}
+        : {
+            sort_order: asInteger(
+              row.sort_order,
+              `${path}.sort_order`,
+            ),
+          }),
     };
   });
 
   return {
     schema: "vgine-runtime-editor-v1",
+    ...(foundationSchema === undefined
+      ? {}
+      : { foundation_schema: foundationSchema }),
+    ...(foundationVersion === undefined
+      ? {}
+      : { foundation_version: foundationVersion }),
     parameters,
     parameter_options: parameterOptions,
     statements,

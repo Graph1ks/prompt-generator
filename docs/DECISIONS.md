@@ -779,3 +779,15 @@ The document stores MusicSpec as semantic source truth plus explicit secondary p
 Theme, UI locale, Favorites and other user preferences are not project state and remain outside ProjectDocument.
 
 The first web adapter uses IndexedDB without an external dependency. Tauri/native storage may later implement the same interface without changing domain/compiler state.
+
+## ADR-040 — Tracked Product Editor Foundation guarantees facet completeness
+
+**Status:** accepted
+
+The completed Database V1 is not reopened merely to manufacture application controls for every ordinary MusicSpec facet. Product-owned editor vocabulary lives in the tracked `data/product/editor-foundation-v1.json` contract and is compiled into Runtime Pack `editor.json`.
+
+The Foundation provides deterministic Easy statements and Advanced parameters/options for all ordinary facets except Genre and Instruments. Genre/Instrument selection continues to come from their specialized Database V1 runtime layers.
+
+Reviewed/approved database editor records overlay matching Foundation records by stable ID. The Foundation is therefore a minimum product surface, not a higher-authority replacement for durable curation.
+
+A runtime export is invalid if Foundation v1 no longer covers every required ordinary facet with both Easy and Advanced selectable content.

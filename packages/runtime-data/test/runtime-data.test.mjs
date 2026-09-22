@@ -19,6 +19,7 @@ function manifest() {
     schema_version: 1,
     runtime_build_id: "b".repeat(64),
     knowledge_db_sha256: "c".repeat(64),
+    editor_foundation_sha256: "d".repeat(64),
     knowledge_build_meta: { build_revision: "test" },
     files: {
       "core.json": { sha256: hash, bytes: 1, counts: { major_genres: 1, sections: 1, renderer_profiles: 1 } },
@@ -137,24 +138,34 @@ function payloads() {
     },
     "editor.json": {
       schema: "vgine-runtime-editor-v1",
+      foundation_schema: "vgine-editor-foundation-v1",
+      foundation_version: 1,
       parameters: [
         {
-          id: "parameter:groove:swing",
-          section_key: "groove",
-          label: "Swing",
-          canonical_slug: "swing",
-          value_type: "enum",
+          id: "parameter:bpm:tempo",
+          section_key: "bpm",
+          label: "Tempo",
+          canonical_slug: "tempo",
+          value_type: "number",
           easy_visible: true,
           advanced_visible: true,
           allow_custom_text: true,
           knowledge_entry_id: null,
           sort_order: 10,
+          ui: {
+            control: "number",
+            min: 40,
+            max: 220,
+            step: 1,
+            unit: "BPM",
+            recommended_values: [84, 96, 120],
+          },
         },
       ],
       parameter_options: [
         {
           id: "option:groove:swing:laid-back",
-          parameter_id: "parameter:groove:swing",
+          parameter_id: "parameter:bpm:tempo",
           label: "Laid-back",
           canonical_slug: "laid-back",
           output_fragment: "laid-back swing",
@@ -162,6 +173,7 @@ function payloads() {
           advanced_visible: true,
           knowledge_entry_id: null,
           sort_order: 10,
+          recommended: true,
         },
       ],
       statements: [
@@ -356,8 +368,13 @@ test("lazy-loads and validates the editor payload", async () => {
   const bootstrap = await loadRuntimeBootstrap(reader(data));
   const editor = await loadRuntimeEditor(reader(data), bootstrap.manifest);
 
-  assert.equal(editor.parameters[0].section_key, "groove");
+  assert.equal(editor.foundation_schema, "vgine-editor-foundation-v1");
+  assert.equal(editor.foundation_version, 1);
+  assert.equal(editor.parameters[0].section_key, "bpm");
+  assert.equal(editor.parameters[0].ui.control, "number");
+  assert.deepEqual(editor.parameters[0].ui.recommended_values, [84, 96, 120]);
   assert.equal(editor.parameter_options[0].output_fragment, "laid-back swing");
+  assert.equal(editor.parameter_options[0].recommended, true);
   assert.equal(editor.statements[0].output_text, "laid-back swung pocket");
   assert.equal(editor.statements[0].source_frequency, null);
   assert.equal(editor.exclude[0].output_text, "bright glossy pop synths");

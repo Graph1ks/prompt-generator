@@ -13,13 +13,23 @@
     "files"
   ],
   "properties": {
-    "schema": { "const": "vgine-runtime-pack-v1" },
-    "schema_version": { "const": 1 },
-    "runtime_build_id": { "$ref": "#/$defs/sha256" },
-    "knowledge_db_sha256": { "$ref": "#/$defs/sha256" },
+    "schema": {
+      "const": "vgine-runtime-pack-v1"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "runtime_build_id": {
+      "$ref": "#/$defs/sha256"
+    },
+    "knowledge_db_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
     "knowledge_build_meta": {
       "type": "object",
-      "additionalProperties": { "type": "string" }
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "files": {
       "type": "object",
@@ -34,14 +44,31 @@
         "search.json"
       ],
       "properties": {
-        "core.json": { "$ref": "#/$defs/file" },
-        "genres.json": { "$ref": "#/$defs/file" },
-        "instruments.json": { "$ref": "#/$defs/file" },
-        "instrument-expressions.json": { "$ref": "#/$defs/file" },
-        "editor.json": { "$ref": "#/$defs/file" },
-        "knowledge.json": { "$ref": "#/$defs/file" },
-        "search.json": { "$ref": "#/$defs/file" }
+        "core.json": {
+          "$ref": "#/$defs/file"
+        },
+        "genres.json": {
+          "$ref": "#/$defs/file"
+        },
+        "instruments.json": {
+          "$ref": "#/$defs/file"
+        },
+        "instrument-expressions.json": {
+          "$ref": "#/$defs/file"
+        },
+        "editor.json": {
+          "$ref": "#/$defs/file"
+        },
+        "knowledge.json": {
+          "$ref": "#/$defs/file"
+        },
+        "search.json": {
+          "$ref": "#/$defs/file"
+        }
       }
+    },
+    "editor_foundation_sha256": {
+      "$ref": "#/$defs/sha256"
     }
   },
   "$defs": {
@@ -52,13 +79,25 @@
     "file": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["sha256", "bytes", "counts"],
+      "required": [
+        "sha256",
+        "bytes",
+        "counts"
+      ],
       "properties": {
-        "sha256": { "$ref": "#/$defs/sha256" },
-        "bytes": { "type": "integer", "minimum": 0 },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
         "counts": {
           "type": "object",
-          "additionalProperties": { "type": "integer", "minimum": 0 }
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
         }
       }
     }

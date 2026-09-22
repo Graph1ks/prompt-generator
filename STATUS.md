@@ -190,3 +190,13 @@ Proceed in this order:
 - Studio debounces local autosave and exposes restoring/saving/saved/error/unavailable status in the top bar.
 - MusicSpec validation is reused when loading persisted projects; unsupported/corrupt project data is not silently accepted.
 - Theme, locale and Favorites remain separate lightweight user preferences rather than project data.
+
+## Product Editor Foundation v1
+
+- Added tracked product baseline `data/product/editor-foundation-v1.json`: 49 parameters, 262 Advanced options, 79 Easy statements and 10 baseline Exclude entries.
+- All 15 ordinary non-Genre/non-Instrument facets now have both Easy and Advanced selectable content.
+- Runtime export merges Foundation first and reviewed/approved DB editor rows second by stable ID.
+- Runtime manifest fingerprints the Foundation separately from `knowledge.sqlite`; changing the baseline forces a Runtime rebuild.
+- Runtime validation fails if any required facet loses parameter or Easy-statement coverage.
+- Sound DNA now renders Era + Key/Mode alongside the specialized Genre picker.
+- BPM now supports explicit 40–220 numeric selection plus recommended values while remaining unset until user action.

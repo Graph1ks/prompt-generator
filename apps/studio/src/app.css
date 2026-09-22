@@ -3182,3 +3182,107 @@
     background: var(--vg-color-danger);
   }
 }
+
+
+@layer studio {
+  .studio-fields {
+    display: grid;
+    gap: 14px;
+  }
+
+  .parameter-option.recommended:not(.selected) {
+    border-style: dashed;
+    border-color: color-mix(
+      in srgb,
+      var(--vg-color-accent) 52%,
+      var(--studio-line)
+    );
+  }
+
+  .number-parameter-control {
+    display: grid;
+    gap: 10px;
+  }
+
+  .number-parameter-readout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .number-parameter-readout > strong {
+    color: var(--studio-muted);
+    font-size: 10px;
+    font-weight: 720;
+  }
+
+  .number-parameter-readout[data-selected="true"] > strong {
+    color: var(--studio-ink);
+  }
+
+  .number-parameter-inputs {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .number-parameter-inputs input[type="number"] {
+    inline-size: 96px;
+    min-block-size: 38px;
+    border: 1px solid var(--studio-line);
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--studio-paper) 72%, var(--studio-card));
+    color: var(--studio-ink);
+    padding: 7px 9px;
+    font-family: var(--vg-font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-align: end;
+  }
+
+  .number-parameter-clear {
+    min-block-size: 36px;
+  }
+
+  .number-parameter-range {
+    inline-size: 100%;
+    accent-color: var(--vg-color-accent);
+    opacity: 0.62;
+    cursor: pointer;
+  }
+
+  .number-parameter-range[data-selected="true"] {
+    opacity: 1;
+  }
+
+  .parameter-recommended {
+    display: grid;
+    gap: 6px;
+  }
+
+  .parameter-recommended > small {
+    color: var(--studio-muted);
+    font-family: var(--vg-font-mono);
+    font-size: 8px;
+    font-weight: 720;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 760px) {
+    .number-parameter-readout {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .number-parameter-inputs {
+      inline-size: 100%;
+    }
+
+    .number-parameter-inputs input[type="number"] {
+      flex: 1;
+      inline-size: auto;
+    }
+  }
+}
