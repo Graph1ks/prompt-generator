@@ -799,6 +799,7 @@ export function App() {
     function onKeyDown(event: KeyboardEvent) {
       if (
         projectLibraryOpen ||
+        copyFallbackText !== null ||
         event.key !== "Enter" ||
         (!event.ctrlKey && !event.metaKey) ||
         event.altKey ||
@@ -818,6 +819,7 @@ export function App() {
   }, [
     activeCopyText,
     canCopyActiveOutput,
+    copyFallbackText,
     outputTab,
     projectLibraryOpen,
   ]);
