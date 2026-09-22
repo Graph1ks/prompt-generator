@@ -323,6 +323,13 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - The facet-wide current-state rail remains the canonical overview; parameter summaries are a local scan aid derived from the same MusicSpec/Runtime IDs.
 - Custom Advanced wording remains full-width and nothing is hidden behind dropdown menus.
 
+## Genre picker focus + selected-pool carry-forward
+
+- Genre role picker triggers declare their open relationship and keyboard focus returns to the originating role control after Escape/close/select/clear.
+- Instruments and Exclude expose explicit current-selection pools above search/browse results. Each item remains directly removable and the pool has a visible Clear All action.
+- Instrument Clear All resets only the `instruments` facet; Exclude Clear All clears only `spec.exclude`.
+- These are direct MusicSpec operations, not separate UI state.
+
 ## Explain activation + search-shortcut carry-forward
 
 - A selectable Knowledge label is still explained on desktop hover/focus, but click/Enter/Space now activates the underlying option. Explain may not consume the primary selection gesture.
