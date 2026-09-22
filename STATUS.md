@@ -193,6 +193,14 @@ Proceed in this order:
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
 
+## Chapter-local facet jump rail
+
+- Every loaded chapter now exposes its facets as direct navigation targets between the chapter header and editor stack.
+- The rail shows live per-facet active-item counts from the same MusicSpec state used by chapter counts; Finish also includes the separate Exclude surface.
+- Desktop keeps this facet rail sticky beneath the chapter tabs so long Advanced/Instrument pages can jump directly between editing regions without returning to the top.
+- Mobile keeps the rail in normal document flow and wraps touch-sized targets instead of adding another nested horizontal scroller.
+- Facet jumps reuse the existing explicit `data-facet` source targets and source-locate behavior; no labels/prompt strings are parsed.
+
 ## Persistent chapter navigation + desktop shortcuts
 
 - Chapter navigation now remains sticky below the global top bar during long Genre/Instrument/Advanced editing sessions instead of disappearing after the first viewport.
