@@ -268,15 +268,15 @@ export function App() {
         </div>
 
         <div className="top-divider" />
-        <span className="top-label">Dein persönliches Sound-Studio</span>
+        <span className="top-label">{t("app.soundStudio")}</span>
 
         <div className="top-actions">
           <span className="save-status">{runtimeLabel}</span>
           <button
             type="button"
             className="icon-btn"
-            aria-label="Neuen Prompt beginnen"
-            title="Prompt vollständig zurücksetzen"
+            aria-label={t("app.newPrompt")}
+            title={t("app.newPrompt")}
             onClick={startNewPrompt}
           >
             <Icon name="reset" />
@@ -284,22 +284,36 @@ export function App() {
           <button
             type="button"
             className="icon-btn"
-            aria-label="Farbschema wechseln"
-            title="Farbschema wechseln"
+            aria-label={t("app.theme")}
+            title={t("app.theme")}
             onClick={() =>
               setTheme((current) => (current === "paradise" ? "ash" : "paradise"))
             }
           >
             <Icon name="theme" />
           </button>
+          <div className="language-switch" role="group" aria-label={t("language.label")}>
+            {SUPPORTED_LOCALES.map((candidate) => (
+              <button
+                key={candidate}
+                type="button"
+                className={locale === candidate ? "active" : ""}
+                aria-pressed={locale === candidate}
+                onClick={() => setLocale(candidate)}
+              >
+                {candidate.toUpperCase()}
+              </button>
+            ))}
+          </div>
           <button
             type="button"
-            className={assistOn ? "btn assist-toggle active" : "btn assist-toggle"}
+            className={assistOn ? "icon-btn assist-toggle active" : "icon-btn assist-toggle"}
             aria-pressed={assistOn}
+            aria-label={assistOn ? t("app.explainOn") : t("app.explainOff")}
+            title={t("app.explain")}
             onClick={() => setAssistOn((current) => !current)}
           >
             <Icon name="help" />
-            Erklärmodus <span>{assistOn ? "an" : "aus"}</span>
           </button>
           <button
             type="button"
@@ -308,7 +322,7 @@ export function App() {
             onClick={copyPrompt}
           >
             <Icon name="copy" />
-            {copyState === "copied" ? "Kopiert" : "Prompt kopieren"}
+            {copyState === "copied" ? t("app.copied") : t("app.copyPrompt")}
           </button>
         </div>
       </header>
@@ -316,11 +330,11 @@ export function App() {
       <div className="app">
         <section className="intro">
           <div>
-            <div className="eyebrow">Weniger Syntax. Mehr Musik.</div>
+            <div className="eyebrow">{t("intro.eyebrow")}</div>
             <h1>
-              Dein Sound. <em>Deine Regeln.</em>
+              {t("intro.titleA")} <em>{t("intro.titleB")}</em>
             </h1>
-            <p>Verbinde Genres. Gib ihnen Charakter. Bau deinen Prompt.</p>
+            <p>{t("intro.body")}</p>
           </div>
           <div className="intro-right">
             <div className="preset-dots" aria-hidden="true">
@@ -329,9 +343,9 @@ export function App() {
               <i />
             </div>
             <div className="intro-note">
-              Drei Einflüsse.
+              {t("intro.noteA")}
               <br />
-              Unendlich viele Richtungen.
+              {t("intro.noteB")}
             </div>
           </div>
         </section>
@@ -341,7 +355,7 @@ export function App() {
             className={mobilePreviewOpen ? "editor mobile-hidden" : "editor"}
             id="editor"
           >
-            <nav className="steps" aria-label="Sound bearbeiten">
+            <nav className="steps" aria-label={t("app.soundStudio")}>
               {STUDIO_CHAPTERS.map((item, index) => {
                 const active = item.id === chapter.id;
                 const currentIndex = STUDIO_CHAPTERS.findIndex(
@@ -362,7 +376,7 @@ export function App() {
                     onClick={() => requestChapter(item.id)}
                   >
                     <span className="num">0{index + 1}</span>
-                    {item.label}
+                    {chapterLabel(item.id)}
                   </button>
                 );
               })}
@@ -379,10 +393,10 @@ export function App() {
                     type="button"
                     className="section-reset"
                     onClick={resetCurrentChapter}
-                    title="Diese Seite zurücksetzen"
+                    title={t("chapter.reset")}
                   >
                     <Icon name="reset" />
-                    Seite zurücksetzen
+                    {t("chapter.reset")}
                   </button>
                   <span className="section-index">
                   0
@@ -396,9 +410,9 @@ export function App() {
                 <div className="field-card runtime-card">
                   <span className="runtime-spinner" aria-hidden="true" />
                   <div>
-                    <strong>Runtime Pack wird validiert.</strong>
+                    <strong>{t("runtime.validating")}</strong>
                     <p>
-                      Genres, Suchindex und Compilerwissen werden lokal geladen.
+                      {t("runtime.validatingBody")}
                     </p>
                   </div>
                 </div>
@@ -408,10 +422,9 @@ export function App() {
                 <div className="field-card runtime-card error">
                   <Icon name="info" />
                   <div>
-                    <strong>Runtime Pack nicht verfügbar.</strong>
+                    <strong>{t("runtime.unavailable")}</strong>
                     <p>
-                      Führe <code>pnpm runtime:stage</code> aus und lade das Studio
-                      neu.
+                      {t("runtime.unavailableBody")}
                     </p>
                     <small>{runtime.message}</small>
                   </div>
@@ -434,14 +447,13 @@ export function App() {
                   {chapter.facets.map((facet) => (
                     <section key={facet} className="field-card">
                       <div className="field-label">
-                        <span>{FACET_LABELS[facet]}</span>
+                        <span>{facetLabel(facet)}</span>
                         <span className="badge">MusicSpec</span>
                       </div>
                       <div className="placeholder-value">
                         <strong>{facetSummary(facet)}</strong>
                         <p>
-                          Produktionscontrol folgt im nächsten Slice. Hier werden
-                          bewusst keine Demo-Werte als echte Daten ausgegeben.
+                          {t("placeholder.future")}
                         </p>
                       </div>
                     </section>
@@ -453,9 +465,9 @@ export function App() {
                 <p>
                   {chapter.id === "dna"
                     ? genreSkipAcknowledged && !hasGenre
-                      ? "Kein Genre gesetzt. Das ist erlaubt — bestätige einmalig für diesen Prompt."
-                      : "Genre ist optional. Ohne Genre gibt es beim Weitergehen genau einen Hinweis."
-                    : "Easy und Advanced bearbeiten denselben MusicSpec-Zustand."}
+                      ? t("footer.genreSkipConfirm")
+                      : t("footer.genreOptional")
+                    : t("footer.sharedState")}
                 </p>
                 <button
                   type="button"
@@ -469,11 +481,11 @@ export function App() {
                   {chapter.id === "dna" && genreSkipAcknowledged && !hasGenre ? (
                     <>
                       <Icon name="warning" />
-                      Ohne Genre weiter
+                      {t("footer.continueNoGenre")}
                     </>
                   ) : (
                     <>
-                      {chapter.id === "finish" ? "Fertig" : nextChapter.label}
+                      {chapter.id === "finish" ? t("footer.done") : chapterLabel(nextChapter.id)}
                       <Icon name="arrow" />
                     </>
                   )}
@@ -492,12 +504,12 @@ export function App() {
                   ? "preview changed"
                   : "preview"
             }
-            aria-label="Dein Live-Prompt"
+            aria-label={t("preview.aria")}
           >
             <div className="preview-top">
-              <span className="eyebrow">Dein Sound, in Worten.</span>
+              <span className="eyebrow">{t("preview.eyebrow")}</span>
               <span className="live">
-                <i className="dot" /> LIVE PROMPT
+                <i className="dot" /> {t("preview.live")}
               </span>
             </div>
 
@@ -511,7 +523,7 @@ export function App() {
               <div className="cover-code">
                 {selectedGenreLabels.length
                   ? selectedGenreLabels.slice(0, 3).join(" × ").toUpperCase()
-                  : "GENRE FREE × USER DIRECTED"}
+                  : t("preview.genreFree")}
               </div>
               <div className="record" aria-hidden="true" />
               <div className="cover-barcode" aria-hidden="true" />
@@ -525,7 +537,7 @@ export function App() {
                 onClick={togglePromptUnlock}
               >
                 <Icon name={promptUnlocked ? "lock" : "unlock"} />
-                {promptUnlocked ? "Prompt sperren" : "Prompt entsperren"}
+                {promptUnlocked ? t("preview.lock") : t("preview.unlock")}
               </button>
               {(manualStyleText !== null || promptUnlocked) && (
                 <button
@@ -534,7 +546,7 @@ export function App() {
                   onClick={resetManualPrompt}
                 >
                   <Icon name="reset" />
-                  Original wiederherstellen
+                  {t("preview.restore")}
                 </button>
               )}
             </div>
@@ -564,14 +576,14 @@ export function App() {
               {outputTab === "style" ? (
                 promptUnlocked ? (
                   <label className="manual-prompt-editor">
-                    <span className="sr-only">Style Prompt manuell bearbeiten</span>
+                    <span className="sr-only">{t("preview.manualAria")}</span>
                     <textarea
                       value={manualStyleText ?? compiledStyleText}
                       spellCheck={false}
                       onChange={(event) => setManualStyleText(event.currentTarget.value)}
                     />
                     <small>
-                      Manueller Output-Override. MusicSpec bleibt unverändert.
+                      {t("preview.manualHint")}
                     </small>
                   </label>
                 ) : manualStyleText !== null ? (
@@ -590,8 +602,7 @@ export function App() {
                   <div className="preview-empty">
                     <Icon name="spark" />
                     <p>
-                      Bau deinen Sound aus den vier Seiten. Genre ist optional;
-                      der Compiler erzeugt nur Abschnitte, die du tatsächlich setzt.
+                      {t("preview.empty")}
                     </p>
                   </div>
                 )
@@ -599,13 +610,13 @@ export function App() {
                 <p className="exclude-text">{compilation.excludeText}</p>
               ) : (
                 <div className="preview-empty">
-                  <p>Noch keine Ausschlüsse gesetzt.</p>
+                  <p>{t("preview.noExclude")}</p>
                 </div>
               )}
 
               {!manualBudgetValid && outputTab === "style" && (
                 <div className="diagnostic error">
-                  Manueller Prompt liegt {budgetUsed - budgetMax} Zeichen über dem Suno-Limit.
+                  {t("preview.manualOver", { count: budgetUsed - budgetMax })}
                 </div>
               )}
 
@@ -614,14 +625,14 @@ export function App() {
                   key={diagnostic.code + String(index)}
                   className={"diagnostic " + diagnostic.severity}
                 >
-                  {diagnostic.message}
+                  {diagnosticMessage(diagnostic.code, diagnostic.message)}
                 </div>
               ))}
             </div>
 
             <div className="preview-footer">
               <div className="budget-row">
-                <span>Suno Style</span>
+                <span>{t("preview.sunoStyle")}</span>
                 <b>
                   {budgetUsed} / {budgetMax}
                 </b>
@@ -643,14 +654,14 @@ export function App() {
                 {copyState === "copied"
                   ? "Kopiert"
                   : outputTab === "style"
-                    ? "Style kopieren"
-                    : "Exclude kopieren"}
+                    ? t("preview.copyStyle")
+                    : t("preview.copyExclude")}
                 <span className="copy-shortcut">Ctrl / ⌘ ↵</span>
               </button>
               <div className="preview-note">
                 {manualStyleText !== null
-                  ? "Manueller Override aktiv · Original bleibt jederzeit wiederherstellbar."
-                  : "Deine Auswahl wird deterministisch in den Prompt übersetzt."}
+                  ? t("preview.manualActive")
+                  : t("preview.deterministic")}
               </div>
             </div>
           </aside>
@@ -669,11 +680,11 @@ export function App() {
           onClick={() => setMobilePreviewOpen((current) => !current)}
         >
           <span>
-            {mobilePreviewOpen ? "Zurück zum Studio" : "Live-Prompt"}
+            {mobilePreviewOpen ? t("mobile.backStudio") : t("mobile.livePrompt")}
             <small>
               {mobilePreviewOpen
-                ? "Deine Auswahl bleibt erhalten"
-                : budgetUsed + " / " + budgetMax + " Zeichen"}
+                ? t("mobile.preserved")
+                : t("mobile.characters", { used: budgetUsed, max: budgetMax })}
             </small>
           </span>
           <Icon name={mobilePreviewOpen ? "back" : "arrow"} />
@@ -685,7 +696,7 @@ export function App() {
           onClick={copyPrompt}
         >
           <Icon name="copy" />
-          Kopieren
+          {t("mobile.copy")}
         </button>
       </div>
     </div>
