@@ -225,24 +225,25 @@ export function GenrePicker({
     searchIndex,
   ]);
 
-  const favoriteCount = useMemo(() => {
-    let count = 0;
-    for (const major of orderedMajors) {
-      if (genrePreferences.isFavorite(major.id)) count += 1;
-    }
-    for (const genre of runtime.genres.genres) {
-      if (genrePreferences.isFavorite(genre.id)) count += 1;
-    }
-    return count;
-  }, [genrePreferences, orderedMajors, runtime.genres.genres]);
+  const favoriteCount = useMemo(
+    () =>
+      matchingOptions.reduce(
+        (count, option) =>
+          count + (genrePreferences.isFavorite(option.id) ? 1 : 0),
+        0,
+      ),
+    [genrePreferences, matchingOptions],
+  );
 
-  const recentCount = useMemo(() => {
-    let count = 0;
-    for (const option of optionById.values()) {
-      if (genrePreferences.lastUsedAt(option.id) > 0) count += 1;
-    }
-    return count;
-  }, [genrePreferences, optionById]);
+  const recentCount = useMemo(
+    () =>
+      matchingOptions.reduce(
+        (count, option) =>
+          count + (genrePreferences.lastUsedAt(option.id) > 0 ? 1 : 0),
+        0,
+      ),
+    [genrePreferences, matchingOptions],
+  );
 
   const poolOptions = useMemo(() => {
     if (quickView === "favorites") {
