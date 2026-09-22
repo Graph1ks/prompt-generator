@@ -553,23 +553,22 @@ export function App() {
                 </div>
               )}
 
-              {runtime.status === "ready" && chapter.id === "dna" && (
-                <GenrePicker
-                  runtime={runtime.value.bootstrap}
-                  searchIndex={runtime.value.searchIndex}
-                  spec={spec}
-                  activeRole={activeGenreRole}
-                  onRoleChange={setActiveGenreRole}
-                  onSpecChange={setSpec}
-                  assistOn={assistOn}
-                  loadKnowledge={runtime.value.loadKnowledge}
-                />
-              )}
-
-              {runtime.status === "ready" && chapter.id !== "dna" && (
-                <div className="placeholder-fields">
+              {runtime.status === "ready" && (
+                <div className="studio-fields">
                   {chapter.facets.map((facet) =>
-                    facet === "instruments" ? (
+                    facet === "genre" ? (
+                      <GenrePicker
+                        key={facet}
+                        runtime={runtime.value.bootstrap}
+                        searchIndex={runtime.value.searchIndex}
+                        spec={spec}
+                        activeRole={activeGenreRole}
+                        onRoleChange={setActiveGenreRole}
+                        onSpecChange={setSpec}
+                        assistOn={assistOn}
+                        loadKnowledge={runtime.value.loadKnowledge}
+                      />
+                    ) : facet === "instruments" ? (
                       <InstrumentPicker
                         key={facet}
                         runtime={runtime.value}
@@ -577,7 +576,7 @@ export function App() {
                         onSpecChange={setSpec}
                         assistOn={assistOn}
                       />
-                    ) : facet === "genre" ? null : (
+                    ) : (
                       <FacetEditor
                         key={facet}
                         facet={facet}
