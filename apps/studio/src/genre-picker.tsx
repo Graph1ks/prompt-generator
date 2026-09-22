@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import {
   removeGenreInfluence,
   resetMusicSpecFacets,
@@ -107,6 +107,9 @@ export function GenrePicker({
   const [majorId, setMajorId] = useState<string | null>(null);
   const [showAllResults, setShowAllResults] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const roleTriggerRefs = useRef<
+    Partial<Record<GenreInfluenceRole, HTMLButtonElement | null>>
+  >({});
   const searchInputRef = useSlashSearchShortcut(pickerOpen);
   const {
     segmentRef: pickerRef,
@@ -260,9 +263,23 @@ export function GenrePicker({
       }
     });
 
-    return () => window.cancelAnimationFrame(frame);
-  }, [activeRole, pickerOpen, pickerRef, searchInputRef]);
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      const role = activeRole;
+      setPickerOpen(false);
+      setShowAllResults(false);
+      window.requestAnimationFrame(() => {
+        roleTriggerRefs.current[role]?.focus({ preventScroll: true });
+      });
+    }
 
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [activeRole, pickerOpen, pickerRef, searchInputRef]);
 
   function roleLabel(role: GenreInfluenceRole): string {
     return t(
@@ -284,6 +301,19 @@ export function GenrePicker({
     );
   }
 
+  function restoreRoleFocus(role: GenreInfluenceRole) {
+    window.requestAnimationFrame(() => {
+      roleTriggerRefs.current[role]?.focus({ preventScroll: true });
+    });
+  }
+
+  function closePicker(restoreFocus = false) {
+    const role = activeRole;
+    setPickerOpen(false);
+    setShowAllResults(false);
+    if (restoreFocus) restoreRoleFocus(role);
+  }
+
   function openRole(role: GenreInfluenceRole) {
     const hasFoundation = genreIdForRole(spec, "foundation") !== null;
     if (!hasFoundation && role !== "foundation") return;
@@ -299,6 +329,7 @@ export function GenrePicker({
     setShowAllResults(false);
     setQuery("");
     setMajorId(null);
+    restoreRoleFocus(activeRole);
   }
 
   function clearRole(role: GenreInfluenceRole) {
@@ -312,6 +343,7 @@ export function GenrePicker({
     setShowAllResults(false);
     setQuery("");
     setMajorId(null);
+    restoreRoleFocus(role);
   }
 
   function familyLabel(option: GenreOption): string {
@@ -340,10 +372,19 @@ export function GenrePicker({
             return (
               <button
                 key={role}
+                ref={(element) => {
+                  roleTriggerRefs.current[role] = element;
+                }}
                 type="button"
                 className="add-genre"
                 data-role={role}
                 disabled={disabled}
+                aria-expanded={pickerOpen && activeRole === role}
+                aria-controls={
+                  pickerOpen && activeRole === role
+                    ? "genre-picker-panel"
+                    : undefined
+                }
                 onClick={() => openRole(role)}
               >
                 <span className="plus">
@@ -398,7 +439,19 @@ export function GenrePicker({
               <div className="genre-family">{familyLabel(option)}</div>
               <div className="genre-purpose">{rolePurpose(role)}</div>
               <div className="genre-actions">
-                <button type="button" onClick={() => openRole(role)}>
+                <button
+                  ref={(element) => {
+                    roleTriggerRefs.current[role] = element;
+                  }}
+                  type="button"
+                  aria-expanded={pickerOpen && activeRole === role}
+                  aria-controls={
+                    pickerOpen && activeRole === role
+                      ? "genre-picker-panel"
+                      : undefined
+                  }
+                  onClick={() => openRole(role)}
+                >
                   {t("genre.change")} <Icon name="arrow" />
                 </button>
                 <button
@@ -422,6 +475,7 @@ export function GenrePicker({
 
       {pickerOpen && (
         <section
+          id="genre-picker-panel"
           ref={pickerRef}
           className="genre-picker-panel"
           aria-label={t("genre.chooseRole", { role: roleLabel(activeRole) })}
@@ -435,10 +489,7 @@ export function GenrePicker({
               type="button"
               className="icon-btn"
               aria-label={t("genre.close")}
-              onClick={() => {
-                setPickerOpen(false);
-                setShowAllResults(false);
-                          }}
+              onClick={() => closePicker(true)}
             >
               <Icon name="close" />
             </button>
