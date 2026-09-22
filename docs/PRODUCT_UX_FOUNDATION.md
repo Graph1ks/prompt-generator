@@ -332,10 +332,14 @@ Leaving Sound DNA without a genre is valid. The first forward action with no gen
 
 ## 17. Manual prompt override and reset
 
-The compiled Style prompt can be unlocked for manual editing. Manual edits are an explicit output override layered above the deterministic compiler result:
+The compiled Style prompt can be unlocked for manual editing. Manual edits are an explicit **final-output override** layered above the deterministic compiler result, not a second authoring workflow:
 
+- the first transition from deterministic Style into manual editing is guarded inline; opening the guard alone must not create a manual override;
+- the guard explains that confirming manual editing freezes the current Style as the final visible/copyable override, so later Studio/MusicSpec edits keep changing the deterministic original underneath but do not update that manual Style;
+- users who still want structured editing should cancel and put their wording into **Advanced → Custom wording** in the matching facet; that text stays in MusicSpec, recompiles normally and keeps prompt-to-source navigation intact;
+- arbitrary manual output is never parsed to guess a facet or migrate text back into MusicSpec;
 - MusicSpec remains unchanged and remains the semantic source truth;
-- the original current compiler output is always recoverable with one reset action;
+- the original **current** compiler output is always recoverable with one reset action, which reconnects the visible Style to MusicSpec;
 - manual output still obeys the renderer character budget;
 - every Studio chapter exposes a page reset that clears only the semantic state owned by that chapter;
 - starting a new prompt resets MusicSpec, chapter warning acknowledgements and manual output overrides.
