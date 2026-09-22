@@ -72,10 +72,14 @@ export function FacetEditor({
   const statements = useMemo(
     () =>
       (data?.statements ?? [])
-        .filter((statement) => statement.section_key === facet)
+        .filter(
+          (statement) =>
+            statement.section_key === facet &&
+            statement.mode_scope !== "advanced",
+        )
         .sort(
           (a, b) =>
-            b.source_frequency - a.source_frequency ||
+            (b.source_frequency ?? 0) - (a.source_frequency ?? 0) ||
             a.label.localeCompare(b.label),
         ),
     [data, facet],
@@ -84,7 +88,10 @@ export function FacetEditor({
   const parameters = useMemo(
     () =>
       (data?.parameters ?? [])
-        .filter((parameter) => parameter.section_key === facet)
+        .filter(
+          (parameter) =>
+            parameter.section_key === facet && parameter.advanced_visible,
+        )
         .sort(
           (a, b) =>
             a.sort_order - b.sort_order || a.label.localeCompare(b.label),
@@ -139,13 +146,29 @@ export function FacetEditor({
     );
   }
 
-  function toggleOption(option: RuntimeParameterOption) {
+  function toggleOption(
+    option: RuntimeParameterOption,
+    parameter: RuntimeParameter,
+  ) {
     if (hasFacetSelection(spec, facet, option.id)) {
       onSpecChange(removeFacetSelection(spec, facet, option.id));
       return;
     }
+
+    let next = spec;
+    if (parameter.value_type !== "multi") {
+      for (const sibling of optionsByParameter.get(parameter.id) ?? []) {
+        if (
+          sibling.id !== option.id &&
+          hasFacetSelection(next, facet, sibling.id)
+        ) {
+          next = removeFacetSelection(next, facet, sibling.id);
+        }
+      }
+    }
+
     onSpecChange(
-      setFacetSelection(spec, facet, {
+      setFacetSelection(next, facet, {
         id: option.id,
         kind: "option",
         value: option.output_fragment,
@@ -282,7 +305,7 @@ export function FacetEditor({
                             type="button"
                             className={selected ? "parameter-option selected" : "parameter-option"}
                             aria-pressed={selected}
-                            onClick={() => toggleOption(option)}
+                            onClick={() => toggleOption(option, parameter)}
                           >
                             {selected && <Icon name="check" />}
                             <span>{option.label}</span>
