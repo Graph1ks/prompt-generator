@@ -193,6 +193,14 @@ Proceed in this order:
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
 
+## Finish review + Genre picker focus
+
+- Finish no longer ends in a no-op `Done` button that requests the already-active Finish chapter.
+- The final stage action is now an explicit `Review prompt` path: it focuses the Live Prompt on desktop and opens the mobile Live Prompt surface on narrow screens.
+- Review selects Style by default, but falls back to Exclude when no Style output exists and Exclude does.
+- Genre role pickers now locate their picker surface on open; desktop/fine-pointer sessions also focus/select the search input immediately for keyboard typing.
+- Genre picker focus is intentionally not forced on touch/mobile so opening a role does not unexpectedly summon the software keyboard.
+
 ## Facet jump scroll position
 
 - The chapter-local facet rail now acts as a lightweight scrollspy: the facet currently passing the editing viewport's sticky-navigation threshold is highlighted and exposed with `aria-current="location"`.
