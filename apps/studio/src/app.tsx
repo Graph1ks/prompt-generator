@@ -22,6 +22,7 @@ import {
   type ProjectSummary,
 } from "@vgine/project-storage";
 
+import { CopyFallback } from "./copy-fallback.js";
 import { ExcludePicker } from "./exclude-picker.js";
 import { FacetEditor } from "./facet-editor.js";
 import { GenrePicker } from "./genre-picker.js";
@@ -67,22 +68,40 @@ function isStudioEditorMode(value: unknown): value is StudioEditorMode {
   return value === "easy" || value === "advanced";
 }
 
-async function copyText(text: string): Promise<void> {
+async function copyText(text: string): Promise<"copied" | "manual"> {
   if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
-    return;
+    try {
+      await navigator.clipboard.writeText(text);
+      return "copied";
+    } catch {
+      // Continue to the legacy fallback when clipboard permission/API fails.
+    }
   }
 
   const textarea = document.createElement("textarea");
   textarea.value = text;
   textarea.setAttribute("readonly", "");
   textarea.style.position = "fixed";
+  textarea.style.insetInlineStart = "-9999px";
   textarea.style.opacity = "0";
   document.body.append(textarea);
-  textarea.select();
-  const copied = document.execCommand("copy");
-  textarea.remove();
-  if (!copied) throw new Error("Clipboard copy failed");
+
+  try {
+    textarea.focus();
+    textarea.select();
+    if (
+      typeof document.execCommand === "function" &&
+      document.execCommand("copy")
+    ) {
+      return "copied";
+    }
+  } catch {
+    // The final manual surface below is the guaranteed user-visible fallback.
+  } finally {
+    textarea.remove();
+  }
+
+  return "manual";
 }
 
 function coverLines(label: string): readonly [string, string] {
@@ -140,7 +159,8 @@ export function App() {
     useState<GenreInfluenceRole>("foundation");
   const [spec, setSpec] = useState<MusicSpec>(() => createMusicSpec());
   const [runtime, setRuntime] = useState<RuntimeState>({ status: "loading" });
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const [copyState, setCopyState] = useState<"idle" | "copied">("idle");
+  const [copyFallbackText, setCopyFallbackText] = useState<string | null>(null);
   const [outputTab, setOutputTab] = useState<OutputTab>("style");
   const [assistOn, setAssistOn] = useState(true);
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
@@ -462,6 +482,10 @@ export function App() {
       : countCharacters(manualStyleText);
   const manualBudgetValid = budgetUsed <= budgetMax;
   const budgetPercent = Math.min(100, Math.max(0, (budgetUsed / budgetMax) * 100));
+  const activeCopyText =
+    outputTab === "exclude" ? compilation?.excludeText ?? "" : effectiveStyleText;
+  const canCopyActiveOutput =
+    activeCopyText.length > 0 && (outputTab !== "style" || manualBudgetValid);
   const hasGenre = spec.genre_influences.length > 0;
 
   function setAllEditorMode(next: StudioEditorMode) {
@@ -758,18 +782,17 @@ export function App() {
   }
 
   async function copyPrompt() {
-    const value =
-      outputTab === "exclude" ? compilation?.excludeText : effectiveStyleText;
-    if (!value) return;
-    if (outputTab === "style" && !manualBudgetValid) return;
-    try {
-      await copyText(value);
+    if (!canCopyActiveOutput) return;
+
+    const result = await copyText(activeCopyText);
+    if (result === "copied") {
       setCopyState("copied");
       window.setTimeout(() => setCopyState("idle"), 1200);
-    } catch {
-      setCopyState("error");
-      window.setTimeout(() => setCopyState("idle"), 1600);
+      return;
     }
+
+    setCopyState("idle");
+    setCopyFallbackText(activeCopyText);
   }
 
   useEffect(() => {
@@ -784,11 +807,7 @@ export function App() {
         return;
       }
 
-      const copyable =
-        outputTab === "exclude"
-          ? Boolean(compilation?.excludeText)
-          : Boolean(effectiveStyleText) && manualBudgetValid;
-      if (!copyable) return;
+      if (!canCopyActiveOutput) return;
 
       event.preventDefault();
       void copyPrompt();
@@ -797,9 +816,8 @@ export function App() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [
-    compilation?.excludeText,
-    effectiveStyleText,
-    manualBudgetValid,
+    activeCopyText,
+    canCopyActiveOutput,
     outputTab,
     projectLibraryOpen,
   ]);
@@ -935,7 +953,7 @@ export function App() {
           <button
             type="button"
             className="btn primary"
-            disabled={!effectiveStyleText || !manualBudgetValid}
+            disabled={!canCopyActiveOutput}
             aria-keyshortcuts="Control+Enter Meta+Enter"
             onClick={copyPrompt}
           >
@@ -1307,11 +1325,7 @@ export function App() {
               <button
                 type="button"
                 className="btn acid"
-                disabled={
-                  outputTab === "style"
-                    ? !effectiveStyleText || !manualBudgetValid
-                    : !compilation?.excludeText
-                }
+                disabled={!canCopyActiveOutput}
                 aria-keyshortcuts="Control+Enter Meta+Enter"
                 onClick={copyPrompt}
               >
@@ -1337,6 +1351,11 @@ export function App() {
           <span>Runtime Pack · MusicSpec v1 · Compiler v1</span>
         </footer>
       </div>
+
+      <CopyFallback
+        text={copyFallbackText}
+        onClose={() => setCopyFallbackText(null)}
+      />
 
       <ProjectLibrary
         open={projectLibraryOpen}
@@ -1388,7 +1407,7 @@ export function App() {
         <button
           type="button"
           className="btn acid"
-          disabled={!effectiveStyleText || !manualBudgetValid}
+          disabled={!canCopyActiveOutput}
           onClick={copyPrompt}
         >
           <Icon name="copy" />
