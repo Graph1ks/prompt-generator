@@ -268,6 +268,12 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Locale resolution is UI-locale -> English fallback; renderer language remains independent.
 - Favorite hold durations remain 0.8 s add / 1.0 s remove internally, but duration instructions are intentionally hidden from normal UI/hover copy.
 
+## Facet rail scrollspy carry-forward
+
+- The direct facet rail highlights the currently reached authoring region using `aria-current="location"` plus a restrained visual state.
+- The scrollspy is derived entirely from explicit `data-facet` targets and chapter order; it does not persist navigation state or parse labels.
+- Tracking is requestAnimationFrame-throttled and suspended while mobile Live Prompt hides the editor.
+
 ## Facet jump rail carry-forward
 
 - Each chapter exposes direct buttons for its actual facets, with live active-item counts; Finish adds Exclude as the separate output-authoring target.
