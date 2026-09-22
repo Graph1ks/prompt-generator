@@ -7,6 +7,7 @@ import {
   PROJECT_DOCUMENT_SCHEMA,
   ProjectStorageError,
   createMemoryProjectStorage,
+  createMemoryUserDataStorage,
   createProjectDocument,
   parseProjectDocument,
 } from "../dist/index.js";
@@ -91,4 +92,25 @@ test("memory adapter implements load/save/list/delete contract", async () => {
 
   await storage.delete("older");
   assert.equal(await storage.load("older"), null);
+});
+
+
+test("memory user-data adapter stores local preferences by key", async () => {
+  const storage = createMemoryUserDataStorage({
+    "preference:theme": "paradise",
+  });
+
+  assert.equal(await storage.get("preference:theme"), "paradise");
+  await storage.set("preference:theme", "ash");
+  assert.equal(await storage.get("preference:theme"), "ash");
+
+  await storage.set("advanced-presets:groove", [
+    { id: "preset:1", text: "late snare pocket" },
+  ]);
+  assert.deepEqual(await storage.get("advanced-presets:groove"), [
+    { id: "preset:1", text: "late snare pocket" },
+  ]);
+
+  await storage.delete("preference:theme");
+  assert.equal(await storage.get("preference:theme"), null);
 });
