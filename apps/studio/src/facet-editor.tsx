@@ -496,6 +496,11 @@ export function FacetEditor({
                               .filter(Boolean)
                               .join(" ")}
                             aria-pressed={selected}
+                            title={
+                              option.recommended
+                                ? t("facetEditor.recommended")
+                                : undefined
+                            }
                             onClick={() => toggleOption(option, parameter)}
                           >
                             {selected && <Icon name="check" />}
