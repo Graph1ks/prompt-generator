@@ -17,6 +17,11 @@ export function CopyFallback({ text, onClose }: CopyFallbackProps) {
   const { t } = useI18n();
   const dialogRef = useRef<HTMLElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (text === null) return;
@@ -36,7 +41,7 @@ export function CopyFallback({ text, onClose }: CopyFallbackProps) {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         event.preventDefault();
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -66,7 +71,7 @@ export function CopyFallback({ text, onClose }: CopyFallbackProps) {
       document.removeEventListener("keydown", onKeyDown);
       previousFocus?.focus();
     };
-  }, [onClose, text]);
+  }, [text]);
 
   if (text === null) return null;
 
