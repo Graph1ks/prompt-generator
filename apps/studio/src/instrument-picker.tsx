@@ -12,7 +12,6 @@ import {
   type MusicSpec,
 } from "@vgine/music-spec";
 import type {
-  RuntimeInstrument,
   RuntimeInstrumentExpression,
   RuntimeInstrumentLibrary,
 } from "@vgine/runtime-data";
