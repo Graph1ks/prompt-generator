@@ -90,6 +90,7 @@ export interface KnowledgeTermProps {
   readonly loadKnowledge: () => Promise<RuntimeKnowledgePayload>;
   readonly contextType?: string;
   readonly contextKey?: string;
+  readonly onActivate?: () => void;
   readonly children?: ReactNode;
 }
 
@@ -124,6 +125,7 @@ export function KnowledgeTerm({
   loadKnowledge,
   contextType,
   contextKey,
+  onActivate,
   children,
 }: KnowledgeTermProps) {
   const { locale, t } = useI18n();
@@ -370,7 +372,9 @@ export function KnowledgeTerm({
         data-pinned={pinned || undefined}
         data-context-type={contextType}
         data-context-key={contextKey}
-        onPointerDown={(event) => event.stopPropagation()}
+        onPointerDown={(event) => {
+          if (!onActivate) event.stopPropagation();
+        }}
         onPointerEnter={(event) => {
           if (event.pointerType !== "touch") {
             openTransient(HOVER_OPEN_DELAY_MS);
@@ -381,18 +385,30 @@ export function KnowledgeTerm({
             closeTransient(HOVER_CLOSE_DELAY_MS);
           }
         }}
-        onFocus={() => openTransient()}
+        onFocus={() => {
+          if (!onActivate) openTransient();
+        }}
         onBlur={() => closeTransient(HOVER_CLOSE_DELAY_MS)}
         onClick={(event) => {
           event.preventDefault();
           event.stopPropagation();
+          if (onActivate) {
+            setActiveKnowledge(null);
+            onActivate();
+            return;
+          }
           togglePinned();
         }}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
             event.stopPropagation();
-            togglePinned();
+            if (onActivate) {
+              setActiveKnowledge(null);
+              onActivate();
+            } else {
+              togglePinned();
+            }
           } else if (event.key === "Escape") {
             event.preventDefault();
             setActiveKnowledge(null);
@@ -401,6 +417,24 @@ export function KnowledgeTerm({
       >
         {children ?? label}
       </span>
+
+      {onActivate && (
+        <button
+          type="button"
+          className="knowledge-mobile-trigger"
+          aria-label={t("knowledge.toggle", { label })}
+          title={t("knowledge.toggle", { label })}
+          aria-expanded={pinned}
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            togglePinned();
+          }}
+        >
+          <Icon name="info" />
+        </button>
+      )}
 
       {open &&
         createPortal(
