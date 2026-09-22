@@ -151,3 +151,14 @@ Proceed in this order:
 - Expanded Genre lists use viewport/segment-scoped return-to-start visibility rather than an always-present sticky control.
 - Hover contrast is explicitly defined across the current Studio button families.
 - Motion remains intentionally restrained until interaction/functionality coverage is further along.
+
+## Production Instruments slice
+
+- Palette now lazy-loads validated `instruments.json` + `instrument-expressions.json` only when needed.
+- All 6,035 source-backed Instrument expressions remain first-class selectable options.
+- Search reuses the accepted shared Search v1 index; no second search dependency/index is introduced.
+- Canonical instrument families filter the expression pool where identity links exist.
+- Selected expressions persist stable expression IDs plus original `output_text` in the MusicSpec `instruments` facet.
+- Selection immediately renders through the pure compiler into the English `[Instruments: ...]` section.
+- Instrument favorites reuse the same persistent hold/usage contract as Genres.
+- Show All auto-loads DOM chunks on scroll instead of requiring repeated paging or mounting 6,035 result cards at once.

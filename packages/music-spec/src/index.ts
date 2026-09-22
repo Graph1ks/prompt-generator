@@ -394,3 +394,76 @@ export function resetMusicSpecFacets(
     exclude: options.clearExclude ? [] : spec.exclude,
   };
 }
+
+
+export function setFacetSelection(
+  spec: MusicSpec,
+  facetKey: FacetKey,
+  selection: Selection,
+): MusicSpec {
+  const current = spec.facets[facetKey] ?? {
+    locked: false,
+    selections: [],
+    custom_text: null,
+  };
+  const nextSelections = selection.id
+    ? [
+        ...current.selections.filter((entry) => entry.id !== selection.id),
+        selection,
+      ]
+    : [
+        ...current.selections.filter(
+          (entry) =>
+            !(
+              entry.id == null &&
+              entry.kind === selection.kind &&
+              entry.value === selection.value
+            ),
+        ),
+        selection,
+      ];
+
+  return {
+    ...spec,
+    facets: {
+      ...spec.facets,
+      [facetKey]: {
+        ...current,
+        selections: nextSelections,
+      },
+    },
+  };
+}
+
+export function removeFacetSelection(
+  spec: MusicSpec,
+  facetKey: FacetKey,
+  selectionId: string,
+): MusicSpec {
+  const current = spec.facets[facetKey];
+  if (!current) return spec;
+  return {
+    ...spec,
+    facets: {
+      ...spec.facets,
+      [facetKey]: {
+        ...current,
+        selections: current.selections.filter(
+          (entry) => entry.id !== selectionId,
+        ),
+      },
+    },
+  };
+}
+
+export function hasFacetSelection(
+  spec: MusicSpec,
+  facetKey: FacetKey,
+  selectionId: string,
+): boolean {
+  return (
+    spec.facets[facetKey]?.selections.some(
+      (entry) => entry.id === selectionId,
+    ) ?? false
+  );
+}

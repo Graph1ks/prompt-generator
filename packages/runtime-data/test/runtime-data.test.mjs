@@ -5,6 +5,7 @@ import {
   RuntimeDataError,
   buildCompilerKnowledge,
   loadRuntimeBootstrap,
+  loadRuntimeInstrumentLibrary,
   parseRuntimeManifest,
 } from "../dist/index.js";
 
@@ -20,11 +21,11 @@ function manifest() {
     files: {
       "core.json": { sha256: hash, bytes: 1, counts: { major_genres: 1, sections: 1, renderer_profiles: 1 } },
       "genres.json": { sha256: hash, bytes: 1, counts: { genres: 1 } },
-      "instruments.json": { sha256: hash, bytes: 1, counts: { families: 0, instruments: 0 } },
-      "instrument-expressions.json": { sha256: hash, bytes: 1, counts: { expressions: 0 } },
+      "instruments.json": { sha256: hash, bytes: 1, counts: { families: 1, instruments: 1 } },
+      "instrument-expressions.json": { sha256: hash, bytes: 1, counts: { expressions: 1 } },
       "editor.json": { sha256: hash, bytes: 1, counts: { parameters: 0, parameter_options: 0, statements: 0, exclude: 0 } },
       "knowledge.json": { sha256: hash, bytes: 1, counts: { entries: 0 } },
-      "search.json": { sha256: hash, bytes: 1, counts: { documents: 1 } },
+      "search.json": { sha256: hash, bytes: 1, counts: { documents: 2 } },
     },
   };
 }
@@ -83,10 +84,65 @@ function payloads() {
         },
       ],
     },
+    "instruments.json": {
+      schema: "vgine-runtime-instruments-v1",
+      families: [
+        {
+          id: "instrument-family:keys",
+          label: "Keys",
+          knowledge_entry_id: null,
+        },
+      ],
+      instruments: [
+        {
+          id: "instrument:rhodes",
+          label: "Rhodes electric piano",
+          normalized: "rhodes electric piano",
+          family_id: "instrument-family:keys",
+          knowledge_entry_id: null,
+          aliases: ["Rhodes"],
+          traits: [],
+        },
+      ],
+    },
+    "instrument-expressions.json": {
+      schema: "vgine-runtime-instrument-expressions-v1",
+      expressions: [
+        {
+          id: "instrument-expression:warm-rhodes",
+          label: "warm Rhodes electric piano",
+          normalized: "warm rhodes electric piano",
+          output_text: "warm Rhodes electric piano",
+          source_kind: "factory",
+          status: "approved",
+          selectable: true,
+          base_instrument_id: "instrument:rhodes",
+          occurrence_count: 12,
+          track_count: 9,
+          decomposition_state: "identity",
+          semantic_coverage: 1,
+          residual_terms: [],
+          instruments: [
+            {
+              instrument_id: "instrument:rhodes",
+              role: "identity",
+              ordinal: 0,
+            },
+          ],
+          concepts: [],
+        },
+      ],
+    },
     "search.json": {
       schema: "vgine-runtime-search-documents-v1",
       documents: [
         { id: "genre:boom-bap", kind: "genre", label: "Boom Bap", terms: ["Hip-Hop"] },
+        {
+          id: "instrument-expression:warm-rhodes",
+          kind: "instrument_expression",
+          label: "warm Rhodes electric piano",
+          terms: ["Rhodes", "Keys"],
+        },
       ],
     },
   };
@@ -106,7 +162,7 @@ test("loads bootstrap payloads and builds compiler knowledge", async () => {
   const bootstrap = await loadRuntimeBootstrap(reader(data));
   const compilerKnowledge = buildCompilerKnowledge(bootstrap);
 
-  assert.equal(bootstrap.search.documents.length, 1);
+  assert.equal(bootstrap.search.documents.length, 2);
   assert.equal(compilerKnowledge.runtimeBuildId, "b".repeat(64));
   assert.equal(compilerKnowledge.genreLabels["major:hip-hop"], "Hip-Hop");
   assert.equal(compilerKnowledge.genreLabels["genre:boom-bap"], "Boom Bap");
@@ -157,4 +213,22 @@ test("rejects renderer sections outside MusicSpec v1", async () => {
     () => buildCompilerKnowledge(bootstrap),
     (error) => error instanceof RuntimeDataError && error.code === "unsupported_renderer_section",
   );
+});
+
+
+test("lazy-loads and validates the Instrument Library", async () => {
+  const data = payloads();
+  const bootstrap = await loadRuntimeBootstrap(reader(data));
+  const library = await loadRuntimeInstrumentLibrary(
+    reader(data),
+    bootstrap.manifest,
+  );
+
+  assert.equal(library.instruments.families[0].label, "Keys");
+  assert.equal(library.instruments.instruments[0].id, "instrument:rhodes");
+  assert.equal(
+    library.expressions.expressions[0].output_text,
+    "warm Rhodes electric piano",
+  );
+  assert.equal(library.expressions.expressions[0].semantic_coverage, 1);
 });

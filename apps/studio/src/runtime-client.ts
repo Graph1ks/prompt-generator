@@ -1,7 +1,9 @@
 import {
   buildCompilerKnowledge,
   loadRuntimeBootstrap,
+  loadRuntimeInstrumentLibrary,
   type RuntimeBootstrap,
+  type RuntimeInstrumentLibrary,
   type RuntimeCompilerKnowledge,
   type RuntimePackReader,
 } from "@vgine/runtime-data";
@@ -11,6 +13,7 @@ export interface StudioRuntime {
   readonly bootstrap: RuntimeBootstrap;
   readonly compilerKnowledge: RuntimeCompilerKnowledge;
   readonly searchIndex: SearchIndex;
+  readonly loadInstrumentLibrary: () => Promise<RuntimeInstrumentLibrary>;
 }
 
 function createBrowserReader(): RuntimePackReader {
@@ -41,10 +44,21 @@ async function sha256Hex(text: string): Promise<string> {
 export async function loadStudioRuntime(): Promise<StudioRuntime> {
   const hashOptions =
     globalThis.crypto?.subtle === undefined ? {} : { sha256Hex };
-  const bootstrap = await loadRuntimeBootstrap(createBrowserReader(), hashOptions);
+  const reader = createBrowserReader();
+  const bootstrap = await loadRuntimeBootstrap(reader, hashOptions);
+  let instrumentLibraryPromise: Promise<RuntimeInstrumentLibrary> | null = null;
+
   return {
     bootstrap,
     compilerKnowledge: buildCompilerKnowledge(bootstrap),
     searchIndex: createSearchIndex(bootstrap.search.documents),
+    loadInstrumentLibrary() {
+      instrumentLibraryPromise ??= loadRuntimeInstrumentLibrary(
+        reader,
+        bootstrap.manifest,
+        hashOptions,
+      );
+      return instrumentLibraryPromise;
+    },
   };
 }

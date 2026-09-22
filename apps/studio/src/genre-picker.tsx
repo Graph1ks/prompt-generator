@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import {
   removeGenreInfluence,
   resetMusicSpecFacets,
@@ -17,6 +17,7 @@ import { HoldFavoriteOption } from "./hold-favorite-option.js";
 import { Icon } from "./icons.js";
 import { useI18n } from "./i18n.js";
 import { usePoolPreferences } from "./pool-preferences.js";
+import { useExpandedPoolSegment } from "./use-expanded-pool-segment.js";
 
 const COMPACT_RESULT_COUNT = 12;
 
@@ -95,9 +96,12 @@ export function GenrePicker({
   const deferredQuery = useDeferredValue(query);
   const [majorId, setMajorId] = useState<string | null>(null);
   const [showAllResults, setShowAllResults] = useState(false);
-  const [showBackToTop, setShowBackToTop] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const pickerRef = useRef<HTMLElement | null>(null);
+  const {
+    segmentRef: pickerRef,
+    showReturnToStart: showBackToTop,
+    scrollToStart: scrollToPickerStart,
+  } = useExpandedPoolSegment(showAllResults);
   const genrePreferences = usePoolPreferences("genres");
 
   const orderedMajors = useMemo(
@@ -222,43 +226,8 @@ export function GenrePicker({
 
   useEffect(() => {
     setShowAllResults(false);
-    setShowBackToTop(false);
   }, [query, majorId]);
 
-  useEffect(() => {
-    if (!showAllResults) {
-      setShowBackToTop(false);
-      return;
-    }
-
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      const element = pickerRef.current;
-      if (!element) {
-        setShowBackToTop(false);
-        return;
-      }
-      const rect = element.getBoundingClientRect();
-      const stickyHeaderAllowance = 92;
-      const hasScrolledIntoSegment = rect.top < stickyHeaderAllowance - 120;
-      const hasNotPassedSegment = rect.bottom > stickyHeaderAllowance + 80;
-      setShowBackToTop(hasScrolledIntoSegment && hasNotPassedSegment);
-    };
-    const schedule = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(update);
-    };
-
-    update();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-      if (frame) window.cancelAnimationFrame(frame);
-    };
-  }, [showAllResults]);
 
   function roleLabel(role: GenreInfluenceRole): string {
     return t(
@@ -286,7 +255,6 @@ export function GenrePicker({
     onRoleChange(role);
     setPickerOpen(true);
     setShowAllResults(false);
-    setShowBackToTop(false);
   }
 
   function selectGenre(option: GenreOption) {
@@ -294,7 +262,6 @@ export function GenrePicker({
     onSpecChange(setGenreInfluence(spec, activeRole, option.id));
     setPickerOpen(false);
     setShowAllResults(false);
-    setShowBackToTop(false);
     setQuery("");
     setMajorId(null);
   }
@@ -308,7 +275,6 @@ export function GenrePicker({
     onRoleChange("foundation");
     setPickerOpen(false);
     setShowAllResults(false);
-    setShowBackToTop(false);
     setQuery("");
     setMajorId(null);
   }
@@ -320,13 +286,6 @@ export function GenrePicker({
       .filter((value): value is string => Boolean(value))
       .slice(0, 2)
       .join(" / ");
-  }
-
-  function scrollToPickerStart() {
-    pickerRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
   }
 
   return (
@@ -431,8 +390,7 @@ export function GenrePicker({
               onClick={() => {
                 setPickerOpen(false);
                 setShowAllResults(false);
-                setShowBackToTop(false);
-              }}
+                          }}
             >
               <Icon name="close" />
             </button>
@@ -564,8 +522,7 @@ export function GenrePicker({
               className="text-btn"
               onClick={() => {
                 setShowAllResults(false);
-                setShowBackToTop(false);
-                scrollToPickerStart();
+                            scrollToPickerStart();
               }}
             >
               {t("genre.compact")}

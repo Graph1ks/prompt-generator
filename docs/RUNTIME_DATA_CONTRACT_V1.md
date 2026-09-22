@@ -241,3 +241,16 @@ Runtime code must not depend on the physical SQLite schema once the pack has bee
 A compatible additive payload extension may remain Runtime Pack v1 when old consumers can safely ignore it.
 
 A breaking semantic/shape change creates Runtime Pack v2 with explicit loader/compiler compatibility handling. Do not silently reinterpret an old pack under new semantics.
+
+## Lazy Instrument Library consumption
+
+The Studio bootstrap intentionally loads only manifest/core/genres/search data required for first paint and Genre editing.
+
+Palette/Instruments lazy-loads and validates:
+
+- `instruments.json` — canonical families, instruments, aliases/traits;
+- `instrument-expressions.json` — all selectable source-backed expression records, original `output_text`, identity/concept links, evidence counts and decomposition metadata.
+
+The lazy load uses the same Runtime Pack manifest hashes/counts as bootstrap payloads and is cached per Studio runtime instance. Search does not build a second index; the already-loaded Search v1 documents resolve matching expression IDs into the lazy expression repository.
+
+A selected expression stores its stable expression ID plus preserved `output_text` in the MusicSpec `instruments` facet. Runtime identity links enrich browsing/filtering; they do not replace the source expression or rewrite its output wording.
