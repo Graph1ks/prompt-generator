@@ -490,15 +490,12 @@ export function I18nProvider({ children }: { readonly children: ReactNode }) {
       .get<unknown>(LOCALE_PREFERENCE_KEY)
       .then(async (stored) => {
         if (!live) return;
-        const next = isLocale(
-          typeof stored === "string" ? stored : undefined,
-        )
-          ? stored
-          : isLocale(legacy)
-            ? legacy
-            : browserLocale();
+        const storedLocale =
+          typeof stored === "string" && isLocale(stored) ? stored : null;
+        const next: AppLocale =
+          storedLocale ?? (isLocale(legacy) ? legacy : browserLocale());
         setLocaleState(next);
-        if (!isLocale(typeof stored === "string" ? stored : undefined)) {
+        if (storedLocale === null) {
           await userDataStorage.set(LOCALE_PREFERENCE_KEY, next);
         }
         try {
