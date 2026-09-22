@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import {
   removeGenreInfluence,
   resetMusicSpecFacets,
@@ -20,6 +20,7 @@ import { KnowledgeTerm } from "./knowledge-term.js";
 import { useI18n } from "./i18n.js";
 import { usePoolPreferences } from "./pool-preferences.js";
 import { useExpandedPoolSegment } from "./use-expanded-pool-segment.js";
+import { useSlashSearchShortcut } from "./use-slash-search-shortcut.js";
 
 const COMPACT_RESULT_COUNT = 12;
 
@@ -106,6 +107,7 @@ export function GenrePicker({
   const [majorId, setMajorId] = useState<string | null>(null);
   const [showAllResults, setShowAllResults] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const searchInputRef = useSlashSearchShortcut(pickerOpen);
   const {
     segmentRef: pickerRef,
     showReturnToStart: showBackToTop,
@@ -422,6 +424,7 @@ export function GenrePicker({
             <Icon name="search" />
             <span className="sr-only">{t("genre.searchAria")}</span>
             <input
+              ref={searchInputRef}
               type="search"
               value={query}
               autoComplete="off"
