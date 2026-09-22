@@ -467,3 +467,26 @@ export function hasFacetSelection(
     ) ?? false
   );
 }
+
+
+export function setFacetCustomText(
+  spec: MusicSpec,
+  facetKey: FacetKey,
+  customText: string | null,
+): MusicSpec {
+  const current = spec.facets[facetKey] ?? {
+    locked: false,
+    selections: [],
+    custom_text: null,
+  };
+  return {
+    ...spec,
+    facets: {
+      ...spec.facets,
+      [facetKey]: {
+        ...current,
+        custom_text: customText,
+      },
+    },
+  };
+}
