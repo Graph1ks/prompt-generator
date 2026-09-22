@@ -868,3 +868,17 @@ Project operations preserve the same local-only boundary:
 
 No server/cloud sync is introduced. Project import/export is explicit user-controlled file I/O.
 
+## ADR-048 — Explain must never steal a selectable control's primary click/tap
+
+**Status:** accepted
+
+Explain is secondary assistance. When a Knowledge-linked term is also the visible label of a selectable option, its primary activation semantics win.
+
+- Desktop mouse hover and keyboard focus preview the explanation.
+- Clicking the selectable label, or pressing Enter/Space while it has keyboard focus, activates/toggles the underlying option.
+- Non-selectable Knowledge terms may still use click-to-pin.
+- Touch has no hover, so selectable Knowledge terms expose a separate compact explanation affordance; tapping the label still selects, while tapping the explanation affordance opens the mobile explanation surface.
+- This rule applies consistently to Easy statements, Advanced values, recommended numeric values, Genre results, Instrument expressions and Exclude entries.
+
+This refines ADR-005/ADR-045: inline explanation remains available before selection, but it cannot make the actual control harder to operate.
+

@@ -128,14 +128,16 @@ Use a subtle **knowledge underline/highlight**, not an `ⓘ` icon after every wo
 Desktop:
 
 - hover after a short delay for a compact explanation;
-- keyboard focus provides the same access;
-- click pins/expands the explanation.
+- keyboard focus provides the same preview;
+- on a selectable control, click/Enter/Space must perform the control's primary action rather than stealing the gesture for Explain;
+- non-selectable knowledge terms may still use click to pin/expand.
 
 Touch/mobile:
 
-- tap the highlighted term;
-- compact content may use an anchored popover;
-- richer content uses a bottom sheet;
+- the primary label tap performs the selection/action;
+- selectable explainable labels expose a compact adjacent explanation affordance because hover does not exist;
+- tapping that explanation affordance pins the concept in the mobile bottom sheet;
+- non-selectable knowledge terms may use direct tap for explanation.
 - never require hover.
 
 ### Three explanation layers
@@ -432,8 +434,9 @@ Explain mode must teach the meaning of a musical choice where the user actually 
 
 - Product Editor parameters, Advanced values, Easy statements and Exclude choices link to explicit Product Knowledge IDs.
 - linked selectable terms expose the knowledge affordance before selection;
-- desktop uses delayed hover/focus for a compact explanation and click to pin;
-- touch/mobile uses tap to pin the same concept in a bottom-safe explanation surface;
+- desktop uses delayed hover/focus for a compact explanation; clicking a selectable term performs its actual selection/action;
+- non-selectable knowledge terms may still click-to-pin;
+- touch/mobile keeps the selectable label tap for the primary action and exposes a separate compact explanation affordance that pins the same concept in a bottom-safe surface;
 - only one explanation surface is active at a time and it renders outside picker/card overflow;
 - numeric selections such as BPM explain through their governing parameter concept;
 - Genre uses existing Genre Knowledge links;

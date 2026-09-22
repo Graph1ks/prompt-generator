@@ -289,6 +289,13 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - The final fallback is deliberate product UI, not an error state; it never injects explanation chrome into the copied text.
 - Keyboard copy is disabled while project/manual-copy overlays are active.
 
+## Explain activation + search-shortcut carry-forward
+
+- A selectable Knowledge label is still explained on desktop hover/focus, but click/Enter/Space now activates the underlying option. Explain may not consume the primary selection gesture.
+- On touch/mobile, selectable labels keep normal selection semantics and a separate compact info affordance opens the pinned explanation sheet.
+- Non-selectable Knowledge terms can still pin directly.
+- The visible `/` affordance in Genre/Instruments/Exclude search is functional: it focuses the active search field unless the user is already typing/editing or holding a modifier.
+
 ## Ordinary-facet ergonomics carry-forward
 
 - Ordinary FacetEditor cards now expose a compact current-state rail above the active Easy/Advanced controls.

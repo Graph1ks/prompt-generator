@@ -23,6 +23,7 @@ import { useI18n } from "./i18n.js";
 import { usePoolPreferences } from "./pool-preferences.js";
 import type { StudioRuntime } from "./runtime-client.js";
 import { useExpandedPoolSegment } from "./use-expanded-pool-segment.js";
+import { useSlashSearchShortcut } from "./use-slash-search-shortcut.js";
 
 const COMPACT_RESULT_COUNT = 12;
 const EXPANDED_CHUNK = 144;
@@ -64,6 +65,7 @@ export function InstrumentPicker({
   const [showAllResults, setShowAllResults] = useState(false);
   const [renderLimit, setRenderLimit] = useState(EXPANDED_CHUNK);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const searchInputRef = useSlashSearchShortcut();
   const preferences = usePoolPreferences("instrument-expressions");
   const {
     segmentRef,
@@ -341,6 +343,7 @@ export function InstrumentPicker({
         <Icon name="search" />
         <span className="sr-only">{t("instrument.searchAria")}</span>
         <input
+          ref={searchInputRef}
           type="search"
           value={query}
           autoComplete="off"
@@ -437,6 +440,7 @@ export function InstrumentPicker({
                   loadKnowledge={runtime.loadKnowledge}
                   contextType="instrument_expression"
                   contextKey={expression.id}
+                  onActivate={() => toggleExpression(expression)}
                 />
               </span>
               <small>{familyLabelsForExpression(expression)}</small>

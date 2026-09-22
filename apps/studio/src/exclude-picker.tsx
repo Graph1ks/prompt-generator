@@ -17,6 +17,7 @@ import { useI18n } from "./i18n.js";
 import { usePoolPreferences } from "./pool-preferences.js";
 import type { StudioRuntime } from "./runtime-client.js";
 import { useExpandedPoolSegment } from "./use-expanded-pool-segment.js";
+import { useSlashSearchShortcut } from "./use-slash-search-shortcut.js";
 
 const COMPACT_RESULT_COUNT = 12;
 
@@ -43,6 +44,7 @@ export function ExcludePicker({
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const [showAllResults, setShowAllResults] = useState(false);
+  const searchInputRef = useSlashSearchShortcut();
   const preferences = usePoolPreferences("exclude");
   const {
     segmentRef,
@@ -192,6 +194,7 @@ export function ExcludePicker({
         <Icon name="search" />
         <span className="sr-only">{t("exclude.searchAria")}</span>
         <input
+          ref={searchInputRef}
           type="search"
           value={query}
           autoComplete="off"
@@ -246,6 +249,7 @@ export function ExcludePicker({
                   loadKnowledge={runtime.loadKnowledge}
                   contextType="exclude"
                   contextKey={entry.id}
+                  onActivate={() => toggleEntry(entry)}
                 />
               </span>
               <small>{entry.output_text}</small>
