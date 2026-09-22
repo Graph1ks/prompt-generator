@@ -268,6 +268,13 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Locale resolution is UI-locale -> English fallback; renderer language remains independent.
 - Favorite hold durations remain 0.8 s add / 1.0 s remove internally, but duration instructions are intentionally hidden from normal UI/hover copy.
 
+## Facet jump rail carry-forward
+
+- Each chapter exposes direct buttons for its actual facets, with live active-item counts; Finish adds Exclude as the separate output-authoring target.
+- Desktop facet navigation sticks below the chapter bar; mobile uses a wrapped touch-target rail in normal flow to avoid nested scrolling.
+- Jumps reuse explicit `data-facet` IDs and the same causal locate highlight as Live Prompt source navigation.
+- Counts are derived from MusicSpec/Exclude state and are not separately persisted.
+
 ## Persistent chapter navigation carry-forward
 
 - The four chapter tabs stick below the global top bar so long editor/picker surfaces never strand navigation off-screen.
