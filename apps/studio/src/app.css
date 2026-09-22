@@ -1212,6 +1212,62 @@
     overflow-wrap: anywhere;
   }
 
+  .prompt-line-source {
+    position: relative;
+    inline-size: 100%;
+    padding-inline-end: 28px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .prompt-line-source:hover,
+  .prompt-line-source:focus-visible,
+  .exclude-source:hover,
+  .exclude-source:focus-visible {
+    background: rgb(255 255 255 / 0.055);
+  }
+
+  .prompt-line-source:focus-visible,
+  .exclude-source:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--studio-acid) 72%, white);
+    outline-offset: 2px;
+  }
+
+  .prompt-source-cue {
+    position: absolute;
+    inset-inline-end: 5px;
+    inset-block-start: 50%;
+    inline-size: 18px;
+    block-size: 18px;
+    border-radius: 5px;
+    color: #9eaa94;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    transform: translateY(-50%);
+    transition:
+      opacity var(--vg-motion-duration-fast),
+      background-color var(--vg-motion-duration-fast),
+      color var(--vg-motion-duration-fast);
+  }
+
+  .prompt-source-cue .studio-icon {
+    inline-size: 12px;
+    block-size: 12px;
+  }
+
+  .prompt-line-source:hover .prompt-source-cue,
+  .prompt-line-source:focus-visible .prompt-source-cue,
+  .exclude-source:hover .prompt-source-cue,
+  .exclude-source:focus-visible .prompt-source-cue {
+    color: var(--studio-acid);
+    background: rgb(255 255 255 / 0.06);
+    opacity: 1;
+  }
+
   .preview.changed .changed-line {
     animation: prompt-flash 1.3s var(--vg-motion-ease-emphasized);
   }
@@ -1258,6 +1314,37 @@
     font-size: 11px;
     line-height: 1.9;
     overflow-wrap: anywhere;
+  }
+
+  .exclude-source {
+    position: relative;
+    inline-size: 100%;
+    padding: 7px 30px 7px 7px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  [data-facet] {
+    scroll-margin-block: 108px;
+  }
+
+  [data-facet][data-source-jump="true"] {
+    animation: source-locate 1s var(--vg-motion-ease-emphasized);
+  }
+
+  @keyframes source-locate {
+    0% {
+      outline: 3px solid color-mix(in srgb, var(--studio-acid) 84%, transparent);
+      outline-offset: 8px;
+    }
+    100% {
+      outline: 3px solid transparent;
+      outline-offset: 3px;
+    }
   }
 
   .diagnostic {
@@ -1667,6 +1754,22 @@
       font-size: 12px;
       line-height: 1.9;
       margin-block-end: 9px;
+    }
+
+    .prompt-line-source,
+    .exclude-source {
+      min-block-size: 44px;
+    }
+
+    .prompt-source-cue {
+      inline-size: 28px;
+      block-size: 28px;
+      opacity: 0.72;
+    }
+
+    .prompt-source-cue .studio-icon {
+      inline-size: 14px;
+      block-size: 14px;
     }
 
     .preview .prompt-area {
