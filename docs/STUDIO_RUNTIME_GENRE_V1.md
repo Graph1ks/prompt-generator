@@ -119,19 +119,15 @@ Interaction model:
 
 1. choose active role: Foundation / Fusion / Accent;
 2. browse one of 24 Major Genres or search directly;
-3. result lists are bounded to 12 items initially;
-4. `Show more` expands in bounded 12-item batches rather than mounting all 1,564 entries;
+3. result lists are compact at 12 items initially;
+4. `Alle anzeigen` explicitly expands the complete current result set; expanded rows use browser rendering containment and provide a floating return-to-top control;
 5. stable IDs are written to MusicSpec; labels remain display data.
 
-Foundation is required. Fusion and Accent remain optional and removable.
+All genre influences are optional. A project with zero genres is valid. If genre guidance is used, Foundation remains the first role and Fusion/Accent are additive.
 
 ## 6. MusicSpec creation rule
 
-Before a Foundation genre is chosen, Studio has **no MusicSpec project yet**.
-
-The first Foundation selection creates a valid `music-spec-v1` object. Subsequent genre edits use shared domain helpers in `@vgine/music-spec`.
-
-There is no separate hidden genre/prompt state.
+Studio creates a valid empty `music-spec-v1` immediately. `genre_influences: []` is valid, so users can build the rest of the prompt without selecting a genre. Genre selections update that same MusicSpec through shared domain helpers; there is no separate hidden genre/prompt state.
 
 ## 7. Live compiler path
 
@@ -191,3 +187,28 @@ Preferred order:
 4. add project persistence behind the documented `ProjectStorage` boundary;
 5. expand shared MusicSpec controls into the remaining facets;
 6. introduce Radix/Motion-for-React only where concrete interaction behavior justifies the dependency.
+
+
+## 11. Pool preferences
+
+Genre results are the first consumer of the reusable large-pool preference contract:
+
+- mouse/touch long-press 1.5 s -> favorite;
+- favorite long-press 2 s -> unfavorite;
+- visual hold progress prevents ambiguous gesture state;
+- favorite entries rank first, ordered by usage count and then recency;
+- selecting an entry records usage;
+- selection closes the picker and resets it to compact mode;
+- browser preference storage is independent from MusicSpec and therefore survives new-prompt/page resets.
+
+## 12. Genre-free navigation and resets
+
+Sound DNA may remain completely empty. The first attempt to continue forward without any genre changes the forward control into a warning/confirmation. A second activation proceeds, and that acknowledgement is remembered for that prompt only.
+
+Each Studio chapter exposes a scoped reset. A separate new-prompt reset returns the entire MusicSpec and prompt-scoped UI state to a clean start.
+
+## 13. Manual Style output override
+
+The Live Prompt can be unlocked. While unlocked the user can edit or delete the final Style text directly. This is output-layer state only; MusicSpec and the deterministic compiler result remain intact underneath it.
+
+`Original wiederherstellen` discards the manual override and restores the current compiler output. Manual text is counted against the same 1,000-character renderer ceiling.
