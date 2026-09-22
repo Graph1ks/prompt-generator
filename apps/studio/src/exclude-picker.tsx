@@ -167,26 +167,53 @@ export function ExcludePicker({
       </div>
 
       {spec.exclude.length > 0 && (
-        <div className="instrument-selected-list">
-          {spec.exclude.map((item, index) => {
-            const runtimeEntry = item.id ? excludeById.get(item.id) : undefined;
-            const label = runtimeEntry?.label ?? item.text;
-            return (
-              <button
-                key={item.id ?? item.text + index}
-                type="button"
-                className="instrument-selected-chip exclude-selected-chip"
-                title={t("exclude.remove", { label })}
-                onClick={() => {
-                  if (!item.id) return;
-                  onSpecChange(removeExcludeItem(spec, item.id));
-                }}
-              >
-                <span>{label}</span>
-                {item.id && <Icon name="close" />}
-              </button>
-            );
-          })}
+        <div className="selected-pool">
+          <div className="selected-pool-head">
+            <div>
+              <strong>{t("exclude.current")}</strong>
+              <small>
+                {t("exclude.selected", {
+                  count: spec.exclude.length.toLocaleString(locale),
+                })}
+              </small>
+            </div>
+            <button
+              type="button"
+              className="text-btn selected-pool-clear"
+              onClick={() => onSpecChange({ ...spec, exclude: [] })}
+            >
+              {t("exclude.clearAll")}
+            </button>
+          </div>
+          <div className="instrument-selected-list">
+            {spec.exclude.map((item, index) => {
+              const runtimeEntry = item.id ? excludeById.get(item.id) : undefined;
+              const label = runtimeEntry?.label ?? item.text;
+              return (
+                <button
+                  key={item.id ?? item.text + index}
+                  type="button"
+                  className="instrument-selected-chip exclude-selected-chip"
+                  title={t("exclude.remove", { label })}
+                  onClick={() => {
+                    if (item.id) {
+                      onSpecChange(removeExcludeItem(spec, item.id));
+                      return;
+                    }
+                    onSpecChange({
+                      ...spec,
+                      exclude: spec.exclude.filter(
+                        (_, itemIndex) => itemIndex !== index,
+                      ),
+                    });
+                  }}
+                >
+                  <span>{label}</span>
+                  <Icon name="close" />
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 
