@@ -23,9 +23,16 @@ import { InstrumentPicker } from "./instrument-picker.js";
 import { Icon } from "./icons.js";
 import { SUPPORTED_LOCALES, useI18n, type MessageKey } from "./i18n.js";
 import { loadStudioRuntime, type StudioRuntime } from "./runtime-client.js";
-import { STUDIO_CHAPTERS } from "./studio-config.js";
+import {
+  STUDIO_CHAPTERS,
+  type StudioEditorMode,
+} from "./studio-config.js";
+import { userDataStorage } from "./user-data-storage.js";
 
-const THEME_KEY = "vgine.theme";
+const LEGACY_THEME_KEY = "vgine.theme";
+const THEME_PREFERENCE_KEY = "preference:theme";
+const EDITOR_MODE_PREFERENCE_KEY = "preference:editor-mode";
+const FACET_MODE_PREFERENCE_KEY = "preference:facet-modes";
 const projectStorage = createIndexedDbProjectStorage();
 const PROJECT_AUTOSAVE_DELAY_MS = 320;
 
@@ -44,8 +51,12 @@ type ProjectSaveState =
   | "unavailable";
 
 function initialTheme(): VgineTheme {
-  const stored = globalThis.localStorage?.getItem(THEME_KEY);
-  return stored && isVgineTheme(stored) ? stored : "paradise";
+  const legacy = globalThis.localStorage?.getItem(LEGACY_THEME_KEY);
+  return legacy && isVgineTheme(legacy) ? legacy : "paradise";
+}
+
+function isStudioEditorMode(value: unknown): value is StudioEditorMode {
+  return value === "easy" || value === "advanced";
 }
 
 async function copyText(text: string): Promise<void> {
@@ -82,6 +93,12 @@ function isChapterId(
 export function App() {
   const { locale, setLocale, t } = useI18n();
   const [theme, setTheme] = useState<VgineTheme>(initialTheme);
+  const [themeReady, setThemeReady] = useState(false);
+  const [globalEditorMode, setGlobalEditorModeState] =
+    useState<StudioEditorMode>("easy");
+  const [facetModes, setFacetModesState] = useState<
+    Partial<Record<FacetKey, StudioEditorMode>>
+  >({});
   const [chapterId, setChapterId] = useState(STUDIO_CHAPTERS[0].id);
   const [activeGenreRole, setActiveGenreRole] =
     useState<GenreInfluenceRole>("foundation");
@@ -111,8 +128,100 @@ export function App() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    localStorage.setItem(THEME_KEY, theme);
   }, [theme]);
+
+  useEffect(() => {
+    let live = true;
+    const legacy = globalThis.localStorage?.getItem(LEGACY_THEME_KEY);
+
+    void userDataStorage
+      .get<unknown>(THEME_PREFERENCE_KEY)
+      .then(async (stored) => {
+        if (!live) return;
+        const next =
+          typeof stored === "string" && isVgineTheme(stored)
+            ? stored
+            : legacy && isVgineTheme(legacy)
+              ? legacy
+              : "paradise";
+        setTheme(next);
+        if (!(typeof stored === "string" && isVgineTheme(stored))) {
+          await userDataStorage.set(THEME_PREFERENCE_KEY, next);
+        }
+        try {
+          globalThis.localStorage?.removeItem(LEGACY_THEME_KEY);
+        } catch {
+          // Legacy cleanup is best effort only.
+        }
+        setThemeReady(true);
+      })
+      .catch(() => {
+        setThemeReady(true);
+      });
+
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!themeReady) return;
+    void userDataStorage.set(THEME_PREFERENCE_KEY, theme).catch(() => {
+      // Theme remains usable for this session if local persistence fails.
+    });
+  }, [theme, themeReady]);
+
+  useEffect(() => {
+    let live = true;
+    void Promise.all([
+      userDataStorage.get<unknown>(EDITOR_MODE_PREFERENCE_KEY),
+      userDataStorage.get<unknown>(FACET_MODE_PREFERENCE_KEY),
+    ])
+      .then(([storedMode, storedFacetModes]) => {
+        if (!live) return;
+        if (isStudioEditorMode(storedMode)) {
+          setGlobalEditorModeState(storedMode);
+        }
+        if (
+          storedFacetModes &&
+          typeof storedFacetModes === "object" &&
+          !Array.isArray(storedFacetModes)
+        ) {
+          const next: Partial<Record<FacetKey, StudioEditorMode>> = {};
+          for (const [key, value] of Object.entries(storedFacetModes)) {
+            if (
+              isStudioEditorMode(value) &&
+              [
+                "era",
+                "bpm",
+                "key_mode",
+                "groove",
+                "melody",
+                "harmony",
+                "drums",
+                "bass",
+                "exciters",
+                "texture",
+                "vocal",
+                "dynamics",
+                "space_mix",
+                "production",
+                "structure",
+              ].includes(key)
+            ) {
+              next[key as FacetKey] = value;
+            }
+          }
+          setFacetModesState(next);
+        }
+      })
+      .catch(() => {
+        // Editor depth is a local preference enhancement.
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
 
   useEffect(() => {
     let live = true;
@@ -264,6 +373,29 @@ export function App() {
   const manualBudgetValid = budgetUsed <= budgetMax;
   const budgetPercent = Math.min(100, Math.max(0, (budgetUsed / budgetMax) * 100));
   const hasGenre = spec.genre_influences.length > 0;
+
+  function setAllEditorMode(next: StudioEditorMode) {
+    setGlobalEditorModeState(next);
+    setFacetModesState({});
+    void Promise.all([
+      userDataStorage.set(EDITOR_MODE_PREFERENCE_KEY, next),
+      userDataStorage.set(FACET_MODE_PREFERENCE_KEY, {}),
+    ]).catch(() => {
+      // The current session still follows the selected mode.
+    });
+  }
+
+  function setFacetEditorMode(facet: FacetKey, next: StudioEditorMode) {
+    setFacetModesState((current) => {
+      const updated = { ...current, [facet]: next };
+      void userDataStorage
+        .set(FACET_MODE_PREFERENCE_KEY, updated)
+        .catch(() => {
+          // Per-facet mode remains available for the current session.
+        });
+      return updated;
+    });
+  }
 
   function chooseChapter(nextId: (typeof STUDIO_CHAPTERS)[number]["id"]) {
     setChapterId(nextId);
@@ -511,6 +643,30 @@ export function App() {
                   <p>{chapterCopy.description}</p>
                 </div>
                 <div className="section-head-actions">
+                  <div
+                    className="global-editor-mode"
+                    role="group"
+                    aria-label={t("editorMode.label")}
+                  >
+                    <button
+                      type="button"
+                      className={globalEditorMode === "easy" ? "active" : ""}
+                      aria-pressed={globalEditorMode === "easy"}
+                      title={t("editorMode.easyTitle")}
+                      onClick={() => setAllEditorMode("easy")}
+                    >
+                      {t("editorMode.allEasy")}
+                    </button>
+                    <button
+                      type="button"
+                      className={globalEditorMode === "advanced" ? "active" : ""}
+                      aria-pressed={globalEditorMode === "advanced"}
+                      title={t("editorMode.advancedTitle")}
+                      onClick={() => setAllEditorMode("advanced")}
+                    >
+                      {t("editorMode.allAdvanced")}
+                    </button>
+                  </div>
                   <button
                     type="button"
                     className="section-reset"
@@ -585,6 +741,10 @@ export function App() {
                         spec={spec}
                         onSpecChange={setSpec}
                         assistOn={assistOn}
+                        mode={facetModes[facet] ?? globalEditorMode}
+                        onModeChange={(next) =>
+                          setFacetEditorMode(facet, next)
+                        }
                       />
                     ),
                   )}

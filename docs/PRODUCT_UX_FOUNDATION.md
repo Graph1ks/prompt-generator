@@ -401,3 +401,19 @@ Every ordinary MusicSpec facet exposed in the four Studio chapters must have mea
 - BPM supports direct numeric entry and a continuous 40–220 control in addition to recommended values.
 
 Explanation mode enriches controls; it is never a substitute for the controls themselves.
+
+## 24. Easy/Advanced depth and personal Advanced presets
+
+The Studio exposes one global Easy/Advanced depth control plus the existing per-facet Easy/Advanced switches.
+
+- global Easy or Advanced updates every ordinary facet view at once;
+- per-facet switches remain available as local overrides;
+- switching view mode alone never mutates MusicSpec;
+- the first Advanced mutation in a facet removes Easy statement state from that facet;
+- selecting an Easy statement replaces Advanced selections/custom text in that facet;
+- Easy statements are exclusive within a facet, preventing contradictory mixed states such as two tonal centers;
+- user-authored Advanced custom wording can be saved by the same hold-favorite interaction used by large pools;
+- saved Advanced presets are scoped per facet, usage-ranked, locally reusable and removable by hold;
+- Delete all uses a second explicit confirmation click.
+
+All user-generated/personal data remains local to the device. Projects and user preferences use IndexedDB-backed adapters; no server persistence is required.

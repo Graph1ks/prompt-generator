@@ -1,15 +1,19 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
 
+import { userDataStorage } from "./user-data-storage.js";
+
 export const SUPPORTED_LOCALES = ["de", "en"] as const;
 export type AppLocale = (typeof SUPPORTED_LOCALES)[number];
 
-const LOCALE_STORAGE_KEY = "vgine.locale";
+const LEGACY_LOCALE_STORAGE_KEY = "vgine.locale";
+const LOCALE_PREFERENCE_KEY = "preference:locale";
 
 const en = {
   "app.soundStudio": "Your personal sound studio",
@@ -148,6 +152,11 @@ const en = {
   "instrument.familyOther": "Semantic / other",
   "instrument.guideTitle": "Every Factory expression stays selectable.",
   "instrument.guideBody": "Canonical instrument identity is linked underneath where available; the original output wording is preserved.",
+  "editorMode.label": "Editor depth",
+  "editorMode.allEasy": "All Easy",
+  "editorMode.allAdvanced": "All Advanced",
+  "editorMode.easyTitle": "Set every ordinary facet to Easy",
+  "editorMode.advancedTitle": "Set every ordinary facet to Advanced",
   "facetEditor.easy": "Easy",
   "facetEditor.advanced": "Advanced",
   "facetEditor.easyHint": "Curated musical combinations from the knowledge layer.",
@@ -165,6 +174,14 @@ const en = {
   "facetEditor.clear": "Clear",
   "facetEditor.showAll": "Show all {count}",
   "facetEditor.compact": "Show compact",
+  "facetEditor.presets": "My presets",
+  "facetEditor.presetSave": "Hold to save this wording",
+  "facetEditor.presetSaved": "Saved preset",
+  "facetEditor.presetApply": "Use preset",
+  "facetEditor.presetEmpty": "No saved Advanced presets in this section yet.",
+  "facetEditor.deleteAllPresets": "Delete all",
+  "facetEditor.confirmDeleteAllPresets": "Click again to delete all",
+  "facetEditor.presetsLocal": "Stored only on this device.",
   "exclude.title": "Exclude",
   "exclude.subtitle": "Keep unwanted directions out of the result. Exclude is copied separately from Style.",
   "exclude.searchAria": "Search exclusions",
@@ -350,6 +367,11 @@ const de: Catalog = {
   "instrument.familyOther": "Semantisch / Sonstige",
   "instrument.guideTitle": "Jeder Factory-Ausdruck bleibt auswählbar.",
   "instrument.guideBody": "Wo vorhanden, ist die kanonische Instrument-Identität darunter verknüpft; die originale Output-Formulierung bleibt erhalten.",
+  "editorMode.label": "Editor-Tiefe",
+  "editorMode.allEasy": "Alles Easy",
+  "editorMode.allAdvanced": "Alles Advanced",
+  "editorMode.easyTitle": "Alle normalen Facets auf Easy stellen",
+  "editorMode.advancedTitle": "Alle normalen Facets auf Advanced stellen",
   "facetEditor.easy": "Easy",
   "facetEditor.advanced": "Advanced",
   "facetEditor.easyHint": "Kuratierte musikalische Kombinationen aus der Knowledge-Schicht.",
@@ -367,6 +389,14 @@ const de: Catalog = {
   "facetEditor.clear": "Leeren",
   "facetEditor.showAll": "Alle {count} anzeigen",
   "facetEditor.compact": "Kompakt anzeigen",
+  "facetEditor.presets": "Meine Presets",
+  "facetEditor.presetSave": "Halten, um diese Formulierung zu speichern",
+  "facetEditor.presetSaved": "Gespeichertes Preset",
+  "facetEditor.presetApply": "Preset verwenden",
+  "facetEditor.presetEmpty": "Noch keine gespeicherten Advanced-Presets in diesem Segment.",
+  "facetEditor.deleteAllPresets": "Alle löschen",
+  "facetEditor.confirmDeleteAllPresets": "Nochmal klicken: alle löschen",
+  "facetEditor.presetsLocal": "Wird nur auf diesem Gerät gespeichert.",
   "exclude.title": "Ausschließen",
   "exclude.subtitle": "Halte unerwünschte Richtungen aus dem Ergebnis. Exclude wird getrennt vom Style kopiert.",
   "exclude.searchAria": "Ausschlüsse durchsuchen",
@@ -419,7 +449,7 @@ function isLocale(value: string | null | undefined): value is AppLocale {
 }
 
 function browserLocale(): AppLocale {
-  const stored = globalThis.localStorage?.getItem(LOCALE_STORAGE_KEY);
+  const stored = globalThis.localStorage?.getItem(LEGACY_LOCALE_STORAGE_KEY);
   if (isLocale(stored)) return stored;
   const language = globalThis.navigator?.language?.toLowerCase() ?? "en";
   return language.startsWith("de") ? "de" : "en";
@@ -450,14 +480,45 @@ const I18nContext = createContext<I18nContextValue | null>(null);
 export function I18nProvider({ children }: { readonly children: ReactNode }) {
   const [locale, setLocaleState] = useState<AppLocale>(browserLocale);
 
+  useEffect(() => {
+    let live = true;
+    const legacy = globalThis.localStorage?.getItem(
+      LEGACY_LOCALE_STORAGE_KEY,
+    );
+
+    void userDataStorage
+      .get<unknown>(LOCALE_PREFERENCE_KEY)
+      .then(async (stored) => {
+        if (!live) return;
+        const storedLocale =
+          typeof stored === "string" && isLocale(stored) ? stored : null;
+        const next: AppLocale =
+          storedLocale ?? (isLocale(legacy) ? legacy : browserLocale());
+        setLocaleState(next);
+        if (storedLocale === null) {
+          await userDataStorage.set(LOCALE_PREFERENCE_KEY, next);
+        }
+        try {
+          globalThis.localStorage?.removeItem(LEGACY_LOCALE_STORAGE_KEY);
+        } catch {
+          // Legacy cleanup is best effort only.
+        }
+      })
+      .catch(() => {
+        // Browser locale remains the current-session fallback.
+      });
+
+    return () => {
+      live = false;
+    };
+  }, []);
+
   const value = useMemo<I18nContextValue>(() => {
     const setLocale = (next: AppLocale) => {
       setLocaleState(next);
-      try {
-        globalThis.localStorage?.setItem(LOCALE_STORAGE_KEY, next);
-      } catch {
-        // Locale persistence is a preference enhancement.
-      }
+      void userDataStorage.set(LOCALE_PREFERENCE_KEY, next).catch(() => {
+        // Locale remains usable for the current session.
+      });
     };
     const t: Translate = (key, values) =>
       formatMessage(CATALOGS[locale][key], values);

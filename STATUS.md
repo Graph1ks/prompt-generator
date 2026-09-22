@@ -200,3 +200,13 @@ Proceed in this order:
 - Runtime validation fails if any required facet loses parameter or Easy-statement coverage.
 - Sound DNA now renders Era + Key/Mode alongside the specialized Genre picker.
 - BPM now supports explicit 40–220 numeric selection plus recommended values while remaining unset until user action.
+
+## Editor depth + personal presets
+
+- Added global `All Easy / All Advanced` control while retaining per-facet mode switches.
+- Easy/Advanced mutations are now mutually exclusive within each ordinary facet; view switching alone does not delete state.
+- Easy statements are single active presets per facet, preventing internally contradictory Easy selections.
+- Advanced custom wording can be hold-saved as a facet-scoped personal preset, usage-ranked, reapplied, hold-removed or cleared with two-click confirmation.
+- Added generic IndexedDB user-data storage and migrated pool Favorites, Theme and locale away from active `localStorage` persistence.
+- Editor-depth preferences and Advanced presets persist locally in IndexedDB.
+- No server/cloud persistence path exists for these user data.

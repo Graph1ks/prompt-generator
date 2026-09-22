@@ -791,3 +791,21 @@ The Foundation provides deterministic Easy statements and Advanced parameters/op
 Reviewed/approved database editor records overlay matching Foundation records by stable ID. The Foundation is therefore a minimum product surface, not a higher-authority replacement for durable curation.
 
 A runtime export is invalid if Foundation v1 no longer covers every required ordinary facet with both Easy and Advanced selectable content.
+
+## ADR-041 — Easy/Advanced are mutually exclusive authoring layers per facet
+
+**Status:** accepted
+
+Easy and Advanced continue to edit the same MusicSpec, but a facet must not retain contradictory state from both authoring layers once the user mutates the new layer.
+
+Mode switching is view-only. On the first Advanced mutation, Easy `statement` selections are removed. Selecting an Easy statement replaces Advanced selections and custom text for that facet.
+
+A global editor-depth preference controls all ordinary facets at once; individual facet switches remain local overrides.
+
+## ADR-042 — Personal Studio data is local IndexedDB state
+
+**Status:** accepted
+
+Projects, pool Favorites, Advanced custom presets, Theme, locale and editor-depth preferences are device-local data. Web/PWA persistence uses IndexedDB-backed adapters. No server or cloud persistence is introduced.
+
+Legacy `localStorage` values may be read only for one-time migration and are no longer the active persistence target.
