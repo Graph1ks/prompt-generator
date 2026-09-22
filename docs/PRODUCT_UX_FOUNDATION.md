@@ -198,12 +198,11 @@ Only non-empty sections are emitted. The renderer order is versioned and configu
 
 When the user edits a facet:
 
-- the corresponding output section is visually highlighted;
-- replacement briefly highlights the outgoing value/section state;
-- insertion highlights the new content;
-- multi-section changes may highlight more than one section (for example, a tempo/groove change);
+- the currently active authoring facet highlights only its corresponding output section; unrelated prompt sections remain visually neutral;
+- replacement/insertion briefly pulse only the section(s) whose explicit MusicSpec facet state changed;
+- multi-section changes may highlight more than one section only when more than one actual facet changed;
 - copy always returns clean plain text without UI markup;
-- the Live Prompt itself should expand with content rather than introduce a nested vertical scrollbar; normal page scroll is the primary desktop scroll path;
+- the Live Prompt itself should expand with content rather than introduce a nested vertical scrollbar; normal page scroll is the primary desktop scroll path, while a bottom-aware sticky preview may follow the editor without trapping scroll;
 - manual prompt editing keeps the structured bracket/key/value visual theme even though the editable value remains plain text.
 
 Causality also works in reverse for deterministic output:
