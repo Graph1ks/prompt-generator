@@ -278,3 +278,12 @@ If a proposed implementation requires changing a Database V1 invariant, call tha
 - Genre and Instruments remain specialized Runtime pickers and are not re-curated by this phase.
 - DNA must render Genre, Era and Key/Mode together.
 - Local developers must re-run Runtime export after pulling a Foundation change because `knowledge.sqlite` may be unchanged while the Runtime editor payload has changed.
+
+## Easy/Advanced + local user data carry-forward
+
+- Global editor depth sets all ordinary facets to Easy or Advanced; facet-level switches remain overrides.
+- Do not clear MusicSpec merely because a user changes the visible mode. Clear the opposite authoring layer only when the new mode is actually mutated.
+- First Advanced mutation removes Easy statement selections. Choosing an Easy statement replaces Advanced state for that facet.
+- Advanced custom-text presets are user data, not Runtime/Knowledge data; they live in local IndexedDB and are scoped per facet.
+- Pool Favorites, Theme, locale and editor-depth preferences now use the IndexedDB user-data adapter. `localStorage` is legacy-migration input only.
+- No user preference/preset/project data is sent to a server.
