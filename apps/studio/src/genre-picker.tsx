@@ -18,6 +18,7 @@ import { HoldFavoriteOption } from "./hold-favorite-option.js";
 import { Icon } from "./icons.js";
 import { KnowledgeTerm } from "./knowledge-term.js";
 import { useI18n } from "./i18n.js";
+import { PoolQuickView, type PoolQuickViewMode } from "./pool-quick-view.js";
 import { usePoolPreferences } from "./pool-preferences.js";
 import { useExpandedPoolSegment } from "./use-expanded-pool-segment.js";
 import { useSlashSearchShortcut } from "./use-slash-search-shortcut.js";
@@ -106,6 +107,7 @@ export function GenrePicker({
   const deferredQuery = useDeferredValue(query);
   const [majorId, setMajorId] = useState<string | null>(null);
   const [showAllResults, setShowAllResults] = useState(false);
+  const [quickView, setQuickView] = useState<PoolQuickViewMode>("all");
   const [pickerOpen, setPickerOpen] = useState(false);
   const roleTriggerRefs = useRef<
     Partial<Record<GenreInfluenceRole, HTMLButtonElement | null>>
@@ -223,10 +225,6 @@ export function GenrePicker({
     searchIndex,
   ]);
 
-  const visibleOptions = showAllResults
-    ? matchingOptions
-    : matchingOptions.slice(0, COMPACT_RESULT_COUNT);
-
   const favoriteCount = useMemo(() => {
     let count = 0;
     for (const major of orderedMajors) {
@@ -238,9 +236,40 @@ export function GenrePicker({
     return count;
   }, [genrePreferences, orderedMajors, runtime.genres.genres]);
 
+  const recentCount = useMemo(() => {
+    let count = 0;
+    for (const option of optionById.values()) {
+      if (genrePreferences.lastUsedAt(option.id) > 0) count += 1;
+    }
+    return count;
+  }, [genrePreferences, optionById]);
+
+  const poolOptions = useMemo(() => {
+    if (quickView === "favorites") {
+      return matchingOptions.filter((option) =>
+        genrePreferences.isFavorite(option.id),
+      );
+    }
+    if (quickView === "recent") {
+      return matchingOptions
+        .filter((option) => genrePreferences.lastUsedAt(option.id) > 0)
+        .sort(
+          (a, b) =>
+            genrePreferences.lastUsedAt(b.id) -
+              genrePreferences.lastUsedAt(a.id) ||
+            a.label.localeCompare(b.label),
+        );
+    }
+    return matchingOptions;
+  }, [genrePreferences, matchingOptions, quickView]);
+
+  const visibleOptions = showAllResults
+    ? poolOptions
+    : poolOptions.slice(0, COMPACT_RESULT_COUNT);
+
   useEffect(() => {
     setShowAllResults(false);
-  }, [query, majorId]);
+  }, [query, majorId, quickView]);
 
   useEffect(() => {
     if (!pickerOpen) return;
@@ -523,6 +552,13 @@ export function GenrePicker({
               )}
             </label>
 
+            <PoolQuickView
+              value={quickView}
+              favoriteCount={favoriteCount}
+              recentCount={recentCount}
+              onChange={setQuickView}
+            />
+
             <div className="family-chips" aria-label="Major Genres">
               <button
                 type="button"
@@ -546,7 +582,7 @@ export function GenrePicker({
             <div className="result-meta">
               <span>
                 {t("genre.results", {
-                  count: matchingOptions.length.toLocaleString(locale),
+                  count: poolOptions.length.toLocaleString(locale),
                 })}
                 {majorId ? " · " + (majorById.get(majorId)?.label ?? "") : ""}
                 {favoriteCount > 0
@@ -614,20 +650,20 @@ export function GenrePicker({
             <p className="empty-state">{t("genre.noResults")}</p>
           )}
 
-          {matchingOptions.length > COMPACT_RESULT_COUNT && !showAllResults && (
+          {poolOptions.length > COMPACT_RESULT_COUNT && !showAllResults && (
             <button
               type="button"
               className="show-all-btn"
               onClick={() => setShowAllResults(true)}
             >
               {t("genre.showAll", {
-                count: matchingOptions.length.toLocaleString(locale),
+                count: poolOptions.length.toLocaleString(locale),
               })}
               <Icon name="arrow" />
             </button>
           )}
 
-          {showAllResults && matchingOptions.length > COMPACT_RESULT_COUNT && (
+          {showAllResults && poolOptions.length > COMPACT_RESULT_COUNT && (
             <button
               type="button"
               className="text-btn"
