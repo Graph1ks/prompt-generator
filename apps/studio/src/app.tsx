@@ -1339,6 +1339,20 @@ export function App() {
         </button>
         <button
           type="button"
+          className={
+            assistOn
+              ? "icon-btn mobile-explain-button active"
+              : "icon-btn mobile-explain-button"
+          }
+          aria-pressed={assistOn}
+          aria-label={assistOn ? t("app.explainOn") : t("app.explainOff")}
+          title={t("app.explain")}
+          onClick={() => setAssistOn((current) => !current)}
+        >
+          <Icon name="help" />
+        </button>
+        <button
+          type="button"
           className="btn acid"
           disabled={!effectiveStyleText || !manualBudgetValid}
           onClick={copyPrompt}
