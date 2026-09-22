@@ -181,3 +181,12 @@ Proceed in this order:
 - Selected Genre labels, ordinary facet section labels, Advanced parameter labels and the Instruments section can expose reviewed definitions when their Runtime records carry Knowledge IDs.
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
+
+## Project persistence v1
+
+- Added `@vgine/project-storage` with versioned `vgine-project-v1` documents and a portable `ProjectStorage` interface.
+- Web Studio uses a dependency-free IndexedDB adapter; an in-memory adapter covers the contract in Node tests.
+- The active project restores MusicSpec, explicit manual Style override, active chapter and genre-skip acknowledgement after reload.
+- Studio debounces local autosave and exposes restoring/saving/saved/error/unavailable status in the top bar.
+- MusicSpec validation is reused when loading persisted projects; unsupported/corrupt project data is not silently accepted.
+- Theme, locale and Favorites remain separate lightweight user preferences rather than project data.
