@@ -6,5 +6,8 @@
     "tsBuildInfoFile": "dist/.tsbuildinfo",
     "lib": ["ES2022", "DOM"]
   },
+  "references": [
+    { "path": "../music-spec" }
+  ],
   "include": ["src/**/*.ts"]
 }
