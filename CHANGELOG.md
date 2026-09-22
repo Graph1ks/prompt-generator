@@ -6,13 +6,16 @@ This file records meaningful product, behavior, compatibility, security, data, a
 
 ### Added
 
+- Added lazy validated `editor.json` Runtime loading plus the shared production Easy/Advanced FacetEditor for Pulse/Palette/Finish, using real statements, parameter options and per-facet custom English renderer text.
+- Added a production Runtime-backed Finish/Exclude picker that writes exclusively to `MusicSpec.exclude[]` and the separate comma-delimited Exclude output.
+
 - Added lazy validated Instrument Runtime loading and the first production Palette/Instrument picker over all 6,035 source-backed expressions, with shared search, family filters, persistent favorites, selected-state chips and direct MusicSpec/compiler wiring.
 - Added generic MusicSpec facet selection helpers and automatic DOM chunk loading for expanded high-cardinality Instrument results.
 
 - Added typed German/English Studio localization with persisted browser/user locale selection and an extension path for additional UI languages while keeping Suno renderer output English.
 - Made all 24 Major Genres permanently visible and selectable as first-class Genre influences; Major browse results now start with the pure Major Genre before its subgenres.
 
-- Added reusable large-pool favorites with browser persistence, mouse/touch long-press progress (1.5 s add, 2 s remove), usage-based favorite ordering, explicit Genre `Alle anzeigen`, expanded-list return-to-top, and automatic compact reset after selection.
+- Added reusable large-pool favorites with browser persistence, mouse/touch hold progress (0.8 s add, 1.0 s remove), usage-based favorite ordering, explicit Genre `Alle anzeigen`, expanded-list return-to-top, and automatic compact reset after selection.
 - Added scoped Studio page reset, global new-prompt reset, one-time genre-free continuation warning, and final Style prompt unlock/manual-edit/restore controls while keeping MusicSpec as semantic source truth.
 - Added a verified product-owned V'gine lexicon seed plus `docs/VGINE_LEXICON_ENTRY.md`; the historical spelling is documented as a late-medieval abbreviation of `virgine` without inventing one universal pronunciation.
 
@@ -62,6 +65,8 @@ This file records meaningful product, behavior, compatibility, security, data, a
 - Fixed the Studio white-screen regression where Vite development could load stale ignored `packages/*/dist` output and miss newly added workspace exports such as `createMusicSpec`. `pnpm dev` now rebuilds workspace packages first, and Vite dev resolves exact internal `@vgine/*` imports from source.
 
 ### Changed
+
+- Shortened Favorites to 0.8 s add / 1.0 s remove, synchronized progress with state timing, changed add progress to theme-semantic success green with an animated checkmark, and moved expanded-segment return controls to the left viewport edge.
 
 - Reworked expanded Genre-list return-to-start behavior so the floating control appears only while scrolled down inside the active expanded segment.
 - Reduced Explanation mode chrome to an icon-only accessible control and hardened hover contrast across current Studio button families.
