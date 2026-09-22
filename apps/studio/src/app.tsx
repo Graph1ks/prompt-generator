@@ -168,7 +168,7 @@ function specHistoryGroup(current: MusicSpec, next: MusicSpec): string | null {
     before.custom_text !== after.custom_text &&
     before.selections === after.selections
   ) {
-    return "facet:" + facet + ":custom";
+    return after.custom_text === null ? null : "facet:" + facet + ":custom";
   }
 
   if (before.custom_text !== after.custom_text) return null;
@@ -199,7 +199,9 @@ function specHistoryGroup(current: MusicSpec, next: MusicSpec): string | null {
   }
 
   if (changedIds.size !== 1) return null;
-  return "facet:" + facet + ":selection:" + [...changedIds][0];
+  const changedId = [...changedIds][0];
+  if (!beforeById.has(changedId) || !afterById.has(changedId)) return null;
+  return "facet:" + facet + ":selection:" + changedId;
 }
 
 function chapterActiveItemCount(
