@@ -206,6 +206,8 @@ export function App() {
   const [previewPulse, setPreviewPulse] = useState(false);
   const [sourceJumpTarget, setSourceJumpTarget] =
     useState<StudioSourceTarget | null>(null);
+  const [activeFacetTarget, setActiveFacetTarget] =
+    useState<StudioSourceTarget | null>(null);
   const [genreSkipAcknowledged, setGenreSkipAcknowledged] = useState(false);
   const [manualStyleText, setManualStyleText] = useState<string | null>(null);
   const [promptUnlocked, setPromptUnlocked] = useState(false);
@@ -652,6 +654,63 @@ export function App() {
 
     return () => window.cancelAnimationFrame(frame);
   }, [chapterId, sourceJumpTarget]);
+
+  useEffect(() => {
+    if (runtime.status !== "ready" || mobilePreviewOpen) {
+      setActiveFacetTarget(null);
+      return;
+    }
+
+    const targets: StudioSourceTarget[] = [
+      ...chapter.facets,
+      ...(chapter.id === "finish" ? (["exclude"] as const) : []),
+    ];
+    if (targets.length === 0) {
+      setActiveFacetTarget(null);
+      return;
+    }
+
+    let frame = 0;
+
+    function updateActiveFacet() {
+      frame = 0;
+      const threshold =
+        window.innerWidth <= 760
+          ? 136
+          : window.innerWidth <= 980
+            ? 206
+            : 218;
+      let next: StudioSourceTarget | null = targets[0] ?? null;
+
+      for (const targetId of targets) {
+        const element = document.querySelector<HTMLElement>(
+          '[data-facet="' + targetId + '"]',
+        );
+        if (!element) continue;
+        if (element.getBoundingClientRect().top <= threshold) {
+          next = targetId;
+          continue;
+        }
+        break;
+      }
+
+      setActiveFacetTarget((current) => (current === next ? current : next));
+    }
+
+    function scheduleUpdate() {
+      if (frame !== 0) return;
+      frame = window.requestAnimationFrame(updateActiveFacet);
+    }
+
+    updateActiveFacet();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    return () => {
+      if (frame !== 0) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+    };
+  }, [chapter, mobilePreviewOpen, runtime.status]);
 
   function resetCurrentChapter() {
     setSpec(
@@ -1229,10 +1288,15 @@ export function App() {
                       <button
                         key={facet}
                         type="button"
-                        className={
-                          count > 0
-                            ? "facet-jump-item filled"
-                            : "facet-jump-item"
+                        className={[
+                          "facet-jump-item",
+                          count > 0 ? "filled" : "",
+                          activeFacetTarget === facet ? "active" : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                        aria-current={
+                          activeFacetTarget === facet ? "location" : undefined
                         }
                         aria-label={
                           count > 0
@@ -1254,10 +1318,15 @@ export function App() {
                   {chapter.id === "finish" && (
                     <button
                       type="button"
-                      className={
-                        spec.exclude.length > 0
-                          ? "facet-jump-item filled"
-                          : "facet-jump-item"
+                      className={[
+                        "facet-jump-item",
+                        spec.exclude.length > 0 ? "filled" : "",
+                        activeFacetTarget === "exclude" ? "active" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      aria-current={
+                        activeFacetTarget === "exclude" ? "location" : undefined
                       }
                       aria-label={
                         spec.exclude.length > 0
