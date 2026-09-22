@@ -162,3 +162,13 @@ Proceed in this order:
 - Selection immediately renders through the pure compiler into the English `[Instruments: ...]` section.
 - Instrument favorites reuse the same persistent hold/usage contract as Genres.
 - Show All auto-loads DOM chunks on scroll instead of requiring repeated paging or mounting 6,035 result cards at once.
+
+## Production facet-editor slice
+
+- Favorite hold timing is now 0.8 s add / 1.0 s remove with synchronized SVG/state timing; add feedback uses theme-semantic success green plus a drawn checkmark.
+- Expanded-segment return-to-start control now lives on the left viewport edge.
+- `editor.json` is now a lazy, manifest-validated and cached Studio Runtime payload.
+- Pulse, Palette and Finish no longer use placeholder cards for ordinary facets; they render the shared production Easy/Advanced FacetEditor.
+- Easy consumes Runtime statements; Advanced consumes Runtime parameter options plus per-facet custom text.
+- Parameter cardinality follows schema value types: `multi` is multi-select, other option-bearing types are exclusive within their parameter.
+- Finish now exposes the real Runtime Exclude catalog and writes only to `MusicSpec.exclude[]` / separate Exclude compiler output.
