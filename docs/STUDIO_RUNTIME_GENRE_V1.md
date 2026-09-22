@@ -212,3 +212,26 @@ Each Studio chapter exposes a scoped reset. A separate new-prompt reset returns 
 The Live Prompt can be unlocked. While unlocked the user can edit or delete the final Style text directly. This is output-layer state only; MusicSpec and the deterministic compiler result remain intact underneath it.
 
 `Original wiederherstellen` discards the manual override and restores the current compiler output. Manual text is counted against the same 1,000-character renderer ceiling.
+
+## 14. Major Genre selectable-first contract
+
+Major Genres are not only filters. Every Major Genre Runtime record is a valid selectable Genre influence.
+
+When a Major Genre is active:
+
+1. result 1 is the pure Major Genre;
+2. remaining results are its subgenres;
+3. an identically named subgenre record, if present, is suppressed to avoid duplicate visible choices;
+4. favorites may reorder subgenres but never move ahead of the pure Major result.
+
+Compiler knowledge resolves both Major and subgenre IDs.
+
+## 15. Localization
+
+Studio UI v1 supports German and English through typed application catalogs. Browser locale is used as the first default and explicit user choice persists locally.
+
+Prompt/compiler output remains English and is not translated with the UI.
+
+## 16. Expanded-list return behavior
+
+The floating return-to-start button is stateful to the active expanded picker segment. It appears only after scrolling down into that segment and disappears at/above its start or after scrolling past its end.
