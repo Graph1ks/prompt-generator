@@ -330,6 +330,13 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - The facet-wide current-state rail remains the canonical overview; parameter summaries are a local scan aid derived from the same MusicSpec/Runtime IDs.
 - Custom Advanced wording remains full-width and nothing is hidden behind dropdown menus.
 
+## Large-pool control reachability carry-forward
+
+- Genre, Instruments and Exclude wrap search/filter/meta controls in a desktop sticky control stack.
+- The stack uses normal page scrolling and sits below existing global/chapter/facet sticky navigation; do not replace it with an inner scrolling list.
+- Mobile removes the sticky behavior and keeps these controls in normal document flow.
+- Result rendering/Show All/chunking semantics are unchanged.
+
 ## Genre picker focus behavior carry-forward
 
 - Opening a Genre role on fine-pointer desktop locates the picker and focuses/selects search.
