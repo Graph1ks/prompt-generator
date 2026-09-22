@@ -25,6 +25,7 @@ import { PoolQuickView, type PoolQuickViewMode } from "./pool-quick-view.js";
 import { usePoolPreferences } from "./pool-preferences.js";
 import type { StudioRuntime } from "./runtime-client.js";
 import { useExpandedPoolSegment } from "./use-expanded-pool-segment.js";
+import { usePoolKeyboardNavigation } from "./use-pool-keyboard-navigation.js";
 import { useSlashSearchShortcut } from "./use-slash-search-shortcut.js";
 
 const COMPACT_RESULT_COUNT = 12;
@@ -69,6 +70,11 @@ export function InstrumentPicker({
   const [renderLimit, setRenderLimit] = useState(EXPANDED_CHUNK);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const searchInputRef = useSlashSearchShortcut();
+  const {
+    resultsRef,
+    onSearchKeyDown,
+    onResultsKeyDown,
+  } = usePoolKeyboardNavigation(searchInputRef);
   const preferences = usePoolPreferences("instrument-expressions");
   const {
     segmentRef,
@@ -416,6 +422,7 @@ export function InstrumentPicker({
                 library.value.expressions.expressions.length.toLocaleString(locale),
             })}
             onChange={(event) => setQuery(event.currentTarget.value)}
+            onKeyDown={onSearchKeyDown}
           />
           {query ? (
             <button
@@ -468,11 +475,13 @@ export function InstrumentPicker({
       </div>
 
       <div
+        ref={resultsRef}
         className={
           showAllResults
             ? "instrument-results expanded"
             : "instrument-results"
         }
+        onKeyDown={onResultsKeyDown}
       >
         {visibleExpressions.map((expression) => {
           const selected = hasFacetSelection(
@@ -500,6 +509,7 @@ export function InstrumentPicker({
               favorite={preferences.isFavorite(expression.id)}
               usageCount={preferences.usageCount(expression.id)}
               activationLabel={expression.label}
+              data-pool-result=""
               onFavorite={() => preferences.setFavorite(expression.id, true)}
               onUnfavorite={() => preferences.setFavorite(expression.id, false)}
               onActivate={() => toggleExpression(expression)}

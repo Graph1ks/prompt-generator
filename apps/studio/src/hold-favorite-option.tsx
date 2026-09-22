@@ -2,6 +2,7 @@ import {
   useRef,
   useState,
   type ButtonHTMLAttributes,
+  type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
   type CSSProperties,
   type ReactNode,
@@ -37,6 +38,8 @@ export function HoldFavoriteOption({
   style,
   disabled,
   "aria-label": ariaLabel,
+  "aria-keyshortcuts": ariaKeyShortcuts,
+  onKeyDown,
   ...buttonProps
 }: HoldFavoriteOptionProps) {
   const { t } = useI18n();
@@ -76,6 +79,23 @@ export function HoldFavoriteOption({
     onActivate();
   }
 
+  function handleKeyDown(event: ReactKeyboardEvent<HTMLButtonElement>) {
+    if (
+      event.shiftKey &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.altKey &&
+      event.key.toLowerCase() === "f"
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (favorite) onUnfavorite();
+      else onFavorite();
+      return;
+    }
+    onKeyDown?.(event);
+  }
+
   const favoriteTitle = favorite
     ? t("favorite.removeTitle")
     : t("favorite.addTitle");
@@ -106,7 +126,11 @@ export function HoldFavoriteOption({
         className="hold-favorite-hitarea"
         disabled={disabled}
         aria-label={ariaLabel ?? activationLabel ?? title ?? favoriteTitle}
-        title={title ?? favoriteTitle}
+        aria-keyshortcuts={
+          ariaKeyShortcuts ? ariaKeyShortcuts + " Shift+F" : "Shift+F"
+        }
+        title={title ?? activationLabel ?? favoriteTitle}
+        onKeyDown={handleKeyDown}
         onPointerDown={startHold}
         onPointerUp={stopTimer}
         onPointerCancel={stopTimer}

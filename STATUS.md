@@ -236,6 +236,14 @@ Proceed in this order:
 - Recent view orders matching items by last actual use; All retains the existing favorite-first ranking contract.
 - Show All/chunked rendering works against the active quick view rather than mounting irrelevant results.
 
+## Keyboard-first large-pool browsing
+
+- Genre, Instruments and Exclude now support direct keyboard travel from search into the visible result grid: `ArrowDown` from search focuses the first result.
+- Once a result is focused, directional arrow keys choose the nearest visible card spatially, so navigation follows the responsive grid rather than assuming a fixed column count. `Home` / `End` jump to the first/last visible result and `Escape` returns to search.
+- Result activation stays native button behavior (Enter/Space) and `Shift+F` toggles the existing local favorite state without requiring the pointer-only hold gesture.
+- Keyboard focus is visually promoted on the whole result card; result hover titles describe the primary selection action rather than incorrectly implying that a click toggles Favorite.
+- The existing `/` shortcut remains the fastest entry point into search. No new focus manager/library or persistence state was added.
+
 ## Sticky large-pool controls
 
 - Genre, Instruments and Exclude keep their search/filter/result-count controls reachable while long result sets scroll on desktop.

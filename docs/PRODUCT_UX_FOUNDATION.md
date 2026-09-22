@@ -294,7 +294,7 @@ Motion should make cause/effect legible:
 Requirements:
 
 - respect `prefers-reduced-motion`;
-- full keyboard access;
+- full keyboard access, including search-to-result navigation in large pools and a keyboard-equivalent favorite action for hold gestures;
 - visible focus states;
 - minimum practical touch targets;
 - no essential hover-only content;
