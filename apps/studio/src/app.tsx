@@ -12,6 +12,7 @@ import { isVgineTheme, type VgineTheme } from "@vgine/ui";
 
 import { GenrePicker } from "./genre-picker.js";
 import { Icon } from "./icons.js";
+import { SUPPORTED_LOCALES, useI18n, type MessageKey } from "./i18n.js";
 import { loadStudioRuntime, type StudioRuntime } from "./runtime-client.js";
 import { FACET_LABELS, STUDIO_CHAPTERS } from "./studio-config.js";
 
@@ -23,25 +24,6 @@ type RuntimeState =
   | { readonly status: "error"; readonly message: string };
 
 type OutputTab = "style" | "exclude";
-
-const CHAPTER_COPY = {
-  dna: {
-    title: "Wo soll die Reise hingehen?",
-    description: "Ein Fundament. Bis zu zwei neue Perspektiven.",
-  },
-  pulse: {
-    title: "Gib deinem Sound einen Puls.",
-    description: "Tempo ist eine Zahl. Groove ist ein Gefühl.",
-  },
-  palette: {
-    title: "Jetzt wird es dein Sound.",
-    description: "Instrument, Rolle und Charakter bleiben frei kombinierbar.",
-  },
-  finish: {
-    title: "Der letzte Schliff.",
-    description: "Nähe, Tiefe, Dynamik. Die Details machen den Unterschied.",
-  },
-} as const;
 
 function initialTheme(): VgineTheme {
   const stored = globalThis.localStorage?.getItem(THEME_KEY);
@@ -74,6 +56,7 @@ function coverLines(label: string): readonly [string, string] {
 }
 
 export function App() {
+  const { locale, setLocale, t } = useI18n();
   const [theme, setTheme] = useState<VgineTheme>(initialTheme);
   const [chapterId, setChapterId] = useState(STUDIO_CHAPTERS[0].id);
   const [activeGenreRole, setActiveGenreRole] =
@@ -92,7 +75,10 @@ export function App() {
   const chapter =
     STUDIO_CHAPTERS.find((candidate) => candidate.id === chapterId) ??
     STUDIO_CHAPTERS[0];
-  const chapterCopy = CHAPTER_COPY[chapter.id];
+  const chapterCopy = {
+    title: t(("chapter." + chapter.id + ".title") as MessageKey),
+    description: t(("chapter." + chapter.id + ".description") as MessageKey),
+  };
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -119,9 +105,14 @@ export function App() {
 
   const genreLabels = useMemo(() => {
     if (runtime.status !== "ready") return new Map<string, string>();
-    return new Map(
-      runtime.value.bootstrap.genres.genres.map((genre) => [genre.id, genre.label]),
-    );
+    return new Map([
+      ...runtime.value.bootstrap.core.major_genres.map(
+        (major) => [major.id, major.label] as const,
+      ),
+      ...runtime.value.bootstrap.genres.genres.map(
+        (genre) => [genre.id, genre.label] as const,
+      ),
+    ]);
   }, [runtime]);
 
   const compilation = useMemo(() => {
@@ -144,9 +135,9 @@ export function App() {
     [genreLabels, spec],
   );
 
-  const [coverLineOne, coverLineTwo] = coverLines(
-    selectedGenreLabels[0] ?? "Build your sound",
-  );
+  const [coverLineOne, coverLineTwo] = selectedGenreLabels[0]
+    ? coverLines(selectedGenreLabels[0])
+    : [t("preview.coverEmptyA"), t("preview.coverEmptyB")];
   const compiledStyleText = compilation?.styleText ?? "";
   const effectiveStyleText = manualStyleText ?? compiledStyleText;
   const budgetMax = compilation?.budget.max || 1000;
@@ -208,12 +199,15 @@ export function App() {
     if (facet === "genre") {
       return selectedGenreLabels.length
         ? selectedGenreLabels.join(" · ")
-        : "Noch nicht gewählt";
+        : t("placeholder.notSelected");
     }
     const state = spec?.facets[facet];
-    if (!state) return "Noch nicht gesetzt";
+    if (!state) return t("placeholder.notSet");
     const count = state.selections.length + (state.custom_text?.trim() ? 1 : 0);
-    return count === 0 ? "Noch nicht gesetzt" : count + " Auswahl";
+    if (count === 0) return t("placeholder.notSet");
+    return t(count === 1 ? "placeholder.selection" : "placeholder.selections", {
+      count,
+    });
   }
 
   async function copyPrompt() {
@@ -233,11 +227,12 @@ export function App() {
 
   const runtimeLabel =
     runtime.status === "ready"
-      ? runtime.value.bootstrap.genres.genres.length.toLocaleString() +
-        " Genres verbunden"
+      ? t("app.runtimeReady", {
+          count: runtime.value.bootstrap.genres.genres.length.toLocaleString(locale),
+        })
       : runtime.status === "loading"
-        ? "Runtime wird geladen"
-        : "Runtime nicht verfügbar";
+        ? t("app.runtimeLoading")
+        : t("app.runtimeError");
 
   const currentChapterIndex = STUDIO_CHAPTERS.findIndex(
     (entry) => entry.id === chapter.id,
@@ -245,6 +240,21 @@ export function App() {
   const nextChapter =
     STUDIO_CHAPTERS.find((_, index) => index === currentChapterIndex + 1) ??
     chapter;
+
+  function chapterLabel(id: (typeof STUDIO_CHAPTERS)[number]["id"]): string {
+    return t(("chapter." + id) as MessageKey);
+  }
+
+  function facetLabel(facet: FacetKey): string {
+    return t(("facet." + facet) as MessageKey);
+  }
+
+  function diagnosticMessage(code: string, fallback: string): string {
+    if (code === "missing_genre_label") return t("diagnostic.missingGenre");
+    if (code === "budget_conflict") return t("diagnostic.budgetConflict");
+    if (code === "budget_compacted") return t("diagnostic.budgetCompacted");
+    return fallback;
+  }
 
   return (
     <div className="studio-shell">
