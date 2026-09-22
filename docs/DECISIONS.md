@@ -809,3 +809,21 @@ A global editor-depth preference controls all ordinary facets at once; individua
 Projects, pool Favorites, Advanced custom presets, Theme, locale and editor-depth preferences are device-local data. Web/PWA persistence uses IndexedDB-backed adapters. No server or cloud persistence is introduced.
 
 Legacy `localStorage` values may be read only for one-time migration and are no longer the active persistence target.
+
+## ADR-043 — Product-owned editor vocabulary has a tracked Knowledge companion
+
+**Status:** accepted
+
+Product Editor Foundation controls must not remain semantic dead ends. A tracked Product Knowledge Foundation supplies stable explanatory entries for product-owned parameters, options, Easy statements and Exclude choices.
+
+Runtime merge precedence is Product Knowledge Foundation -> reviewed/approved database Knowledge by stable ID. The product layer guarantees explanation coverage without replacing durable curated knowledge authority.
+
+The Product Knowledge Foundation is independently fingerprinted in Runtime manifests.
+
+## ADR-044 — Prompt explanations are provenance-backed, not inferred from output prose
+
+**Status:** accepted
+
+Explain mode derives live-prompt explanations from MusicSpec selection IDs and their Runtime semantic links. It may verify that the selection's rendered value is present in the final section before surfacing the explanation.
+
+The product does not string-guess arbitrary custom prompt wording into Knowledge concepts. Unlinked user text remains unannotated.
