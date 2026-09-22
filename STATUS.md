@@ -193,6 +193,12 @@ Proceed in this order:
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
 
+## Facet jump scroll position
+
+- The chapter-local facet rail now acts as a lightweight scrollspy: the facet currently passing the editing viewport's sticky-navigation threshold is highlighted and exposed with `aria-current="location"`.
+- Scroll tracking is requestAnimationFrame-throttled and inspects only the 3–7 explicit facet targets in the active chapter; it does not introduce a new observer/index/state persistence layer.
+- Scrollspy pauses while the mobile Live Prompt replaces the editor and recomputes when Studio becomes visible again.
+
 ## Chapter-local facet jump rail
 
 - Every loaded chapter now exposes its facets as direct navigation targets between the chapter header and editor stack.
