@@ -820,7 +820,8 @@ export function App() {
   }
 
   function undoSpec() {
-    const previous = undoSpecRef.current.at(-1);
+    const previous =
+      undoSpecRef.current[undoSpecRef.current.length - 1];
     if (!previous) return;
 
     undoSpecRef.current = undoSpecRef.current.slice(0, -1);
@@ -834,7 +835,7 @@ export function App() {
   }
 
   function redoSpec() {
-    const next = redoSpecRef.current.at(-1);
+    const next = redoSpecRef.current[redoSpecRef.current.length - 1];
     if (!next) return;
 
     redoSpecRef.current = redoSpecRef.current.slice(0, -1);
