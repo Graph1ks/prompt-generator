@@ -1,8 +1,8 @@
 # Handover — Explain UX + authored Product Knowledge
 
 **Last updated:** 2026-09-22  
-**Handoff target:** owner-local Runtime/Explain smoke, then Studio project-library UX  
-**Milestone:** Database V1 remains closed; Product Editor/Easy-Advanced/local persistence foundations stand; Explain is selection-time/portal-based and the complete 400-entry Product Knowledge Foundation now contains authored bilingual musical explanations
+**Handoff target:** owner-local Runtime/Explain + project-library acceptance, then remaining Studio ergonomics  
+**Milestone:** Database V1 remains closed; Explain is selection-time/portal-based; Product Knowledge v1 is fully authored; multi-project local library/naming/duplicate/import/export is implemented on ProjectStorage
 
 ## Read this first
 
@@ -193,7 +193,7 @@ Recommended order:
 1. **Re-export owner-local Runtime Pack** after pulling `main`; the authored Product Knowledge file changes its independent Runtime fingerprint.
 2. **Rebuild the user's reference prompt** and inspect selection-time Explain section by section. Product definitions should now teach the actual concept before selection without changing copied prompt text.
 3. **Investigate only explicit-link gaps.** Product controls resolve through Product Knowledge; Genre resolves through existing Genre Knowledge; Instruments resolve through canonical instrument/concept Knowledge. Never add rendered-string guessing.
-4. **Continue project UX** on the existing IndexedDB `ProjectStorage`: project naming/library, duplicate, import/export are the next persistence layer.
+4. **Smoke the project library** on desktop and mobile: migrate the legacy active project, create/rename/switch/duplicate, export/import, delete active/non-active projects and reload the page to verify pointer restore.
 5. **Continue Studio ergonomics and visual refinement** while keeping broad motion polish late.
 
 ## Post-V1 enrichment is allowed but is not a blocker
@@ -261,6 +261,17 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Current first consumers: selected Genres, facet section labels, Advanced parameter headings and Instruments section heading.
 - Locale resolution is UI-locale -> English fallback; renderer language remains independent.
 - Favorite hold durations remain 0.8 s add / 1.0 s remove internally, but duration instructions are intentionally hidden from normal UI/hover copy.
+
+## Project library v1 carry-forward
+
+- The old fixed `active` project ID is migration-only. Studio keeps a separate active-project pointer in local user data and migrates an existing legacy project to a fresh ID.
+- Creating a new project first persists the current project and then opens a new blank project. Existing work is no longer destructively reused as the sole active record.
+- The top-bar project switcher opens a responsive library with inline rename, switch/open, duplicate, export, import and two-click delete.
+- Duplicate preserves MusicSpec/manual Style/workspace state but receives a fresh ID and timestamps.
+- Import validates `vgine-project-v1` and deliberately assigns a fresh local ID so importing a file cannot silently overwrite another project.
+- Export writes one validated project document as a local `.vgine.json` file. No cloud path exists.
+- Deleting the active project selects the newest remaining project or creates a blank project if the library becomes empty.
+- Project summaries remain sorted by `updated_at`; autosave continuously refreshes the active summary.
 
 ## Project persistence v1 carry-forward
 
