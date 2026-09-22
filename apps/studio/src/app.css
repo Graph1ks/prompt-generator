@@ -492,6 +492,64 @@
     color: var(--studio-paper);
   }
 
+  .facet-jump-rail {
+    position: sticky;
+    inset-block-start: 154px;
+    z-index: calc(var(--vg-z-sticky) - 1);
+    margin-block: -8px 18px;
+    padding: 5px;
+    border: 1px solid color-mix(in srgb, var(--studio-line) 78%, transparent);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--studio-paper) 91%, transparent);
+    backdrop-filter: blur(15px);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    box-shadow: 0 8px 22px rgb(36 39 34 / 0.045);
+  }
+
+  .facet-jump-item {
+    min-block-size: 34px;
+    min-inline-size: 0;
+    padding: 6px 9px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--studio-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 9px;
+    font-weight: 680;
+    cursor: pointer;
+  }
+
+  .facet-jump-item:hover,
+  .facet-jump-item:focus-visible {
+    color: var(--studio-ink);
+    border-color: var(--studio-line);
+    background: var(--studio-card);
+  }
+
+  .facet-jump-item.filled {
+    color: var(--studio-ink);
+  }
+
+  .facet-jump-item small {
+    min-inline-size: 18px;
+    block-size: 18px;
+    padding-inline: 4px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--studio-mint) 58%, var(--studio-card));
+    color: var(--studio-ink);
+    display: inline-grid;
+    place-items: center;
+    font-family: var(--vg-font-mono);
+    font-size: 7px;
+    font-weight: 780;
+    line-height: 1;
+  }
+
   .stage {
     animation: stage-arrive 0.35s var(--vg-motion-ease-enter);
   }
@@ -1382,12 +1440,12 @@
   }
 
   [data-facet] {
-    scroll-margin-block: 168px;
+    scroll-margin-block: 214px;
   }
 
   @media (max-width: 980px) {
     [data-facet] {
-      scroll-margin-block: 156px;
+      scroll-margin-block: 202px;
     }
   }
 
@@ -1561,6 +1619,10 @@
       inset-block-start: 78px;
     }
 
+    .facet-jump-rail {
+      inset-block-start: 144px;
+    }
+
     .top-label,
     .top-divider {
       display: none;
@@ -1684,6 +1746,23 @@
       gap: 2px;
       padding: 4px;
       border-radius: 12px;
+    }
+
+    .facet-jump-rail {
+      position: relative;
+      inset-block-start: 0;
+      margin-block: -6px 16px;
+      padding: 4px;
+      gap: 3px;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    .facet-jump-item {
+      flex: 1 1 auto;
+      min-block-size: 42px;
+      justify-content: center;
+      padding-inline: 7px;
     }
 
     .step-shortcut {
