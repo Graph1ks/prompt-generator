@@ -229,6 +229,59 @@ export interface RuntimeEditorPayload {
   readonly exclude: readonly RuntimeExcludeEntry[];
 }
 
+export type RuntimeKnowledgeDifficulty =
+  | "beginner"
+  | "intermediate"
+  | "advanced";
+
+export interface RuntimeTermVariant {
+  readonly surface: string;
+  readonly normalized: string;
+  readonly locale: string;
+  readonly match_kind: string;
+  readonly match_priority: number;
+  readonly is_primary: boolean;
+}
+
+export interface RuntimeDefinition {
+  readonly locale: string;
+  readonly kind: string;
+  readonly text: string;
+  readonly revision: number;
+}
+
+export interface RuntimeContextDefinition {
+  readonly locale: string;
+  readonly context_type: string;
+  readonly context_key: string;
+  readonly text: string;
+  readonly revision: number;
+}
+
+export interface RuntimeKnowledgeRelation {
+  readonly relation_type: string;
+  readonly target_entry_id: string;
+  readonly strength: number | null;
+}
+
+export interface RuntimeKnowledgeEntry {
+  readonly id: string;
+  readonly entry_type: string;
+  readonly canonical_label: string;
+  readonly canonical_slug: string;
+  readonly difficulty: RuntimeKnowledgeDifficulty;
+  readonly replaces_entry_id: string | null;
+  readonly variants: readonly RuntimeTermVariant[];
+  readonly definitions: readonly RuntimeDefinition[];
+  readonly context_definitions: readonly RuntimeContextDefinition[];
+  readonly relations: readonly RuntimeKnowledgeRelation[];
+}
+
+export interface RuntimeKnowledgePayload {
+  readonly schema: "vgine-runtime-knowledge-v1";
+  readonly entries: readonly RuntimeKnowledgeEntry[];
+}
+
 export type RuntimeSearchKind = "genre" | "instrument_expression" | "knowledge";
 
 export interface RuntimeSearchDocument {
@@ -361,6 +414,26 @@ function asInteger(value: unknown, path: string): number {
 function asNullableInteger(value: unknown, path: string): number | null {
   if (value === null) return null;
   return asInteger(value, path);
+}
+
+function asNullableNumber(value: unknown, path: string): number | null {
+  if (value === null) return null;
+  return asNumber(value, path);
+}
+
+function asKnowledgeDifficulty(
+  value: unknown,
+  path: string,
+): RuntimeKnowledgeDifficulty {
+  const text = asString(value, path);
+  if (
+    text !== "beginner" &&
+    text !== "intermediate" &&
+    text !== "advanced"
+  ) {
+    fail("invalid_knowledge_difficulty", path, `unsupported difficulty: ${text}`);
+  }
+  return text;
 }
 
 function asStringArray(value: unknown, path: string): readonly string[] {
@@ -761,6 +834,138 @@ export function parseRuntimeEditor(value: unknown): RuntimeEditorPayload {
   };
 }
 
+export function parseRuntimeKnowledge(value: unknown): RuntimeKnowledgePayload {
+  const root = asRecord(value, "knowledge");
+  assertSchema(root, "vgine-runtime-knowledge-v1", "knowledge");
+
+  const entries = asArray(root.entries, "knowledge.entries").map(
+    (entry, index) => {
+      const path = `knowledge.entries[${index}]`;
+      const row = asRecord(entry, path);
+
+      const variants = asArray(row.variants, `${path}.variants`).map(
+        (variantEntry, variantIndex) => {
+          const variantPath = `${path}.variants[${variantIndex}]`;
+          const variant = asRecord(variantEntry, variantPath);
+          return {
+            surface: asString(variant.surface, `${variantPath}.surface`),
+            normalized: asString(
+              variant.normalized,
+              `${variantPath}.normalized`,
+            ),
+            locale: asString(variant.locale, `${variantPath}.locale`),
+            match_kind: asString(
+              variant.match_kind,
+              `${variantPath}.match_kind`,
+            ),
+            match_priority: asInteger(
+              variant.match_priority,
+              `${variantPath}.match_priority`,
+            ),
+            is_primary: asBoolean(
+              variant.is_primary,
+              `${variantPath}.is_primary`,
+            ),
+          };
+        },
+      );
+
+      const definitions = asArray(
+        row.definitions,
+        `${path}.definitions`,
+      ).map((definitionEntry, definitionIndex) => {
+        const definitionPath = `${path}.definitions[${definitionIndex}]`;
+        const definition = asRecord(definitionEntry, definitionPath);
+        return {
+          locale: asString(
+            definition.locale,
+            `${definitionPath}.locale`,
+          ),
+          kind: asString(definition.kind, `${definitionPath}.kind`),
+          text: asString(definition.text, `${definitionPath}.text`),
+          revision: asInteger(
+            definition.revision,
+            `${definitionPath}.revision`,
+          ),
+        };
+      });
+
+      const contextDefinitions = asArray(
+        row.context_definitions,
+        `${path}.context_definitions`,
+      ).map((contextEntry, contextIndex) => {
+        const contextPath =
+          `${path}.context_definitions[${contextIndex}]`;
+        const context = asRecord(contextEntry, contextPath);
+        return {
+          locale: asString(context.locale, `${contextPath}.locale`),
+          context_type: asString(
+            context.context_type,
+            `${contextPath}.context_type`,
+          ),
+          context_key: asString(
+            context.context_key,
+            `${contextPath}.context_key`,
+          ),
+          text: asString(context.text, `${contextPath}.text`),
+          revision: asInteger(
+            context.revision,
+            `${contextPath}.revision`,
+          ),
+        };
+      });
+
+      const relations = asArray(row.relations, `${path}.relations`).map(
+        (relationEntry, relationIndex) => {
+          const relationPath = `${path}.relations[${relationIndex}]`;
+          const relation = asRecord(relationEntry, relationPath);
+          return {
+            relation_type: asString(
+              relation.relation_type,
+              `${relationPath}.relation_type`,
+            ),
+            target_entry_id: asString(
+              relation.target_entry_id,
+              `${relationPath}.target_entry_id`,
+            ),
+            strength: asNullableNumber(
+              relation.strength,
+              `${relationPath}.strength`,
+            ),
+          };
+        },
+      );
+
+      return {
+        id: asString(row.id, `${path}.id`),
+        entry_type: asString(row.entry_type, `${path}.entry_type`),
+        canonical_label: asString(
+          row.canonical_label,
+          `${path}.canonical_label`,
+        ),
+        canonical_slug: asString(
+          row.canonical_slug,
+          `${path}.canonical_slug`,
+        ),
+        difficulty: asKnowledgeDifficulty(
+          row.difficulty,
+          `${path}.difficulty`,
+        ),
+        replaces_entry_id: asNullableString(
+          row.replaces_entry_id,
+          `${path}.replaces_entry_id`,
+        ),
+        variants,
+        definitions,
+        context_definitions: contextDefinitions,
+        relations,
+      };
+    },
+  );
+
+  return { schema: "vgine-runtime-knowledge-v1", entries };
+}
+
 export function parseRuntimeSearch(value: unknown): RuntimeSearchPayload {
   const root = asRecord(value, "search");
   assertSchema(root, "vgine-runtime-search-documents-v1", "search");
@@ -912,6 +1117,31 @@ export async function loadRuntimeEditor(
   assertCount(manifest, "editor.json", "exclude", editor.exclude.length);
 
   return editor;
+}
+
+export async function loadRuntimeKnowledge(
+  reader: RuntimePackReader,
+  manifest: RuntimeManifest,
+  options: LoadRuntimeBootstrapOptions = {},
+): Promise<RuntimeKnowledgePayload> {
+  const knowledgeText = await readAndVerify(
+    reader,
+    manifest,
+    "knowledge.json",
+    options.sha256Hex,
+  );
+  const knowledge = parseRuntimeKnowledge(
+    parseJson(knowledgeText, "knowledge.json"),
+  );
+
+  assertCount(
+    manifest,
+    "knowledge.json",
+    "entries",
+    knowledge.entries.length,
+  );
+
+  return knowledge;
 }
 
 export function buildCompilerKnowledge(bootstrap: RuntimeBootstrap): RuntimeCompilerKnowledge {
