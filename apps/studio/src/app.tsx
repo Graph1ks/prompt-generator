@@ -315,6 +315,7 @@ export function App() {
   const [genreSkipAcknowledged, setGenreSkipAcknowledged] = useState(false);
   const [manualStyleText, setManualStyleText] = useState<string | null>(null);
   const [promptUnlocked, setPromptUnlocked] = useState(false);
+  const [manualEditGuardOpen, setManualEditGuardOpen] = useState(false);
   const [projectReady, setProjectReady] = useState(false);
   const [projectSaveState, setProjectSaveState] =
     useState<ProjectSaveState>("loading");
@@ -979,6 +980,7 @@ export function App() {
     projectCreatedAtRef.current = project.created_at;
     setActiveGenreRole("foundation");
     setPromptUnlocked(false);
+    setManualEditGuardOpen(false);
     setOutputTab("style");
     setMobilePreviewOpen(false);
   }
@@ -1223,15 +1225,32 @@ export function App() {
   }
 
   function togglePromptUnlock() {
-    if (!promptUnlocked && manualStyleText === null) {
-      setManualStyleText(compiledStyleText);
+    if (promptUnlocked) {
+      setPromptUnlocked(false);
+      setManualEditGuardOpen(false);
+      return;
     }
-    setPromptUnlocked((current) => !current);
+
+    setOutputTab("style");
+    if (manualStyleText !== null) {
+      setPromptUnlocked(true);
+      setManualEditGuardOpen(false);
+      return;
+    }
+
+    setManualEditGuardOpen(true);
+  }
+
+  function confirmManualPromptEdit() {
+    setManualStyleText(compiledStyleText);
+    setPromptUnlocked(true);
+    setManualEditGuardOpen(false);
   }
 
   function resetManualPrompt() {
     setManualStyleText(null);
     setPromptUnlocked(false);
+    setManualEditGuardOpen(false);
   }
 
   async function copyPrompt() {
@@ -1836,6 +1855,16 @@ export function App() {
                 type="button"
                 className={promptUnlocked ? "prompt-edit active" : "prompt-edit"}
                 disabled={!compiledStyleText && manualStyleText === null}
+                aria-expanded={
+                  !promptUnlocked && manualStyleText === null
+                    ? manualEditGuardOpen
+                    : undefined
+                }
+                aria-controls={
+                  !promptUnlocked && manualStyleText === null
+                    ? "manual-style-edit-guard"
+                    : undefined
+                }
                 onClick={togglePromptUnlock}
               >
                 <Icon name={promptUnlocked ? "lock" : "unlock"} />
@@ -1853,6 +1882,36 @@ export function App() {
               )}
             </div>
 
+            {manualEditGuardOpen && (
+              <div
+                id="manual-style-edit-guard"
+                className="prompt-edit-guard"
+                aria-live="polite"
+              >
+                <strong>{t("preview.manualGuardTitle")}</strong>
+                <p>{t("preview.manualGuardBody")}</p>
+                <p className="prompt-edit-guard-guidance">
+                  {t("preview.manualGuardAdvanced")}
+                </p>
+                <div className="prompt-edit-guard-actions">
+                  <button
+                    type="button"
+                    className="prompt-edit prompt-edit-confirm"
+                    onClick={confirmManualPromptEdit}
+                  >
+                    {t("preview.manualGuardConfirm")}
+                  </button>
+                  <button
+                    type="button"
+                    className="prompt-edit"
+                    onClick={() => setManualEditGuardOpen(false)}
+                  >
+                    {t("preview.manualGuardCancel")}
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="preview-tabs">
               <button
                 type="button"
@@ -1867,7 +1926,10 @@ export function App() {
                 type="button"
                 className={outputTab === "exclude" ? "preview-tab active" : "preview-tab"}
                 aria-pressed={outputTab === "exclude"}
-                onClick={() => setOutputTab("exclude")}
+                onClick={() => {
+                  setOutputTab("exclude");
+                  setManualEditGuardOpen(false);
+                }}
               >
                 Exclude
                 <span className="n">{compilation?.excludeText ? 1 : 0}</span>

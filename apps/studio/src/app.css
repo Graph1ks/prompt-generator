@@ -2571,6 +2571,47 @@
     block-size: 13px;
   }
 
+  .prompt-edit-guard {
+    margin: 8px 20px 0;
+    padding: 11px 12px 12px;
+    border: 1px solid rgb(255 255 255 / 0.13);
+    border-inline-start: 3px solid var(--studio-acid);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--studio-dark-soft) 86%, #111711);
+    color: #dce3d4;
+    display: grid;
+    gap: 7px;
+  }
+
+  .prompt-edit-guard strong {
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .prompt-edit-guard p {
+    margin: 0;
+    color: #aeb8a5;
+    font-size: 9px;
+    line-height: 1.55;
+  }
+
+  .prompt-edit-guard .prompt-edit-guard-guidance {
+    color: #d2dacb;
+  }
+
+  .prompt-edit-guard-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-block-start: 2px;
+  }
+
+  .prompt-edit-guard .prompt-edit-confirm {
+    border-color: color-mix(in srgb, var(--studio-acid) 58%, var(--studio-dark-line));
+    color: #eff4e7;
+  }
+
   .manual-prompt-editor {
     display: grid;
     gap: 8px;
@@ -2682,6 +2723,14 @@
 
     .prompt-edit-controls {
       padding-inline: 18px;
+    }
+
+    .prompt-edit-guard {
+      margin-inline: 18px;
+    }
+
+    .prompt-edit-guard-actions .prompt-edit {
+      min-block-size: 44px;
     }
 
     .manual-themed-underlay,

@@ -1,8 +1,8 @@
-# Handover — Studio UX stabilization after compact Live Prompt parity
+# Handover — Studio UX stabilization after guarded final Style editing
 
 **Last updated:** 2026-09-22  
-**Handoff target:** start the next thread from current `main`, owner-smoke the completed Studio interaction stack, then continue only targeted visual/motion refinement and real defects  
-**Milestone:** Database V1 is closed; Product Knowledge v1 is authored; local multi-project persistence is implemented; current Studio includes source-linked Live Prompt, scoped causality highlights, bottom-aware preview following, undo/redo, pool quick views/keyboard navigation and compact locked/unlocked prompt parity
+**Handoff target:** owner-smoke the completed Studio interaction stack including the guarded manual Style transition, then continue only targeted visual/motion refinement and real defects  
+**Milestone:** Database V1 is closed; Product Knowledge v1 is authored; local multi-project persistence is implemented; current Studio includes source-linked Live Prompt, scoped causality highlights, bottom-aware preview following, undo/redo, pool quick views/keyboard navigation, compact locked/unlocked prompt parity and a guarded final-output manual Style escape hatch
 
 ## Read this first
 
@@ -44,7 +44,8 @@ The current continuation baseline includes these merged slices:
 - PR #62: direct BPM entry can exceed the 40–220 slider range; numeric BPM is centered/large; Live Prompt has no inner scrollbar; manual Style editing keeps the structured theme.
 - PR #63: desktop Live Prompt follows long page edits with a bottom-aware sticky offset; only the active/changed prompt section highlights.
 - PR #64: Genre/Instruments/Exclude support spatial keyboard browsing, search-to-result transfer and keyboard-equivalent Favorite toggling.
-- This handover slice: locked deterministic Style output uses the same compact mobile line rhythm as unlocked themed manual Style editing; no forced 44 px row height or 9 px inter-section gap remains.
+- PR #65: locked deterministic Style output uses the same compact mobile line rhythm as unlocked themed manual Style editing; no forced 44 px row height or 9 px inter-section gap remains.
+- This handover slice: the first manual Style unlock is guarded inline. No override is created until the user explicitly confirms that they are entering final-output editing; ongoing structured wording is directed to the matching facet's Advanced custom wording.
 
 These are Studio presentation/interaction changes only. They do not require a Runtime Pack rebuild.
 
@@ -349,6 +350,16 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Undo/redo computes changed prompt targets from immutable MusicSpec facet/genre/exclude references. Do not revert to `.preview.changed .changed-line`, which flashes every section indiscriminately.
 - Active deterministic prompt lines expose `aria-current="location"`. Manual overrides stay intentionally non-semantic.
 
+## Guarded manual Style override carry-forward
+
+- Manual Style editing is a final-output escape hatch, not a parallel authoring mode.
+- The first unlock from deterministic Style opens an inline guard and does **not** create `manual_style_override` until explicit confirmation.
+- The guard explains that after confirmation, further Studio/MusicSpec edits continue updating the deterministic compiler result underneath but no longer update the visible/copyable manual Style.
+- Users who are still authoring should use the matching facet's **Advanced → Custom wording** so the wording remains in MusicSpec and prompt-to-source navigation stays available.
+- Never reverse-parse arbitrary manual Style text to infer a facet.
+- Restoring the original discards the override and reconnects the visible Style to the current compiler result.
+- Existing persisted manual overrides may be reopened directly; do not force the first-time warning on every lock/unlock cycle.
+
 ## BPM + Live Prompt layout carry-forward
 
 - The Product Foundation BPM UI range remains 40–220 for slider/recommended ergonomics, but direct BPM entry intentionally accepts values beyond that range (for example 400) and writes the actual value into MusicSpec.
@@ -478,6 +489,7 @@ pnpm dev
 ```
 
 3. Smoke the current Studio interaction baseline before adding new features:
+   - first deterministic Style unlock shows the inline final-output guard without creating an override; cancel leaves Style compiler-driven; confirm creates the override; later Studio edits leave the manual Style unchanged; Restore original reconnects to the current compiler output;
    - locked Style output is compact on mobile and visually matches unlocked themed Style density;
    - Live Prompt has no inner vertical scrollbar and follows long desktop edits without hiding its footer permanently;
    - only the active authoring facet is persistently highlighted in Style; actual mutations pulse only changed sections;

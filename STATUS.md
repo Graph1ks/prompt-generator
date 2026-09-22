@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-22  
-**Current milestone:** **Studio UX stabilization through compact Live Prompt parity** — Database V1/Product Knowledge/project library remain closed/implemented; next: owner-local interaction smoke, then targeted visual/motion refinement
+**Current milestone:** **Studio UX stabilization through guarded final Style editing** — Database V1/Product Knowledge/project library remain closed/implemented; Studio now guards the first manual Style transition as an explicit final-output override; next: owner-local interaction smoke, then targeted visual/motion refinement
 
 ## Completion verdict
 
@@ -90,6 +90,14 @@ Expected result: acceptance remains `status: ok`; the compiled knowledge DB is s
 - `@vgine/ui` now includes the first reusable React primitives (`Surface`, `Button`, `IconButton`, `Text`, `Stack`, `Cluster`) styled only through V'gine semantic tokens.
 - Local operator outputs are standardized: flat `reports/`, separate `logs/`, durable `.local-data/backups/`; legacy nested report folders have a safe plan/apply migrator.
 
+## Guarded final Style editing
+
+- The first deterministic Style unlock now opens an inline guard instead of immediately creating a manual override.
+- The guard states the actual consequence: once confirmed, the current Style becomes final output-layer state and later Studio/MusicSpec edits no longer update that visible/copyable Style until `Restore original` is used.
+- Ongoing structured wording belongs in the matching facet's **Advanced → Custom wording** field; no arbitrary manual prompt text is reverse-parsed into MusicSpec.
+- Existing manual overrides can still be reopened directly, and restoring the original reconnects the visible Style to the current compiler result.
+- The guard is part of the existing Live Prompt surface, not a modal/dropdown, and adds no Runtime Pack/schema dependency.
+
 ## Current blocker
 
 **No implementation blocker.** The accepted 400-entry Product Knowledge authoring batch has been imported into the tracked Product Knowledge Foundation: all 49 parameter concepts, 262 Advanced values, 79 Easy statements and 10 Exclude entries now carry substantive English/German musical explanations instead of generated editor-meta copy.
@@ -105,9 +113,10 @@ Future enrichment does not reopen the V1 database milestone unless it changes sc
 Proceed in this order:
 
 1. owner-locally `git pull` + `pnpm dev`; no Runtime rebuild is required for the latest Studio-only slices;
-2. smoke locked/unlocked prompt density, bottom-aware preview following, facet-scoped highlight/source-jump behavior, direct BPM >220, Explain click-through, Undo/Redo, project library operations and large-pool mouse/touch/keyboard flows;
-3. fix only reproducible interaction/layout defects found in that smoke; keep Database V1, Genre crosswalk, Instruments semantic completion and authored Product Knowledge closed;
-4. after interaction acceptance, continue targeted visual refinement and restrained causal motion polish rather than broad decorative animation.
+2. smoke the guarded first-unlock flow plus locked/unlocked prompt density, bottom-aware preview following, facet-scoped highlight/source-jump behavior, direct BPM >220, Explain click-through, Undo/Redo, project library operations and large-pool mouse/touch/keyboard flows;
+3. verify that cancelling the guard preserves deterministic Style, confirming creates the final override, later MusicSpec edits do not alter that manual Style, and Restore original reconnects to the current compiler result;
+4. fix only reproducible interaction/layout defects found in that smoke; keep Database V1, Genre crosswalk, Instruments semantic completion and authored Product Knowledge closed;
+5. after interaction acceptance, continue targeted visual refinement and restrained causal motion polish rather than broad decorative animation.
 
 ## Do not redo
 
