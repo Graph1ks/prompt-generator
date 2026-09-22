@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-22  
-**Current milestone:** **Explain UX rebuilt + Product Knowledge v1 authored** — next: owner-local Runtime/Explain smoke validation, then project-library / remaining UX refinement
+**Current milestone:** **Explain UX + authored Product Knowledge complete; multi-project library implemented** — next: CI/owner-local acceptance, then remaining Studio ergonomics
 
 ## Completion verdict
 
@@ -106,7 +106,7 @@ Proceed in this order:
 
 1. owner-locally re-export Runtime Pack v1 and reproduce the reference prompt with Explain enabled;
 2. verify selection-time Explain on Product controls, Genre, Instruments and Exclude; fix only genuine explicit-link/UX defects — never infer Knowledge identity from rendered strings;
-3. continue project naming/library/duplicate/import-export on the existing `ProjectStorage` contract;
+3. owner-locally exercise the project library: legacy restore, create, rename, switch, duplicate, export/import and active-project deletion;
 4. continue Studio ergonomics/visual refinement; reserve broad motion polish until interaction/functionality is accepted.
 
 ## Do not redo
@@ -185,6 +185,17 @@ Proceed in this order:
 - Selected Genre labels, ordinary facet section labels, Advanced parameter labels and the Instruments section can expose reviewed definitions when their Runtime records carry Knowledge IDs.
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
+
+## Project library v1
+
+- Studio now supports multiple local projects on the existing IndexedDB `ProjectStorage` contract instead of treating the fixed `active` record as the permanent project identity.
+- The active project pointer is separate local user data; legacy `active` projects migrate losslessly to a fresh project ID.
+- New Project preserves the previous project, then opens a fresh blank MusicSpec instead of destructively resetting the only project.
+- The project library supports inline naming, open/switch, duplicate, two-click delete, per-project export and validated import.
+- Import never overwrites by exported ID; it validates `vgine-project-v1` and creates a fresh local identity.
+- Export is explicit local file download only; there is still no cloud/server persistence path.
+- Desktop uses a project switcher in the top bar and a full library surface; mobile collapses the switcher to a touch-sized icon and presents the library as a bottom sheet.
+- Project document helpers now cover title normalization, JSON parse/serialize and duplication; regression tests cover these semantics.
 
 ## Project persistence v1
 
