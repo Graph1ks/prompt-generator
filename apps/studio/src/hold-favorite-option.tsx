@@ -98,6 +98,8 @@ export function HoldFavoriteOption({
         "--favorite-remove-x-ms": Math.round(REMOVE_HOLD_MS * 0.3) + "ms",
       } as CSSProperties}
     >
+      {children}
+
       <button
         type="button"
         {...buttonProps}
@@ -112,8 +114,6 @@ export function HoldFavoriteOption({
         onContextMenu={(event) => event.preventDefault()}
         onClick={activate}
       />
-
-      <span className="hold-favorite-content">{children}</span>
 
       {favorite && (
         <span className="favorite-mark" aria-hidden="true">
