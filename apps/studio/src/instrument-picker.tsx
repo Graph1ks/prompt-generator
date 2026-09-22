@@ -261,7 +261,7 @@ export function InstrumentPicker({
 
   if (library.status === "loading") {
     return (
-      <section className="instrument-panel field-card">
+      <section className="instrument-panel field-card" data-facet="instruments">
         <div className="instrument-loading">
           <span className="runtime-spinner" aria-hidden="true" />
           <strong>{t("instrument.loading")}</strong>
@@ -272,7 +272,7 @@ export function InstrumentPicker({
 
   if (library.status === "error") {
     return (
-      <section className="instrument-panel field-card">
+      <section className="instrument-panel field-card" data-facet="instruments">
         <div className="runtime-card error">
           <Icon name="info" />
           <div>
@@ -285,7 +285,11 @@ export function InstrumentPicker({
   }
 
   return (
-    <section ref={segmentRef} className="instrument-panel field-card">
+    <section
+      ref={segmentRef}
+      className="instrument-panel field-card"
+      data-facet="instruments"
+    >
       <div className="instrument-panel-head">
         <div>
           <div className="field-label">
