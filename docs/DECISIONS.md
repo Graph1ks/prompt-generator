@@ -734,3 +734,21 @@ MusicSpec may store the stable Major Genre Runtime ID as a genre influence ID. C
 A floating return-to-start control for an expanded option pool is visible only after the user has scrolled materially below that segment's start and while the viewport is still inside the segment. It is hidden before/at the segment start and after the segment is passed.
 
 This prevents multiple stale floating controls when several expandable pools exist on one page.
+
+## ADR-036 — Editor Runtime payload is the shared facet-control source
+
+**Status:** accepted
+
+Pulse, Palette and Finish consume one lazy, manifest-validated `editor.json` Runtime payload for parameters, parameter options, curated statements and Exclude entries. Feature components do not invent local option catalogs.
+
+Easy and Advanced remain views over the same MusicSpec. Easy writes statement selections; Advanced writes stable parameter-option selections and facet custom text.
+
+Parameter cardinality follows the existing knowledge schema. `multi` allows multiple selected options. Other option-bearing parameter types are exclusive within their parameter until a more specific relation/constraint contract overrides that behavior.
+
+## ADR-037 — Favorite hold feedback uses one synchronized timing source
+
+**Status:** accepted
+
+Mouse/touch favorite timing is 0.8 s to add and 1.0 s to remove. JavaScript state transition and SVG progress use the same duration variables so visual completion cannot drift from the actual state change.
+
+Add feedback uses the active theme's semantic success color and an animated checkmark. Removal retains explicit danger-colored square/X feedback.
