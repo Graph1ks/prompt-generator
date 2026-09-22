@@ -212,12 +212,15 @@ Proceed in this order:
 - Editor-depth preferences and Advanced presets persist locally in IndexedDB.
 - No server/cloud persistence path exists for these user data.
 
-## Product Knowledge Foundation + live prompt explanations
+## Product Knowledge Foundation + Explain UX
 
-- Added tracked Product Knowledge Foundation v1 with 400 explicit entries covering all Product Editor parameters/options/Easy statements/Exclude baseline entries.
-- Product Knowledge definitions currently ship in English and German.
-- Product Editor Foundation records now carry stable Knowledge links instead of null semantic references.
-- Runtime export merges Product Knowledge into `knowledge.json`, indexes it for Knowledge search, fingerprints it separately and validates reference integrity.
-- Explain mode now exposes Knowledge-origin chips beneath rendered live-prompt sections without changing copyable prompt text.
-- Ordinary Product Editor selections, numeric BPM, Genre and Instrument selections resolve through their actual Runtime semantic origins.
-- Arbitrary custom wording remains intentionally unexplained unless a semantic link exists.
+- Product Knowledge Foundation v1 still contains 400 explicit stable entries covering all Product Editor parameters/options/Easy statements/Exclude baseline entries.
+- Product Editor Foundation records keep their explicit Knowledge links; Genre/Instrument explanation still uses Database V1 semantic links. No rendered-string inference was introduced.
+- Explain is now available at authoring time: Easy statement labels, Advanced option/recommended-value labels, Genre results, Instrument-expression results and Exclude results can expose their linked Knowledge before the user selects them.
+- Desktop Explain uses a subtle dashed term affordance with delayed hover/focus and click-to-pin. Touch uses tap-to-pin with a mobile bottom-sheet presentation.
+- Explanation UI is a singleton viewport portal, so parent overflow cannot clip it and multiple cards cannot overlap.
+- The old Knowledge-origin chip rows beneath the Live Prompt were removed. Explain UI no longer consumes prompt-preview layout space and still never enters copied Style/Exclude text.
+- Favorite hold feedback now renders outside the small preset control's clipping boundary; hit areas are separated from explainable labels so favorite/select gestures and Explain can coexist.
+- The current generated/meta prose for Product Knowledge options/statements/Exclude entries is not accepted as final editorial quality. The complete 400-entry authoring handoff is `data/product/knowledge-foundation-v1-authoring-request.txt`.
+- Returned bilingual `ID / EN / DE` copy is validated/imported by `scripts/data/import_product_knowledge_authoring.py`, which preserves stable IDs/links and rejects the known UI-meta template wording.
+- Owner-local Runtime re-export remains required after Product Knowledge copy changes because `product_knowledge_foundation_sha256` participates in Runtime identity.
