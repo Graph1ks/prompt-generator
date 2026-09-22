@@ -254,3 +254,18 @@ Palette/Instruments lazy-loads and validates:
 The lazy load uses the same Runtime Pack manifest hashes/counts as bootstrap payloads and is cached per Studio runtime instance. Search does not build a second index; the already-loaded Search v1 documents resolve matching expression IDs into the lazy expression repository.
 
 A selected expression stores its stable expression ID plus preserved `output_text` in the MusicSpec `instruments` facet. Runtime identity links enrich browsing/filtering; they do not replace the source expression or rewrite its output wording.
+
+## Lazy editor payload consumption
+
+The application lazy-loads `editor.json` when a production facet/Exclude control first needs it. The payload is validated against the same manifest hash/count contract as other Runtime files and cached per Studio runtime.
+
+Typed Runtime records include:
+
+- parameters with MusicSpec section key, value type, visibility, custom-text capability and sort order;
+- parameter options with stable IDs and English renderer `output_fragment`;
+- curated statements with section key, mode scope, output text, optional source frequency and semantic links;
+- Exclude entries with stable IDs and separate output text.
+
+The application preserves nullable statement `source_frequency`; absence of corpus frequency is not invalid knowledge.
+
+The canonical parameter value types are `enum`, `multi`, `number`, `text`, `boolean`, and `relation`.
