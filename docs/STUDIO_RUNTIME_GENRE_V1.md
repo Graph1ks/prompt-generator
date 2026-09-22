@@ -209,9 +209,11 @@ Each Studio chapter exposes a scoped reset. A separate new-prompt reset returns 
 
 ## 13. Manual Style output override
 
-The Live Prompt can be unlocked. While unlocked the user can edit or delete the final Style text directly. This is output-layer state only; MusicSpec and the deterministic compiler result remain intact underneath it.
+The Live Prompt can be unlocked for final Style edits, but the first transition from deterministic output is guarded inline. Merely opening that guard does not create an override.
 
-`Original wiederherstellen` discards the manual override and restores the current compiler output. Manual text is counted against the same 1,000-character renderer ceiling.
+The guard makes the boundary explicit: confirming manual editing freezes the current Style into output-layer state. MusicSpec and the deterministic compiler continue to exist underneath, but later Studio edits no longer update the visible/copyable manual Style. Users who are still building the prompt are directed to the matching facet's **Advanced → Custom wording** instead, which remains semantic MusicSpec state and retains prompt-to-source navigation. Arbitrary final text is never reverse-classified into a facet.
+
+`Original wiederherstellen` discards the manual override and restores the **current** compiler output, reconnecting Style to MusicSpec. Manual text is counted against the same 1,000-character renderer ceiling.
 
 ## 14. Major Genre selectable-first contract
 
