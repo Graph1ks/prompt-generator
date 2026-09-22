@@ -142,11 +142,11 @@ function payloads() {
       foundation_version: 1,
       parameters: [
         {
-          id: "parameter:groove:swing",
-          section_key: "groove",
-          label: "Swing",
-          canonical_slug: "swing",
-          value_type: "enum",
+          id: "parameter:bpm:tempo",
+          section_key: "bpm",
+          label: "Tempo",
+          canonical_slug: "tempo",
+          value_type: "number",
           easy_visible: true,
           advanced_visible: true,
           allow_custom_text: true,
@@ -165,7 +165,7 @@ function payloads() {
       parameter_options: [
         {
           id: "option:groove:swing:laid-back",
-          parameter_id: "parameter:groove:swing",
+          parameter_id: "parameter:bpm:tempo",
           label: "Laid-back",
           canonical_slug: "laid-back",
           output_fragment: "laid-back swing",
@@ -370,7 +370,7 @@ test("lazy-loads and validates the editor payload", async () => {
 
   assert.equal(editor.foundation_schema, "vgine-editor-foundation-v1");
   assert.equal(editor.foundation_version, 1);
-  assert.equal(editor.parameters[0].section_key, "groove");
+  assert.equal(editor.parameters[0].section_key, "bpm");
   assert.equal(editor.parameters[0].ui.control, "number");
   assert.deepEqual(editor.parameters[0].ui.recommended_values, [84, 96, 120]);
   assert.equal(editor.parameter_options[0].output_fragment, "laid-back swing");
