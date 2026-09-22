@@ -925,3 +925,18 @@ The desktop Live Prompt may follow long Studio editing sessions, but it must pre
 
 This supersedes the indiscriminate `.preview.changed .changed-line` behavior where every structured section flashed after any Style change.
 
+## ADR-052 — Large pools use spatial keyboard navigation and keyboard-equivalent favorites
+
+**Status:** accepted
+
+Large Genre, Instrument and Exclude result grids must remain efficient without a pointer.
+
+- `/` focuses search and `ArrowDown` transfers focus from search into the first visible result.
+- Arrow-key movement is derived from rendered card geometry, not hard-coded column counts, so it follows responsive grid changes.
+- `Home` / `End` reach the first/last visible result and `Escape` returns focus to search.
+- Enter/Space perform the result's primary selection/toggle action.
+- The pointer hold gesture for Favorite has a keyboard equivalent: `Shift+F` toggles the same local favorite state.
+- Result focus is visibly represented on the entire result card even when an internal full-card button owns accessible activation.
+
+No separate roving-tabindex persistence or picker-specific keyboard state is introduced.
+
