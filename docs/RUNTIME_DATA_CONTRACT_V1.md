@@ -285,3 +285,23 @@ Runtime knowledge entries preserve reviewed/approved:
 UI locale selection does not alter renderer output. Explanation resolution prefers the active UI locale, then English, then another available reviewed definition as a final display fallback.
 
 Product UI must not synthesize explanations for controls without a real `knowledge_entry_id`.
+
+## Product Editor Foundation v1
+
+Database V1 closes the evidence/knowledge and Genre/Instrument semantic layers, but a usable product editor also requires a complete authored control vocabulary for ordinary MusicSpec facets. Runtime Pack v1 therefore merges the tracked `data/product/editor-foundation-v1.json` baseline into `editor.json`.
+
+Current Foundation v1 contains:
+
+- 49 parameters;
+- 262 Advanced parameter options;
+- 79 Easy statements;
+- 10 baseline Exclude entries;
+- complete Easy + Advanced coverage for Era, BPM, Key/Mode, Groove, Melody, Harmony, Drums, Bass, Exciters, Texture, Vocal, Dynamics, Space/Mix, Production and Structure.
+
+Genre and Instruments are intentionally excluded from this baseline because they already have specialized Database V1-backed pickers.
+
+Merge precedence is **Foundation first, reviewed/approved database editor rows second by stable ID**. The tracked baseline therefore guarantees product completeness without blocking later reviewed knowledge from replacing labels/output/visibility for the same semantic control.
+
+The Runtime manifest records `editor_foundation_sha256`. A Foundation change invalidates an existing local Runtime Pack even when `knowledge.sqlite` itself is unchanged.
+
+Runtime export fails closed when required Foundation facets lose either parameter coverage or Easy-statement coverage. The UI must never silently substitute ad-hoc React demo options for a missing product catalog.
