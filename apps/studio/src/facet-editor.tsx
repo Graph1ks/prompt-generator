@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   hasFacetSelection,
   removeFacetSelection,
@@ -6,6 +6,7 @@ import {
   setFacetSelection,
   type FacetKey,
   type MusicSpec,
+  type Selection,
 } from "@vgine/music-spec";
 import type {
   RuntimeEditorPayload,
@@ -13,12 +14,13 @@ import type {
   RuntimeParameterOption,
 } from "@vgine/runtime-data";
 
+import { HoldFavoriteOption } from "./hold-favorite-option.js";
 import { Icon } from "./icons.js";
 import { KnowledgeTerm } from "./knowledge-term.js";
 import { useI18n } from "./i18n.js";
 import type { StudioRuntime } from "./runtime-client.js";
-
-type FacetEditorMode = "easy" | "advanced";
+import type { StudioEditorMode } from "./studio-config.js";
+import { useAdvancedPresets } from "./use-advanced-presets.js";
 
 type EditorState =
   | { readonly status: "loading" }
@@ -34,6 +36,8 @@ export interface FacetEditorProps {
   readonly spec: MusicSpec;
   readonly onSpecChange: (spec: MusicSpec) => void;
   readonly assistOn: boolean;
+  readonly mode: StudioEditorMode;
+  readonly onModeChange: (mode: StudioEditorMode) => void;
 }
 
 export function FacetEditor({
@@ -43,13 +47,18 @@ export function FacetEditor({
   spec,
   onSpecChange,
   assistOn,
+  mode,
+  onModeChange,
 }: FacetEditorProps) {
   const { t } = useI18n();
   const [editor, setEditor] = useState<EditorState>({ status: "loading" });
-  const [mode, setMode] = useState<FacetEditorMode>("easy");
   const [expandedParameters, setExpandedParameters] = useState<ReadonlySet<string>>(
     () => new Set(),
   );
+  const [presetsOpen, setPresetsOpen] = useState(false);
+  const [clearPresetsArmed, setClearPresetsArmed] = useState(false);
+  const clearPresetsTimerRef = useRef<number | null>(null);
+  const advancedPresets = useAdvancedPresets(facet);
 
   useEffect(() => {
     let live = true;
@@ -69,6 +78,15 @@ export function FacetEditor({
       live = false;
     };
   }, [runtime]);
+
+  useEffect(
+    () => () => {
+      if (clearPresetsTimerRef.current !== null) {
+        window.clearTimeout(clearPresetsTimerRef.current);
+      }
+    },
+    [],
+  );
 
   const data = editor.status === "ready" ? editor.value : null;
   const sectionKnowledgeEntryId =
@@ -123,28 +141,60 @@ export function FacetEditor({
     return map;
   }, [data]);
 
-  useEffect(() => {
-    if (editor.status !== "ready") return;
-    if (statements.length === 0 && parameters.length > 0) {
-      setMode("advanced");
-    }
-  }, [editor.status, parameters.length, statements.length]);
-
   const facetState = spec.facets[facet];
+  const customText = facetState?.custom_text ?? "";
+  const matchingPreset = advancedPresets.findByText(customText);
   const selectedCount =
     (facetState?.selections.length ?? 0) +
-    (facetState?.custom_text?.trim() ? 1 : 0);
+    (customText.trim() ? 1 : 0);
 
-  function toggleStatement(
-    id: string,
-    outputText: string,
-  ) {
-    if (hasFacetSelection(spec, facet, id)) {
-      onSpecChange(removeFacetSelection(spec, facet, id));
+  function replaceFacetState(
+    source: MusicSpec,
+    selections: readonly Selection[],
+    customTextValue: string | null,
+  ): MusicSpec {
+    const current = source.facets[facet] ?? {
+      locked: false,
+      selections: [],
+      custom_text: null,
+    };
+    return {
+      ...source,
+      facets: {
+        ...source.facets,
+        [facet]: {
+          ...current,
+          selections,
+          custom_text: customTextValue,
+        },
+      },
+    };
+  }
+
+  function withoutEasySelections(source: MusicSpec): MusicSpec {
+    const current = source.facets[facet];
+    if (!current) return source;
+    const nextSelections = current.selections.filter(
+      (selection) => selection.kind !== "statement",
+    );
+    if (nextSelections.length === current.selections.length) return source;
+    return replaceFacetState(source, nextSelections, current.custom_text);
+  }
+
+  function emptyFacetForEasy(source: MusicSpec): MusicSpec {
+    return replaceFacetState(source, [], null);
+  }
+
+  function toggleStatement(id: string, outputText: string) {
+    const selected = hasFacetSelection(spec, facet, id);
+    const clean = emptyFacetForEasy(spec);
+    if (selected) {
+      onSpecChange(clean);
       return;
     }
+
     onSpecChange(
-      setFacetSelection(spec, facet, {
+      setFacetSelection(clean, facet, {
         id,
         kind: "statement",
         value: outputText,
@@ -169,7 +219,7 @@ export function FacetEditor({
         parameter.ui.step +
       parameter.ui.min;
     const displayValue = Number(snapped.toFixed(6));
-    let next = spec;
+    let next = withoutEasySelections(spec);
 
     for (const sibling of optionsByParameter.get(parameter.id) ?? []) {
       if (hasFacetSelection(next, facet, sibling.id)) {
@@ -205,20 +255,25 @@ export function FacetEditor({
 
   function clearNumberParameter(parameter: RuntimeParameter) {
     const valueId = parameter.id + ":value";
-    if (!hasFacetSelection(spec, facet, valueId)) return;
-    onSpecChange(removeFacetSelection(spec, facet, valueId));
+    const clean = withoutEasySelections(spec);
+    if (!hasFacetSelection(clean, facet, valueId)) {
+      if (clean !== spec) onSpecChange(clean);
+      return;
+    }
+    onSpecChange(removeFacetSelection(clean, facet, valueId));
   }
 
   function toggleOption(
     option: RuntimeParameterOption,
     parameter: RuntimeParameter,
   ) {
-    if (hasFacetSelection(spec, facet, option.id)) {
-      onSpecChange(removeFacetSelection(spec, facet, option.id));
+    let next = withoutEasySelections(spec);
+
+    if (hasFacetSelection(next, facet, option.id)) {
+      onSpecChange(removeFacetSelection(next, facet, option.id));
       return;
     }
 
-    let next = spec;
     if (parameter.value_type !== "multi") {
       for (const sibling of optionsByParameter.get(parameter.id) ?? []) {
         if (
@@ -227,6 +282,10 @@ export function FacetEditor({
         ) {
           next = removeFacetSelection(next, facet, sibling.id);
         }
+      }
+      const numberValueId = parameter.id + ":value";
+      if (hasFacetSelection(next, facet, numberValueId)) {
+        next = removeFacetSelection(next, facet, numberValueId);
       }
     }
 
@@ -241,6 +300,23 @@ export function FacetEditor({
     );
   }
 
+  function updateCustomText(value: string) {
+    const clean = value.trim().length > 0 ? withoutEasySelections(spec) : spec;
+    onSpecChange(
+      setFacetCustomText(
+        clean,
+        facet,
+        value.trim().length > 0 ? value : null,
+      ),
+    );
+  }
+
+  function applyPreset(id: string, text: string) {
+    const clean = withoutEasySelections(spec);
+    advancedPresets.recordUse(id);
+    onSpecChange(setFacetCustomText(clean, facet, text));
+  }
+
   function toggleParameterExpansion(parameter: RuntimeParameter) {
     setExpandedParameters((current) => {
       const next = new Set(current);
@@ -248,6 +324,27 @@ export function FacetEditor({
       else next.add(parameter.id);
       return next;
     });
+  }
+
+  function requestClearAllPresets() {
+    if (clearPresetsArmed) {
+      if (clearPresetsTimerRef.current !== null) {
+        window.clearTimeout(clearPresetsTimerRef.current);
+        clearPresetsTimerRef.current = null;
+      }
+      advancedPresets.clearAll();
+      setClearPresetsArmed(false);
+      return;
+    }
+
+    setClearPresetsArmed(true);
+    if (clearPresetsTimerRef.current !== null) {
+      window.clearTimeout(clearPresetsTimerRef.current);
+    }
+    clearPresetsTimerRef.current = window.setTimeout(() => {
+      setClearPresetsArmed(false);
+      clearPresetsTimerRef.current = null;
+    }, 2600);
   }
 
   return (
@@ -286,7 +383,7 @@ export function FacetEditor({
           type="button"
           className={mode === "easy" ? "active" : ""}
           aria-pressed={mode === "easy"}
-          onClick={() => setMode("easy")}
+          onClick={() => onModeChange("easy")}
         >
           {t("facetEditor.easy")}
         </button>
@@ -294,7 +391,7 @@ export function FacetEditor({
           type="button"
           className={mode === "advanced" ? "active" : ""}
           aria-pressed={mode === "advanced"}
-          onClick={() => setMode("advanced")}
+          onClick={() => onModeChange("advanced")}
         >
           {t("facetEditor.advanced")}
         </button>
@@ -325,7 +422,9 @@ export function FacetEditor({
                   <button
                     key={statement.id}
                     type="button"
-                    className={selected ? "statement-card selected" : "statement-card"}
+                    className={
+                      selected ? "statement-card selected" : "statement-card"
+                    }
                     aria-pressed={selected}
                     onClick={() =>
                       toggleStatement(statement.id, statement.output_text)
@@ -379,8 +478,7 @@ export function FacetEditor({
                   {parameter.ui?.control === "number" ? (
                     <div className="number-parameter-control">
                       {(() => {
-                        const selectedValue =
-                          selectedNumberValue(parameter);
+                        const selectedValue = selectedNumberValue(parameter);
                         const rangeValue =
                           selectedValue ??
                           parameter.ui.recommended_values[0] ??
@@ -417,14 +515,19 @@ export function FacetEditor({
                                       clearNumberParameter(parameter);
                                       return;
                                     }
-                                    setNumberParameter(parameter, Number(raw));
+                                    setNumberParameter(
+                                      parameter,
+                                      Number(raw),
+                                    );
                                   }}
                                 />
                                 {selectedValue !== null && (
                                   <button
                                     type="button"
                                     className="text-btn number-parameter-clear"
-                                    onClick={() => clearNumberParameter(parameter)}
+                                    onClick={() =>
+                                      clearNumberParameter(parameter)
+                                    }
                                   >
                                     {t("facetEditor.clear")}
                                   </button>
@@ -451,28 +554,30 @@ export function FacetEditor({
                               <div className="parameter-recommended">
                                 <small>{t("facetEditor.recommended")}</small>
                                 <div className="parameter-options">
-                                  {parameter.ui.recommended_values.map((value) => (
-                                    <button
-                                      key={value}
-                                      type="button"
-                                      className={
-                                        selectedValue === value
-                                          ? "parameter-option selected"
-                                          : "parameter-option recommended"
-                                      }
-                                      aria-pressed={selectedValue === value}
-                                      onClick={() =>
-                                        setNumberParameter(parameter, value)
-                                      }
-                                    >
-                                      <span>
-                                        {value}
-                                        {parameter.ui?.unit
-                                          ? " " + parameter.ui.unit
-                                          : ""}
-                                      </span>
-                                    </button>
-                                  ))}
+                                  {parameter.ui.recommended_values.map(
+                                    (value) => (
+                                      <button
+                                        key={value}
+                                        type="button"
+                                        className={
+                                          selectedValue === value
+                                            ? "parameter-option selected"
+                                            : "parameter-option recommended"
+                                        }
+                                        aria-pressed={selectedValue === value}
+                                        onClick={() =>
+                                          setNumberParameter(parameter, value)
+                                        }
+                                      >
+                                        <span>
+                                          {value}
+                                          {parameter.ui?.unit
+                                            ? " " + parameter.ui.unit
+                                            : ""}
+                                        </span>
+                                      </button>
+                                    ),
+                                  )}
                                 </div>
                               </div>
                             )}
@@ -483,7 +588,11 @@ export function FacetEditor({
                   ) : visible.length > 0 ? (
                     <div className="parameter-options">
                       {visible.map((option) => {
-                        const selected = hasFacetSelection(spec, facet, option.id);
+                        const selected = hasFacetSelection(
+                          spec,
+                          facet,
+                          option.id,
+                        );
                         return (
                           <button
                             key={option.id}
@@ -517,17 +626,19 @@ export function FacetEditor({
 
                   {parameter.ui?.control !== "number" &&
                     options.length > COMPACT_OPTIONS_PER_PARAMETER && (
-                    <button
-                      type="button"
-                      className="text-btn parameter-expand"
-                      onClick={() => toggleParameterExpansion(parameter)}
-                    >
-                      {expanded
-                        ? t("facetEditor.compact")
-                        : t("facetEditor.showAll", { count: options.length })}
-                      <Icon name={expanded ? "up" : "arrow"} />
-                    </button>
-                  )}
+                      <button
+                        type="button"
+                        className="text-btn parameter-expand"
+                        onClick={() => toggleParameterExpansion(parameter)}
+                      >
+                        {expanded
+                          ? t("facetEditor.compact")
+                          : t("facetEditor.showAll", {
+                              count: options.length,
+                            })}
+                        <Icon name={expanded ? "up" : "arrow"} />
+                      </button>
+                    )}
                 </section>
               );
             })
@@ -535,24 +646,114 @@ export function FacetEditor({
             <p className="facet-empty">{t("facetEditor.noParameters")}</p>
           )}
 
-          <label className="facet-custom-text">
-            <span>{t("facetEditor.custom")}</span>
-            <textarea
-              value={facetState?.custom_text ?? ""}
-              spellCheck={false}
-              placeholder={t("facetEditor.customPlaceholder")}
-              onChange={(event) => {
-                const value = event.currentTarget.value;
-                onSpecChange(
-                  setFacetCustomText(
-                    spec,
-                    facet,
-                    value.trim().length > 0 ? value : null,
-                  ),
-                );
-              }}
-            />
-          </label>
+          <div className="facet-custom-text">
+            <div className="facet-custom-head">
+              <span>{t("facetEditor.custom")}</span>
+              <button
+                type="button"
+                className={
+                  presetsOpen
+                    ? "text-btn advanced-presets-toggle active"
+                    : "text-btn advanced-presets-toggle"
+                }
+                aria-expanded={presetsOpen}
+                onClick={() => setPresetsOpen((current) => !current)}
+              >
+                {t("facetEditor.presets")} · {advancedPresets.presets.length}
+                <Icon name={presetsOpen ? "up" : "arrow"} />
+              </button>
+            </div>
+
+            <div className="facet-custom-input-shell">
+              <textarea
+                value={customText}
+                spellCheck={false}
+                placeholder={t("facetEditor.customPlaceholder")}
+                onChange={(event) =>
+                  updateCustomText(event.currentTarget.value)
+                }
+              />
+              {customText.trim().length > 0 && (
+                <HoldFavoriteOption
+                  className="custom-preset-hold"
+                  favorite={matchingPreset !== null}
+                  usageCount={matchingPreset?.useCount ?? 0}
+                  title={
+                    matchingPreset
+                      ? t("facetEditor.presetSaved")
+                      : t("facetEditor.presetSave")
+                  }
+                  onFavorite={() => advancedPresets.add(customText)}
+                  onUnfavorite={() => {
+                    if (matchingPreset) {
+                      advancedPresets.remove(matchingPreset.id);
+                    }
+                  }}
+                  onActivate={() => setPresetsOpen(true)}
+                  aria-label={
+                    matchingPreset
+                      ? t("facetEditor.presetSaved")
+                      : t("facetEditor.presetSave")
+                  }
+                >
+                  <Icon name="star" />
+                </HoldFavoriteOption>
+              )}
+            </div>
+
+            {presetsOpen && (
+              <div className="advanced-presets-menu">
+                <div className="advanced-presets-menu-head">
+                  <div>
+                    <strong>{t("facetEditor.presets")}</strong>
+                    <small>{t("facetEditor.presetsLocal")}</small>
+                  </div>
+                  {advancedPresets.presets.length > 0 && (
+                    <button
+                      type="button"
+                      className={
+                        clearPresetsArmed
+                          ? "text-btn danger armed"
+                          : "text-btn danger"
+                      }
+                      onClick={requestClearAllPresets}
+                    >
+                      {clearPresetsArmed
+                        ? t("facetEditor.confirmDeleteAllPresets")
+                        : t("facetEditor.deleteAllPresets")}
+                    </button>
+                  )}
+                </div>
+
+                {advancedPresets.presets.length > 0 ? (
+                  <div className="advanced-presets-list">
+                    {advancedPresets.presets.map((preset) => (
+                      <HoldFavoriteOption
+                        key={preset.id}
+                        className="advanced-preset-option"
+                        favorite
+                        usageCount={preset.useCount}
+                        title={t("facetEditor.presetApply")}
+                        onFavorite={() => undefined}
+                        onUnfavorite={() =>
+                          advancedPresets.remove(preset.id)
+                        }
+                        onActivate={() =>
+                          applyPreset(preset.id, preset.text)
+                        }
+                      >
+                        <span>{preset.text}</span>
+                      </HoldFavoriteOption>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="facet-empty">
+                    {t("facetEditor.presetEmpty")}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </section>
