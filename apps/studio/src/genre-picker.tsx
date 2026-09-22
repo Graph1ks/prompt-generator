@@ -239,6 +239,30 @@ export function GenrePicker({
     setShowAllResults(false);
   }, [query, majorId]);
 
+  useEffect(() => {
+    if (!pickerOpen) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      const panel = pickerRef.current;
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      panel?.scrollIntoView({
+        behavior: reducedMotion ? "auto" : "smooth",
+        block: "start",
+      });
+
+      if (
+        window.matchMedia("(min-width: 761px) and (pointer: fine)").matches
+      ) {
+        searchInputRef.current?.focus({ preventScroll: true });
+        searchInputRef.current?.select();
+      }
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [activeRole, pickerOpen, pickerRef, searchInputRef]);
+
 
   function roleLabel(role: GenreInfluenceRole): string {
     return t(
