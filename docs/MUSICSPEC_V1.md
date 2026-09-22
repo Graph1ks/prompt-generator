@@ -56,7 +56,7 @@ A project has one to three ordered influences.
 
 Roles:
 
-- `foundation` — primary musical grammar;
+- `foundation` — primary musical grammar when genre guidance is used;
 - `fusion` — secondary language integrated into the foundation;
 - `accent` — limited color/texture/production influence.
 
@@ -158,7 +158,7 @@ Example inputs:
 - concept: `transient`;
 - context: `drums`;
 - current option: `sharp`;
-- Foundation: Boom Bap;
+- Foundation: Boom Bap (optional);
 - Bass: sustained/rounded.
 
 The UI can then explain what “sharp transients” are doing **in this project**, while the static knowledge DB supplies the global and facet-specific definitions.
@@ -180,6 +180,6 @@ Persist:
 - user text;
 - locks/origins/routing.
 
-Do not persist rendered prompt text as the canonical state. It may be cached for convenience but must be reproducible.
+Do not persist rendered prompt text as the canonical semantic state. A user may create an explicit manual output override after compilation; that override is secondary output state and must never mutate or replace MusicSpec as source truth.
 
 Future MusicSpec changes require explicit migration logic rather than silent reinterpretation.
