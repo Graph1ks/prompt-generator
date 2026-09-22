@@ -361,60 +361,62 @@ export function InstrumentPicker({
         </div>
       )}
 
-      <label className="searchbox instrument-search">
-        <Icon name="search" />
-        <span className="sr-only">{t("instrument.searchAria")}</span>
-        <input
-          ref={searchInputRef}
-          type="search"
-          value={query}
-          autoComplete="off"
-          placeholder={t("instrument.searchPlaceholder", {
-            count:
-              library.value.expressions.expressions.length.toLocaleString(locale),
-          })}
-          onChange={(event) => setQuery(event.currentTarget.value)}
-        />
-        {query ? (
+      <div className="pool-control-stack instrument-pool-controls">
+        <label className="searchbox instrument-search">
+          <Icon name="search" />
+          <span className="sr-only">{t("instrument.searchAria")}</span>
+          <input
+            ref={searchInputRef}
+            type="search"
+            value={query}
+            autoComplete="off"
+            placeholder={t("instrument.searchPlaceholder", {
+              count:
+                library.value.expressions.expressions.length.toLocaleString(locale),
+            })}
+            onChange={(event) => setQuery(event.currentTarget.value)}
+          />
+          {query ? (
+            <button
+              type="button"
+              className="search-clear"
+              aria-label={t("instrument.clearSearch")}
+              onClick={() => setQuery("")}
+            >
+              <Icon name="close" />
+            </button>
+          ) : (
+            <kbd>/</kbd>
+          )}
+        </label>
+
+        <div className="family-chips instrument-family-chips">
           <button
             type="button"
-            className="search-clear"
-            aria-label={t("instrument.clearSearch")}
-            onClick={() => setQuery("")}
+            className={familyId === null ? "chip selected" : "chip"}
+            onClick={() => setFamilyId(null)}
           >
-            <Icon name="close" />
+            {t("instrument.allFamilies")}
           </button>
-        ) : (
-          <kbd>/</kbd>
-        )}
-      </label>
+          {library.value.instruments.families.map((family) => (
+            <button
+              key={family.id}
+              type="button"
+              className={familyId === family.id ? "chip selected" : "chip"}
+              onClick={() => setFamilyId(family.id)}
+            >
+              {family.label}
+            </button>
+          ))}
+        </div>
 
-      <div className="family-chips instrument-family-chips">
-        <button
-          type="button"
-          className={familyId === null ? "chip selected" : "chip"}
-          onClick={() => setFamilyId(null)}
-        >
-          {t("instrument.allFamilies")}
-        </button>
-        {library.value.instruments.families.map((family) => (
-          <button
-            key={family.id}
-            type="button"
-            className={familyId === family.id ? "chip selected" : "chip"}
-            onClick={() => setFamilyId(family.id)}
-          >
-            {family.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="result-meta">
-        <span>
-          {t("instrument.results", {
-            count: matchingExpressions.length.toLocaleString(locale),
-          })}
-        </span>
+        <div className="result-meta">
+          <span>
+            {t("instrument.results", {
+              count: matchingExpressions.length.toLocaleString(locale),
+            })}
+          </span>
+        </div>
       </div>
 
       <div

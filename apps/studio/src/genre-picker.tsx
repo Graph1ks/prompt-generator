@@ -495,66 +495,68 @@ export function GenrePicker({
             </button>
           </div>
 
-          <label className="searchbox">
-            <Icon name="search" />
-            <span className="sr-only">{t("genre.searchAria")}</span>
-            <input
-              ref={searchInputRef}
-              type="search"
-              value={query}
-              autoComplete="off"
-              placeholder={t("genre.searchPlaceholder", {
-                count: runtime.genres.genres.length.toLocaleString(locale),
-              })}
-              onChange={(event) => setQuery(event.currentTarget.value)}
-            />
-            {query ? (
+          <div className="pool-control-stack genre-pool-controls">
+            <label className="searchbox">
+              <Icon name="search" />
+              <span className="sr-only">{t("genre.searchAria")}</span>
+              <input
+                ref={searchInputRef}
+                type="search"
+                value={query}
+                autoComplete="off"
+                placeholder={t("genre.searchPlaceholder", {
+                  count: runtime.genres.genres.length.toLocaleString(locale),
+                })}
+                onChange={(event) => setQuery(event.currentTarget.value)}
+              />
+              {query ? (
+                <button
+                  type="button"
+                  className="search-clear"
+                  aria-label={t("genre.clearSearch")}
+                  onClick={() => setQuery("")}
+                >
+                  <Icon name="close" />
+                </button>
+              ) : (
+                <kbd>/</kbd>
+              )}
+            </label>
+
+            <div className="family-chips" aria-label="Major Genres">
               <button
                 type="button"
-                className="search-clear"
-                aria-label={t("genre.clearSearch")}
-                onClick={() => setQuery("")}
+                className={!majorId ? "chip selected" : "chip"}
+                onClick={() => setMajorId(null)}
               >
-                <Icon name="close" />
+                {t("genre.all")}
               </button>
-            ) : (
-              <kbd>/</kbd>
-            )}
-          </label>
+              {orderedMajors.map((major) => (
+                <button
+                  key={major.id}
+                  type="button"
+                  className={majorId === major.id ? "chip selected" : "chip"}
+                  onClick={() => setMajorId(major.id)}
+                >
+                  {major.label}
+                </button>
+              ))}
+            </div>
 
-          <div className="family-chips" aria-label="Major Genres">
-            <button
-              type="button"
-              className={!majorId ? "chip selected" : "chip"}
-              onClick={() => setMajorId(null)}
-            >
-              {t("genre.all")}
-            </button>
-            {orderedMajors.map((major) => (
-              <button
-                key={major.id}
-                type="button"
-                className={majorId === major.id ? "chip selected" : "chip"}
-                onClick={() => setMajorId(major.id)}
-              >
-                {major.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="result-meta">
-            <span>
-              {t("genre.results", {
-                count: matchingOptions.length.toLocaleString(locale),
-              })}
-              {majorId ? " · " + (majorById.get(majorId)?.label ?? "") : ""}
-              {favoriteCount > 0
-                ? " · " +
-                  t("genre.favorites", {
-                    count: favoriteCount.toLocaleString(locale),
-                  })
-                : ""}
-            </span>
+            <div className="result-meta">
+              <span>
+                {t("genre.results", {
+                  count: matchingOptions.length.toLocaleString(locale),
+                })}
+                {majorId ? " · " + (majorById.get(majorId)?.label ?? "") : ""}
+                {favoriteCount > 0
+                  ? " · " +
+                    t("genre.favorites", {
+                      count: favoriteCount.toLocaleString(locale),
+                    })
+                  : ""}
+              </span>
+            </div>
           </div>
 
           <div
