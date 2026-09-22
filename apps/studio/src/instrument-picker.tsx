@@ -402,6 +402,13 @@ export function InstrumentPicker({
             expression.id,
           );
           const identities = identityLabelsForExpression(expression);
+          const linkedInstrument = expression.instruments
+            .map((link) => instrumentById.get(link.instrument_id))
+            .find((instrument) => instrument?.knowledge_entry_id);
+          const knowledgeEntryId =
+            linkedInstrument?.knowledge_entry_id ??
+            expression.concepts.find((concept) => concept.entry_id)?.entry_id ??
+            null;
           return (
             <HoldFavoriteOption
               key={expression.id}
@@ -413,12 +420,20 @@ export function InstrumentPicker({
                 .join(" ")}
               favorite={preferences.isFavorite(expression.id)}
               usageCount={preferences.usageCount(expression.id)}
+              activationLabel={expression.label}
               onFavorite={() => preferences.setFavorite(expression.id, true)}
               onUnfavorite={() => preferences.setFavorite(expression.id, false)}
               onActivate={() => toggleExpression(expression)}
             >
               <span className="instrument-result-title">
-                {expression.label}
+                <KnowledgeTerm
+                  entryId={knowledgeEntryId}
+                  label={expression.label}
+                  enabled={assistOn}
+                  loadKnowledge={runtime.loadKnowledge}
+                  contextType="instrument_expression"
+                  contextKey={expression.id}
+                />
               </span>
               <small>{familyLabelsForExpression(expression)}</small>
               <small className="instrument-result-detail">
