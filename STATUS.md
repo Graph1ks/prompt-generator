@@ -244,6 +244,6 @@ Proceed in this order:
 - Explanation UI is a singleton viewport portal, so parent overflow cannot clip it and multiple cards cannot overlap.
 - The old Knowledge-origin chip rows beneath the Live Prompt were removed. Explain UI no longer consumes prompt-preview layout space and still never enters copied Style/Exclude text.
 - Favorite hold feedback now renders outside the small preset control's clipping boundary; hit areas are separated from explainable labels so favorite/select gestures and Explain can coexist.
-- The current generated/meta prose for Product Knowledge options/statements/Exclude entries is not accepted as final editorial quality. The complete 400-entry authoring handoff is `data/product/knowledge-foundation-v1-authoring-request.txt`.
-- Returned bilingual `ID / EN / DE` copy is validated/imported by `scripts/data/import_product_knowledge_authoring.py`, which preserves stable IDs/links and rejects the known UI-meta template wording.
+- Product Knowledge v1 now contains the accepted authored EN/DE musical explanations for all 400 Product Foundation entries; the generated preset/control/rendering meta copy is no longer the tracked baseline.
+- `scripts/data/import_product_knowledge_authoring.py` remains the guarded authoring/import path for future editorial revisions and rejects the known UI-meta template wording.
 - Owner-local Runtime re-export remains required after Product Knowledge copy changes because `product_knowledge_foundation_sha256` participates in Runtime identity.
