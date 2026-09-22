@@ -81,6 +81,11 @@ export function HoldFavoriteOption({
       style={{
         ...props.style,
         "--favorite-hold-ms": (favorite ? REMOVE_HOLD_MS : ADD_HOLD_MS) + "ms",
+        "--favorite-check-delay-ms": Math.round(ADD_HOLD_MS * 0.55) + "ms",
+        "--favorite-check-ms": Math.round(ADD_HOLD_MS * 0.45) + "ms",
+        "--favorite-remove-outline-ms": Math.round(REMOVE_HOLD_MS * 0.7) + "ms",
+        "--favorite-remove-x-delay-ms": Math.round(REMOVE_HOLD_MS * 0.7) + "ms",
+        "--favorite-remove-x-ms": Math.round(REMOVE_HOLD_MS * 0.3) + "ms",
       } as CSSProperties}
       title={
         favorite
