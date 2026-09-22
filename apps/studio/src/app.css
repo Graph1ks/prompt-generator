@@ -4193,3 +4193,145 @@
   }
 }
 
+@layer studio {
+  .copy-fallback-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: var(--vg-z-dialog);
+    padding: clamp(16px, 5vw, 56px);
+    background: rgb(10 12 10 / 0.5);
+    backdrop-filter: blur(12px);
+    display: grid;
+    place-items: center;
+  }
+
+  .copy-fallback {
+    inline-size: min(720px, 100%);
+    max-block-size: calc(100dvh - 32px);
+    overflow: hidden;
+    border: 1px solid var(--studio-line-strong);
+    border-radius: 20px;
+    background: var(--studio-paper);
+    color: var(--studio-ink);
+    box-shadow: 0 28px 90px rgb(0 0 0 / 0.28);
+  }
+
+  .copy-fallback-head {
+    padding: 22px 22px 17px;
+    border-block-end: 1px solid var(--studio-line);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .copy-fallback-head .eyebrow {
+    color: var(--studio-muted);
+  }
+
+  .copy-fallback-head h2 {
+    margin-block-start: 5px;
+    font-size: 23px;
+    letter-spacing: -0.65px;
+  }
+
+  .copy-fallback-head p {
+    margin-block-start: 6px;
+    max-inline-size: 560px;
+    color: var(--studio-muted);
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  .copy-fallback-content {
+    padding: 18px 22px 20px;
+    display: grid;
+    gap: 12px;
+  }
+
+  .copy-fallback textarea {
+    inline-size: 100%;
+    min-block-size: 220px;
+    max-block-size: 46dvh;
+    resize: vertical;
+    padding: 14px;
+    border: 1px solid var(--studio-line-strong);
+    border-radius: 12px;
+    background: var(--studio-dark);
+    color: #e4e9d9;
+    font-family: var(--vg-font-mono);
+    font-size: 11px;
+    line-height: 1.75;
+  }
+
+  .copy-fallback textarea:focus-visible {
+    outline: 3px solid var(--studio-focus);
+    outline-offset: 3px;
+  }
+
+  .copy-fallback-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .copy-fallback-actions > span {
+    color: var(--studio-muted);
+    font-size: 10px;
+  }
+
+  .copy-fallback-actions > div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  @media (max-width: 760px) {
+    .copy-fallback-backdrop {
+      padding: 0;
+      align-items: end;
+    }
+
+    .copy-fallback {
+      inline-size: 100%;
+      max-block-size: min(88dvh, 760px);
+      border-inline: 0;
+      border-block-end: 0;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .copy-fallback-head {
+      padding: 19px 16px 15px;
+    }
+
+    .copy-fallback-head h2 {
+      font-size: 21px;
+    }
+
+    .copy-fallback-content {
+      padding: 14px 16px calc(16px + env(safe-area-inset-bottom));
+    }
+
+    .copy-fallback textarea {
+      min-block-size: 190px;
+      max-block-size: 42dvh;
+      font-size: 12px;
+    }
+
+    .copy-fallback-actions {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .copy-fallback-actions > div {
+      inline-size: 100%;
+    }
+
+    .copy-fallback-actions .btn {
+      flex: 1;
+      min-block-size: 48px;
+    }
+  }
+}
+
