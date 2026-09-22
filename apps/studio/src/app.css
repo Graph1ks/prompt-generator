@@ -2369,6 +2369,13 @@
     outline-offset: 3px;
   }
 
+  .hold-favorite-option:has(.hold-favorite-hitarea:focus-visible) {
+    border-color: var(--studio-line-strong);
+    box-shadow:
+      0 0 0 2px color-mix(in srgb, var(--studio-focus) 18%, transparent),
+      0 8px 22px rgb(36 39 34 / 0.08);
+  }
+
   .favorite-mark {
     position: absolute;
     inset-block-start: 8px;
