@@ -269,3 +269,19 @@ Typed Runtime records include:
 The application preserves nullable statement `source_frequency`; absence of corpus frequency is not invalid knowledge.
 
 The canonical parameter value types are `enum`, `multi`, `number`, `text`, `boolean`, and `relation`.
+
+## Lazy knowledge payload consumption
+
+Studio lazy-loads `knowledge.json` only when a user opens an explanation. The payload is manifest hash/count validated and cached per Studio runtime.
+
+Runtime knowledge entries preserve reviewed/approved:
+
+- canonical entry identity/type/difficulty;
+- localized term variants;
+- layered definitions;
+- context definitions;
+- entry relations.
+
+UI locale selection does not alter renderer output. Explanation resolution prefers the active UI locale, then English, then another available reviewed definition as a final display fallback.
+
+Product UI must not synthesize explanations for controls without a real `knowledge_entry_id`.
