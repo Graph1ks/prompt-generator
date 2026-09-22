@@ -172,3 +172,12 @@ Proceed in this order:
 - Easy consumes Runtime statements; Advanced consumes Runtime parameter options plus per-facet custom text.
 - Parameter cardinality follows schema value types: `multi` is multi-select, other option-bearing types are exclusive within their parameter.
 - Finish now exposes the real Runtime Exclude catalog and writes only to `MusicSpec.exclude[]` / separate Exclude compiler output.
+
+## Runtime Knowledge surface slice
+
+- Favorite hold duration instructions have been removed from visible pool hints and hover titles; gesture timing remains internal behavior.
+- `knowledge.json` now has typed Runtime parsing/validation and cached lazy Studio loading.
+- Explanation mode now activates real Knowledge terms instead of being chrome-only.
+- Selected Genre labels, ordinary facet section labels, Advanced parameter labels and the Instruments section can expose reviewed definitions when their Runtime records carry Knowledge IDs.
+- Definitions resolve active UI locale first with English fallback; prompt output remains English.
+- Unlinked labels stay plain text; no explanation is generated from label guesses.

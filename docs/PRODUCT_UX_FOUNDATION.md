@@ -359,3 +359,16 @@ Instruments remain a specialized high-cardinality facet because source expressio
 ## 20. Finish / Exclude editing
 
 Finish exposes the Runtime `exclude` catalog as a separate selectable pool. Selected entries write only to `MusicSpec.exclude[]` and compile to the separate comma-delimited Exclude output. They must never produce a bracketed Style section.
+
+## 21. Runtime knowledge surfaces
+
+Explanation mode exposes knowledge only where Runtime data provides an explicit Knowledge entry link.
+
+- knowledge data loads lazily on first explanation request;
+- linked terms receive a subtle knowledge underline rather than repeated info icons;
+- desktop explanations open adjacent to the term; mobile uses a bottom-safe compact surface;
+- the surface may show a localized global definition, matching context definition, difficulty, and related terms;
+- UI locale resolution may fall back to English when a localized reviewed definition does not exist;
+- unlinked labels remain ordinary text; the UI does not invent definitions from label wording.
+
+Favorite gesture timings are implementation behavior and are not displayed as instructional copy in pool result metadata or hover titles.

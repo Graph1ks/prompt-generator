@@ -752,3 +752,13 @@ Parameter cardinality follows the existing knowledge schema. `multi` allows mult
 Mouse/touch favorite timing is 0.8 s to add and 1.0 s to remove. JavaScript state transition and SVG progress use the same duration variables so visual completion cannot drift from the actual state change.
 
 Add feedback uses the active theme's semantic success color and an animated checkmark. Removal retains explicit danger-colored square/X feedback.
+
+## ADR-038 — Runtime knowledge loads lazily and only explicit links become explainable
+
+**Status:** accepted
+
+The application does not load the full Knowledge payload during initial Studio bootstrap. `knowledge.json` is loaded, manifest-validated and cached on the first explanation request.
+
+A UI label becomes an interactive Knowledge term only when its Runtime entity carries a concrete `knowledge_entry_id` (or an equivalent explicit semantic relation). The UI does not infer dictionary identity from matching visible strings.
+
+Definition selection follows UI locale first, English fallback second. This localization path is independent of the English v1 prompt renderer.

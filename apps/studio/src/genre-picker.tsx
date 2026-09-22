@@ -10,11 +10,13 @@ import type {
   RuntimeBootstrap,
   RuntimeGenre,
   RuntimeMajorGenre,
+  RuntimeKnowledgePayload,
 } from "@vgine/runtime-data";
 import type { SearchIndex } from "@vgine/search";
 
 import { HoldFavoriteOption } from "./hold-favorite-option.js";
 import { Icon } from "./icons.js";
+import { KnowledgeTerm } from "./knowledge-term.js";
 import { useI18n } from "./i18n.js";
 import { usePoolPreferences } from "./pool-preferences.js";
 import { useExpandedPoolSegment } from "./use-expanded-pool-segment.js";
@@ -39,6 +41,7 @@ interface GenreOption {
   readonly label: string;
   readonly majorGenreIds: readonly string[];
   readonly isMajor: boolean;
+  readonly knowledgeEntryId: string | null;
 }
 
 export interface GenrePickerProps {
@@ -48,6 +51,8 @@ export interface GenrePickerProps {
   readonly activeRole: GenreInfluenceRole;
   readonly onRoleChange: (role: GenreInfluenceRole) => void;
   readonly onSpecChange: (spec: MusicSpec) => void;
+  readonly assistOn: boolean;
+  readonly loadKnowledge: () => Promise<RuntimeKnowledgePayload>;
 }
 
 function genreIdForRole(
@@ -63,6 +68,7 @@ function genreOption(genre: RuntimeGenre): GenreOption {
     label: genre.label,
     majorGenreIds: genre.major_genre_ids,
     isMajor: false,
+    knowledgeEntryId: genre.knowledge_entry_id,
   };
 }
 
@@ -72,6 +78,7 @@ function majorOption(major: RuntimeMajorGenre): GenreOption {
     label: major.label,
     majorGenreIds: [major.id],
     isMajor: true,
+    knowledgeEntryId: major.knowledge_entry_id,
   };
 }
 
@@ -90,6 +97,8 @@ export function GenrePicker({
   activeRole,
   onRoleChange,
   onSpecChange,
+  assistOn,
+  loadKnowledge,
 }: GenrePickerProps) {
   const { locale, t } = useI18n();
   const [query, setQuery] = useState("");
@@ -346,7 +355,16 @@ export function GenrePicker({
                 <span className="genre-card-status">LIVE</span>
               </div>
               <div className="genre-art" aria-hidden="true" />
-              <h3>{option.label}</h3>
+              <h3>
+                <KnowledgeTerm
+                  entryId={option.knowledgeEntryId}
+                  label={option.label}
+                  enabled={assistOn}
+                  loadKnowledge={loadKnowledge}
+                  contextType="genre"
+                  contextKey={option.id}
+                />
+              </h3>
               <div className="genre-family">{familyLabel(option)}</div>
               <div className="genre-purpose">{rolePurpose(role)}</div>
               <div className="genre-actions">
@@ -454,10 +472,6 @@ export function GenrePicker({
                     count: favoriteCount.toLocaleString(locale),
                   })
                 : ""}
-            </span>
-            <span className="favorite-hint">
-              <Icon name="star" />
-              {t("genre.favoriteHint")}
             </span>
           </div>
 

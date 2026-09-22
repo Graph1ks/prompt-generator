@@ -427,6 +427,8 @@ export function App() {
                   activeRole={activeGenreRole}
                   onRoleChange={setActiveGenreRole}
                   onSpecChange={setSpec}
+                  assistOn={assistOn}
+                  loadKnowledge={runtime.value.loadKnowledge}
                 />
               )}
 
@@ -439,6 +441,7 @@ export function App() {
                         runtime={runtime.value}
                         spec={spec}
                         onSpecChange={setSpec}
+                        assistOn={assistOn}
                       />
                     ) : facet === "genre" ? null : (
                       <FacetEditor
@@ -448,6 +451,7 @@ export function App() {
                         runtime={runtime.value}
                         spec={spec}
                         onSpecChange={setSpec}
+                        assistOn={assistOn}
                       />
                     ),
                   )}
