@@ -341,10 +341,11 @@ export function App() {
     ]);
   }, [runtime]);
 
+  const studioRuntime = runtime.status === "ready" ? runtime.value : null;
   const compilation = useMemo(() => {
-    if (runtime.status !== "ready") return null;
-    return compileMusicSpec(spec, runtime.value.compilerKnowledge);
-  }, [runtime, spec]);
+    if (!studioRuntime) return null;
+    return compileMusicSpec(spec, studioRuntime.compilerKnowledge);
+  }, [studioRuntime, spec]);
 
   useEffect(() => {
     if (!compilation?.styleText) return;
@@ -896,13 +897,15 @@ export function App() {
                         <span className="prompt-value">{section.content}</span>
                         <span className="bracket">]</span>
                       </div>
-                      <PromptKnowledgeOrigins
-                        enabled={assistOn}
-                        runtime={runtime.value}
-                        spec={spec}
-                        sectionKey={section.sectionKey}
-                        sectionContent={section.content}
-                      />
+                      {studioRuntime && (
+                        <PromptKnowledgeOrigins
+                          enabled={assistOn}
+                          runtime={studioRuntime}
+                          spec={spec}
+                          sectionKey={section.sectionKey}
+                          sectionContent={section.content}
+                        />
+                      )}
                     </div>
                   ))
                 ) : (
