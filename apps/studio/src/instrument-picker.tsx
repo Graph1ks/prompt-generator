@@ -126,6 +126,18 @@ export function InstrumentPicker({
     [data],
   );
 
+  const recentExpressions = useMemo(
+    () =>
+      preferences
+        .recentIds(6)
+        .map((id) => expressionById.get(id))
+        .filter(
+          (expression): expression is RuntimeInstrumentExpression =>
+            expression !== undefined,
+        ),
+    [expressionById, preferences],
+  );
+
   const familyById = useMemo(
     () =>
       new Map(
@@ -355,6 +367,33 @@ export function InstrumentPicker({
               >
                 <span>{expression.label}</span>
                 <Icon name="close" />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!query && !familyId && recentExpressions.length > 0 && (
+        <div className="pool-recent" aria-label={t("pool.recent")}>
+          <span>{t("pool.recent")}</span>
+          <div>
+            {recentExpressions.map((expression) => (
+              <button
+                key={expression.id}
+                type="button"
+                className={
+                  hasFacetSelection(spec, "instruments", expression.id)
+                    ? "pool-recent-chip selected"
+                    : "pool-recent-chip"
+                }
+                aria-pressed={hasFacetSelection(
+                  spec,
+                  "instruments",
+                  expression.id,
+                )}
+                onClick={() => toggleExpression(expression)}
+              >
+                {expression.label}
               </button>
             ))}
           </div>
