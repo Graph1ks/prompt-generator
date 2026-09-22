@@ -573,7 +573,11 @@ export function App() {
 
   function requestChapter(nextId: (typeof STUDIO_CHAPTERS)[number]["id"]) {
     const targetIndex = STUDIO_CHAPTERS.findIndex((entry) => entry.id === nextId);
-    const leavingDnaForward = chapter.id === "dna" && targetIndex > currentChapterIndex;
+    const currentIndex = STUDIO_CHAPTERS.findIndex(
+      (entry) => entry.id === chapter.id,
+    );
+    const leavingDnaForward =
+      chapter.id === "dna" && targetIndex > currentIndex;
     if (leavingDnaForward && !hasGenre && !genreSkipAcknowledged) {
       setGenreSkipAcknowledged(true);
       return;
@@ -608,7 +612,6 @@ export function App() {
   }, [
     chapter.id,
     copyFallbackText,
-    currentChapterIndex,
     genreSkipAcknowledged,
     hasGenre,
     projectLibraryOpen,
