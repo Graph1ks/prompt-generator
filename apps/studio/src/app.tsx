@@ -51,6 +51,7 @@ type RuntimeState =
   | { readonly status: "error"; readonly message: string };
 
 type OutputTab = "style" | "exclude";
+type StudioSourceTarget = FacetKey | "exclude";
 type ProjectSaveState =
   | "loading"
   | "restored"
@@ -117,6 +118,13 @@ function isChapterId(
   return STUDIO_CHAPTERS.some((chapter) => chapter.id === value);
 }
 
+function isStudioSourceTarget(value: string): value is StudioSourceTarget {
+  if (value === "exclude") return true;
+  return STUDIO_CHAPTERS.some((chapter) =>
+    chapter.facets.includes(value as FacetKey),
+  );
+}
+
 
 function createLocalProjectId(): string {
   const uuid = globalThis.crypto?.randomUUID?.();
@@ -165,6 +173,8 @@ export function App() {
   const [assistOn, setAssistOn] = useState(true);
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
   const [previewPulse, setPreviewPulse] = useState(false);
+  const [sourceJumpTarget, setSourceJumpTarget] =
+    useState<StudioSourceTarget | null>(null);
   const [genreSkipAcknowledged, setGenreSkipAcknowledged] = useState(false);
   const [manualStyleText, setManualStyleText] = useState<string | null>(null);
   const [promptUnlocked, setPromptUnlocked] = useState(false);
@@ -516,6 +526,22 @@ export function App() {
     setMobilePreviewOpen(false);
   }
 
+  function jumpToPromptSource(sectionKey: string) {
+    if (!isStudioSourceTarget(sectionKey)) return;
+
+    const targetChapter =
+      sectionKey === "exclude"
+        ? STUDIO_CHAPTERS.find((entry) => entry.id === "finish")
+        : STUDIO_CHAPTERS.find((entry) =>
+            entry.facets.includes(sectionKey as FacetKey),
+          );
+    if (!targetChapter) return;
+
+    setSourceJumpTarget(sectionKey);
+    setChapterId(targetChapter.id);
+    setMobilePreviewOpen(false);
+  }
+
   function requestChapter(nextId: (typeof STUDIO_CHAPTERS)[number]["id"]) {
     const targetIndex = STUDIO_CHAPTERS.findIndex((entry) => entry.id === nextId);
     const leavingDnaForward = chapter.id === "dna" && targetIndex > currentChapterIndex;
@@ -525,6 +551,40 @@ export function App() {
     }
     chooseChapter(nextId);
   }
+
+  useEffect(() => {
+    if (!sourceJumpTarget) return;
+
+    const targetChapterId =
+      sourceJumpTarget === "exclude"
+        ? "finish"
+        : STUDIO_CHAPTERS.find((entry) =>
+            entry.facets.includes(sourceJumpTarget as FacetKey),
+          )?.id;
+    if (!targetChapterId || targetChapterId !== chapterId) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      const target = document.querySelector<HTMLElement>(
+        '[data-facet="' + sourceJumpTarget + '"]',
+      );
+      if (!target) return;
+
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      target.scrollIntoView({
+        behavior: reducedMotion ? "auto" : "smooth",
+        block: "center",
+      });
+      target.dataset.sourceJump = "true";
+      window.setTimeout(() => {
+        delete target.dataset.sourceJump;
+      }, reducedMotion ? 120 : 1100);
+      setSourceJumpTarget(null);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [chapterId, sourceJumpTarget]);
 
   function resetCurrentChapter() {
     setSpec(
@@ -1273,13 +1333,26 @@ export function App() {
                 ) : compilation?.sections.length ? (
                   compilation.sections.map((section) => (
                     <div className="prompt-line-group" key={section.sectionKey}>
-                      <div className="prompt-line changed-line">
+                      <button
+                        type="button"
+                        className="prompt-line changed-line prompt-line-source"
+                        aria-label={t("preview.editSection", {
+                          section: section.label,
+                        })}
+                        title={t("preview.editSection", {
+                          section: section.label,
+                        })}
+                        onClick={() => jumpToPromptSource(section.sectionKey)}
+                      >
                         <span className="bracket">[</span>
                         <span className="prompt-key">{section.label}</span>
                         <span className="bracket">: </span>
                         <span className="prompt-value">{section.content}</span>
                         <span className="bracket">]</span>
-                      </div>
+                        <span className="prompt-source-cue" aria-hidden="true">
+                          <Icon name="edit" />
+                        </span>
+                      </button>
                     </div>
                   ))
                 ) : (
@@ -1291,7 +1364,18 @@ export function App() {
                   </div>
                 )
               ) : compilation?.excludeText ? (
-                <p className="exclude-text">{compilation.excludeText}</p>
+                <button
+                  type="button"
+                  className="exclude-text exclude-source"
+                  aria-label={t("preview.editExclude")}
+                  title={t("preview.editExclude")}
+                  onClick={() => jumpToPromptSource("exclude")}
+                >
+                  <span>{compilation.excludeText}</span>
+                  <span className="prompt-source-cue" aria-hidden="true">
+                    <Icon name="edit" />
+                  </span>
+                </button>
               ) : (
                 <div className="preview-empty">
                   <p>{t("preview.noExclude")}</p>

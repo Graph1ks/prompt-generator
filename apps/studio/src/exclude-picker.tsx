@@ -120,7 +120,7 @@ export function ExcludePicker({
 
   if (editor.status === "loading") {
     return (
-      <section className="exclude-panel field-card">
+      <section className="exclude-panel field-card" data-facet="exclude">
         <div className="instrument-loading">
           <span className="runtime-spinner" aria-hidden="true" />
           <strong>{t("facetEditor.loading")}</strong>
@@ -131,7 +131,7 @@ export function ExcludePicker({
 
   if (editor.status === "error") {
     return (
-      <section className="exclude-panel field-card">
+      <section className="exclude-panel field-card" data-facet="exclude">
         <div className="facet-editor-state error">
           <Icon name="info" />
           <span>{t("facetEditor.error")}</span>
@@ -142,7 +142,11 @@ export function ExcludePicker({
   }
 
   return (
-    <section ref={segmentRef} className="exclude-panel field-card">
+    <section
+      ref={segmentRef}
+      className="exclude-panel field-card"
+      data-facet="exclude"
+    >
       <div className="exclude-panel-head">
         <div>
           <div className="field-label">

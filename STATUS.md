@@ -186,6 +186,15 @@ Proceed in this order:
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
 
+## Live Prompt -> authoring source navigation
+
+- Deterministic Live Prompt Style lines are now interactive source links rather than read-only dead-end text.
+- Clicking/focusing a rendered section navigates to the chapter that owns its explicit section key, returns from mobile preview to Studio, scrolls the source editor into view and gives it a short causal locate highlight.
+- Genre and Instruments expose explicit `data-facet` source targets alongside ordinary FacetEditor cards; no prompt-label/string guessing is used.
+- The Exclude output links back to the separate Finish/Exclude surface.
+- Manual Style overrides remain plain output only and intentionally do not get reverse navigation because the product does not back-parse arbitrary user text into MusicSpec.
+- Desktop source cues stay visually quiet until hover/focus; mobile cues remain visible with practical 44 px activation targets.
+
 ## Clipboard reliability + active-output copy
 
 - Copy now follows the documented progressive fallback contract: Clipboard API -> legacy `execCommand` -> explicit manual-copy surface.

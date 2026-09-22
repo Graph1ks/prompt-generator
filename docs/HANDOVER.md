@@ -262,6 +262,14 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Locale resolution is UI-locale -> English fallback; renderer language remains independent.
 - Favorite hold durations remain 0.8 s add / 1.0 s remove internally, but duration instructions are intentionally hidden from normal UI/hover copy.
 
+## Live Prompt source-navigation carry-forward
+
+- In deterministic Style mode, each rendered section can navigate directly back to its owning authoring facet.
+- Navigation is keyed by compiler section/facet IDs, never by parsing the rendered prompt label/value.
+- Mobile source navigation closes the Live Prompt view before locating the facet.
+- Exclude output maps directly to the separate Exclude surface in Finish.
+- Manual Style overrides stay intentionally non-navigable because arbitrary output text is not reverse-classified.
+
 ## Clipboard/copy carry-forward
 
 - Copy uses one active-output validity rule across the header, Live Prompt footer, mobile dock and `Ctrl / ⌘ + Enter`.

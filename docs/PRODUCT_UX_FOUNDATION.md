@@ -202,6 +202,14 @@ When the user edits a facet:
 - multi-section changes may highlight more than one section (for example, a tempo/groove change);
 - copy always returns clean plain text without UI markup.
 
+Causality also works in reverse for deterministic output:
+
+- each rendered Style section is an editable source link, not a dead preview line;
+- activating a section navigates to the Studio chapter/facet that owns it and brings that authoring surface into view;
+- on mobile, source navigation closes the Live Prompt surface and returns to the editor automatically;
+- Exclude output links back to the separate Exclude authoring surface;
+- manual Style override text is deliberately not reverse-parsed into MusicSpec and therefore does not expose guessed source links.
+
 ### Exclude is separate
 
 Exclude is **not** a bracketed prompt section. It has its own copy block and compiles to a comma-separated list:
