@@ -1344,59 +1344,82 @@
     font-size: 11px;
     line-height: 1.72;
     margin: 0;
-    padding: 3px 5px;
-    border-radius: 5px;
+    padding: 0;
     overflow-wrap: anywhere;
+  }
+
+  .prompt-line-group {
+    position: relative;
+    min-inline-size: 0;
   }
 
   .prompt-line-group + .prompt-line-group {
     margin-block-start: 0;
   }
 
-  .prompt-line-source {
-    position: relative;
-    inline-size: 100%;
-    padding-inline-end: 28px;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    text-align: start;
-    cursor: pointer;
+  .prompt-line-group[data-active="true"]::before {
+    content: "";
+    position: absolute;
+    inset-block: 0.24em;
+    inset-inline-start: -8px;
+    inline-size: 2px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--studio-acid) 76%, transparent);
   }
 
-  .prompt-line-source[data-active="true"],
-  .exclude-source[data-active="true"] {
-    background:
-      linear-gradient(
-        90deg,
-        color-mix(in srgb, var(--studio-acid) 14%, transparent),
-        transparent 72%
-      );
-    box-shadow: inset 2px 0 0 color-mix(in srgb, var(--studio-acid) 76%, transparent);
-  }
-
-  .prompt-line-source[data-active="true"] .prompt-key,
+  .prompt-line-group[data-active="true"] .prompt-key,
   .exclude-source[data-active="true"] {
     color: color-mix(in srgb, var(--studio-acid) 72%, #edf0e7);
   }
 
-  .prompt-line-source[data-active="true"] .prompt-source-cue,
-  .exclude-source[data-active="true"] .prompt-source-cue {
+  .prompt-source-action {
+    position: absolute;
+    inset-inline-end: -18px;
+    inset-block-start: 50%;
+    inline-size: 18px;
+    block-size: 18px;
+    padding: 0;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: #9eaa94;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    transform: translateY(-50%);
+    cursor: pointer;
+    transition:
+      opacity var(--vg-motion-duration-fast),
+      background-color var(--vg-motion-duration-fast),
+      color var(--vg-motion-duration-fast),
+      transform var(--vg-motion-duration-fast);
+  }
+
+  .prompt-source-action .studio-icon {
+    inline-size: 12px;
+    block-size: 12px;
+  }
+
+  .prompt-line-group:hover .prompt-source-action,
+  .prompt-line-group[data-active="true"] .prompt-source-action,
+  .prompt-source-action:focus-visible {
     color: var(--studio-acid);
-    opacity: 0.72;
+    opacity: 1;
   }
 
-  .prompt-line-source:hover,
-  .prompt-line-source:focus-visible,
-  .exclude-source:hover,
-  .exclude-source:focus-visible {
-    background: rgb(255 255 255 / 0.055);
+  .prompt-source-action:hover,
+  .prompt-source-action:focus-visible {
+    background: rgb(255 255 255 / 0.07);
   }
 
-  .prompt-line-source:focus-visible,
+  .prompt-source-action:focus-visible,
   .exclude-source:focus-visible {
     outline: 2px solid color-mix(in srgb, var(--studio-acid) 72%, white);
     outline-offset: 2px;
+  }
+
+  .exclude-source:hover {
+    background: rgb(255 255 255 / 0.055);
   }
 
   .prompt-source-cue {
@@ -1422,8 +1445,11 @@
     block-size: 12px;
   }
 
-  .prompt-line-source:hover .prompt-source-cue,
-  .prompt-line-source:focus-visible .prompt-source-cue,
+  .exclude-source[data-active="true"] .prompt-source-cue {
+    color: var(--studio-acid);
+    opacity: 0.72;
+  }
+
   .exclude-source:hover .prompt-source-cue,
   .exclude-source:focus-visible .prompt-source-cue {
     color: var(--studio-acid);
@@ -1431,7 +1457,7 @@
     opacity: 1;
   }
 
-  .prompt-line-source[data-changed="true"],
+  .prompt-line-group[data-changed="true"],
   .exclude-source[data-changed="true"] {
     animation: prompt-section-flash 1.05s var(--vg-motion-ease-emphasized);
   }
@@ -1981,15 +2007,23 @@
       font-size: 12px;
       line-height: 1.72;
       margin: 0;
-      padding-block: 2px;
-    }
-
-    .prompt-line-source {
-      min-block-size: 0;
+      padding: 0;
     }
 
     .exclude-source {
       min-block-size: 44px;
+    }
+
+    .prompt-source-action {
+      inset-inline-end: -18px;
+      inline-size: 20px;
+      block-size: 20px;
+      opacity: 0.72;
+    }
+
+    .prompt-source-action .studio-icon {
+      inline-size: 13px;
+      block-size: 13px;
     }
 
     .prompt-source-cue {
