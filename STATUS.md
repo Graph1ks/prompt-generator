@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-22  
-**Current milestone:** **Explain UX + authored Product Knowledge complete; multi-project library implemented** — next: CI/owner-local acceptance, then remaining Studio ergonomics
+**Current milestone:** **Explain UX + authored Product Knowledge + multi-project library implemented** — current: ordinary-facet state visibility/mobile ergonomics
 
 ## Completion verdict
 
@@ -186,6 +186,16 @@ Proceed in this order:
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
 
+## Ordinary facet state rail + mobile Explain access
+
+- Every ordinary FacetEditor now keeps its active MusicSpec state visible above the Easy/Advanced authoring surface.
+- Selected Easy statements, Advanced options, numeric values and custom wording are represented as compact removable chips; users no longer need to hunt through an expanded option set merely to see or remove current state.
+- The rail exposes a facet-scoped clear action without changing the Easy/Advanced view contract.
+- State labels come from the same Runtime statement/option/parameter records that created the selection; no prompt-string parsing or semantic guessing was added.
+- Mobile chips and clear controls use practical touch targets and wrap rather than introducing a nested horizontal scroller.
+- Explain mode remains directly toggleable on narrow/mobile screens through the persistent bottom dock instead of disappearing when the top bar becomes constrained.
+- The visible `Ctrl / ⌘ + Enter` copy affordance is now a real global Studio shortcut for the currently active Style/Exclude output; it is suppressed while the project library is open and respects output/budget validity.
+
 ## Project library v1
 
 - Studio now supports multiple local projects on the existing IndexedDB `ProjectStorage` contract instead of treating the fixed `active` record as the permanent project identity.
@@ -235,6 +245,6 @@ Proceed in this order:
 - Explanation UI is a singleton viewport portal, so parent overflow cannot clip it and multiple cards cannot overlap.
 - The old Knowledge-origin chip rows beneath the Live Prompt were removed. Explain UI no longer consumes prompt-preview layout space and still never enters copied Style/Exclude text.
 - Favorite hold feedback now renders outside the small preset control's clipping boundary; hit areas are separated from explainable labels so favorite/select gestures and Explain can coexist.
-- The current generated/meta prose for Product Knowledge options/statements/Exclude entries is not accepted as final editorial quality. The complete 400-entry authoring handoff is `data/product/knowledge-foundation-v1-authoring-request.txt`.
-- Returned bilingual `ID / EN / DE` copy is validated/imported by `scripts/data/import_product_knowledge_authoring.py`, which preserves stable IDs/links and rejects the known UI-meta template wording.
+- Product Knowledge v1 now contains the accepted authored EN/DE musical explanations for all 400 Product Foundation entries; the generated preset/control/rendering meta copy is no longer the tracked baseline.
+- `scripts/data/import_product_knowledge_authoring.py` remains the guarded authoring/import path for future editorial revisions and rejects the known UI-meta template wording.
 - Owner-local Runtime re-export remains required after Product Knowledge copy changes because `product_knowledge_foundation_sha256` participates in Runtime identity.
