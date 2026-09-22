@@ -211,6 +211,14 @@ Proceed in this order:
 - Repeated edits to the same stable selection ID (for example a dragged BPM value) and continuous custom-text typing coalesce briefly so one gesture does not create dozens of undo steps.
 - Project open/create/import/duplicate/switch clears session history; undo never crosses project boundaries. Autosave persists the resulting current MusicSpec normally, not the history stack.
 
+## Favorites / Recent quick views for large pools
+
+- Genre, Instruments and Exclude now expose explicit All / Favorites / Recent quick views directly inside their search/filter control stack.
+- Favorites reuse the existing local hold-favorite state; Recent uses the already-persisted `lastUsedAt` timestamps from actual selections, so no new persistence store or schema is introduced.
+- Quick-view counts are scoped to the active search/category/family filter, preventing misleading counts when a narrower filter is active.
+- Recent view orders matching items by last actual use; All retains the existing favorite-first ranking contract.
+- Show All/chunked rendering works against the active quick view rather than mounting irrelevant results.
+
 ## Sticky large-pool controls
 
 - Genre, Instruments and Exclude keep their search/filter/result-count controls reachable while long result sets scroll on desktop.
