@@ -21,7 +21,7 @@ The internal product model must remain richer than the exported prompt. Suno is 
 5. **No option-wall UI.** Large vocabularies use search-first animated pickers, categories, recent/favorite items, and browsing. Avoid huge native dropdowns.
 6. **Mobile is a first-class interaction model.** Anything necessary must work by tap. Hover is enhancement, never a requirement. Long editing surfaces keep primary chapter navigation reachable; desktop may add discoverable keyboard accelerators without making them the only path.
 7. **Teach in place.** Music terminology is explained where it appears, including inside generated prompt text.
-8. **The output is inspectable.** The user must see exactly which structured prompt section a change affects.
+8. **The output is inspectable.** The user must see exactly which structured prompt section a change affects. Long chapters also expose direct facet navigation so expert users can move between visible authoring regions without hiding those regions behind menus.
 9. **Readable before dense.** Avoid micro-fonts and gratuitous dashboard chrome. Dense expert functionality is allowed, but hierarchy and touch/readability win. Wide desktop layouts should spend horizontal space to reduce unnecessary vertical travel; density must be responsive rather than achieved by hiding controls.
 10. **Motion communicates state.** Animation is used for reorder, replacement, navigation, picker transitions, and causality—not decorative perpetual motion.
 
