@@ -1,5 +1,7 @@
 import type { FacetKey } from "@vgine/music-spec";
 
+export type StudioEditorMode = "easy" | "advanced";
+
 export interface StudioChapter {
   readonly id: "dna" | "pulse" | "palette" | "finish";
   readonly label: string;
