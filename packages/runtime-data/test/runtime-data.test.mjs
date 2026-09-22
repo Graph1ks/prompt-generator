@@ -108,6 +108,7 @@ test("loads bootstrap payloads and builds compiler knowledge", async () => {
 
   assert.equal(bootstrap.search.documents.length, 1);
   assert.equal(compilerKnowledge.runtimeBuildId, "b".repeat(64));
+  assert.equal(compilerKnowledge.genreLabels["major:hip-hop"], "Hip-Hop");
   assert.equal(compilerKnowledge.genreLabels["genre:boom-bap"], "Boom Bap");
   assert.equal(
     compilerKnowledge.rendererProfiles["suno-structured-v1"].sections[0].label,
