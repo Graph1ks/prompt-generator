@@ -253,6 +253,12 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Favorite add/remove timings are 0.8 s / 1.0 s. Add progress uses theme semantic success green and an animated checkmark.
 - Expanded-pool return controls are left-edge, viewport/segment scoped.
 
+## Explain loader defect carry-forward
+
+- The permanent `Loading explanation …` state was a React effect lifecycle bug, not missing Knowledge data.
+- Do not reintroduce `state.status` into the KnowledgeTerm load-effect dependency list while the effect itself transitions that status to `loading`; doing so cancels the same request on its own rerender.
+- Runtime lazy payload caches reset after rejection so a later open/load can retry instead of permanently reusing one rejected promise.
+
 ## Runtime Knowledge surfaces carry-forward
 
 - `knowledge.json` is a lazy manifest-validated/cached Studio payload, not part of first-paint bootstrap.
