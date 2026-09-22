@@ -710,3 +710,27 @@ Resetting the override restores the current compiler result. The hard renderer b
 **Status:** accepted
 
 Each of the four Studio chapters can clear only the MusicSpec facets it owns. Starting a new prompt clears the whole MusicSpec plus prompt-scoped UI acknowledgements and manual output overrides. User-level preferences such as favorites survive project resets.
+
+## ADR-033 — UI localization is independent from renderer language
+
+**Status:** accepted
+
+Studio UI text uses typed locale catalogs. German and English are the first supported interface locales; the architecture allows additional locales without component rewrites.
+
+MusicSpec stores semantic IDs/values rather than localized UI labels. The Suno structured renderer remains English in v1. Changing the interface language must never alter compiled prompt semantics or renderer section labels.
+
+## ADR-034 — Major Genres are selectable genre entities in Studio
+
+**Status:** accepted
+
+All 24 Major Genres are always visible in the Genre picker. Selecting a Major Genre filter shows the pure Major Genre itself as the first selectable result, followed by its taxonomy subgenres.
+
+MusicSpec may store the stable Major Genre Runtime ID as a genre influence ID. Compiler knowledge therefore resolves both Major Genre IDs and subgenre IDs to canonical labels.
+
+## ADR-035 — Expanded-pool return controls are viewport/segment scoped
+
+**Status:** accepted
+
+A floating return-to-start control for an expanded option pool is visible only after the user has scrolled materially below that segment's start and while the viewport is still inside the segment. It is hidden before/at the segment start and after the segment is passed.
+
+This prevents multiple stale floating controls when several expandable pools exist on one page.
