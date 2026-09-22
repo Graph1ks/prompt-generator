@@ -286,21 +286,43 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 
 ## Product Knowledge / Explain mode carry-forward
 
-- Product Knowledge Foundation v1 lives at `data/product/knowledge-foundation-v1.json`; current coverage is 400 entries.
-- Product Editor Foundation carries stable links into this Knowledge layer. Do not replace these with label-string matching in React.
-- Runtime manifest now fingerprints both Editor Foundation and Product Knowledge Foundation; changing either requires Runtime re-export.
-- Live-prompt Explain mode resolves selected MusicSpec IDs back to Runtime semantic origins and shows explanation chips outside the copied prompt.
-- Product ordinary facets use Product Knowledge links; Genre/Instrument explanation continues to use Database V1 links.
-- User custom text is not semantically inferred. Add an explicit semantic contract before making it explainable.
+- Product Knowledge Foundation v1 lives at `data/product/knowledge-foundation-v1.json`; coverage remains 400 stable entries.
+- Product Editor Foundation carries explicit links into this Knowledge layer. Genre/Instrument explanation continues to use Database V1 semantic links. Never replace these links with rendered-label or prompt-string guessing.
+- Explain is now an authoring-time affordance, not a Live Prompt chip list. Easy statements, Advanced options/recommended values, Genre results, Instrument-expression results and Exclude results expose linked Knowledge before selection.
+- Desktop terms use a subtle dashed underline with delayed hover/focus; click pins. Touch taps pin the same concept in a mobile bottom sheet.
+- The explanation surface is a singleton viewport portal. Parent overflow must not clip it, opening a second term closes the first, and the popover must not consume Studio layout space.
+- The old explanation-chip rows beneath Live Prompt sections are removed. Copyable Style/Exclude output remains unchanged.
+- Product ordinary facets use Product Knowledge links; Genre/Instrument explanation uses their existing explicit Database V1 links. If an item has no explicit Knowledge link, leave it plain.
+- User custom text remains unexplained unless a future explicit semantic-assist contract links it.
+- The generated/meta v1 prose for Product Knowledge options/statements/Exclude entries is not accepted as final dictionary copy. The complete 400-entry authoring request is `data/product/knowledge-foundation-v1-authoring-request.txt`.
+- Returned authoring text uses strict `ID / EN / DE / ---` blocks and is validated/imported with `scripts/data/import_product_knowledge_authoring.py`. The importer preserves IDs/semantic links, bumps localized plain-definition revisions and rejects the known UI-meta templates.
 
-## Immediate owner-local resume after PR #35
+## Immediate next owner-local sequence
 
 No new dependency install is required.
+
+1. Run the complete authoring request through the dedicated knowledge-writing/research thread and save the returned UTF-8 text locally, for example as `.local-data\current\product-knowledge-v1-authored.txt`.
+2. Validate the returned batch without changing tracked data:
 
 ```powershell
 Set-Location D:\prompt-engine
 git pull
 
+py scripts\data\import_product_knowledge_authoring.py `
+  --input ".local-data\current\product-knowledge-v1-authored.txt"
+```
+
+3. If validation passes, import it:
+
+```powershell
+py scripts\data\import_product_knowledge_authoring.py `
+  --input ".local-data\current\product-knowledge-v1-authored.txt" `
+  --write
+```
+
+4. Rebuild Runtime Pack because Product Knowledge content participates in Runtime identity:
+
+```powershell
 py scripts\data\export_runtime_v1.py `
   --knowledge ".local-data\current\knowledge.sqlite" `
   --out-dir ".local-data\current\runtime-v1"
@@ -335,9 +357,15 @@ Reference Explain-mode smoke prompt from the owner:
 
 Acceptance expectations:
 
-- Product sections above expose Explain-mode origins only through explicit Product Knowledge links;
+- each linked term can be explained before selection from the picker/editor itself;
+- desktop hover/focus and click-pinning work without clipped or overlapping popovers;
+- touch opens the mobile explanation sheet without requiring hover;
+- Product sections resolve only through explicit Product Knowledge links;
 - Genre uses existing Genre Knowledge links;
 - Instruments use existing canonical instrument/concept Knowledge links;
 - free custom Advanced wording stays unexplained unless a future explicit semantic-assist contract links it;
-- explanation controls never alter or enter copied Style/Exclude text;
-- missing explanation is a semantic-link gap to investigate, not permission for label-string inference.
+- explanation UI never alters or enters copied Style/Exclude text;
+- missing explanation is a semantic-link gap to investigate, not permission for label-string inference;
+- the imported Product Knowledge definitions explain the musical meaning itself and contain no preset/control/rendering meta copy.
+
+After this acceptance pass, resume project naming/library/duplicate/import/export on the existing `ProjectStorage` contract, then continue Studio ergonomics. Broad motion polish remains later.

@@ -419,25 +419,38 @@ export function FacetEditor({
               {statements.map((statement) => {
                 const selected = hasFacetSelection(spec, facet, statement.id);
                 return (
-                  <button
+                  <div
                     key={statement.id}
-                    type="button"
                     className={
                       selected ? "statement-card selected" : "statement-card"
                     }
-                    aria-pressed={selected}
-                    onClick={() =>
-                      toggleStatement(statement.id, statement.output_text)
-                    }
                   >
-                    <span>{statement.label}</span>
+                    <span>
+                      <KnowledgeTerm
+                        entryId={statement.concepts[0]?.entry_id}
+                        label={statement.label}
+                        enabled={assistOn}
+                        loadKnowledge={runtime.loadKnowledge}
+                        contextType="section"
+                        contextKey={facet}
+                      />
+                    </span>
                     <small>{statement.output_text}</small>
                     {selected && (
                       <span className="selection-check" aria-hidden="true">
                         <Icon name="check" />
                       </span>
                     )}
-                  </button>
+                    <button
+                      type="button"
+                      className="choice-hitarea"
+                      aria-label={statement.label}
+                      aria-pressed={selected}
+                      onClick={() =>
+                        toggleStatement(statement.id, statement.output_text)
+                      }
+                    />
+                  </div>
                 );
               })}
             </div>
@@ -555,28 +568,49 @@ export function FacetEditor({
                                 <small>{t("facetEditor.recommended")}</small>
                                 <div className="parameter-options">
                                   {parameter.ui.recommended_values.map(
-                                    (value) => (
-                                      <button
-                                        key={value}
-                                        type="button"
-                                        className={
-                                          selectedValue === value
-                                            ? "parameter-option selected"
-                                            : "parameter-option recommended"
-                                        }
-                                        aria-pressed={selectedValue === value}
-                                        onClick={() =>
-                                          setNumberParameter(parameter, value)
-                                        }
-                                      >
-                                        <span>
-                                          {value}
-                                          {parameter.ui?.unit
-                                            ? " " + parameter.ui.unit
-                                            : ""}
-                                        </span>
-                                      </button>
-                                    ),
+                                    (value) => {
+                                      const valueLabel =
+                                        String(value) +
+                                        (parameter.ui?.unit
+                                          ? " " + parameter.ui.unit
+                                          : "");
+                                      const valueKnowledgeEntryId =
+                                        options.find(
+                                          (option) =>
+                                            Number(option.output_fragment) === value,
+                                        )?.knowledge_entry_id ??
+                                        parameter.knowledge_entry_id;
+                                      return (
+                                        <div
+                                          key={value}
+                                          className={
+                                            selectedValue === value
+                                              ? "parameter-option selected"
+                                              : "parameter-option recommended"
+                                          }
+                                        >
+                                          <span>
+                                            <KnowledgeTerm
+                                              entryId={valueKnowledgeEntryId}
+                                              label={valueLabel}
+                                              enabled={assistOn}
+                                              loadKnowledge={runtime.loadKnowledge}
+                                              contextType="parameter"
+                                              contextKey={parameter.id}
+                                            />
+                                          </span>
+                                          <button
+                                            type="button"
+                                            className="choice-hitarea"
+                                            aria-label={valueLabel}
+                                            aria-pressed={selectedValue === value}
+                                            onClick={() =>
+                                              setNumberParameter(parameter, value)
+                                            }
+                                          />
+                                        </div>
+                                      );
+                                    },
                                   )}
                                 </div>
                               </div>
@@ -594,9 +628,8 @@ export function FacetEditor({
                           option.id,
                         );
                         return (
-                          <button
+                          <div
                             key={option.id}
-                            type="button"
                             className={[
                               "parameter-option",
                               selected ? "selected" : "",
@@ -604,17 +637,31 @@ export function FacetEditor({
                             ]
                               .filter(Boolean)
                               .join(" ")}
-                            aria-pressed={selected}
                             title={
                               option.recommended
                                 ? t("facetEditor.recommended")
                                 : undefined
                             }
-                            onClick={() => toggleOption(option, parameter)}
                           >
                             {selected && <Icon name="check" />}
-                            <span>{option.label}</span>
-                          </button>
+                            <span>
+                              <KnowledgeTerm
+                                entryId={option.knowledge_entry_id}
+                                label={option.label}
+                                enabled={assistOn}
+                                loadKnowledge={runtime.loadKnowledge}
+                                contextType="parameter"
+                                contextKey={parameter.id}
+                              />
+                            </span>
+                            <button
+                              type="button"
+                              className="choice-hitarea"
+                              aria-label={option.label}
+                              aria-pressed={selected}
+                              onClick={() => toggleOption(option, parameter)}
+                            />
+                          </div>
                         );
                       })}
                     </div>
@@ -733,6 +780,7 @@ export function FacetEditor({
                         className="advanced-preset-option"
                         favorite
                         usageCount={preset.useCount}
+                        activationLabel={preset.text}
                         title={t("facetEditor.presetApply")}
                         onFavorite={() => undefined}
                         onUnfavorite={() =>

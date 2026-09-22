@@ -495,13 +495,23 @@ export function GenrePicker({
                     .join(" ")}
                   favorite={favorite}
                   usageCount={genrePreferences.usageCount(option.id)}
+                  activationLabel={option.label}
                   onFavorite={() => genrePreferences.setFavorite(option.id, true)}
                   onUnfavorite={() => genrePreferences.setFavorite(option.id, false)}
                   onActivate={() => {
                     if (!selectedRole) selectGenre(option);
                   }}
                 >
-                  <span>{option.label}</span>
+                  <span>
+                    <KnowledgeTerm
+                      entryId={option.knowledgeEntryId}
+                      label={option.label}
+                      enabled={assistOn}
+                      loadKnowledge={loadKnowledge}
+                      contextType="genre"
+                      contextKey={option.id}
+                    />
+                  </span>
                   <small>{familyLabel(option)}</small>
                   {selectedRole && (
                     <small className="picked-label">

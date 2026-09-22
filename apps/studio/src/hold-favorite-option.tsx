@@ -17,6 +17,7 @@ export interface HoldFavoriteOptionProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick" | "children"> {
   readonly favorite: boolean;
   readonly usageCount?: number;
+  readonly activationLabel?: string;
   readonly onFavorite: () => void;
   readonly onUnfavorite: () => void;
   readonly onActivate: () => void;
@@ -26,13 +27,17 @@ export interface HoldFavoriteOptionProps
 export function HoldFavoriteOption({
   favorite,
   usageCount = 0,
+  activationLabel,
   onFavorite,
   onUnfavorite,
   onActivate,
   children,
   className = "",
   title,
-  ...props
+  style,
+  disabled,
+  "aria-label": ariaLabel,
+  ...buttonProps
 }: HoldFavoriteOptionProps) {
   const { t } = useI18n();
   const [holding, setHolding] = useState(false);
@@ -48,7 +53,7 @@ export function HoldFavoriteOption({
   }
 
   function startHold(event: ReactPointerEvent<HTMLButtonElement>) {
-    if (event.button !== 0 || props.disabled) return;
+    if (event.button !== 0 || disabled) return;
     suppressClickRef.current = false;
     setHolding(true);
     event.currentTarget.setPointerCapture?.(event.pointerId);
@@ -71,41 +76,52 @@ export function HoldFavoriteOption({
     onActivate();
   }
 
+  const favoriteTitle = favorite
+    ? t("favorite.removeTitle")
+    : t("favorite.addTitle");
+
   return (
-    <button
-      type="button"
-      {...props}
+    <div
       className={"hold-favorite-option " + className}
       data-favorite={favorite || undefined}
       data-holding={holding || undefined}
       data-hold-action={favorite ? "remove" : "add"}
       style={{
-        ...props.style,
+        ...style,
         "--favorite-hold-ms": (favorite ? REMOVE_HOLD_MS : ADD_HOLD_MS) + "ms",
         "--favorite-check-delay-ms": Math.round(ADD_HOLD_MS * 0.55) + "ms",
         "--favorite-check-ms": Math.round(ADD_HOLD_MS * 0.45) + "ms",
-        "--favorite-remove-outline-ms": Math.round(REMOVE_HOLD_MS * 0.7) + "ms",
-        "--favorite-remove-x-delay-ms": Math.round(REMOVE_HOLD_MS * 0.7) + "ms",
+        "--favorite-remove-outline-ms":
+          Math.round(REMOVE_HOLD_MS * 0.7) + "ms",
+        "--favorite-remove-x-delay-ms":
+          Math.round(REMOVE_HOLD_MS * 0.7) + "ms",
         "--favorite-remove-x-ms": Math.round(REMOVE_HOLD_MS * 0.3) + "ms",
       } as CSSProperties}
-      title={title ?? (favorite ? t("favorite.removeTitle") : t("favorite.addTitle"))}
-      onPointerDown={startHold}
-      onPointerUp={stopTimer}
-      onPointerCancel={stopTimer}
-      onPointerLeave={stopTimer}
-      onContextMenu={(event) => event.preventDefault()}
-      onClick={activate}
     >
       {children}
+
+      <button
+        type="button"
+        {...buttonProps}
+        className="hold-favorite-hitarea"
+        disabled={disabled}
+        aria-label={ariaLabel ?? activationLabel ?? title ?? favoriteTitle}
+        title={title ?? favoriteTitle}
+        onPointerDown={startHold}
+        onPointerUp={stopTimer}
+        onPointerCancel={stopTimer}
+        onPointerLeave={stopTimer}
+        onContextMenu={(event) => event.preventDefault()}
+        onClick={activate}
+      />
+
       {favorite && (
-        <span
-          className="favorite-mark"
-          aria-label={t("favorite.aria", { count: usageCount })}
-        >
+        <span className="favorite-mark" aria-hidden="true">
           <Icon name="star" />
           {usageCount > 0 && <small>{usageCount}</small>}
         </span>
       )}
+
       {holding && (
         <span className="favorite-hold-progress" aria-hidden="true">
           {favorite ? (
@@ -121,6 +137,6 @@ export function HoldFavoriteOption({
           )}
         </span>
       )}
-    </button>
+    </div>
   );
 }
