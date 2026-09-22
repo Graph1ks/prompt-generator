@@ -330,6 +330,13 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - The facet-wide current-state rail remains the canonical overview; parameter summaries are a local scan aid derived from the same MusicSpec/Runtime IDs.
 - Custom Advanced wording remains full-width and nothing is hidden behind dropdown menus.
 
+## Genre picker focus behavior carry-forward
+
+- Opening a Genre role on fine-pointer desktop locates the picker and focuses/selects search.
+- The role trigger owns the picker relationship through `aria-expanded` / `aria-controls`; closing with the visible close control or Escape returns focus to that same role trigger.
+- Selecting or clearing a role also restores focus after the card rerenders, preventing focus loss when picker content disappears.
+- Touch/mobile still avoids forced search focus so the software keyboard is not summoned unexpectedly.
+
 ## Explain activation + search-shortcut carry-forward
 
 - A selectable Knowledge label is still explained on desktop hover/focus, but click/Enter/Space now activates the underlying option. Explain may not consume the primary selection gesture.
