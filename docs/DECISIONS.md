@@ -897,3 +897,16 @@ Studio authoring gets a bounded in-memory undo/redo history around MusicSpec mut
 
 This keeps recovery fast without creating hidden cross-project state or expanding the persistence contract.
 
+## ADR-050 — BPM slider range is ergonomic, not a hard domain ceiling
+
+**Status:** accepted
+
+The BPM control separates fast bounded manipulation from explicit expert entry.
+
+- Slider and recommended-value interaction remain bounded to the Product Foundation range (currently 40–220 BPM).
+- Direct numeric BPM entry may exceed the slider range; the entered positive finite value is preserved in MusicSpec/compiler output.
+- When the stored value is outside the slider range, the slider visual clamps to the nearest endpoint rather than mutating the stored value.
+- Direct entry remains step-snapped; the range metadata continues to describe the physical slider, not the entire representable BPM domain.
+
+The Live Prompt also follows a single-scroll-path rule: it grows with structured output and does not own an inner vertical scrollbar on desktop. Manual Style editing preserves the themed structured appearance while remaining plain-text and non-semantic.
+

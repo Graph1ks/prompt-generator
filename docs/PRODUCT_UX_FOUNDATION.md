@@ -17,7 +17,7 @@ The internal product model must remain richer than the exported prompt. Suno is 
 1. **Do not hide creative content behind constraints.** Constraints/quality checks advise, explain relationships, and surface conflicts. They do not decide what the user is allowed to select.
 2. **Genre influence is powerful but optional.** A project may use zero to three genre influences. If genre is omitted, the rest of the musical facets remain fully usable.
 3. **Progressive disclosure, not feature removal.** Easy and Advanced modes operate on the same underlying MusicSpec. Easy uses curated statements/combinations; Advanced reveals atomic controls and custom text.
-4. **Words in, words out.** Do not expose pseudo-precision such as percentage sliders when the compiled prompt can only express language. A control must map to a meaningful verbal state.
+4. **Words in, words out.** Do not expose pseudo-precision such as percentage sliders when the compiled prompt can only express language. A control must map to a meaningful verbal state. A slider may define an ergonomic browsing range without silently constraining an explicit expert numeric entry when the renderer can represent the entered value.
 5. **No option-wall UI.** Large vocabularies use search-first animated pickers, categories, recent/favorite items, and browsing. Avoid huge native dropdowns. On desktop, search/filter controls for very long result pools should remain reachable while browsing without introducing nested-scroll traps.
 6. **Mobile is a first-class interaction model.** Anything necessary must work by tap. Hover is enhancement, never a requirement. Long editing surfaces keep primary chapter navigation reachable; desktop may add discoverable keyboard accelerators without making them the only path.
 7. **Teach in place.** Music terminology is explained where it appears, including inside generated prompt text.
@@ -202,7 +202,9 @@ When the user edits a facet:
 - replacement briefly highlights the outgoing value/section state;
 - insertion highlights the new content;
 - multi-section changes may highlight more than one section (for example, a tempo/groove change);
-- copy always returns clean plain text without UI markup.
+- copy always returns clean plain text without UI markup;
+- the Live Prompt itself should expand with content rather than introduce a nested vertical scrollbar; normal page scroll is the primary desktop scroll path;
+- manual prompt editing keeps the structured bracket/key/value visual theme even though the editable value remains plain text.
 
 Causality also works in reverse for deterministic output:
 

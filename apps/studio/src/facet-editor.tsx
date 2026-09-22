@@ -288,13 +288,17 @@ export function FacetEditor({
   function setNumberParameter(
     parameter: RuntimeParameter,
     value: number,
+    source: "bounded" | "direct" = "bounded",
   ) {
     if (!parameter.ui || parameter.ui.control !== "number") return;
+    if (!Number.isFinite(value)) return;
 
-    const normalized = Math.min(
-      parameter.ui.max,
-      Math.max(parameter.ui.min, value),
-    );
+    const directBpmEntry =
+      source === "direct" &&
+      parameter.id === "product:parameter:bpm:tempo";
+    const normalized = directBpmEntry
+      ? Math.max(1, value)
+      : Math.min(parameter.ui.max, Math.max(parameter.ui.min, value));
     const snapped =
       Math.round((normalized - parameter.ui.min) / parameter.ui.step) *
         parameter.ui.step +
@@ -720,32 +724,32 @@ export function FacetEditor({
                   {parameter.ui?.control === "number" ? (
                     <div className="number-parameter-control">
                       {(() => {
-                        const rangeValue =
-                          selectedValue ??
+                        const fallbackRangeValue =
                           parameter.ui.recommended_values[0] ??
                           parameter.ui.min;
+                        const rangeValue = Math.min(
+                          parameter.ui.max,
+                          Math.max(
+                            parameter.ui.min,
+                            selectedValue ?? fallbackRangeValue,
+                          ),
+                        );
+                        const isDirectBpm =
+                          parameter.id === "product:parameter:bpm:tempo";
                         return (
                           <>
                             <div
                               className="number-parameter-readout"
                               data-selected={selectedValue !== null}
+                              data-bpm={isDirectBpm || undefined}
                             >
-                              <strong>
-                                {selectedValue === null
-                                  ? t("facetEditor.notSet")
-                                  : t("facetEditor.numberValue", {
-                                      label: parameter.label,
-                                      value: selectedValue,
-                                      unit: parameter.ui.unit
-                                        ? " " + parameter.ui.unit
-                                        : "",
-                                    })}
-                              </strong>
-                              <div className="number-parameter-inputs">
+                              <span className="number-parameter-spacer" aria-hidden="true" />
+                              <label className="number-parameter-hero">
+                                <span className="sr-only">{parameter.label}</span>
                                 <input
                                   type="number"
-                                  min={parameter.ui.min}
-                                  max={parameter.ui.max}
+                                  min={isDirectBpm ? 1 : parameter.ui.min}
+                                  max={isDirectBpm ? undefined : parameter.ui.max}
                                   step={parameter.ui.step}
                                   value={selectedValue ?? ""}
                                   placeholder={String(rangeValue)}
@@ -759,9 +763,15 @@ export function FacetEditor({
                                     setNumberParameter(
                                       parameter,
                                       Number(raw),
+                                      "direct",
                                     );
                                   }}
                                 />
+                                {parameter.ui.unit && (
+                                  <span>{parameter.ui.unit}</span>
+                                )}
+                              </label>
+                              <div className="number-parameter-inputs">
                                 {selectedValue !== null && (
                                   <button
                                     type="button"

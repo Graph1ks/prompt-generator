@@ -330,6 +330,14 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - The facet-wide current-state rail remains the canonical overview; parameter summaries are a local scan aid derived from the same MusicSpec/Runtime IDs.
 - Custom Advanced wording remains full-width and nothing is hidden behind dropdown menus.
 
+## BPM + Live Prompt layout carry-forward
+
+- The Product Foundation BPM UI range remains 40–220 for slider/recommended ergonomics, but direct BPM entry intentionally accepts values beyond that range (for example 400) and writes the actual value into MusicSpec.
+- The direct BPM value is authoritative; the physical slider visual clamps to 40–220 when the typed value is outside that range.
+- Live Prompt has no inner vertical scrollbar on desktop. It expands with its content and relies on normal page scrolling to reach the footer/copy action.
+- Generated structured sections are visually contiguous rather than separated by blank-looking line gaps.
+- Manual prompt edit/locked-manual states reuse the bracket/key/value theme through `ThemedPromptEditor` / `ThemedPromptText`; editing remains plain-text and does not parse back into MusicSpec.
+
 ## MusicSpec undo/redo carry-forward
 
 - MusicSpec editing has a bounded session-only undo/redo stack; the project document schema is unchanged and history itself is not persisted.
