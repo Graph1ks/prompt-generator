@@ -3257,8 +3257,8 @@
     }
 
     .knowledge-popover-close {
-      inline-size: 40px;
-      block-size: 40px;
+      inline-size: 44px;
+      block-size: 44px;
       margin-block-start: -8px;
       margin-inline-end: -7px;
     }
