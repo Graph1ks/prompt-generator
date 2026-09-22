@@ -202,6 +202,13 @@ Proceed in this order:
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
 
+## Sticky large-pool controls
+
+- Genre, Instruments and Exclude keep their search/filter/result-count controls reachable while long result sets scroll on desktop.
+- The control stack is sticky beneath the global/chapter/facet navigation layers and uses the existing page scroll; no nested scrolling container was introduced.
+- Instrument family filters and Genre Major Genre filters remain visible together with search, so refining a 6,035-expression/1,564-genre pool does not require returning to the top.
+- Mobile deliberately falls back to normal document flow to preserve vertical space and avoid a stack of fixed/sticky chrome.
+
 ## Genre picker focus return
 
 - Genre role triggers now expose their expanded relationship to the inline picker and receive focus back after explicit close, Escape, successful selection, or clearing the active role.
