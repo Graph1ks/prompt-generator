@@ -511,6 +511,7 @@ export function buildCompilerKnowledge(bootstrap: RuntimeBootstrap): RuntimeComp
   }
 
   const genreLabels: Record<string, string> = {};
+  for (const major of bootstrap.core.major_genres) genreLabels[major.id] = major.label;
   for (const genre of bootstrap.genres.genres) genreLabels[genre.id] = genre.label;
 
   return {
