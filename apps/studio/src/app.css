@@ -1372,6 +1372,16 @@
     color: color-mix(in srgb, var(--studio-acid) 72%, #edf0e7);
   }
 
+  .exclude-source[data-active="true"] {
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--studio-acid) 14%, transparent),
+        transparent 72%
+      );
+    box-shadow: inset 2px 0 0 color-mix(in srgb, var(--studio-acid) 76%, transparent);
+  }
+
   .prompt-source-action {
     position: absolute;
     inset-inline-end: -18px;
