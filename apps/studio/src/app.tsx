@@ -125,6 +125,15 @@ function isStudioSourceTarget(value: string): value is StudioSourceTarget {
   );
 }
 
+function isTextEntryTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  return Boolean(
+    target.closest(
+      'input, textarea, select, [contenteditable="true"], [role="textbox"]',
+    ),
+  );
+}
+
 function chapterActiveItemCount(
   spec: MusicSpec,
   chapter: (typeof STUDIO_CHAPTERS)[number],
@@ -564,13 +573,49 @@ export function App() {
 
   function requestChapter(nextId: (typeof STUDIO_CHAPTERS)[number]["id"]) {
     const targetIndex = STUDIO_CHAPTERS.findIndex((entry) => entry.id === nextId);
-    const leavingDnaForward = chapter.id === "dna" && targetIndex > currentChapterIndex;
+    const currentIndex = STUDIO_CHAPTERS.findIndex(
+      (entry) => entry.id === chapter.id,
+    );
+    const leavingDnaForward =
+      chapter.id === "dna" && targetIndex > currentIndex;
     if (leavingDnaForward && !hasGenre && !genreSkipAcknowledged) {
       setGenreSkipAcknowledged(true);
       return;
     }
     chooseChapter(nextId);
   }
+
+  useEffect(() => {
+    function onChapterShortcut(event: KeyboardEvent) {
+      if (
+        projectLibraryOpen ||
+        copyFallbackText !== null ||
+        !event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey ||
+        isTextEntryTarget(event.target)
+      ) {
+        return;
+      }
+
+      const index = Number(event.key) - 1;
+      const target = STUDIO_CHAPTERS[index];
+      if (!target || index < 0 || index > 3) return;
+
+      event.preventDefault();
+      requestChapter(target.id);
+    }
+
+    window.addEventListener("keydown", onChapterShortcut);
+    return () => window.removeEventListener("keydown", onChapterShortcut);
+  }, [
+    chapter.id,
+    copyFallbackText,
+    genreSkipAcknowledged,
+    hasGenre,
+    projectLibraryOpen,
+  ]);
 
   useEffect(() => {
     if (!sourceJumpTarget) return;
@@ -1090,6 +1135,11 @@ export function App() {
                       .filter(Boolean)
                       .join(" ")}
                     aria-current={active ? "step" : undefined}
+                    aria-keyshortcuts={"Alt+" + (index + 1)}
+                    title={t("chapter.shortcut", {
+                      chapter: label,
+                      shortcut: "Alt+" + (index + 1),
+                    })}
                     aria-label={
                       activeItems > 0
                         ? t("chapter.navWithCount", {
@@ -1102,6 +1152,9 @@ export function App() {
                   >
                     <span className="num">0{index + 1}</span>
                     <span className="step-label">{label}</span>
+                    <kbd className="step-shortcut" aria-hidden="true">
+                      Alt {index + 1}
+                    </kbd>
                     {activeItems > 0 && (
                       <span className="step-count" aria-hidden="true">
                         {activeItems}
