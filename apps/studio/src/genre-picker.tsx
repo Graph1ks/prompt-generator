@@ -224,6 +224,15 @@ export function GenrePicker({
     ? matchingOptions
     : matchingOptions.slice(0, COMPACT_RESULT_COUNT);
 
+  const recentOptions = useMemo(
+    () =>
+      genrePreferences
+        .recentIds(6)
+        .map((id) => optionById.get(id))
+        .filter((option): option is GenreOption => option !== undefined),
+    [genrePreferences, optionById],
+  );
+
   const favoriteCount = useMemo(() => {
     let count = 0;
     for (const major of orderedMajors) {
@@ -470,6 +479,24 @@ export function GenrePicker({
               <kbd>/</kbd>
             )}
           </label>
+
+          {!query && !majorId && recentOptions.length > 0 && (
+            <div className="pool-recent" aria-label={t("pool.recent")}>
+              <span>{t("pool.recent")}</span>
+              <div>
+                {recentOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    className="pool-recent-chip"
+                    onClick={() => selectGenre(option)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="family-chips" aria-label="Major Genres">
             <button
