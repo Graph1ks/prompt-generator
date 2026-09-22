@@ -268,6 +268,13 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Locale resolution is UI-locale -> English fallback; renderer language remains independent.
 - Favorite hold durations remain 0.8 s add / 1.0 s remove internally, but duration instructions are intentionally hidden from normal UI/hover copy.
 
+## Persistent chapter navigation carry-forward
+
+- The four chapter tabs stick below the global top bar so long editor/picker surfaces never strand navigation off-screen.
+- Desktop supports `Alt+1` … `Alt+4` for DNA/Pulse/Palette/Finish. The keyboard route uses the normal chapter request path, including the one-time no-genre acknowledgement.
+- Shortcuts are suppressed for text-entry targets and while project/manual-copy overlays are active.
+- Prompt-source jumps use larger responsive scroll margins so sticky navigation does not obscure the located facet.
+
 ## Chapter navigation state carry-forward
 
 - Chapter navigation reflects actual active MusicSpec/Exclude content rather than treating previously visited chapters as "done".
