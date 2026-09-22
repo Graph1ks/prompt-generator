@@ -859,7 +859,7 @@ export function App() {
           </span>
           <button
             type="button"
-            className="icon-btn"
+            className="icon-btn new-project-action"
             aria-label={t("project.new")}
             title={t("project.new")}
             onClick={startNewPrompt}

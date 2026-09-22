@@ -2367,7 +2367,7 @@
   }
 
   @media (max-width: 430px) {
-    .top-actions > .icon-btn:first-of-type {
+    .top-actions > .new-project-action {
       display: none;
     }
 
@@ -3156,17 +3156,48 @@
 
   .knowledge-inline-head {
     display: flex;
-    align-items: baseline;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
     padding-block-end: 8px;
     border-block-end: 1px solid var(--studio-line);
   }
 
+  .knowledge-inline-title {
+    min-inline-size: 0;
+    display: grid;
+    gap: 2px;
+  }
+
   .knowledge-inline-head strong {
     color: var(--studio-ink);
     font-size: 13px;
     font-weight: 780;
+  }
+
+  .knowledge-popover-close {
+    inline-size: 32px;
+    block-size: 32px;
+    margin: -5px -5px -3px 0;
+    padding: 0;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--studio-muted);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex: none;
+  }
+
+  .knowledge-popover-close:hover {
+    color: var(--studio-ink);
+    background: color-mix(in srgb, var(--studio-mint) 30%, var(--studio-card));
+  }
+
+  .knowledge-popover-close .studio-icon {
+    inline-size: 15px;
+    block-size: 15px;
   }
 
   .knowledge-inline-head small,
@@ -3210,7 +3241,26 @@
       inline-size: auto;
       max-block-size: min(48dvh, 420px);
       border-radius: 16px;
-      padding: 16px;
+      padding: 21px 16px 16px;
+    }
+
+    .knowledge-popover[data-pinned]::before {
+      content: "";
+      position: absolute;
+      inset-block-start: 7px;
+      inset-inline-start: 50%;
+      inline-size: 34px;
+      block-size: 4px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--studio-muted) 38%, transparent);
+      transform: translateX(-50%);
+    }
+
+    .knowledge-popover-close {
+      inline-size: 44px;
+      block-size: 44px;
+      margin-block-start: -8px;
+      margin-inline-end: -7px;
     }
   }
 }
@@ -3964,6 +4014,11 @@
       grid-row: 1;
     }
 
+    .project-action {
+      inline-size: 44px;
+      block-size: 44px;
+    }
+
     .project-title-field input {
       background: color-mix(in srgb, var(--studio-paper) 62%, var(--studio-card));
       border-color: var(--studio-line);
@@ -3977,12 +4032,12 @@
 
   @media (max-width: 430px) {
     .project-row-actions {
-      gap: 3px;
+      gap: 4px;
     }
 
     .project-action {
-      inline-size: 38px;
-      block-size: 38px;
+      inline-size: 44px;
+      block-size: 44px;
     }
 
     .project-row-icon {
