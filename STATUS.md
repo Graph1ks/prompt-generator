@@ -156,6 +156,15 @@ Proceed in this order:
 - Hover contrast is explicitly defined across the current Studio button families.
 - Motion remains intentionally restrained until interaction/functionality coverage is further along.
 
+## Specialized selected-state rails
+
+- Instruments and Exclude now use the same visible-current-state pattern as ordinary facets instead of exposing only a count plus a loose chip row.
+- Both specialized surfaces show a labeled current-state rail with direct per-item removal and a pool-scoped clear-all action.
+- Instrument clear-all resets only the Instruments facet through the shared MusicSpec helper.
+- Exclude clear-all affects only the separate Exclude channel.
+- Legacy/imported Exclude items without stable IDs are now individually removable from the current-state rail instead of becoming effectively stuck UI entries.
+- Mobile selected chips remain practical 44 px touch targets; no nested horizontal scroller was introduced.
+
 ## Production Instruments slice
 
 - Palette now lazy-loads validated `instruments.json` + `instrument-expressions.json` only when needed.
