@@ -18,7 +18,12 @@ type IconName =
   | "unlock"
   | "reset"
   | "edit"
-  | "warning";
+  | "warning"
+  | "folder"
+  | "download"
+  | "upload"
+  | "duplicate"
+  | "trash";
 
 const paths: Readonly<Record<IconName, ReactNode>> = {
   arrow: <><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></>,
@@ -39,6 +44,11 @@ const paths: Readonly<Record<IconName, ReactNode>> = {
   reset: <><path d="M4 8V4h4" /><path d="M5.5 5.5A8 8 0 1 1 4 14" /></>,
   edit: <><path d="m4 20 4.5-1 10-10a2 2 0 0 0-3-3l-10 10Z" /><path d="m14 7 3 3" /></>,
   warning: <><path d="M12 3 2.7 20h18.6Z" /><path d="M12 9v5" /><path d="M12 17v.1" /></>,
+  folder: <><path d="M3 7.5h7l2 2h9v9.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" /><path d="M3 7.5V5a2 2 0 0 1 2-2h4l2 2h4" /></>,
+  download: <><path d="M12 3v12" /><path d="m7 10 5 5 5-5" /><path d="M4 20h16" /></>,
+  upload: <><path d="M12 15V3" /><path d="m7 8 5-5 5 5" /><path d="M4 20h16" /></>,
+  duplicate: <><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" /><path d="M14 11v6M11 14h6" /></>,
+  trash: <><path d="M4 7h16" /><path d="m9 3h6l1 4H8Z" /><path d="m6 7 1 14h10l1-14" /><path d="M10 11v6M14 11v6" /></>,
 };
 
 export interface IconProps extends SVGProps<SVGSVGElement> {

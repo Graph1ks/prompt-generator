@@ -14,6 +14,12 @@ import {
   ProjectStorageError,
   createIndexedDbProjectStorage,
   createProjectDocument,
+  duplicateProjectDocument,
+  normalizeProjectTitle,
+  parseProjectDocumentJson,
+  serializeProjectDocument,
+  type ProjectDocument,
+  type ProjectSummary,
 } from "@vgine/project-storage";
 
 import { ExcludePicker } from "./exclude-picker.js";
@@ -22,6 +28,7 @@ import { GenrePicker } from "./genre-picker.js";
 import { InstrumentPicker } from "./instrument-picker.js";
 import { Icon } from "./icons.js";
 import { SUPPORTED_LOCALES, useI18n, type MessageKey } from "./i18n.js";
+import { ProjectLibrary } from "./project-library.js";
 import { loadStudioRuntime, type StudioRuntime } from "./runtime-client.js";
 import {
   STUDIO_CHAPTERS,
@@ -33,6 +40,7 @@ const LEGACY_THEME_KEY = "vgine.theme";
 const THEME_PREFERENCE_KEY = "preference:theme";
 const EDITOR_MODE_PREFERENCE_KEY = "preference:editor-mode";
 const FACET_MODE_PREFERENCE_KEY = "preference:facet-modes";
+const ACTIVE_PROJECT_POINTER_KEY = "project:active-id";
 const projectStorage = createIndexedDbProjectStorage();
 const PROJECT_AUTOSAVE_DELAY_MS = 320;
 
@@ -90,6 +98,34 @@ function isChapterId(
   return STUDIO_CHAPTERS.some((chapter) => chapter.id === value);
 }
 
+
+function createLocalProjectId(): string {
+  const uuid = globalThis.crypto?.randomUUID?.();
+  if (uuid) return "project:" + uuid;
+  return "project:" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
+}
+
+function safeProjectFileName(title: string | null, fallback: string): string {
+  const stem = (title ?? fallback)
+    .normalize("NFKD")
+    .replace(/[^\p{L}\p{N}._-]+/gu, "-")
+    .replace(/^-+|-+$/gu, "")
+    .slice(0, 72);
+  return (stem || "vgine-project") + ".vgine.json";
+}
+
+function downloadProjectDocument(project: ProjectDocument, fallback: string) {
+  const blob = new Blob([serializeProjectDocument(project)], {
+    type: "application/json;charset=utf-8",
+  });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = safeProjectFileName(project.title, fallback);
+  anchor.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
 export function App() {
   const { locale, setLocale, t } = useI18n();
   const [theme, setTheme] = useState<VgineTheme>(initialTheme);
@@ -115,8 +151,15 @@ export function App() {
   const [projectReady, setProjectReady] = useState(false);
   const [projectSaveState, setProjectSaveState] =
     useState<ProjectSaveState>("loading");
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
+  const [projectTitle, setProjectTitle] = useState<string | null>(null);
+  const [projectSummaries, setProjectSummaries] = useState<readonly ProjectSummary[]>([]);
+  const [projectLibraryOpen, setProjectLibraryOpen] = useState(false);
+  const [projectLibraryBusy, setProjectLibraryBusy] = useState(false);
+  const [projectLibraryError, setProjectLibraryError] = useState<string | null>(null);
   const projectCreatedAtRef = useRef(new Date().toISOString());
   const saveRevisionRef = useRef(0);
+  const autosaveTimerRef = useRef<number | null>(null);
 
   const chapter =
     STUDIO_CHAPTERS.find((candidate) => candidate.id === chapterId) ??
@@ -244,29 +287,60 @@ export function App() {
   useEffect(() => {
     let live = true;
 
-    void projectStorage
-      .load(ACTIVE_PROJECT_ID)
-      .then((project) => {
-        if (!live) return;
+    void (async () => {
+      try {
+        const storedActive = await userDataStorage.get<unknown>(
+          ACTIVE_PROJECT_POINTER_KEY,
+        );
+        let project =
+          typeof storedActive === "string"
+            ? await projectStorage.load(storedActive)
+            : null;
 
-        if (project) {
-          setSpec(project.music_spec);
-          setManualStyleText(project.output.manual_style_override);
-          if (isChapterId(project.workspace.active_chapter)) {
-            setChapterId(project.workspace.active_chapter);
+        if (!project) {
+          const legacy = await projectStorage.load(ACTIVE_PROJECT_ID);
+          if (legacy) {
+            const migratedId = createLocalProjectId();
+            project = duplicateProjectDocument(legacy, migratedId, {
+              title: legacy.title,
+              createdAt: legacy.created_at,
+              updatedAt: legacy.updated_at,
+            });
+            await projectStorage.save(project);
+            await userDataStorage.set(ACTIVE_PROJECT_POINTER_KEY, migratedId);
+            await projectStorage.delete(ACTIVE_PROJECT_ID);
           }
-          setGenreSkipAcknowledged(
-            project.workspace.genre_skip_acknowledged,
-          );
-          projectCreatedAtRef.current = project.created_at;
-          setProjectSaveState("restored");
-        } else {
-          setProjectSaveState("saved");
         }
 
+        if (!project) {
+          const summaries = await projectStorage.list();
+          const fallback = summaries.find(
+            (candidate) => candidate.id !== ACTIVE_PROJECT_ID,
+          );
+          if (fallback) {
+            project = await projectStorage.load(fallback.id);
+          }
+        }
+
+        if (!project) {
+          const now = new Date().toISOString();
+          project = createProjectDocument(
+            createLocalProjectId(),
+            createMusicSpec(),
+            { createdAt: now, updatedAt: now },
+          );
+          await projectStorage.save(project);
+        }
+
+        await userDataStorage.set(ACTIVE_PROJECT_POINTER_KEY, project.id);
+        const summaries = await projectStorage.list();
+
+        if (!live) return;
+        applyProject(project);
+        setProjectSummaries(summaries);
+        setProjectSaveState("restored");
         setProjectReady(true);
-      })
-      .catch((error: unknown) => {
+      } catch (error: unknown) {
         if (!live) return;
         if (
           error instanceof ProjectStorageError &&
@@ -276,7 +350,8 @@ export function App() {
         } else {
           setProjectSaveState("error");
         }
-      });
+      }
+    })();
 
     return () => {
       live = false;
@@ -284,14 +359,20 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    if (!projectReady) return;
+    if (!projectReady || !currentProjectId) return;
 
     const revision = ++saveRevisionRef.current;
     setProjectSaveState("saving");
 
-    const timer = window.setTimeout(() => {
+    if (autosaveTimerRef.current !== null) {
+      window.clearTimeout(autosaveTimerRef.current);
+    }
+
+    autosaveTimerRef.current = window.setTimeout(() => {
+      autosaveTimerRef.current = null;
       const updatedAt = new Date().toISOString();
-      const project = createProjectDocument(ACTIVE_PROJECT_ID, spec, {
+      const project = createProjectDocument(currentProjectId, spec, {
+        title: projectTitle,
         createdAt: projectCreatedAtRef.current,
         updatedAt,
         manualStyleOverride: manualStyleText,
@@ -304,6 +385,7 @@ export function App() {
         .then(() => {
           if (saveRevisionRef.current === revision) {
             setProjectSaveState("saved");
+            setProjectSummaries((current) => upsertSummary(current, project));
           }
         })
         .catch((error: unknown) => {
@@ -319,12 +401,19 @@ export function App() {
         });
     }, PROJECT_AUTOSAVE_DELAY_MS);
 
-    return () => window.clearTimeout(timer);
+    return () => {
+      if (autosaveTimerRef.current !== null) {
+        window.clearTimeout(autosaveTimerRef.current);
+        autosaveTimerRef.current = null;
+      }
+    };
   }, [
     chapterId,
+    currentProjectId,
     genreSkipAcknowledged,
     manualStyleText,
     projectReady,
+    projectTitle,
     spec,
   ]);
 
@@ -421,17 +510,239 @@ export function App() {
     );
   }
 
-  function startNewPrompt() {
-    projectCreatedAtRef.current = new Date().toISOString();
-    setProjectSaveState(projectReady ? "saving" : projectSaveState);
-    setSpec(resetMusicSpec());
-    setChapterId(STUDIO_CHAPTERS[0].id);
+  function applyProject(project: ProjectDocument) {
+    setCurrentProjectId(project.id);
+    setProjectTitle(project.title);
+    setSpec(project.music_spec);
+    setManualStyleText(project.output.manual_style_override);
+    setChapterId(
+      isChapterId(project.workspace.active_chapter)
+        ? project.workspace.active_chapter
+        : STUDIO_CHAPTERS[0].id,
+    );
+    setGenreSkipAcknowledged(project.workspace.genre_skip_acknowledged);
+    projectCreatedAtRef.current = project.created_at;
     setActiveGenreRole("foundation");
-    setGenreSkipAcknowledged(false);
-    setManualStyleText(null);
     setPromptUnlocked(false);
     setOutputTab("style");
     setMobilePreviewOpen(false);
+  }
+
+  function upsertSummary(
+    current: readonly ProjectSummary[],
+    project: ProjectDocument,
+  ): readonly ProjectSummary[] {
+    const summary: ProjectSummary = {
+      id: project.id,
+      title: project.title,
+      created_at: project.created_at,
+      updated_at: project.updated_at,
+    };
+    return [
+      summary,
+      ...current.filter((candidate) => candidate.id !== project.id),
+    ].sort((a, b) => b.updated_at.localeCompare(a.updated_at));
+  }
+
+  async function persistCurrentProjectNow(): Promise<ProjectDocument | null> {
+    if (!projectReady || !currentProjectId) return null;
+    if (autosaveTimerRef.current !== null) {
+      window.clearTimeout(autosaveTimerRef.current);
+      autosaveTimerRef.current = null;
+    }
+
+    const revision = ++saveRevisionRef.current;
+    const project = createProjectDocument(currentProjectId, spec, {
+      title: projectTitle,
+      createdAt: projectCreatedAtRef.current,
+      updatedAt: new Date().toISOString(),
+      manualStyleOverride: manualStyleText,
+      activeChapter: chapterId,
+      genreSkipAcknowledged,
+    });
+    setProjectSaveState("saving");
+    await projectStorage.save(project);
+    if (saveRevisionRef.current === revision) {
+      setProjectSaveState("saved");
+      setProjectSummaries((current) => upsertSummary(current, project));
+    }
+    return project;
+  }
+
+  async function refreshProjectLibrary() {
+    setProjectSummaries(await projectStorage.list());
+  }
+
+  async function runProjectAction(action: () => Promise<void>) {
+    setProjectLibraryBusy(true);
+    setProjectLibraryError(null);
+    try {
+      await action();
+    } catch (error: unknown) {
+      setProjectLibraryError(
+        error instanceof ProjectStorageError &&
+          (error.code === "invalid_project_json" ||
+            error.code === "invalid_project_document" ||
+            error.code === "unsupported_project_document")
+          ? t("project.importError")
+          : t("project.operationError"),
+      );
+    } finally {
+      setProjectLibraryBusy(false);
+    }
+  }
+
+  async function createNewProject() {
+    await runProjectAction(async () => {
+      await persistCurrentProjectNow();
+      const now = new Date().toISOString();
+      const project = createProjectDocument(
+        createLocalProjectId(),
+        resetMusicSpec(),
+        { createdAt: now, updatedAt: now },
+      );
+      await projectStorage.save(project);
+      await userDataStorage.set(ACTIVE_PROJECT_POINTER_KEY, project.id);
+      applyProject(project);
+      setProjectSaveState("saved");
+      await refreshProjectLibrary();
+      setProjectLibraryOpen(false);
+    });
+  }
+
+  async function openProject(id: string) {
+    if (id === currentProjectId) {
+      setProjectLibraryOpen(false);
+      return;
+    }
+    await runProjectAction(async () => {
+      await persistCurrentProjectNow();
+      const project = await projectStorage.load(id);
+      if (!project) {
+        throw new ProjectStorageError(
+          "project_not_found",
+          "Project no longer exists",
+        );
+      }
+      await userDataStorage.set(ACTIVE_PROJECT_POINTER_KEY, project.id);
+      applyProject(project);
+      setProjectSaveState("restored");
+      await refreshProjectLibrary();
+      setProjectLibraryOpen(false);
+    });
+  }
+
+  async function renameProject(id: string, title: string | null) {
+    await runProjectAction(async () => {
+      if (id === currentProjectId) await persistCurrentProjectNow();
+      const source = await projectStorage.load(id);
+      if (!source) return;
+      const project = createProjectDocument(id, source.music_spec, {
+        title: normalizeProjectTitle(title),
+        createdAt: source.created_at,
+        updatedAt: new Date().toISOString(),
+        manualStyleOverride: source.output.manual_style_override,
+        activeChapter: source.workspace.active_chapter,
+        genreSkipAcknowledged: source.workspace.genre_skip_acknowledged,
+      });
+      await projectStorage.save(project);
+      if (id === currentProjectId) {
+        setProjectTitle(project.title);
+        projectCreatedAtRef.current = project.created_at;
+      }
+      await refreshProjectLibrary();
+    });
+  }
+
+  async function duplicateProject(id: string) {
+    await runProjectAction(async () => {
+      if (id === currentProjectId) await persistCurrentProjectNow();
+      const source = await projectStorage.load(id);
+      if (!source) return;
+      const now = new Date().toISOString();
+      const title = source.title
+        ? t("project.copyTitle", { title: source.title })
+        : t("project.untitledCopy");
+      const project = duplicateProjectDocument(
+        source,
+        createLocalProjectId(),
+        { title, createdAt: now, updatedAt: now },
+      );
+      await projectStorage.save(project);
+      await userDataStorage.set(ACTIVE_PROJECT_POINTER_KEY, project.id);
+      applyProject(project);
+      setProjectSaveState("saved");
+      await refreshProjectLibrary();
+      setProjectLibraryOpen(false);
+    });
+  }
+
+  async function deleteProject(id: string) {
+    await runProjectAction(async () => {
+      await projectStorage.delete(id);
+      const remaining = await projectStorage.list();
+
+      if (id === currentProjectId) {
+        const nextSummary = remaining[0];
+        if (nextSummary) {
+          const next = await projectStorage.load(nextSummary.id);
+          if (next) {
+            await userDataStorage.set(ACTIVE_PROJECT_POINTER_KEY, next.id);
+            applyProject(next);
+            setProjectSaveState("restored");
+          }
+        } else {
+          const now = new Date().toISOString();
+          const next = createProjectDocument(
+            createLocalProjectId(),
+            resetMusicSpec(),
+            { createdAt: now, updatedAt: now },
+          );
+          await projectStorage.save(next);
+          await userDataStorage.set(ACTIVE_PROJECT_POINTER_KEY, next.id);
+          applyProject(next);
+          setProjectSaveState("saved");
+        }
+      }
+
+      await refreshProjectLibrary();
+    });
+  }
+
+  async function exportProject(id: string) {
+    await runProjectAction(async () => {
+      if (id === currentProjectId) await persistCurrentProjectNow();
+      const project = await projectStorage.load(id);
+      if (!project) return;
+      downloadProjectDocument(project, t("project.untitled"));
+    });
+  }
+
+  async function importProject(text: string) {
+    await runProjectAction(async () => {
+      await persistCurrentProjectNow();
+      const source = parseProjectDocumentJson(text);
+      const now = new Date().toISOString();
+      const project = duplicateProjectDocument(
+        source,
+        createLocalProjectId(),
+        {
+          title: source.title ?? t("project.importedUntitled"),
+          createdAt: now,
+          updatedAt: now,
+        },
+      );
+      await projectStorage.save(project);
+      await userDataStorage.set(ACTIVE_PROJECT_POINTER_KEY, project.id);
+      applyProject(project);
+      setProjectSaveState("saved");
+      await refreshProjectLibrary();
+      setProjectLibraryOpen(false);
+    });
+  }
+
+  function startNewPrompt() {
+    void createNewProject();
   }
 
   function togglePromptUnlock() {
@@ -520,6 +831,25 @@ export function App() {
         <span className="top-label">{t("app.soundStudio")}</span>
 
         <div className="top-actions">
+          <button
+            type="button"
+            className="project-switcher"
+            aria-label={t("project.switcherAria")}
+            title={t("project.switcherAria")}
+            onClick={() => {
+              setProjectLibraryError(null);
+              setProjectLibraryOpen(true);
+              void refreshProjectLibrary().catch(() => {
+                setProjectLibraryError(t("project.operationError"));
+              });
+            }}
+          >
+            <Icon name="folder" />
+            <span>
+              <strong>{projectTitle ?? t("project.untitled")}</strong>
+              <small>{projectSaveLabel}</small>
+            </span>
+          </button>
           <span
             className="save-status"
             data-state={projectSaveState}
@@ -530,11 +860,11 @@ export function App() {
           <button
             type="button"
             className="icon-btn"
-            aria-label={t("app.newPrompt")}
-            title={t("app.newPrompt")}
+            aria-label={t("project.new")}
+            title={t("project.new")}
             onClick={startNewPrompt}
           >
-            <Icon name="reset" />
+            <Icon name="plus" />
           </button>
           <button
             type="button"
@@ -973,6 +1303,23 @@ export function App() {
           <span>Runtime Pack · MusicSpec v1 · Compiler v1</span>
         </footer>
       </div>
+
+      <ProjectLibrary
+        open={projectLibraryOpen}
+        currentProjectId={currentProjectId}
+        currentProjectTitle={projectTitle}
+        projects={projectSummaries}
+        busy={projectLibraryBusy}
+        error={projectLibraryError}
+        onClose={() => setProjectLibraryOpen(false)}
+        onCreate={createNewProject}
+        onOpen={openProject}
+        onRename={renameProject}
+        onDuplicate={duplicateProject}
+        onDelete={deleteProject}
+        onExport={exportProject}
+        onImport={importProject}
+      />
 
       <div className="mobile-dock">
         <button

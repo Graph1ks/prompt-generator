@@ -9,7 +9,11 @@ import {
   createMemoryProjectStorage,
   createMemoryUserDataStorage,
   createProjectDocument,
+  duplicateProjectDocument,
+  normalizeProjectTitle,
   parseProjectDocument,
+  parseProjectDocumentJson,
+  serializeProjectDocument,
 } from "../dist/index.js";
 
 test("creates and parses a v1 project document", () => {
@@ -68,6 +72,49 @@ test("rejects unsupported project schemas and invalid MusicSpec state", () => {
       }),
     /Invalid MusicSpec/u,
   );
+});
+
+test("normalizes project titles and round-trips exported project JSON", () => {
+  const project = createProjectDocument("project:a", createMusicSpec(), {
+    title: "  Late   Night  ",
+    createdAt: "2026-09-22T07:00:00.000Z",
+    updatedAt: "2026-09-22T07:01:00.000Z",
+  });
+
+  assert.equal(project.title, "Late Night");
+  assert.equal(normalizeProjectTitle("   "), null);
+  assert.deepEqual(parseProjectDocumentJson(serializeProjectDocument(project)), project);
+
+  assert.throws(
+    () => parseProjectDocumentJson("{bad json"),
+    (error) =>
+      error instanceof ProjectStorageError &&
+      error.code === "invalid_project_json",
+  );
+});
+
+test("duplicates semantic project state under a fresh identity", () => {
+  const source = createProjectDocument("project:source", createMusicSpec(), {
+    title: "Source",
+    createdAt: "2026-09-22T07:00:00.000Z",
+    updatedAt: "2026-09-22T07:01:00.000Z",
+    manualStyleOverride: "[BPM: 110]",
+    activeChapter: "pulse",
+    genreSkipAcknowledged: true,
+  });
+
+  const duplicate = duplicateProjectDocument(source, "project:copy", {
+    title: "Source Copy",
+    createdAt: "2026-09-22T08:00:00.000Z",
+    updatedAt: "2026-09-22T08:00:00.000Z",
+  });
+
+  assert.equal(duplicate.id, "project:copy");
+  assert.equal(duplicate.title, "Source Copy");
+  assert.equal(duplicate.created_at, "2026-09-22T08:00:00.000Z");
+  assert.deepEqual(duplicate.music_spec, source.music_spec);
+  assert.deepEqual(duplicate.output, source.output);
+  assert.deepEqual(duplicate.workspace, source.workspace);
 });
 
 test("memory adapter implements load/save/list/delete contract", async () => {

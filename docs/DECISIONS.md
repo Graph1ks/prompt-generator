@@ -850,3 +850,21 @@ Product Knowledge authoring therefore treats stable IDs and editor metadata as c
 
 The complete v1 authoring batch lives beside the Product Knowledge source as `data/product/knowledge-foundation-v1-authoring-request.txt`. Returned ID/EN/DE text is validated and imported through `scripts/data/import_product_knowledge_authoring.py`; the importer preserves IDs/links and replaces only localized `plain` definitions with revision bumps.
 
+## ADR-047 — Project library uses ProjectStorage documents plus a separate active-project pointer
+
+**Status:** accepted
+
+Multi-project Studio state continues to use the existing `ProjectStorage` document contract. Each project has its own stable local ID and persists MusicSpec plus the already accepted secondary project/workspace state.
+
+The currently open project ID is a user-level local preference stored through `UserDataStorage`, not embedded into a project document. The historical fixed ID `active` is migration input only: Studio migrates that legacy record to a fresh project ID and removes the old record after successful save.
+
+Project operations preserve the same local-only boundary:
+
+- rename keeps project ID and creation time while updating title and `updated_at`;
+- duplicate clones semantic/output/workspace state under a fresh ID and fresh timestamps;
+- export serializes one validated `vgine-project-v1` document to a user-downloaded `.vgine.json` file;
+- import validates `vgine-project-v1`, then creates a fresh local ID instead of overwriting an existing project with the exported ID;
+- deleting the active project switches to the most recently updated remaining project, or creates a new blank local project when none remain.
+
+No server/cloud sync is introduced. Project import/export is explicit user-controlled file I/O.
+

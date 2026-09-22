@@ -46,6 +46,55 @@ export interface ProjectStorage {
   list(): Promise<readonly ProjectSummary[]>;
 }
 
+
+export interface DuplicateProjectDocumentOptions {
+  readonly title?: string | null;
+  readonly createdAt?: string;
+  readonly updatedAt?: string;
+}
+
+export function normalizeProjectTitle(value: string | null | undefined): string | null {
+  if (value === null || value === undefined) return null;
+  const normalized = value.trim().replace(/\s+/gu, " ");
+  return normalized.length > 0 ? normalized : null;
+}
+
+export function serializeProjectDocument(project: ProjectDocument): string {
+  return JSON.stringify(parseProjectDocument(project), null, 2) + "\n";
+}
+
+export function parseProjectDocumentJson(text: string): ProjectDocument {
+  let value: unknown;
+  try {
+    value = JSON.parse(text);
+  } catch (error) {
+    throw new ProjectStorageError(
+      "invalid_project_json",
+      error instanceof Error ? error.message : "Project JSON is invalid",
+    );
+  }
+  return parseProjectDocument(value);
+}
+
+export function duplicateProjectDocument(
+  source: ProjectDocument,
+  id: string,
+  options: DuplicateProjectDocumentOptions = {},
+): ProjectDocument {
+  const parsed = parseProjectDocument(source);
+  const now = new Date().toISOString();
+  return createProjectDocument(id, parsed.music_spec, {
+    title: options.title === undefined
+      ? parsed.title
+      : normalizeProjectTitle(options.title),
+    createdAt: options.createdAt ?? now,
+    updatedAt: options.updatedAt ?? now,
+    manualStyleOverride: parsed.output.manual_style_override,
+    activeChapter: parsed.workspace.active_chapter,
+    genreSkipAcknowledged: parsed.workspace.genre_skip_acknowledged,
+  });
+}
+
 export class ProjectStorageError extends Error {
   readonly code: string;
 
@@ -104,7 +153,7 @@ export function createProjectDocument(
   return {
     schema: PROJECT_DOCUMENT_SCHEMA,
     id: requireString(id, "id"),
-    title: options.title ?? null,
+    title: normalizeProjectTitle(options.title),
     created_at: validTimestamp(createdAt, "created_at"),
     updated_at: validTimestamp(updatedAt, "updated_at"),
     music_spec: parseMusicSpec(musicSpec),
@@ -152,7 +201,7 @@ export function parseProjectDocument(value: unknown): ProjectDocument {
   return {
     schema: PROJECT_DOCUMENT_SCHEMA,
     id: requireString(value.id, "id"),
-    title: nullableString(value.title, "title"),
+    title: normalizeProjectTitle(nullableString(value.title, "title")),
     created_at: validTimestamp(value.created_at, "created_at"),
     updated_at: validTimestamp(value.updated_at, "updated_at"),
     music_spec: parseMusicSpec(value.music_spec),
