@@ -1,7 +1,7 @@
 # Project Status
 
 **Last updated:** 2026-09-22  
-**Current milestone:** **Explain UX + authored Product Knowledge + multi-project library implemented** — current: ordinary-facet state visibility/mobile ergonomics
+**Current milestone:** **Studio UX stabilization through compact Live Prompt parity** — Database V1/Product Knowledge/project library remain closed/implemented; next: owner-local interaction smoke, then targeted visual/motion refinement
 
 ## Completion verdict
 
@@ -104,10 +104,10 @@ Future enrichment does not reopen the V1 database milestone unless it changes sc
 
 Proceed in this order:
 
-1. owner-locally re-export Runtime Pack v1 and reproduce the reference prompt with Explain enabled;
-2. verify selection-time Explain on Product controls, Genre, Instruments and Exclude; fix only genuine explicit-link/UX defects — never infer Knowledge identity from rendered strings;
-3. owner-locally exercise the project library: legacy restore, create, rename, switch, duplicate, export/import and active-project deletion;
-4. continue Studio ergonomics/visual refinement; reserve broad motion polish until interaction/functionality is accepted.
+1. owner-locally `git pull` + `pnpm dev`; no Runtime rebuild is required for the latest Studio-only slices;
+2. smoke locked/unlocked prompt density, bottom-aware preview following, facet-scoped highlight/source-jump behavior, direct BPM >220, Explain click-through, Undo/Redo, project library operations and large-pool mouse/touch/keyboard flows;
+3. fix only reproducible interaction/layout defects found in that smoke; keep Database V1, Genre crosswalk, Instruments semantic completion and authored Product Knowledge closed;
+4. after interaction acceptance, continue targeted visual refinement and restrained causal motion polish rather than broad decorative animation.
 
 ## Do not redo
 
@@ -201,6 +201,13 @@ Proceed in this order:
 - Selected Genre labels, ordinary facet section labels, Advanced parameter labels and the Instruments section can expose reviewed definitions when their Runtime records carry Knowledge IDs.
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
+
+## Compact locked/unlocked Live Prompt parity
+
+- Mobile locked Style output now uses the same compact vertical rhythm as the themed manual editor: no per-section 9 px margin and no forced 44 px minimum height on every structured Style line.
+- Structured Style lines use the same 12 px / 1.72 line-height family as the unlocked themed editor, so locking/unlocking does not visually expand/collapse the prompt into different densities.
+- The source-navigation edit cue was reduced to 24 px on mobile so it does not force or visually overlap compact prompt rows. Exclude keeps its larger touch target because it is a separate block, not a dense structured section list.
+- This is presentation-only: compiler text, section order, copy output, source navigation and MusicSpec are unchanged.
 
 ## Bottom-aware Live Prompt follow + scoped causality highlight
 

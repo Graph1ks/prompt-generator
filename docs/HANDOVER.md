@@ -1,8 +1,8 @@
-# Handover — Explain UX + authored Product Knowledge
+# Handover — Studio UX stabilization after compact Live Prompt parity
 
 **Last updated:** 2026-09-22  
-**Handoff target:** owner-local Runtime/Explain/project-library acceptance plus ordinary-facet state-rail smoke, then remaining Studio ergonomics  
-**Milestone:** Database V1 remains closed; Explain is selection-time/portal-based; Product Knowledge v1 is fully authored; multi-project local library/naming/duplicate/import/export is implemented on ProjectStorage
+**Handoff target:** start the next thread from current `main`, owner-smoke the completed Studio interaction stack, then continue only targeted visual/motion refinement and real defects  
+**Milestone:** Database V1 is closed; Product Knowledge v1 is authored; local multi-project persistence is implemented; current Studio includes source-linked Live Prompt, scoped causality highlights, bottom-aware preview following, undo/redo, pool quick views/keyboard navigation and compact locked/unlocked prompt parity
 
 ## Read this first
 
@@ -33,9 +33,20 @@ Real Factory files, generated SQLite databases, reports, checkpoints and backups
 - PR #37 merged CI-green as `dd503031ed546f0ed508763ebab2efe2269ec83c`.
 - Explain no longer renders chip rows beneath Live Prompt sections.
 - Explicitly linked terms are explainable before selection via dashed inline affordances.
-- One viewport-level explanation surface is active at a time; desktop supports hover/focus + pin, mobile uses tap + bottom sheet.
+- One viewport-level explanation surface is active at a time; desktop hover/focus previews Explain, selectable clicks still activate the control, and mobile uses the separate Explain affordance + bottom sheet.
 - Compact favorite/preset hold feedback is no longer clipped inside the 38 px control.
 - Product Knowledge content remediation is complete for v1: all 400 Product Foundation entries now use the accepted authored EN/DE musical explanations; the old generated preset/control/rendering prose is no longer the tracked baseline.
+
+## Latest Studio UX completion snapshot
+
+The current continuation baseline includes these merged slices:
+
+- PR #62: direct BPM entry can exceed the 40–220 slider range; numeric BPM is centered/large; Live Prompt has no inner scrollbar; manual Style editing keeps the structured theme.
+- PR #63: desktop Live Prompt follows long page edits with a bottom-aware sticky offset; only the active/changed prompt section highlights.
+- PR #64: Genre/Instruments/Exclude support spatial keyboard browsing, search-to-result transfer and keyboard-equivalent Favorite toggling.
+- This handover slice: locked deterministic Style output uses the same compact mobile line rhythm as unlocked themed manual Style editing; no forced 44 px row height or 9 px inter-section gap remains.
+
+These are Studio presentation/interaction changes only. They do not require a Runtime Pack rebuild.
 
 ## What has been completed
 
@@ -445,7 +456,7 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Product Knowledge Foundation v1 lives at `data/product/knowledge-foundation-v1.json`; coverage remains 400 stable entries.
 - Product Editor Foundation carries explicit links into this Knowledge layer. Genre/Instrument explanation continues to use Database V1 semantic links. Never replace these links with rendered-label or prompt-string guessing.
 - Explain is now an authoring-time affordance, not a Live Prompt chip list. Easy statements, Advanced options/recommended values, Genre results, Instrument-expression results and Exclude results expose linked Knowledge before selection.
-- Desktop terms use a subtle dashed underline with delayed hover/focus; click pins. Touch taps pin the same concept in a mobile bottom sheet.
+- Desktop terms use a subtle dashed underline with delayed hover/focus. On selectable labels, click/Enter/Space performs the primary selection; non-selectable terms may still pin. Touch keeps label taps for selection and uses the separate compact Explain affordance to open the mobile bottom sheet.
 - The explanation surface is a singleton viewport portal. Parent overflow must not clip it, opening a second term closes the first, and the popover must not consume Studio layout space.
 - The old explanation-chip rows beneath Live Prompt sections are removed. Copyable Style/Exclude output remains unchanged.
 - Product ordinary facets use Product Knowledge links; Genre/Instrument explanation uses their existing explicit Database V1 links. If an item has no explicit Knowledge link, leave it plain.
@@ -453,47 +464,32 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - The generated/meta v1 prose for Product Knowledge options/statements/Exclude entries is not accepted as final dictionary copy. The complete 400-entry authoring request is `data/product/knowledge-foundation-v1-authoring-request.txt`.
 - Returned authoring text uses strict `ID / EN / DE / ---` blocks and is validated/imported with `scripts/data/import_product_knowledge_authoring.py`. The importer preserves IDs/semantic links, bumps localized plain-definition revisions and rejects the known UI-meta templates.
 
-## Immediate next owner-local sequence
+## Immediate next-thread sequence
 
-No new dependency install is required.
+No new dependency install or Runtime rebuild is required for the latest Studio-only changes.
 
-1. Run the complete authoring request through the dedicated knowledge-writing/research thread and save the returned UTF-8 text locally, for example as `.local-data\current\product-knowledge-v1-authored.txt`.
-2. Validate the returned batch without changing tracked data:
+1. Start the new thread by reading the canonical docs in the order at the top of this file, then inspect current `main` before changing code.
+2. Owner-local sync and launch:
 
 ```powershell
 Set-Location D:\prompt-engine
 git pull
-
-py scripts\data\import_product_knowledge_authoring.py `
-  --input ".local-data\current\product-knowledge-v1-authored.txt"
-```
-
-3. If validation passes, import it:
-
-```powershell
-py scripts\data\import_product_knowledge_authoring.py `
-  --input ".local-data\current\product-knowledge-v1-authored.txt" `
-  --write
-```
-
-4. Rebuild Runtime Pack because Product Knowledge content participates in Runtime identity:
-
-```powershell
-py scripts\data\export_runtime_v1.py `
-  --knowledge ".local-data\current\knowledge.sqlite" `
-  --out-dir ".local-data\current\runtime-v1"
-
 pnpm dev
 ```
 
-If an older interrupted Runtime export blocks the rebuild:
+3. Smoke the current Studio interaction baseline before adding new features:
+   - locked Style output is compact on mobile and visually matches unlocked themed Style density;
+   - Live Prompt has no inner vertical scrollbar and follows long desktop edits without hiding its footer permanently;
+   - only the active authoring facet is persistently highlighted in Style; actual mutations pulse only changed sections;
+   - clicking a deterministic prompt section jumps back to its explicit authoring facet;
+   - direct BPM accepts values above 220 while the slider remains 40–220;
+   - Explain hover/focus does not steal selectable clicks/taps;
+   - Undo/Redo works across MusicSpec edits but not across project boundaries;
+   - Genre/Instruments/Exclude search, quick views, spatial keyboard navigation and selected-state pools remain functional;
+   - project library create/rename/switch/duplicate/export/import/delete still works.
 
-```powershell
-py scripts\data\export_runtime_v1.py `
-  --knowledge ".local-data\current\knowledge.sqlite" `
-  --out-dir ".local-data\current\runtime-v1" `
-  --reset-incomplete
-```
+4. Fix only reproducible defects from that smoke. Do not reopen Database V1, Genre crosswalk, Instruments semantic review or Product Knowledge authoring.
+5. After interaction acceptance, continue targeted visual polish and causal motion. Avoid broad decorative animation until the owner accepts the current layout/interaction model.
 
 Reference Explain-mode smoke prompt from the owner:
 
@@ -524,4 +520,4 @@ Acceptance expectations:
 - missing explanation is a semantic-link gap to investigate, not permission for label-string inference;
 - the imported Product Knowledge definitions explain the musical meaning itself and contain no preset/control/rendering meta copy.
 
-After this acceptance pass, resume project naming/library/duplicate/import/export on the existing `ProjectStorage` contract, then continue Studio ergonomics. Broad motion polish remains later.
+Project naming/library/duplicate/import/export is already implemented on the existing `ProjectStorage` contract. After the smoke pass, continue only targeted Studio ergonomics/visual refinement and then restrained causal motion polish.

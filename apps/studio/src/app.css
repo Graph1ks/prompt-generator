@@ -1979,24 +1979,28 @@
 
     .preview .prompt-line {
       font-size: 12px;
-      line-height: 1.9;
-      margin-block-end: 9px;
+      line-height: 1.72;
+      margin: 0;
+      padding-block: 2px;
     }
 
-    .prompt-line-source,
+    .prompt-line-source {
+      min-block-size: 0;
+    }
+
     .exclude-source {
       min-block-size: 44px;
     }
 
     .prompt-source-cue {
-      inline-size: 28px;
-      block-size: 28px;
+      inline-size: 24px;
+      block-size: 24px;
       opacity: 0.72;
     }
 
     .prompt-source-cue .studio-icon {
-      inline-size: 14px;
-      block-size: 14px;
+      inline-size: 13px;
+      block-size: 13px;
     }
 
     .preview .prompt-area {

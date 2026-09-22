@@ -940,3 +940,16 @@ Large Genre, Instrument and Exclude result grids must remain efficient without a
 
 No separate roving-tabindex persistence or picker-specific keyboard state is introduced.
 
+## ADR-053 — Locked and unlocked Style output share one compact visual rhythm
+
+**Status:** accepted
+
+The deterministic locked Live Prompt and the themed manual Style editor represent the same text surface and should not diverge in vertical density.
+
+- Structured Style lines must not gain artificial inter-section spacing merely because they are clickable source links.
+- Mobile source-link affordances may be smaller than the general 44 px primary-control target when the link is a secondary reverse-navigation affordance inside dense read-only output.
+- The dense locked Style view should match the themed manual editor's font size/line-height closely enough that lock/unlock does not cause a large layout jump.
+- Exclude remains a separate output block and may retain a larger touch target.
+- This rule changes presentation only; compiler serialization/copy output remain plain text and unchanged.
+
+

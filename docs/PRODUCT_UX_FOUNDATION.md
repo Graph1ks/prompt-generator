@@ -203,7 +203,8 @@ When the user edits a facet:
 - multi-section changes may highlight more than one section only when more than one actual facet changed;
 - copy always returns clean plain text without UI markup;
 - the Live Prompt itself should expand with content rather than introduce a nested vertical scrollbar; normal page scroll is the primary desktop scroll path, while a bottom-aware sticky preview may follow the editor without trapping scroll;
-- manual prompt editing keeps the structured bracket/key/value visual theme even though the editable value remains plain text.
+- manual prompt editing keeps the structured bracket/key/value visual theme even though the editable value remains plain text;
+- locked deterministic Style output and unlocked manual Style editing should keep the same compact typographic rhythm; unlocking must not be the only way to get a dense readable prompt.
 
 Causality also works in reverse for deterministic output:
 
