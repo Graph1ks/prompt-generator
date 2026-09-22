@@ -233,6 +233,13 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Explanation mode uses icon-only global chrome, but linked controls and live-prompt origins now expose real Knowledge definitions when enabled.
 - Do not spend the next implementation slice on motion polish; prioritize production facet/pool functionality first.
 
+## Specialized selected-state rail carry-forward
+
+- Instruments and Exclude expose explicit current-state rails with per-item removal and pool-scoped clear-all actions.
+- Instrument clear-all resets only the Instruments facet; Exclude clear-all resets only the separate Exclude output state.
+- Imported/legacy Exclude entries without IDs can still be removed by their local list position, so malformed/older local state cannot trap the user in an undeletable chip.
+- These rails mirror the ordinary-facet current-state pattern and remain fully visible rather than moving selected state into menus.
+
 ## Production Instruments carry-forward
 
 - `@vgine/runtime-data` now parses/validates a lazy Instrument Library from `instruments.json` and `instrument-expressions.json`.
