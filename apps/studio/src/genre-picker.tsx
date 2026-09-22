@@ -514,6 +514,9 @@ export function GenrePicker({
                       loadKnowledge={loadKnowledge}
                       contextType="genre"
                       contextKey={option.id}
+                      onActivate={() => {
+                        if (!selectedRole) selectGenre(option);
+                      }}
                     />
                   </span>
                   <small>{familyLabel(option)}</small>
