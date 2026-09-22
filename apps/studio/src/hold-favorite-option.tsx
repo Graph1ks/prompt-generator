@@ -27,6 +27,7 @@ export function HoldFavoriteOption({
   onFavorite,
   onUnfavorite,
   onActivate,
+  children,
   className = "",
   ...props
 }: HoldFavoriteOptionProps) {
