@@ -7,6 +7,7 @@ import {
   loadRuntimeBootstrap,
   loadRuntimeInstrumentLibrary,
   loadRuntimeEditor,
+  loadRuntimeKnowledge,
   parseRuntimeManifest,
 } from "../dist/index.js";
 
@@ -25,7 +26,7 @@ function manifest() {
       "instruments.json": { sha256: hash, bytes: 1, counts: { families: 1, instruments: 1 } },
       "instrument-expressions.json": { sha256: hash, bytes: 1, counts: { expressions: 1 } },
       "editor.json": { sha256: hash, bytes: 1, counts: { parameters: 1, parameter_options: 1, statements: 1, exclude: 1 } },
-      "knowledge.json": { sha256: hash, bytes: 1, counts: { entries: 0 } },
+      "knowledge.json": { sha256: hash, bytes: 1, counts: { entries: 2 } },
       "search.json": { sha256: hash, bytes: 1, counts: { documents: 2 } },
     },
   };
@@ -190,6 +191,65 @@ function payloads() {
         },
       ],
     },
+    "knowledge.json": {
+      schema: "vgine-runtime-knowledge-v1",
+      entries: [
+        {
+          id: "knowledge:groove:swing",
+          entry_type: "concept",
+          canonical_label: "Swing",
+          canonical_slug: "swing",
+          difficulty: "beginner",
+          replaces_entry_id: null,
+          variants: [
+            {
+              surface: "swing",
+              normalized: "swing",
+              locale: "en",
+              match_kind: "exact",
+              match_priority: 100,
+              is_primary: true,
+            },
+          ],
+          definitions: [
+            {
+              locale: "en",
+              kind: "plain",
+              text: "A rhythmic feel that delays alternating subdivisions.",
+              revision: 1,
+            },
+          ],
+          context_definitions: [
+            {
+              locale: "en",
+              context_type: "section",
+              context_key: "groove",
+              text: "Controls how straight or lilted the groove feels.",
+              revision: 1,
+            },
+          ],
+          relations: [
+            {
+              relation_type: "related",
+              target_entry_id: "knowledge:groove:shuffle",
+              strength: 0.8,
+            },
+          ],
+        },
+        {
+          id: "knowledge:groove:shuffle",
+          entry_type: "concept",
+          canonical_label: "Shuffle",
+          canonical_slug: "shuffle",
+          difficulty: "intermediate",
+          replaces_entry_id: null,
+          variants: [],
+          definitions: [],
+          context_definitions: [],
+          relations: [],
+        },
+      ],
+    },
     "search.json": {
       schema: "vgine-runtime-search-documents-v1",
       documents: [
@@ -301,4 +361,23 @@ test("lazy-loads and validates the editor payload", async () => {
   assert.equal(editor.statements[0].output_text, "laid-back swung pocket");
   assert.equal(editor.statements[0].source_frequency, null);
   assert.equal(editor.exclude[0].output_text, "bright glossy pop synths");
+});
+
+
+test("lazy-loads and validates knowledge entries", async () => {
+  const data = payloads();
+  const bootstrap = await loadRuntimeBootstrap(reader(data));
+  const knowledge = await loadRuntimeKnowledge(reader(data), bootstrap.manifest);
+
+  assert.equal(knowledge.entries.length, 2);
+  assert.equal(knowledge.entries[0].canonical_label, "Swing");
+  assert.equal(
+    knowledge.entries[0].definitions[0].text,
+    "A rhythmic feel that delays alternating subdivisions.",
+  );
+  assert.equal(
+    knowledge.entries[0].context_definitions[0].context_key,
+    "groove",
+  );
+  assert.equal(knowledge.entries[0].relations[0].strength, 0.8);
 });
