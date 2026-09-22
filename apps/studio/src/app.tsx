@@ -772,6 +772,38 @@ export function App() {
     }
   }
 
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (
+        projectLibraryOpen ||
+        event.key !== "Enter" ||
+        (!event.ctrlKey && !event.metaKey) ||
+        event.altKey ||
+        event.shiftKey
+      ) {
+        return;
+      }
+
+      const copyable =
+        outputTab === "exclude"
+          ? Boolean(compilation?.excludeText)
+          : Boolean(effectiveStyleText) && manualBudgetValid;
+      if (!copyable) return;
+
+      event.preventDefault();
+      void copyPrompt();
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [
+    compilation?.excludeText,
+    effectiveStyleText,
+    manualBudgetValid,
+    outputTab,
+    projectLibraryOpen,
+  ]);
+
   const runtimeLabel =
     runtime.status === "ready"
       ? t("app.runtimeReady", {
@@ -904,6 +936,7 @@ export function App() {
             type="button"
             className="btn primary"
             disabled={!effectiveStyleText || !manualBudgetValid}
+            aria-keyshortcuts="Control+Enter Meta+Enter"
             onClick={copyPrompt}
           >
             <Icon name="copy" />
@@ -1279,6 +1312,7 @@ export function App() {
                     ? !effectiveStyleText || !manualBudgetValid
                     : !compilation?.excludeText
                 }
+                aria-keyshortcuts="Control+Enter Meta+Enter"
                 onClick={copyPrompt}
               >
                 <Icon name="copy" />
