@@ -103,20 +103,20 @@ export function ExcludePicker({
 
   const favoriteCount = useMemo(
     () =>
-      data?.exclude.reduce(
+      matchingEntries.reduce(
         (count, entry) => count + (preferences.isFavorite(entry.id) ? 1 : 0),
         0,
-      ) ?? 0,
-    [data, preferences],
+      ),
+    [matchingEntries, preferences],
   );
 
   const recentCount = useMemo(
     () =>
-      data?.exclude.reduce(
+      matchingEntries.reduce(
         (count, entry) => count + (preferences.lastUsedAt(entry.id) > 0 ? 1 : 0),
         0,
-      ) ?? 0,
-    [data, preferences],
+      ),
+    [matchingEntries, preferences],
   );
 
   const poolEntries = useMemo(() => {
