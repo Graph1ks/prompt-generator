@@ -292,3 +292,52 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Live-prompt Explain mode resolves selected MusicSpec IDs back to Runtime semantic origins and shows explanation chips outside the copied prompt.
 - Product ordinary facets use Product Knowledge links; Genre/Instrument explanation continues to use Database V1 links.
 - User custom text is not semantically inferred. Add an explicit semantic contract before making it explainable.
+
+## Immediate owner-local resume after PR #35
+
+No new dependency install is required.
+
+```powershell
+Set-Location D:\prompt-engine
+git pull
+
+py scripts\data\export_runtime_v1.py `
+  --knowledge ".local-data\current\knowledge.sqlite" `
+  --out-dir ".local-data\current\runtime-v1"
+
+pnpm dev
+```
+
+If an older interrupted Runtime export blocks the rebuild:
+
+```powershell
+py scripts\data\export_runtime_v1.py `
+  --knowledge ".local-data\current\knowledge.sqlite" `
+  --out-dir ".local-data\current\runtime-v1" `
+  --reset-incomplete
+```
+
+Reference Explain-mode smoke prompt from the owner:
+
+```text
+[Genre: Foundation: Boom Bap]
+[Era: 2000s studio production]
+[BPM: 110]
+[Instruments: electric bass, acoustic drums, electric piano, organ, electronic drums, acoustic guitar, electric guitar, bass, piano, drums, strings, keyboards]
+[Exciters: tambourine accents on selected backbeats, light shaker subdivision, occasional dry handclaps, sparse hand percussion, short noise sweeps at transitions]
+[Texture: airy ambient layer, dry intimate texture, warm analog texture, clean polished surface, filtered grainy texture]
+[Vocal: instrumental / no lead vocal, breathy airy lead vocal, lead vocal with stacked harmonies, gritty forward lead vocal, intimate close lead vocal]
+[Dynamics: steady controlled energy]
+[Space/Mix: wide upper layers, centered low end, narrow mono-era image, dry center, wide stereo image with controlled spacious depth]
+[Production: clean polished studio production, warm tape-like saturation]
+[Structure: short hook-led song form, gradual opening with a final peak]
+```
+
+Acceptance expectations:
+
+- Product sections above expose Explain-mode origins only through explicit Product Knowledge links;
+- Genre uses existing Genre Knowledge links;
+- Instruments use existing canonical instrument/concept Knowledge links;
+- free custom Advanced wording stays unexplained unless a future explicit semantic-assist contract links it;
+- explanation controls never alter or enter copied Style/Exclude text;
+- missing explanation is a semantic-link gap to investigate, not permission for label-string inference.
