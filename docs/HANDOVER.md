@@ -247,3 +247,12 @@ If a proposed implementation requires changing a Database V1 invariant, call tha
 - Finish has a separate Runtime-backed Exclude picker writing only to `MusicSpec.exclude[]`.
 - Favorite add/remove timings are 0.8 s / 1.0 s. Add progress uses theme semantic success green and an animated checkmark.
 - Expanded-pool return controls are left-edge, viewport/segment scoped.
+
+## Runtime Knowledge surfaces carry-forward
+
+- `knowledge.json` is a lazy manifest-validated/cached Studio payload, not part of first-paint bootstrap.
+- Explanation mode gates subtle Knowledge term affordances.
+- Knowledge terms require explicit Runtime Knowledge IDs; never string-match labels into semantic identity in product code.
+- Current first consumers: selected Genres, facet section labels, Advanced parameter headings and Instruments section heading.
+- Locale resolution is UI-locale -> English fallback; renderer language remains independent.
+- Favorite hold durations remain 0.8 s add / 1.0 s remove internally, but duration instructions are intentionally hidden from normal UI/hover copy.
