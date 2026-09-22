@@ -8,6 +8,7 @@ import {
 import {
   hasFacetSelection,
   removeFacetSelection,
+  resetMusicSpecFacets,
   setFacetSelection,
   type MusicSpec,
 } from "@vgine/music-spec";
@@ -319,23 +320,37 @@ export function InstrumentPicker({
       </div>
 
       {selectedExpressions.length > 0 && (
-        <div className="instrument-selected-list">
-          {selectedExpressions.map((expression) => (
+        <div className="selected-pool">
+          <div className="selected-pool-head">
+            <strong>{t("instrument.current")}</strong>
             <button
-              key={expression.id}
               type="button"
-              className="instrument-selected-chip"
-              title={t("instrument.remove", { label: expression.label })}
+              className="text-btn selected-pool-clear"
               onClick={() =>
-                onSpecChange(
-                  removeFacetSelection(spec, "instruments", expression.id),
-                )
+                onSpecChange(resetMusicSpecFacets(spec, ["instruments"]))
               }
             >
-              <span>{expression.label}</span>
-              <Icon name="close" />
+              {t("instrument.clearAll")}
             </button>
-          ))}
+          </div>
+          <div className="instrument-selected-list">
+            {selectedExpressions.map((expression) => (
+              <button
+                key={expression.id}
+                type="button"
+                className="instrument-selected-chip"
+                title={t("instrument.remove", { label: expression.label })}
+                onClick={() =>
+                  onSpecChange(
+                    removeFacetSelection(spec, "instruments", expression.id),
+                  )
+                }
+              >
+                <span>{expression.label}</span>
+                <Icon name="close" />
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
