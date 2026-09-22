@@ -2367,7 +2367,7 @@
   }
 
   @media (max-width: 430px) {
-    .top-actions > .icon-btn:first-of-type {
+    .top-actions > .new-project-action {
       display: none;
     }
 
@@ -3964,6 +3964,11 @@
       grid-row: 1;
     }
 
+    .project-action {
+      inline-size: 44px;
+      block-size: 44px;
+    }
+
     .project-title-field input {
       background: color-mix(in srgb, var(--studio-paper) 62%, var(--studio-card));
       border-color: var(--studio-line);
@@ -3977,12 +3982,12 @@
 
   @media (max-width: 430px) {
     .project-row-actions {
-      gap: 3px;
+      gap: 4px;
     }
 
     .project-action {
-      inline-size: 38px;
-      block-size: 38px;
+      inline-size: 44px;
+      block-size: 44px;
     }
 
     .project-row-icon {
