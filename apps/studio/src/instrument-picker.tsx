@@ -21,6 +21,7 @@ import { HoldFavoriteOption } from "./hold-favorite-option.js";
 import { Icon } from "./icons.js";
 import { KnowledgeTerm } from "./knowledge-term.js";
 import { useI18n } from "./i18n.js";
+import { PoolQuickView, type PoolQuickViewMode } from "./pool-quick-view.js";
 import { usePoolPreferences } from "./pool-preferences.js";
 import type { StudioRuntime } from "./runtime-client.js";
 import { useExpandedPoolSegment } from "./use-expanded-pool-segment.js";
@@ -63,6 +64,7 @@ export function InstrumentPicker({
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const [familyId, setFamilyId] = useState<string | null>(null);
+  const [quickView, setQuickView] = useState<PoolQuickViewMode>("all");
   const [showAllResults, setShowAllResults] = useState(false);
   const [renderLimit, setRenderLimit] = useState(EXPANDED_CHUNK);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -96,7 +98,7 @@ export function InstrumentPicker({
   useEffect(() => {
     setShowAllResults(false);
     setRenderLimit(EXPANDED_CHUNK);
-  }, [query, familyId]);
+  }, [query, familyId, quickView]);
 
   const data = library.status === "ready" ? library.value : null;
   const sectionKnowledgeEntryId =
@@ -217,17 +219,56 @@ export function InstrumentPicker({
     runtime.searchIndex,
   ]);
 
+  const favoriteCount = useMemo(
+    () =>
+      matchingExpressions.reduce(
+        (count, expression) =>
+          count + (preferences.isFavorite(expression.id) ? 1 : 0),
+        0,
+      ),
+    [matchingExpressions, preferences],
+  );
+
+  const recentCount = useMemo(
+    () =>
+      matchingExpressions.reduce(
+        (count, expression) =>
+          count + (preferences.lastUsedAt(expression.id) > 0 ? 1 : 0),
+        0,
+      ),
+    [matchingExpressions, preferences],
+  );
+
+  const poolExpressions = useMemo(() => {
+    if (quickView === "favorites") {
+      return matchingExpressions.filter((expression) =>
+        preferences.isFavorite(expression.id),
+      );
+    }
+    if (quickView === "recent") {
+      return matchingExpressions
+        .filter((expression) => preferences.lastUsedAt(expression.id) > 0)
+        .sort(
+          (a, b) =>
+            preferences.lastUsedAt(b.id) -
+              preferences.lastUsedAt(a.id) ||
+            a.label.localeCompare(b.label),
+        );
+    }
+    return matchingExpressions;
+  }, [matchingExpressions, preferences, quickView]);
+
   const visibleExpressions = showAllResults
-    ? matchingExpressions.slice(0, renderLimit)
-    : matchingExpressions.slice(0, COMPACT_RESULT_COUNT);
+    ? poolExpressions.slice(0, renderLimit)
+    : poolExpressions.slice(0, COMPACT_RESULT_COUNT);
 
   useEffect(() => {
     if (!showAllResults) return;
-    if (renderLimit >= matchingExpressions.length) return;
+    if (renderLimit >= poolExpressions.length) return;
 
     const target = sentinelRef.current;
     if (!target || typeof IntersectionObserver === "undefined") {
-      setRenderLimit(matchingExpressions.length);
+      setRenderLimit(poolExpressions.length);
       return;
     }
 
@@ -235,14 +276,14 @@ export function InstrumentPicker({
       (entries) => {
         if (!entries.some((entry) => entry.isIntersecting)) return;
         setRenderLimit((current) =>
-          Math.min(current + EXPANDED_CHUNK, matchingExpressions.length),
+          Math.min(current + EXPANDED_CHUNK, poolExpressions.length),
         );
       },
       { rootMargin: "800px 0px" },
     );
     observer.observe(target);
     return () => observer.disconnect();
-  }, [matchingExpressions.length, renderLimit, showAllResults]);
+  }, [poolExpressions.length, renderLimit, showAllResults]);
 
   function toggleExpression(expression: RuntimeInstrumentExpression) {
     if (hasFacetSelection(spec, "instruments", expression.id)) {
@@ -390,6 +431,13 @@ export function InstrumentPicker({
           )}
         </label>
 
+        <PoolQuickView
+          value={quickView}
+          favoriteCount={favoriteCount}
+          recentCount={recentCount}
+          onChange={setQuickView}
+        />
+
         <div className="family-chips instrument-family-chips">
           <button
             type="button"
@@ -413,7 +461,7 @@ export function InstrumentPicker({
         <div className="result-meta">
           <span>
             {t("instrument.results", {
-              count: matchingExpressions.length.toLocaleString(locale),
+              count: poolExpressions.length.toLocaleString(locale),
             })}
           </span>
         </div>
@@ -483,7 +531,7 @@ export function InstrumentPicker({
         <p className="empty-state">{t("instrument.noResults")}</p>
       )}
 
-      {matchingExpressions.length > COMPACT_RESULT_COUNT && !showAllResults && (
+      {poolExpressions.length > COMPACT_RESULT_COUNT && !showAllResults && (
         <button
           type="button"
           className="show-all-btn"
@@ -493,13 +541,13 @@ export function InstrumentPicker({
           }}
         >
           {t("instrument.showAll", {
-            count: matchingExpressions.length.toLocaleString(locale),
+            count: poolExpressions.length.toLocaleString(locale),
           })}
           <Icon name="arrow" />
         </button>
       )}
 
-      {showAllResults && matchingExpressions.length > COMPACT_RESULT_COUNT && (
+      {showAllResults && poolExpressions.length > COMPACT_RESULT_COUNT && (
         <button
           type="button"
           className="text-btn"
@@ -514,7 +562,7 @@ export function InstrumentPicker({
         </button>
       )}
 
-      {showAllResults && renderLimit < matchingExpressions.length && (
+      {showAllResults && renderLimit < poolExpressions.length && (
         <div ref={sentinelRef} className="instrument-load-sentinel" aria-hidden="true" />
       )}
 

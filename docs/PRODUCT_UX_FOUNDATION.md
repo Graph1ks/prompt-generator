@@ -80,7 +80,7 @@ Top level:
 
 - search field;
 - **all 24 Major Genres always visible** as browse/filter controls;
-- recent/favorite choices;
+- explicit All / Favorites / Recent quick views backed by local preference/usage data;
 - explicit compact / **Show all** result modes.
 
 Browsing a Major Genre reveals its options with the **pure Major Genre itself as the first selectable result**, followed by its subgenres. A subgenre that belongs to multiple Major Genres is represented **once** in a result set and displays all applicable Major Genre tags. The taxonomy is many-to-many and the UI must not duplicate an entity just because it has multiple parents.

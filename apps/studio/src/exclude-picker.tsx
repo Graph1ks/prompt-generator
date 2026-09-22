@@ -14,6 +14,7 @@ import { HoldFavoriteOption } from "./hold-favorite-option.js";
 import { Icon } from "./icons.js";
 import { KnowledgeTerm } from "./knowledge-term.js";
 import { useI18n } from "./i18n.js";
+import { PoolQuickView, type PoolQuickViewMode } from "./pool-quick-view.js";
 import { usePoolPreferences } from "./pool-preferences.js";
 import type { StudioRuntime } from "./runtime-client.js";
 import { useExpandedPoolSegment } from "./use-expanded-pool-segment.js";
@@ -43,6 +44,7 @@ export function ExcludePicker({
   const [editor, setEditor] = useState<EditorState>({ status: "loading" });
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
+  const [quickView, setQuickView] = useState<PoolQuickViewMode>("all");
   const [showAllResults, setShowAllResults] = useState(false);
   const searchInputRef = useSlashSearchShortcut();
   const preferences = usePoolPreferences("exclude");
@@ -73,7 +75,7 @@ export function ExcludePicker({
 
   useEffect(() => {
     setShowAllResults(false);
-  }, [query]);
+  }, [query, quickView]);
 
   const data = editor.status === "ready" ? editor.value : null;
 
@@ -99,9 +101,44 @@ export function ExcludePicker({
     return preferences.sortFavoriteFirst(source, (entry) => entry.id);
   }, [data, deferredQuery, preferences]);
 
+  const favoriteCount = useMemo(
+    () =>
+      matchingEntries.reduce(
+        (count, entry) => count + (preferences.isFavorite(entry.id) ? 1 : 0),
+        0,
+      ),
+    [matchingEntries, preferences],
+  );
+
+  const recentCount = useMemo(
+    () =>
+      matchingEntries.reduce(
+        (count, entry) => count + (preferences.lastUsedAt(entry.id) > 0 ? 1 : 0),
+        0,
+      ),
+    [matchingEntries, preferences],
+  );
+
+  const poolEntries = useMemo(() => {
+    if (quickView === "favorites") {
+      return matchingEntries.filter((entry) => preferences.isFavorite(entry.id));
+    }
+    if (quickView === "recent") {
+      return matchingEntries
+        .filter((entry) => preferences.lastUsedAt(entry.id) > 0)
+        .sort(
+          (a, b) =>
+            preferences.lastUsedAt(b.id) -
+              preferences.lastUsedAt(a.id) ||
+            a.label.localeCompare(b.label),
+        );
+    }
+    return matchingEntries;
+  }, [matchingEntries, preferences, quickView]);
+
   const visibleEntries = showAllResults
-    ? matchingEntries
-    : matchingEntries.slice(0, COMPACT_RESULT_COUNT);
+    ? poolEntries
+    : poolEntries.slice(0, COMPACT_RESULT_COUNT);
 
   function toggleEntry(entry: RuntimeExcludeEntry) {
     if (hasExcludeItem(spec, entry.id)) {
@@ -245,10 +282,17 @@ export function ExcludePicker({
           )}
         </label>
 
+        <PoolQuickView
+          value={quickView}
+          favoriteCount={favoriteCount}
+          recentCount={recentCount}
+          onChange={setQuickView}
+        />
+
         <div className="result-meta">
           <span>
             {t("exclude.results", {
-              count: matchingEntries.length.toLocaleString(locale),
+              count: poolEntries.length.toLocaleString(locale),
             })}
           </span>
         </div>
@@ -296,20 +340,20 @@ export function ExcludePicker({
         <p className="empty-state">{t("exclude.noResults")}</p>
       )}
 
-      {matchingEntries.length > COMPACT_RESULT_COUNT && !showAllResults && (
+      {poolEntries.length > COMPACT_RESULT_COUNT && !showAllResults && (
         <button
           type="button"
           className="show-all-btn"
           onClick={() => setShowAllResults(true)}
         >
           {t("exclude.showAll", {
-            count: matchingEntries.length.toLocaleString(locale),
+            count: poolEntries.length.toLocaleString(locale),
           })}
           <Icon name="arrow" />
         </button>
       )}
 
-      {showAllResults && matchingEntries.length > COMPACT_RESULT_COUNT && (
+      {showAllResults && poolEntries.length > COMPACT_RESULT_COUNT && (
         <button
           type="button"
           className="text-btn"

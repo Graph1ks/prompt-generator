@@ -56,6 +56,7 @@ function removeLegacyPool(poolId: string): void {
 export interface PoolPreferences {
   readonly isFavorite: (id: string) => boolean;
   readonly usageCount: (id: string) => number;
+  readonly lastUsedAt: (id: string) => number;
   readonly setFavorite: (id: string, favorite: boolean) => void;
   readonly recordUse: (id: string) => void;
   readonly sortFavoriteFirst: <T>(
@@ -122,6 +123,11 @@ export function usePoolPreferences(poolId: string): PoolPreferences {
     [items],
   );
 
+  const lastUsedAt = useCallback(
+    (id: string) => items[id]?.lastUsedAt ?? 0,
+    [items],
+  );
+
   const setFavorite = useCallback(
     (id: string, favorite: boolean) => {
       mutate(id, (current) => ({ ...current, favorite }));
@@ -168,10 +174,18 @@ export function usePoolPreferences(poolId: string): PoolPreferences {
     () => ({
       isFavorite,
       usageCount,
+      lastUsedAt,
       setFavorite,
       recordUse,
       sortFavoriteFirst,
     }),
-    [isFavorite, recordUse, setFavorite, sortFavoriteFirst, usageCount],
+    [
+      isFavorite,
+      lastUsedAt,
+      recordUse,
+      setFavorite,
+      sortFavoriteFirst,
+      usageCount,
+    ],
   );
 }
