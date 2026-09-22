@@ -435,8 +435,32 @@
     box-shadow: 0 2px 8px rgb(36 39 34 / 0.07);
   }
 
-  .step.done .num {
+  .step.filled .num {
     color: #6d8c38;
+  }
+
+  .step-label {
+    min-inline-size: 0;
+  }
+
+  .step-count {
+    min-inline-size: 20px;
+    block-size: 20px;
+    padding-inline: 5px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--studio-mint) 58%, var(--studio-card));
+    color: var(--studio-ink);
+    display: inline-grid;
+    place-items: center;
+    font-family: var(--vg-font-mono);
+    font-size: 8px;
+    font-weight: 780;
+    line-height: 1;
+  }
+
+  .step.active .step-count {
+    background: var(--studio-ink);
+    color: var(--studio-paper);
   }
 
   .stage {
@@ -1624,6 +1648,21 @@
 
     .step .num {
       display: none;
+    }
+
+    .step {
+      position: relative;
+      padding-inline: 7px;
+    }
+
+    .step-count {
+      position: absolute;
+      inset-block-start: 4px;
+      inset-inline-end: 4px;
+      min-inline-size: 17px;
+      block-size: 17px;
+      padding-inline: 4px;
+      font-size: 7px;
     }
 
     .section-head h2 {
