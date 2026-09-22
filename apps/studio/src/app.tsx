@@ -133,6 +133,30 @@ function isStudioSourceTarget(value: string): value is StudioSourceTarget {
   );
 }
 
+function changedSpecTargets(
+  current: MusicSpec,
+  next: MusicSpec,
+): readonly StudioSourceTarget[] {
+  const targets: StudioSourceTarget[] = [];
+
+  if (current.genre_influences !== next.genre_influences) {
+    targets.push("genre");
+  }
+
+  for (const facet of FACET_KEYS) {
+    if (facet === "genre") continue;
+    if (current.facets[facet] !== next.facets[facet]) {
+      targets.push(facet);
+    }
+  }
+
+  if (current.exclude !== next.exclude) {
+    targets.push("exclude");
+  }
+
+  return targets;
+}
+
 function isTextEntryTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
   return Boolean(
@@ -281,6 +305,9 @@ export function App() {
   const [assistOn, setAssistOn] = useState(true);
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
   const [previewPulse, setPreviewPulse] = useState(false);
+  const [recentPromptTargets, setRecentPromptTargets] = useState<
+    readonly StudioSourceTarget[]
+  >([]);
   const [sourceJumpTarget, setSourceJumpTarget] =
     useState<StudioSourceTarget | null>(null);
   const [activeFacetTarget, setActiveFacetTarget] =
@@ -300,6 +327,7 @@ export function App() {
   const projectCreatedAtRef = useRef(new Date().toISOString());
   const saveRevisionRef = useRef(0);
   const autosaveTimerRef = useRef<number | null>(null);
+  const promptTargetTimerRef = useRef<number | null>(null);
   const previewRef = useRef<HTMLElement | null>(null);
 
   const chapter =
@@ -583,6 +611,44 @@ export function App() {
     return () => window.clearTimeout(timer);
   }, [compilation?.styleText]);
 
+  useEffect(() => {
+    const preview = previewRef.current;
+    if (!preview) return;
+
+    let frame = 0;
+    const updateStickyTop = () => {
+      frame = 0;
+      if (window.innerWidth <= 760) {
+        preview.style.removeProperty("--preview-sticky-top");
+        return;
+      }
+
+      const previewHeight = preview.getBoundingClientRect().height;
+      const viewportGutter = 20;
+      const normalTop = 98;
+      const followTop = window.innerHeight - previewHeight - viewportGutter;
+      preview.style.setProperty(
+        "--preview-sticky-top",
+        Math.floor(Math.min(normalTop, followTop)) + "px",
+      );
+    };
+    const schedule = () => {
+      if (frame !== 0) return;
+      frame = window.requestAnimationFrame(updateStickyTop);
+    };
+
+    const observer = new ResizeObserver(schedule);
+    observer.observe(preview);
+    window.addEventListener("resize", schedule);
+    updateStickyTop();
+
+    return () => {
+      if (frame !== 0) window.cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("resize", schedule);
+    };
+  }, []);
+
   const selectedGenreLabels = useMemo(
     () =>
       spec.genre_influences.map(
@@ -734,10 +800,11 @@ export function App() {
   }, [chapterId, sourceJumpTarget]);
 
   useEffect(() => {
-    if (runtime.status !== "ready" || mobilePreviewOpen) {
+    if (runtime.status !== "ready") {
       setActiveFacetTarget(null);
       return;
     }
+    if (mobilePreviewOpen) return;
 
     const targets: StudioSourceTarget[] = [
       ...chapter.facets,
@@ -790,6 +857,29 @@ export function App() {
     };
   }, [chapter, mobilePreviewOpen, runtime.status]);
 
+  function markActiveFacetFromTarget(target: EventTarget | null) {
+    if (!(target instanceof HTMLElement)) return;
+    const facetElement = target.closest<HTMLElement>("[data-facet]");
+    const facet = facetElement?.dataset.facet;
+    if (facet && isStudioSourceTarget(facet)) {
+      setActiveFacetTarget(facet);
+    }
+  }
+
+  function pulsePromptTargets(current: MusicSpec, next: MusicSpec) {
+    const targets = changedSpecTargets(current, next);
+    if (targets.length === 0) return;
+
+    setRecentPromptTargets(targets);
+    if (promptTargetTimerRef.current !== null) {
+      window.clearTimeout(promptTargetTimerRef.current);
+    }
+    promptTargetTimerRef.current = window.setTimeout(() => {
+      promptTargetTimerRef.current = null;
+      setRecentPromptTargets([]);
+    }, 1050);
+  }
+
   function syncSpecHistoryState() {
     setSpecHistoryState({
       undo: undoSpecRef.current.length,
@@ -807,6 +897,7 @@ export function App() {
   function commitSpec(next: MusicSpec) {
     if (next === spec) return;
 
+    pulsePromptTargets(spec, next);
     const now = performance.now();
     const group = specHistoryGroup(spec, next);
     const last = lastSpecCommitRef.current;
@@ -839,6 +930,7 @@ export function App() {
       spec,
     ];
     lastSpecCommitRef.current = null;
+    pulsePromptTargets(spec, previous);
     setSpec(previous);
     syncSpecHistoryState();
   }
@@ -853,6 +945,7 @@ export function App() {
       spec,
     ];
     lastSpecCommitRef.current = null;
+    pulsePromptTargets(spec, next);
     setSpec(next);
     syncSpecHistoryState();
   }
@@ -867,6 +960,12 @@ export function App() {
 
   function applyProject(project: ProjectDocument) {
     clearSpecHistory();
+    if (promptTargetTimerRef.current !== null) {
+      window.clearTimeout(promptTargetTimerRef.current);
+      promptTargetTimerRef.current = null;
+    }
+    setRecentPromptTargets([]);
+    setActiveFacetTarget(null);
     setCurrentProjectId(project.id);
     setProjectTitle(project.title);
     setSpec(project.music_spec);
@@ -1599,7 +1698,15 @@ export function App() {
               )}
 
               {runtime.status === "ready" && (
-                <div className="studio-fields">
+                <div
+                  className="studio-fields"
+                  onFocusCapture={(event) =>
+                    markActiveFacetFromTarget(event.target)
+                  }
+                  onPointerDownCapture={(event) =>
+                    markActiveFacetFromTarget(event.target)
+                  }
+                >
                   {chapter.facets.map((facet) =>
                     facet === "genre" ? (
                       <GenrePicker
@@ -1786,7 +1893,19 @@ export function App() {
                     <div className="prompt-line-group" key={section.sectionKey}>
                       <button
                         type="button"
-                        className="prompt-line changed-line prompt-line-source"
+                        className="prompt-line prompt-line-source"
+                        data-active={
+                          activeFacetTarget === section.sectionKey || undefined
+                        }
+                        data-changed={
+                          recentPromptTargets.includes(section.sectionKey) ||
+                          undefined
+                        }
+                        aria-current={
+                          activeFacetTarget === section.sectionKey
+                            ? "location"
+                            : undefined
+                        }
                         aria-label={t("preview.editSection", {
                           section: section.label,
                         })}
@@ -1818,6 +1937,13 @@ export function App() {
                 <button
                   type="button"
                   className="exclude-text exclude-source"
+                  data-active={activeFacetTarget === "exclude" || undefined}
+                  data-changed={
+                    recentPromptTargets.includes("exclude") || undefined
+                  }
+                  aria-current={
+                    activeFacetTarget === "exclude" ? "location" : undefined
+                  }
                   aria-label={t("preview.editExclude")}
                   title={t("preview.editExclude")}
                   onClick={() => jumpToPromptSource("exclude")}

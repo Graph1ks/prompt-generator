@@ -330,6 +330,14 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - The facet-wide current-state rail remains the canonical overview; parameter summaries are a local scan aid derived from the same MusicSpec/Runtime IDs.
 - Custom Advanced wording remains full-width and nothing is hidden behind dropdown menus.
 
+## Live Prompt follow/highlight carry-forward
+
+- Desktop preview uses a dynamic sticky offset based on its rendered height. It never owns an inner vertical scrollbar: a tall preview moves upward with page scroll until its footer can sit inside the viewport, then follows while still being constrained by the layout column.
+- Structured prompt highlighting is keyed to explicit MusicSpec facet IDs. The current authoring facet is highlighted persistently; recent mutations pulse only changed facet sections.
+- Focus/pointer activity inside a `data-facet` editor updates the active prompt section immediately; scrollspy remains the fallback as the user moves through a long chapter.
+- Undo/redo computes changed prompt targets from immutable MusicSpec facet/genre/exclude references. Do not revert to `.preview.changed .changed-line`, which flashes every section indiscriminately.
+- Active deterministic prompt lines expose `aria-current="location"`. Manual overrides stay intentionally non-semantic.
+
 ## BPM + Live Prompt layout carry-forward
 
 - The Product Foundation BPM UI range remains 40–220 for slider/recommended ergonomics, but direct BPM entry intentionally accepts values beyond that range (for example 400) and writes the actual value into MusicSpec.

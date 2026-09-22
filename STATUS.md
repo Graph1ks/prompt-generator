@@ -202,6 +202,14 @@ Proceed in this order:
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
 
+## Bottom-aware Live Prompt follow + scoped causality highlight
+
+- Desktop Live Prompt follows long editor sessions again without reintroducing an inner scrollbar. Its sticky top offset is derived from the actual preview height: short previews stay near the top bar, tall previews scroll upward naturally until their footer reaches the viewport and then follow from there.
+- The preview remains bounded by the normal layout column, so reaching the page/editor end reveals the preview end/copy controls naturally.
+- Prompt causality highlighting is now section-scoped. Only the currently active authoring facet (scroll position, focus, or pointer interaction) receives the persistent prompt highlight; the whole Style output is no longer flashed.
+- MusicSpec mutations briefly pulse only the section(s) whose explicit facet state changed. Undo/redo use the same section diff, and Exclude changes only pulse Exclude.
+- Active prompt-source links expose `aria-current="location"` and keep their edit/source cue visible. Manual Style override remains non-semantic and therefore has no guessed per-section highlight.
+
 ## BPM direct entry + full-height Live Prompt
 
 - BPM keeps the ergonomic 40–220 slider/recommended range, but direct numeric entry is no longer clamped to 220. A user-entered value such as 400 BPM is preserved in MusicSpec/compiler output; direct BPM remains positive and step-snapped.
