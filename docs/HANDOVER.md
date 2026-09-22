@@ -1,8 +1,8 @@
-# Handover — Studio editor depth + Product Knowledge
+# Handover — Explain UX + Product Knowledge authoring
 
 **Last updated:** 2026-09-22  
-**Handoff target:** owner-local smoke validation of Product Knowledge + continued Studio/project UX  
-**Milestone:** Database V1 remains closed; all ordinary facets now have Product Editor controls, Easy/Advanced depth is coherent, user state is local IndexedDB data, and Explain mode resolves explicit semantic origins into the live prompt
+**Handoff target:** replace generated Product Knowledge prose, owner-local Runtime/Explain smoke, then Studio project-library UX  
+**Milestone:** Database V1 remains closed; Product Editor/Easy-Advanced/local persistence foundations stand; PR #37 moved Explain to selection-time singleton overlays and prepared the complete 400-entry bilingual Knowledge-authoring workflow
 
 ## Read this first
 
@@ -27,6 +27,15 @@ Read in this order:
 Owner workspace: `D:\prompt-engine`.
 
 Real Factory files, generated SQLite databases, reports, checkpoints and backups are local-only and must never be committed.
+
+## Current merged repository state
+
+- PR #37 merged CI-green as `dd503031ed546f0ed508763ebab2efe2269ec83c`.
+- Explain no longer renders chip rows beneath Live Prompt sections.
+- Explicitly linked terms are explainable before selection via dashed inline affordances.
+- One viewport-level explanation surface is active at a time; desktop supports hover/focus + pin, mobile uses tap + bottom sheet.
+- Compact favorite/preset hold feedback is no longer clipped inside the 38 px control.
+- Product Knowledge content remediation is intentionally separate: use the tracked 400-entry authoring request/importer before declaring the dictionary copy accepted.
 
 ## What has been completed
 
