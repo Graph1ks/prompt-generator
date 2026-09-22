@@ -11,6 +11,7 @@ import {
 import { isVgineTheme, type VgineTheme } from "@vgine/ui";
 
 import { GenrePicker } from "./genre-picker.js";
+import { InstrumentPicker } from "./instrument-picker.js";
 import { Icon } from "./icons.js";
 import { SUPPORTED_LOCALES, useI18n, type MessageKey } from "./i18n.js";
 import { loadStudioRuntime, type StudioRuntime } from "./runtime-client.js";
@@ -444,20 +445,27 @@ export function App() {
 
               {runtime.status === "ready" && chapter.id !== "dna" && (
                 <div className="placeholder-fields">
-                  {chapter.facets.map((facet) => (
-                    <section key={facet} className="field-card">
-                      <div className="field-label">
-                        <span>{facetLabel(facet)}</span>
-                        <span className="badge">MusicSpec</span>
-                      </div>
-                      <div className="placeholder-value">
-                        <strong>{facetSummary(facet)}</strong>
-                        <p>
-                          {t("placeholder.future")}
-                        </p>
-                      </div>
-                    </section>
-                  ))}
+                  {chapter.facets.map((facet) =>
+                    facet === "instruments" ? (
+                      <InstrumentPicker
+                        key={facet}
+                        runtime={runtime.value}
+                        spec={spec}
+                        onSpecChange={setSpec}
+                      />
+                    ) : (
+                      <section key={facet} className="field-card">
+                        <div className="field-label">
+                          <span>{facetLabel(facet)}</span>
+                          <span className="badge">MusicSpec</span>
+                        </div>
+                        <div className="placeholder-value">
+                          <strong>{facetSummary(facet)}</strong>
+                          <p>{t("placeholder.future")}</p>
+                        </div>
+                      </section>
+                    ),
+                  )}
                 </div>
               )}
 
