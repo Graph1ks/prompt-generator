@@ -202,6 +202,12 @@ Proceed in this order:
 - Definitions resolve active UI locale first with English fallback; prompt output remains English.
 - Unlinked labels stay plain text; no explanation is generated from label guesses.
 
+## Genre picker focus return
+
+- Genre role triggers now expose their expanded relationship to the inline picker and receive focus back after explicit close, Escape, successful selection, or clearing the active role.
+- Escape closes the open Genre picker without leaving keyboard focus stranded in content that is immediately removed from the DOM.
+- The existing desktop behavior still focuses/selects the search field on open; touch/mobile still avoids forced software-keyboard activation.
+
 ## Finish review + Genre picker focus
 
 - Finish no longer ends in a no-op `Done` button that requests the already-active Finish chapter.
