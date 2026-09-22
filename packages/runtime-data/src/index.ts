@@ -158,12 +158,20 @@ export interface RuntimeInstrumentLibrary {
   readonly expressions: RuntimeInstrumentExpressionsPayload;
 }
 
+export type RuntimeParameterValueType =
+  | "enum"
+  | "multi"
+  | "number"
+  | "text"
+  | "boolean"
+  | "relation";
+
 export interface RuntimeParameter {
   readonly id: string;
   readonly section_key: FacetKey;
   readonly label: string;
   readonly canonical_slug: string;
-  readonly value_type: string;
+  readonly value_type: RuntimeParameterValueType;
   readonly easy_visible: boolean;
   readonly advanced_visible: boolean;
   readonly allow_custom_text: boolean;
@@ -201,7 +209,7 @@ export interface RuntimeStatement {
   readonly output_text: string;
   readonly mode_scope: string;
   readonly statement_kind: string;
-  readonly source_frequency: number;
+  readonly source_frequency: number | null;
   readonly concepts: readonly RuntimeStatementConceptLink[];
   readonly options: readonly RuntimeStatementOptionLink[];
 }
@@ -316,6 +324,24 @@ function asNullableString(value: unknown, path: string): string | null {
 function asBoolean(value: unknown, path: string): boolean {
   if (typeof value !== "boolean") fail("invalid_boolean", path, `${path} must be boolean`);
   return value;
+}
+
+function asRuntimeParameterValueType(
+  value: unknown,
+  path: string,
+): RuntimeParameterValueType {
+  const text = asString(value, path);
+  if (
+    text !== "enum" &&
+    text !== "multi" &&
+    text !== "number" &&
+    text !== "text" &&
+    text !== "boolean" &&
+    text !== "relation"
+  ) {
+    fail("invalid_parameter_value_type", path, `unsupported value_type: ${text}`);
+  }
+  return text;
 }
 
 function asNumber(value: unknown, path: string): number {
@@ -628,7 +654,10 @@ export function parseRuntimeEditor(value: unknown): RuntimeEditorPayload {
         section_key: sectionKey,
         label: asString(row.label, `${path}.label`),
         canonical_slug: asString(row.canonical_slug, `${path}.canonical_slug`),
-        value_type: asString(row.value_type, `${path}.value_type`),
+        value_type: asRuntimeParameterValueType(
+          row.value_type,
+          `${path}.value_type`,
+        ),
         easy_visible: asBoolean(row.easy_visible, `${path}.easy_visible`),
         advanced_visible: asBoolean(row.advanced_visible, `${path}.advanced_visible`),
         allow_custom_text: asBoolean(row.allow_custom_text, `${path}.allow_custom_text`),
@@ -699,7 +728,10 @@ export function parseRuntimeEditor(value: unknown): RuntimeEditorPayload {
         output_text: asString(row.output_text, `${path}.output_text`),
         mode_scope: asString(row.mode_scope, `${path}.mode_scope`),
         statement_kind: asString(row.statement_kind, `${path}.statement_kind`),
-        source_frequency: asInteger(row.source_frequency, `${path}.source_frequency`),
+        source_frequency: asNullableInteger(
+          row.source_frequency,
+          `${path}.source_frequency`,
+        ),
         concepts,
         options: optionLinks,
       };
