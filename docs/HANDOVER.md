@@ -267,3 +267,14 @@ If a proposed implementation requires changing a Database V1 invariant, call tha
 - User preferences (Theme, locale, Favorites) stay outside ProjectDocument.
 - Restore validates MusicSpec before accepting persisted state.
 - Next persistence expansion should be project naming/library/import-export rather than replacing this adapter contract.
+
+## Product Editor Foundation v1 carry-forward
+
+- Do not interpret an empty DB `parameter`/`statement` population as intentional empty product UX. The tracked Editor Foundation is the minimum application catalog.
+- Foundation v1 lives at `data/product/editor-foundation-v1.json`; do not duplicate its options in React components.
+- Runtime exporter fingerprints/merges it into `editor.json` and validates complete facet coverage.
+- Merge precedence: Foundation -> reviewed/approved DB records by stable ID.
+- Current coverage: 49 parameters / 262 options / 79 Easy statements / 10 Exclude entries across all ordinary facets.
+- Genre and Instruments remain specialized Runtime pickers and are not re-curated by this phase.
+- DNA must render Genre, Era and Key/Mode together.
+- Local developers must re-run Runtime export after pulling a Foundation change because `knowledge.sqlite` may be unchanged while the Runtime editor payload has changed.
