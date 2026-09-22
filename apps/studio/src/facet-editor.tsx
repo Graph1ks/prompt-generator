@@ -14,6 +14,7 @@ import type {
 } from "@vgine/runtime-data";
 
 import { Icon } from "./icons.js";
+import { KnowledgeTerm } from "./knowledge-term.js";
 import { useI18n } from "./i18n.js";
 import type { StudioRuntime } from "./runtime-client.js";
 
@@ -32,6 +33,7 @@ export interface FacetEditorProps {
   readonly runtime: StudioRuntime;
   readonly spec: MusicSpec;
   readonly onSpecChange: (spec: MusicSpec) => void;
+  readonly assistOn: boolean;
 }
 
 export function FacetEditor({
@@ -40,6 +42,7 @@ export function FacetEditor({
   runtime,
   spec,
   onSpecChange,
+  assistOn,
 }: FacetEditorProps) {
   const { t } = useI18n();
   const [editor, setEditor] = useState<EditorState>({ status: "loading" });
@@ -68,6 +71,9 @@ export function FacetEditor({
   }, [runtime]);
 
   const data = editor.status === "ready" ? editor.value : null;
+  const sectionKnowledgeEntryId =
+    runtime.bootstrap.core.sections.find((section) => section.key === facet)
+      ?.knowledge_entry_id ?? null;
 
   const statements = useMemo(
     () =>
@@ -192,7 +198,16 @@ export function FacetEditor({
       <div className="facet-editor-head">
         <div>
           <div className="field-label">
-            <span>{label}</span>
+            <span>
+              <KnowledgeTerm
+                entryId={sectionKnowledgeEntryId}
+                label={label}
+                enabled={assistOn}
+                loadKnowledge={runtime.loadKnowledge}
+                contextType="section"
+                contextKey={facet}
+              />
+            </span>
             <span className="badge">MusicSpec</span>
           </div>
           <p>
@@ -291,7 +306,16 @@ export function FacetEditor({
               return (
                 <section key={parameter.id} className="parameter-group">
                   <div className="parameter-head">
-                    <strong>{parameter.label}</strong>
+                    <strong>
+                      <KnowledgeTerm
+                        entryId={parameter.knowledge_entry_id}
+                        label={parameter.label}
+                        enabled={assistOn}
+                        loadKnowledge={runtime.loadKnowledge}
+                        contextType="parameter"
+                        contextKey={parameter.id}
+                      />
+                    </strong>
                     <small>{parameter.value_type}</small>
                   </div>
 
