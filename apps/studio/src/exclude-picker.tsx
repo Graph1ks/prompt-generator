@@ -12,6 +12,7 @@ import type {
 
 import { HoldFavoriteOption } from "./hold-favorite-option.js";
 import { Icon } from "./icons.js";
+import { KnowledgeTerm } from "./knowledge-term.js";
 import { useI18n } from "./i18n.js";
 import { usePoolPreferences } from "./pool-preferences.js";
 import type { StudioRuntime } from "./runtime-client.js";
@@ -28,12 +29,14 @@ export interface ExcludePickerProps {
   readonly runtime: StudioRuntime;
   readonly spec: MusicSpec;
   readonly onSpecChange: (spec: MusicSpec) => void;
+  readonly assistOn: boolean;
 }
 
 export function ExcludePicker({
   runtime,
   spec,
   onSpecChange,
+  assistOn,
 }: ExcludePickerProps) {
   const { locale, t } = useI18n();
   const [editor, setEditor] = useState<EditorState>({ status: "loading" });
@@ -226,11 +229,21 @@ export function ExcludePicker({
               className={selected ? "exclude-result picked" : "exclude-result"}
               favorite={preferences.isFavorite(entry.id)}
               usageCount={preferences.usageCount(entry.id)}
+              activationLabel={entry.label}
               onFavorite={() => preferences.setFavorite(entry.id, true)}
               onUnfavorite={() => preferences.setFavorite(entry.id, false)}
               onActivate={() => toggleEntry(entry)}
             >
-              <span>{entry.label}</span>
+              <span>
+                <KnowledgeTerm
+                  entryId={entry.knowledge_entry_id}
+                  label={entry.label}
+                  enabled={assistOn}
+                  loadKnowledge={runtime.loadKnowledge}
+                  contextType="exclude"
+                  contextKey={entry.id}
+                />
+              </span>
               <small>{entry.output_text}</small>
               {selected && (
                 <span className="instrument-picked" aria-hidden="true">
