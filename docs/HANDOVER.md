@@ -227,3 +227,13 @@ If a proposed implementation requires changing a Database V1 invariant, call tha
 - Expanded-list return controls are viewport/segment scoped and must not remain visible outside their active expanded segment.
 - Explanation mode currently uses icon-only chrome.
 - Do not spend the next implementation slice on motion polish; prioritize production facet/pool functionality first.
+
+## Production Instruments carry-forward
+
+- `@vgine/runtime-data` now parses/validates a lazy Instrument Library from `instruments.json` and `instrument-expressions.json`.
+- Studio runtime caches that lazy load; Palette triggers it only when the Instruments control mounts.
+- The existing Search v1 index supplies `instrument_expression` IDs; no additional search kernel exists.
+- MusicSpec generic facet-selection helpers add/remove stable expression selections.
+- Instrument selections use `kind: option`, `id: <instrument_expression id>`, `value: <preserved output_text>`, `origin: user`.
+- Palette has production search, family filters, selected chips, favorites/usage ordering, explicit Show All, automatic scroll chunking and segment-scoped return-to-start behavior.
+- Database V1 semantics/identity curation remain closed. Do not collapse or rewrite source expressions in application code.
