@@ -217,3 +217,13 @@ If a proposed implementation requires changing a Database V1 invariant, call tha
 - Page reset clears only the current chapter's state; new prompt reset clears the complete prompt session but not user favorites.
 - The final Style output may be manually overridden. The override never mutates MusicSpec; restoring the original returns to the current deterministic compiler result.
 - `docs/VGINE_LEXICON_ENTRY.md` documents the verified product-name history. The knowledge compiler seeds the V'gine entry reproducibly; rebuild owner-local knowledge/runtime data to surface it.
+
+## Studio i18n / Genre picker v2 carry-forward
+
+- UI locale and renderer language are separate. German/English UI is implemented via typed catalogs; Suno output remains English.
+- All 24 Major Genres stay visible in the Genre picker.
+- Major Genre Runtime IDs are valid MusicSpec Genre influence IDs; compiler knowledge resolves them alongside subgenres.
+- Browsing a Major starts with the pure Major itself, then subgenres.
+- Expanded-list return controls are viewport/segment scoped and must not remain visible outside their active expanded segment.
+- Explanation mode currently uses icon-only chrome.
+- Do not spend the next implementation slice on motion polish; prioritize production facet/pool functionality first.
