@@ -1380,6 +1380,12 @@
     color: color-mix(in srgb, var(--studio-acid) 72%, #edf0e7);
   }
 
+  .prompt-line-source[data-active="true"] .prompt-source-cue,
+  .exclude-source[data-active="true"] .prompt-source-cue {
+    color: var(--studio-acid);
+    opacity: 0.72;
+  }
+
   .prompt-line-source:hover,
   .prompt-line-source:focus-visible,
   .exclude-source:hover,
