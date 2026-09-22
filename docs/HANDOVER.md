@@ -268,6 +268,13 @@ Then continue runtime/application UX while preserving the V1 DB contract. If a p
 - Locale resolution is UI-locale -> English fallback; renderer language remains independent.
 - Favorite hold durations remain 0.8 s add / 1.0 s remove internally, but duration instructions are intentionally hidden from normal UI/hover copy.
 
+## Finish review / Genre picker focus carry-forward
+
+- The Finish footer action now reviews output instead of re-requesting the current Finish chapter.
+- Desktop review moves focus to the Live Prompt and gives it a short causal focus ring; mobile review opens the existing Live Prompt surface.
+- Review defaults to Style and uses Exclude only when Style is empty but Exclude exists.
+- Opening a Genre role locates the picker and, on desktop/fine pointer, focuses/selects its search field. Touch/mobile deliberately avoids forced software-keyboard invocation.
+
 ## Facet rail scrollspy carry-forward
 
 - The direct facet rail highlights the currently reached authoring region using `aria-current="location"` plus a restrained visual state.
