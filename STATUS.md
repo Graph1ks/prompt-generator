@@ -194,6 +194,7 @@ Proceed in this order:
 - State labels come from the same Runtime statement/option/parameter records that created the selection; no prompt-string parsing or semantic guessing was added.
 - Mobile chips and clear controls use practical touch targets and wrap rather than introducing a nested horizontal scroller.
 - Explain mode remains directly toggleable on narrow/mobile screens through the persistent bottom dock instead of disappearing when the top bar becomes constrained.
+- The visible `Ctrl / ⌘ + Enter` copy affordance is now a real global Studio shortcut for the currently active Style/Exclude output; it is suppressed while the project library is open and respects output/budget validity.
 
 ## Project library v1
 
